@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aloja - Alquila fácil, viaja feliz</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Solo agrego esto para el botón "Buscar" */
+      .btn-header {
+        background: none;
+        border: none;
+        color: white;
+        font-weight: bold;
+        padding: 8px 12px;
+        text-decoration: none;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .btn-header:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Encabezado -->
+    <header>
+      <a href="index.html" class="logo">
+        <span class="icono-maleta">🧳</span> Aloja.com.ar</a>
+
+      </div>
+      <nav>
+        <select id="idioma" style="margin-right: 15px">
+          <option value="es">Español</option>
+          <option value="en">English</option>
+          <option value="pt">Português</option>
+        </select>
+        <select id="moneda">
+          <option value="ars">ARS</option>
+          <option value="usd">USD</option>
+          <option value="eur">EUR</option>
+        </select>
+        <div class="cta-buttons"></div>
+        <a href="login.html">Iniciar sesión</a>
+        <a href="register.html">Hazte una cuenta</a>
+        <a href="alojamiento.html">Registra tu alojamiento</a>
+        <a href="ayuda.html">Ayuda</a>
+      </nav>
+
+    </header>
+
+    <!-- Eslogan -->
+    <section class="hero">
+      <h2>Alquila fácil, viaja feliz</h2>
+      <p>Las mejores opciones para tu próxima estadía.</p>
+    </section>
+
+    <!-- Buscador -->
+    <section class="search-box">
+      <input type="text" id="destino" placeholder="Destino" />
+      <input type="date" id="entrada" name="fecha-entrada" />
+      <input type="date" id="salida" name="fecha-salida" />
+
+      <select id="adultos">
+        <option value="1">1 adulto</option>
+        <option value="2">2 adultos</option>
+        <option value="3">3 adultos</option>
+        <option value="4">4 adultos</option>
+        <option value="5">5 adultos</option>
+        <option value="6">6 adultos</option>
+        <option value="7">7 adultos</option>
+        <option value="8">8 adultos</option>
+        <option value="9">9 adultos</option>
+        <option value="10">10 adultos</option>
+      </select>
+
+      <input type="number" id="ninos" placeholder="Cantidad de niños" min="0" />
+      <div id="edades-ninos" style="margin-top: 10px"></div>
+
+      <!-- BOTÓN MODIFICADO -->
+      <a href="#" class="btn-header" onclick="buscar()">Buscar</a>
+    </section>
+
+    <!-- Script original sin tocar -->
+    <script>
+      const fechaHoy = new Date().toISOString().split("T")[0];
+      const entradaInput = document.getElementById("entrada");
+      const salidaInput = document.getElementById("salida");
+
+      entradaInput.min = fechaHoy;
+      salidaInput.min = fechaHoy;
+
+      entradaInput.addEventListener("change", function () {
+        salidaInput.min = this.value;
+      });
+
+      const inputNinos = document.getElementById("ninos");
+      const containerEdades = document.getElementById("edades-ninos");
+
+      inputNinos.addEventListener("input", () => {
+        const cantidad = parseInt(inputNinos.value) || 0;
+        containerEdades.innerHTML = "";
+        for (let i = 1; i <= cantidad; i++) {
+          const inputEdad = document.createElement("input");
+          inputEdad.type = "number";
+          inputEdad.placeholder = `Edad del niño ${i}`;
+          inputEdad.min = 0;
+          inputEdad.max = 17;
+          inputEdad.required = true;
+          inputEdad.name = `edad-nino-${i}`;
+          inputEdad.style.marginRight = "5px";
+          inputEdad.style.marginTop = "5px";
+          containerEdades.appendChild(inputEdad);
+        }
+      });
+
+      function buscar() {
+        const destino = document.getElementById("destino").value;
+        const entrada = entradaInput.value;
+        const salida = salidaInput.value;
+        const adultos = document.getElementById("adultos").value;
+        const ninos = inputNinos.value;
+
+        if (!destino || !entrada || !salida) {
+          alert("Por favor completa destino y fechas.");
+          return;
+        }
+
+        localStorage.setItem("destino", destino);
+        localStorage.setItem("entrada", entrada);
+        localStorage.setItem("salida", salida);
+        localStorage.setItem("adultos", adultos);
+        localStorage.setItem("ninos", ninos);
+
+        const edades = [];
+        const inputsEdad = document.querySelectorAll("#edades-ninos input");
+        inputsEdad.forEach((input) => edades.push(input.value));
+        localStorage.setItem("edades_ninos", JSON.stringify(edades));
+
+        window.location.href = "resultados.html";
+      }
+
+      const traducciones = {
+        es: {
+          slogan: "Alquila fácil, viaja feliz",
+          subtitulo: "Las mejores opciones para tu próxima estadía.",
+          destino: "Destino",
+          buscar: "Buscar",
+          iniciar: "Iniciar sesión",
+          registro: "Hazte una cuenta",
+          ninos: "Cantidad de niños",
+          adultos: "adulto",
+        },
+        en: {
+          slogan: "Rent easy, travel happy",
+          subtitulo: "The best options for your next stay.",
+          destino: "Destination",
+          buscar: "Search",
+          iniciar: "Sign in",
+          registro: "Create account",
+          ninos: "Number of children",
+          adultos: "adult",
+        },
+        pt: {
+          slogan: "Alugue fácil, viaje feliz",
+          subtitulo: "As melhores opções para sua próxima estadia.",
+          destino: "Destino",
+          buscar: "Buscar",
+          iniciar: "Entrar",
+          registro: "Criar conta",
+          ninos: "Número de crianças",
+          adultos: "adulto",
+        },
+      };
+
+      const idiomaSelect = document.getElementById("idioma");
+
+      function aplicarTraduccion(idioma) {
+        const t = traducciones[idioma];
+        document.querySelector(".hero h2").textContent = t.slogan;
+        document.querySelector(".hero p").textContent = t.subtitulo;
+        document.getElementById("destino").placeholder = t.destino;
+        document.querySelector(".btn-header").textContent = t.buscar;
+        document.querySelector('nav a[href="login.html"]').textContent =
+          t.iniciar;
+        document.querySelector('nav a[href="registro.html"]').textContent =
+          t.registro;
+        document.getElementById("ninos").placeholder = t.ninos;
+
+        const selectAdultos = document.getElementById("adultos");
+        for (let i = 0; i < selectAdultos.options.length; i++) {
+          const n = i + 1;
+          selectAdultos.options[i].text =
+            `${n} ${t.adultos}${n > 1 ? "s" : ""}`;
+        }
+      }
+
+      idiomaSelect.addEventListener("change", () => {
+        const idioma = idiomaSelect.value;
+        localStorage.setItem("idioma", idioma);
+        aplicarTraduccion(idioma);
+      });
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const idiomaGuardado = localStorage.getItem("idioma") || "es";
+        idiomaSelect.value = idiomaGuardado;
+        aplicarTraduccion(idiomaGuardado);
+      });
+    </script>
+  </body>
+</html>

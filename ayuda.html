@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ayuda - Aloja</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <h1><a href="index.html" style="color: white; text-decoration: none;">Aloja</a></h1>
+    </div>
+  </header>
+
+  <main class="ayuda">
+    <div class="alerta-seguridad" id="alertaSeguridad">
+      <button class="cerrar-alerta" onclick="cerrarAlerta()">×</button>
+      <strong>⚠️ Garantiza tu seguridad online</strong><br />
+      Por motivos de seguridad, nunca compartas tus datos personales ni los de tu tarjeta de crédito por teléfono, email o chat.
+    </div>
+
+
+    <h2>Hola, esta es la página de Ayuda</h2>
+    <p>Estamos disponibles 24 h al día</p>
+    <button class="boton-ayuda">Recibir ayuda con una reserva</button>
+
+    <div class="tabs-ayuda">
+      <button class="tab-activa">🏨 Alojamiento</button>
+      <button>🚗 Alquiler de coches</button>
+      <button>✈️ Vuelos</button>
+      <button>🚕 Taxis aeropuerto</button>
+      <button>🛡️ Seguro</button>
+      <button>➕ Otro</button>
+    </div>
+
+    <div class="faq">
+      <a href="cancelaciones.html" class="faq-item enlace-item">
+        Cancelaciones
+      </a>
+      <a href="pago.html" class="faq-item enlace-item">
+        Pago
+      </a>
+      <a href="datos-reserva.html" class="faq-item enlace-item">Datos de la reserva</a>
+      <a href="comunicaciones.html" class="faq-item enlace-item">Comunicaciones</a>
+      <a href="estilo-hospedaje.html" class="faq-item enlace-item">Estilos de hospedaje</a>
+
+      <div class="faq-item">Precios</div>
+      <div class="faq-item">Tarjetas de crédito</div>
+      <div class="faq-item">Condiciones del alojamiento</div>
+      <div class="faq-item">Instalaciones y servicios</div>
+      <div class="faq-item">Seguridad y sensibilización</div>
+    </div>
+  
+
+  </main>
+  <script>
+    function cerrarAlerta() {
+      const alerta = document.getElementById('alertaSeguridad');
+      alerta.style.display = 'none';
+    }
+  </script>
+  <script>
+    function toggleRespuesta(elemento) {
+      const respuesta = elemento.querySelector(".faq-respuesta");
+      const estaVisible = respuesta.style.display === "block";
+
+      // Oculta todas las respuestas activas
+      document.querySelectorAll(".faq-respuesta").forEach(res => res.style.display = "none");
+
+      // Muestra si no estaba visible
+      if (!estaVisible) {
+        respuesta.style.display = "block";
+      }
+    }
+  </script>
+
+
+
+</body>
+</html>
+

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Resultados de búsqueda - Aloja</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Encabezado -->
+    <header>
+      <div class="logo">
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/201/201623.png"
+          alt="Logo"
+        />
+        <h1>
+          <a href="index.html" style="color: white; text-decoration: none"
+            >Aloja.com.ar</a
+          >
+        </h1>
+      </div>
+    </header>
+
+    <!-- Filtros -->
+    <section class="hero">
+      <p id="filtros" style="font-weight: bold"></p>
+      <h2 id="titulo-resultados">Resultados encontrados</h2>
+    </section>
+
+    <!-- Lista de alojamientos -->
+    <section class="resultados-listado">
+      <div class="alojamiento-card">
+        <img
+          src="https://images.unsplash.com/photo-1600047500631-1fe4ac65c7dd?auto=format&fit=crop&w=400&q=80"
+          alt="Hotel 1"
+        />
+        <div class="info">
+          <h3>Hotel Central Mendoza</h3>
+          <p>📍 Mendoza, Argentina</p>
+          <p><strong>Precio:</strong> $30.000 por noche</p>
+          <a href="detalle.html">Ver más</a>
+        </div>
+      </div>
+
+      <div class="alojamiento-card">
+        <img
+          src="https://images.unsplash.com/photo-1582719478185-2c4f79975df5?auto=format&fit=crop&w=400&q=80"
+          alt="Hotel 2"
+        />
+        <div class="info">
+          <h3>Hostel Andes</h3>
+          <p>📍 Mendoza, Argentina</p>
+          <p><strong>Precio:</strong> $18.000 por noche</p>
+          <a href="detalle.html">Ver más</a>
+        </div>
+      </div>
+
+      <div class="alojamiento-card">
+        <img
+          src="https://images.unsplash.com/photo-1576675784080-5e5b28f3c9c8?auto=format&fit=crop&w=400&q=80"
+          alt="Hotel 3"
+        />
+        <div class="info">
+          <h3>Apart Mendoza Suites</h3>
+          <p>📍 Mendoza, Argentina</p>
+          <p><strong>Precio:</strong> $24.000 por noche</p>
+          <a href="detalle.html">Ver más</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Script para mostrar filtros -->
+    <script>
+      const destino = localStorage.getItem("destino") || "Destino";
+      const entrada = localStorage.getItem("entrada") || "";
+      const salida = localStorage.getItem("salida") || "";
+      const adultos = localStorage.getItem("adultos") || "1";
+      const ninos = localStorage.getItem("ninos") || "0";
+
+      document.getElementById("filtros").innerText =
+        `🧭 Buscando en: ${destino} | 📅 Fechas: ${entrada} a ${salida} | 👤 Adultos: ${adultos} | 👶 Niños: ${ninos}`;
+
+      document.getElementById("titulo-resultados").innerText =
+        `Resultados en ${destino}`;
+    </script>
+  </body>
+</html>
