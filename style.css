@@ -275,3 +275,86 @@ nav a:hover {
   color: #555;
   display: none;
 }
+/* ===== CONTENEDOR CENTRAL ===== */
+.contenedor {
+  width: 90%;
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* ===== SECCIONES TIPO LANDING ===== */
+.seccion {
+  padding: 60px 0;
+}
+
+.seccion-blanca {
+  background: white;
+}
+
+.seccion-transparente {
+  background: transparent;
+}
+
+/* ===== BLOQUE HERO PROFESIONAL ===== */
+.hero-pro {
+  text-align: center;
+  padding: 50px 20px 30px;
+  color: #1b167f;
+}
+
+.hero-pro h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.hero-pro p {
+  font-size: 18px;
+  margin-bottom: 25px;
+}
+
+/* ===== BOTÓN PRINCIPAL ===== */
+.boton-principal {
+  background-color: #1b167f;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+}
+
+/* ===== TARJETAS DE BENEFICIOS ===== */
+.grid-beneficios {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.card-beneficio {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  flex: 1;
+  min-width: 250px;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* ===== FORMULARIO PROFESIONAL ===== */
+.formulario-pro {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  margin: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.formulario-pro input,
+.formulario-pro button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+}
