@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro recibido - TuAloja</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      .gracias-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background: #67c7f7;
+        padding: 40px 20px;
+      }
+
+      .gracias-box {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        max-width: 520px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      }
+
+      .gracias-box h1 {
+        color: #0a6ea8;
+        margin-bottom: 15px;
+      }
+
+      .gracias-box p {
+        color: #444;
+        line-height: 1.6;
+        margin-bottom: 25px;
+      }
+
+      .boton-volver {
+        display: inline-block;
+        background: #0a6ea8;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .boton-volver:hover {
+        background: #095c8c;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div class="gracias-container">
+      <div class="gracias-box">
+        <h1>¡Registro recibido!</h1>
+        <p>
+          Gracias por registrar tu alojamiento en <strong>TuAloja</strong>.
+          Nuestro equipo revisará la información y te contactará pronto.
+        </p>
+
+        <p>
+          Estás un paso más cerca de recibir reservas y ganar más con tu propiedad.
+        </p>
+
+        <a href="index.html" class="boton-volver">Volver al inicio</a>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
+    </footer>
+
+  </body>
+</html>
