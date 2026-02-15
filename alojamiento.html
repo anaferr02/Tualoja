@@ -7,64 +7,64 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+
     <section class="seccion seccion-transparente">
-  <div class="contenedor hero-pro">
-    <h1>Da de alta tu alojamiento en TuAloja</h1>
-    <p>Ganá más dinero, más rápido y llegá a nuevos huéspedes.</p>
-    <a href="#registro" class="boton-principal">Registrar alojamiento</a>
-  </div>
-</section>
+      <div class="contenedor hero-pro">
+        <h1>Da de alta tu alojamiento en TuAloja</h1>
+        <p>Ganá más dinero, más rápido y llegá a nuevos huéspedes.</p>
+        <a href="#registro" class="boton-principal">Registrar alojamiento</a>
+      </div>
+    </section>
 
-<section class="seccion seccion-blanca">
-  <div class="contenedor grid-beneficios">
+    <section class="seccion seccion-blanca">
+      <div class="contenedor grid-beneficios">
 
-    <div class="card-beneficio">
-      <h3>Pagos sin complicaciones</h3>
-      <p>Nos encargamos del proceso de cobro.</p>
-    </div>
+        <div class="card-beneficio">
+          <h3>Pagos sin complicaciones</h3>
+          <p>Nos encargamos del proceso de cobro.</p>
+        </div>
 
-    <div class="card-beneficio">
-      <h3>Mayor visibilidad</h3>
-      <p>Tu propiedad aparece ante miles de usuarios.</p>
-    </div>
+        <div class="card-beneficio">
+          <h3>Mayor visibilidad</h3>
+          <p>Tu propiedad aparece ante miles de usuarios.</p>
+        </div>
 
-    <div class="card-beneficio">
-      <h3>Sin costos fijos</h3>
-      <p>Solo pagás comisión por reservas confirmadas.</p>
-    </div>
+        <div class="card-beneficio">
+          <h3>Sin costos fijos</h3>
+          <p>Solo pagás comisión por reservas confirmadas.</p>
+        </div>
 
-  </div>
-</section>
+      </div>
+    </section>
 
-    <section class="ayuda">
-  <h2>Registrá tu alojamiento</h2>
+    <!-- FORMULARIO CORREGIDO -->
+    <section id="registro" class="ayuda">
+      <h2>Registrá tu alojamiento</h2>
 
-  <form action="https://formsubmit.co/anafer02@hotmail.com" method="POST">
+      <form action="https://formsubmit.co/anafer02@hotmail.com" method="POST">
 
-    <input type="text" name="nombre" placeholder="Tu nombre" required>
+        <!-- Configuración -->
+        <input type="hidden" name="_subject" value="Nuevo alojamiento registrado en TuAloja">
+        <input type="hidden" name="_captcha" value="false">
 
-    <input type="email" name="email" placeholder="Tu correo electrónico" required>
+        <!-- Campos -->
+        <input type="text" name="nombre" placeholder="Tu nombre" required>
+        <input type="email" name="email" placeholder="Tu correo electrónico" required>
+        <input type="text" name="direccion" placeholder="Dirección del alojamiento" required>
+        <input type="text" name="ciudad" placeholder="Ciudad del alojamiento" required>
 
-    <input type="text" name="direccion" placeholder="Dirección del alojamiento" required>
-
-    <button type="submit" class="boton-ayuda">Registrarme</button>
-
-  </form>
-</section>
-
-
+        <button type="submit" class="boton-ayuda">Registrarme</button>
+      </form>
+    </section>
 
     <footer>
-  <p>&copy; 2026 Aloja. Todos los derechos reservados.</p>
-  <p>
-    <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
-    <a href="politica-de-privacidad.html">Política de Privacidad</a> |
-    <a href="alojamientos.html">Registrar alojamiento</a>
-  </p>
-</footer>
-
- 
-
+      <p>&copy; 2026 Aloja. Todos los derechos reservados.</p>
+      <p>
+        <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
+        <a href="politica-de-privacidad.html">Política de Privacidad</a> |
+        <a href="alojamientos.html">Registrar alojamiento</a>
+      </p>
+    </footer>
 
   </body>
 </html>
