@@ -358,3 +358,15 @@ nav a:hover {
   padding: 12px;
   margin-top: 10px;
 }
+.ayuda form input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.ayuda form button {
+  width: 100%;
+}
+
