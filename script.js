@@ -28,3 +28,38 @@ window.addEventListener("DOMContentLoaded", () => {
     idiomaSelect.value = idiomaGuardado;
   }
 });
+// ===== MENU DINÁMICO (login / logout) =====
+function renderAuthMenu() {
+  const navAuth = document.getElementById("navAuth");
+  if (!navAuth) return;
+
+  const user = localStorage.getItem("loggedUser");
+
+  if (user) {
+    const nombre = user.split("@")[0]; // muestra solo antes del @
+
+    navAuth.innerHTML = `
+      <span style="margin-right:12px; font-weight:700;">
+        Hola, ${nombre}
+      </span>
+      <a href="#" id="logoutLink">Cerrar sesión</a>
+    `;
+
+    const logout = document.getElementById("logoutLink");
+    if (logout) {
+      logout.addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.removeItem("loggedUser");
+        window.location.href = "index.html";
+      });
+    }
+
+  } else {
+    navAuth.innerHTML = `
+      <a href="login.html">Iniciar sesión</a>
+      <a href="register.html">Hazte una cuenta</a>
+    `;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", renderAuthMenu);
