@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Publicar alojamiento - TuAloja</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- 🔐 PROTECCIÓN: solo usuarios logueados -->
+  <script>
+    const logged = localStorage.getItem("loggedUser");
+    if (!logged) {
+      alert("Tenés que iniciar sesión para publicar un alojamiento.");
+      window.location.href = "login.html";
+    }
+  </script>
+</head>
+
+<body>
+
+  <header>
+    <a href="index.html" class="logo">🧳 TuAloja</a>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="alojamiento.html">Registra tu alojamiento</a>
+      <a href="ayuda.html">Ayuda</a>
+    </nav>
+  </header>
+
+  <main style="max-width:600px; margin:40px auto; background:#fff; padding:20px; border-radius:12px;">
+    <h1>Publicar alojamiento</h1>
+
+    <form id="publicarForm">
+
+      <label>Nombre del alojamiento</label><br />
+      <input type="text" name="nombre" required /><br /><br />
+
+      <label>Ciudad</label><br />
+      <input type="text" name="ciudad" required /><br /><br />
+
+      <label>Precio por noche</label><br />
+      <input type="number" name="precio" required /><br /><br />
+
+      <label>
+        <input type="checkbox" id="aptoNinos" checked />
+        Apto para niños
+      </label><br /><br />
+
+      <button type="submit">Publicar</button>
+    </form>
+  </main>
+
+  <script>
+    document.getElementById("publicarForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const alojamiento = {
+        nombre: e.target.nombre.value,
+        ciudad: e.target.ciudad.value,
+        precio: e.target.precio.value,
+        aceptaNinos: document.getElementById("aptoNinos").checked
+      };
+
+      const lista = JSON.parse(localStorage.getItem("alojamientos") || "[]");
+      lista.push(alojamiento);
+      localStorage.setItem("alojamientos", JSON.stringify(lista));
+
+      alert("Alojamiento publicado ✅");
+      window.location.href = "resultados.html";
+    });
+  </script>
+
+</body>
+</html>
