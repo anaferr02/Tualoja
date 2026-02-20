@@ -369,4 +369,10 @@ nav a:hover {
 .ayuda form button {
   width: 100%;
 }
+/* Arreglo inputs que se salen del contenedor */
+input,
+select,
+textarea {
+  box-sizing: border-box;
+}
 
