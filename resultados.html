@@ -109,8 +109,15 @@
         const edadesLimpias = edades.filter(x => String(x).trim() !== "");
         if (edadesLimpias.length) {
           const etiqueta = (ninos === 1) ? "Edad del niño" : "Edades de los niños";
-          const sufijo = (edadesLimpias.length > 1) ? " años" : " año";
-          chipsData.push(`${etiqueta}: ${edadesLimpias.join(", ")}${sufijo}`);
+
+        // Si hay 1 sola edad y es 1 => "año", si es 2 o más => "años"
+let sufijo = " años";
+if (edadesLimpias.length === 1) {
+  const edadNum = parseInt(edadesLimpias[0], 10);
+  sufijo = (edadNum === 1) ? " año" : " años";
+}
+
+chipsData.push(`${etiqueta}: ${edadesLimpias.join(", ")}${sufijo}`);
         }
       }
 
