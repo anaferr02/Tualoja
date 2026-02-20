@@ -207,5 +207,33 @@
         aplicarTraduccion(idiomaGuardado);
       });
     </script>
+    <script>
+  function renderAuthMenu() {
+    const navAuth = document.getElementById("navAuth");
+    if (!navAuth) return;
+
+    const user = localStorage.getItem("loggedUser");
+
+    if (user) {
+      navAuth.innerHTML = `
+        <span style="margin-right:12px; font-weight:700;">Hola, ${user}</span>
+        <a href="#" id="logoutLink">Cerrar sesión</a>
+      `;
+
+      document.getElementById("logoutLink").addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.removeItem("loggedUser");
+        window.location.reload();
+      });
+    } else {
+      navAuth.innerHTML = `
+        <a href="login.html">Iniciar sesión</a>
+        <a href="register.html">Hazte una cuenta</a>
+      `;
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", renderAuthMenu);
+</script>
   </body>
 </html>
