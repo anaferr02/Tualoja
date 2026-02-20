@@ -375,4 +375,6 @@ select,
 textarea {
   box-sizing: border-box;
 }
-
+input {
+  padding: 12px 14px;
+}
