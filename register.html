@@ -1,63 +1,104 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Registro - TuAloja</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css">
+  <title>Publicar alojamiento | TuAloja</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY"></script>
+  <style>
+    body { font-family: Arial; max-width: 700px; margin: auto; }
+    input, textarea, select { width: 100%; padding: 10px; margin: 8px 0; }
+    button { background:#0a58ca; color:white; padding:12px; border:none; cursor:pointer; }
+    #map { height: 300px; margin-top: 10px; }
+  </style>
 </head>
+
 <body>
 
-  <h1>Crear cuenta en TuAloja</h1>
+<h2>Publicar alojamiento</h2>
 
-  <form id="registroForm">
+<form id="propertyForm">
 
-    <!-- Tipo de usuario -->
-    <label for="tipo">¿Cómo querés usar TuAloja?</label>
-    <select id="tipo" name="tipo" required>
-      <option value="">Seleccionar</option>
-      <option value="huesped">Soy huésped</option>
-      <option value="propietario">Soy propietario</option>
-    </select>
+<label>Tipo de propiedad</label>
+<select name="propertyType">
+  <option>Departamento</option>
+  <option>Casa</option>
+</select>
 
-    <hr>
+<label>Nombre del alojamiento</label>
+<input name="title" required>
 
-    <!-- Datos comunes -->
-    <label>Nombre completo</label>
-    <input type="text" name="nombre" required>
+<label>Dirección</label>
+<input name="address" required>
 
-    <label>Email</label>
-    <input type="email" name="email" required>
+<label>Ciudad</label>
+<input name="city" required>
 
-    <label>Contraseña</label>
-    <input type="password" name="password" required>
+<div id="map"></div>
 
-    <!-- Datos SOLO propietario -->
-    <div id="datosPropietario" style="display:none">
+<input type="hidden" name="lat">
+<input type="hidden" name="lng">
 
-      <h3>Datos del alojamiento</h3>
+<label>Huéspedes máximos</label>
+<input type="number" name="maxGuests" required>
 
-      <label>Nombre del alojamiento</label>
-      <input type="text" name="alojamiento">
+<label>Habitaciones</label>
+<input type="number" name="bedrooms" required>
 
-      <label>Ciudad</label>
-      <input type="text" name="ciudad">
+<label>Baños</label>
+<input type="number" name="bathrooms" required>
 
-      <label>Tipo de alojamiento</label>
-      <select name="tipoAlojamiento">
-        <option value="">Seleccionar</option>
-        <option value="casa">Casa</option>
-        <option value="departamento">Departamento</option>
-        <option value="cabaña">Cabaña</option>
-        <option value="hotel">Hotel</option>
-      </select>
+<label>Precio por noche</label>
+<input type="number" name="price" required>
 
-    </div>
+<label>Descripción</label>
+<textarea name="description"></textarea>
 
-    <button type="submit">Registrarme</button>
+<label>Fotos</label>
+<input type="file" multiple>
 
-  </form>
+<h3>Verificación del anfitrión</h3>
 
-  <script src="registro.js"></script>
+<label>Nombre del propietario</label>
+<input name="ownerName" required>
+
+<label>WhatsApp</label>
+<input name="ownerPhone" required>
+
+<button type="submit">Publicar propiedad</button>
+
+</form>
+
+<script>
+let map;
+let marker;
+
+function initMap() {
+  const defaultLocation = { lat: -31.865, lng: -59.026 }; // Villaguay
+  map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 13,
+    center: defaultLocation
+  });
+
+  marker = new google.maps.Marker({
+    position: defaultLocation,
+    map: map,
+    draggable: true
+  });
+
+  marker.addListener("dragend", function() {
+    document.querySelector("[name=lat]").value = marker.getPosition().lat();
+    document.querySelector("[name=lng]").value = marker.getPosition().lng();
+  });
+}
+
+window.onload = initMap;
+
+document.getElementById("propertyForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(this));
+  localStorage.setItem("propiedad", JSON.stringify(data));
+  alert("Propiedad enviada para revisión");
+});
+</script>
+
 </body>
 </html>
