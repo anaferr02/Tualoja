@@ -108,7 +108,9 @@
       if (ninos > 0 && edades.length) {
         const edadesLimpias = edades.filter(x => String(x).trim() !== "");
         if (edadesLimpias.length) {
-          chipsData.push(`Edades: ${edadesLimpias.join(", ")}`);
+          const etiqueta = (ninos === 1) ? "Edad del niño" : "Edades de los niños";
+          const sufijo = (edadesLimpias.length > 1) ? " años" : " año";
+          chipsData.push(`${etiqueta}: ${edadesLimpias.join(", ")}${sufijo}`);
         }
       }
 
