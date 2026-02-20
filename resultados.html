@@ -1,88 +1,145 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Resultados de búsqueda - Aloja</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <!-- Encabezado -->
-    <header>
-      <div class="logo">
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/201/201623.png"
-          alt="Logo"
-        />
-        <h1>
-          <a href="index.html" style="color: white; text-decoration: none"
-            >Aloja.com.ar</a
-          >
-        </h1>
-      </div>
-    </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resultados - Aloja</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Solo para que se vea prolijo aunque tu CSS no tenga estilos para esto */
+    .contenedor { max-width: 980px; margin: 0 auto; padding: 20px; }
+    .box {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.08);
+      margin-bottom: 16px;
+    }
+    .titulo { margin: 0 0 6px; }
+    .muted { color: #5b6472; margin: 0; }
+    .chips { display:flex; flex-wrap:wrap; gap:10px; margin-top: 10px; }
+    .chip { background:#eef4ff; color:#1b167f; padding:8px 12px; border-radius:999px; font-weight:700; }
+    .grid { display:grid; gap:12px; }
+    @media(min-width:900px){ .grid { grid-template-columns: 1fr 1fr; } }
+    .card {
+      background:#fff;
+      border:1px solid #eef0f6;
+      border-radius:16px;
+      padding:14px;
+    }
+    .btn {
+      display:inline-block;
+      padding:10px 14px;
+      border-radius:12px;
+      text-decoration:none;
+      font-weight:800;
+      background:#1b167f;
+      color:#fff;
+      margin-top: 10px;
+    }
+  </style>
+</head>
 
-    <!-- Filtros -->
-    <section class="hero">
-      <p id="filtros" style="font-weight: bold"></p>
-      <h2 id="titulo-resultados">Resultados encontrados</h2>
+<body>
+  <header>
+    <a href="index.html" class="logo"><span class="icono-maleta">🧳</span> Aloja.com.ar</a>
+    <nav>
+      <a href="login.html">Iniciar sesión</a>
+      <a href="register.html">Hazte una cuenta</a>
+      <a href="alojamiento.html">Registra tu alojamiento</a>
+      <a href="ayuda.html">Ayuda</a>
+    </nav>
+  </header>
+
+  <main class="contenedor">
+    <!-- Resumen de búsqueda -->
+    <section class="box">
+      <h1 class="titulo">Resultados</h1>
+      <p class="muted" id="resumenTexto">Cargando tu búsqueda...</p>
+
+      <div class="chips" id="chips"></div>
+
+      <a class="btn" href="index.html">Cambiar búsqueda</a>
     </section>
 
-    <!-- Lista de alojamientos -->
-    <section class="resultados-listado">
-      <div class="alojamiento-card">
-        <img
-          src="https://images.unsplash.com/photo-1600047500631-1fe4ac65c7dd?auto=format&fit=crop&w=400&q=80"
-          alt="Hotel 1"
-        />
-        <div class="info">
-          <h3>Hotel Central Mendoza</h3>
-          <p>📍 Mendoza, Argentina</p>
-          <p><strong>Precio:</strong> $30.000 por noche</p>
-          <a href="detalle.html">Ver más</a>
-        </div>
-      </div>
+    <!-- Zona donde luego van los alojamientos -->
+    <section class="box">
+      <h2 class="titulo" style="font-size:18px;">Alojamientos (demo)</h2>
+      <p class="muted">Todavía no estás filtrando una base real. Esto es solo para ver que el buscador funciona.</p>
 
-      <div class="alojamiento-card">
-        <img
-          src="https://images.unsplash.com/photo-1582719478185-2c4f79975df5?auto=format&fit=crop&w=400&q=80"
-          alt="Hotel 2"
-        />
-        <div class="info">
-          <h3>Hostel Andes</h3>
-          <p>📍 Mendoza, Argentina</p>
-          <p><strong>Precio:</strong> $18.000 por noche</p>
-          <a href="detalle.html">Ver más</a>
-        </div>
-      </div>
-
-      <div class="alojamiento-card">
-        <img
-          src="https://images.unsplash.com/photo-1576675784080-5e5b28f3c9c8?auto=format&fit=crop&w=400&q=80"
-          alt="Hotel 3"
-        />
-        <div class="info">
-          <h3>Apart Mendoza Suites</h3>
-          <p>📍 Mendoza, Argentina</p>
-          <p><strong>Precio:</strong> $24.000 por noche</p>
-          <a href="detalle.html">Ver más</a>
-        </div>
-      </div>
+      <div class="grid" id="listaAlojamientos"></div>
     </section>
+  </main>
 
-    <!-- Script para mostrar filtros -->
-    <script>
-      const destino = localStorage.getItem("destino") || "Destino";
-      const entrada = localStorage.getItem("entrada") || "";
-      const salida = localStorage.getItem("salida") || "";
-      const adultos = localStorage.getItem("adultos") || "1";
-      const ninos = localStorage.getItem("ninos") || "0";
+  <script>
+    // 1) Leer lo que guardó el index
+    const destino = localStorage.getItem("destino") || "";
+    const entrada = localStorage.getItem("entrada") || "";
+    const salida = localStorage.getItem("salida") || "";
+    const adultos = localStorage.getItem("adultos") || "1";
+    const ninos = parseInt(localStorage.getItem("ninos")) || 0;
 
-      document.getElementById("filtros").innerText =
-        `🧭 Buscando en: ${destino} | 📅 Fechas: ${entrada} a ${salida} | 👤 Adultos: ${adultos} | 👶 Niños: ${ninos}`;
+    let edades = [];
+    try {
+      edades = JSON.parse(localStorage.getItem("edades_ninos") || "[]");
+    } catch (e) {
+      edades = [];
+    }
 
-      document.getElementById("titulo-resultados").innerText =
-        `Resultados en ${destino}`;
-    </script>
-  </body>
+    // 2) Mostrar resumen arriba
+    const resumen = document.getElementById("resumenTexto");
+    const chips = document.getElementById("chips");
+
+    // Si entraron a resultados sin buscar, los mandamos al inicio
+    if (!destino || !entrada || !salida) {
+      resumen.textContent = "No hay una búsqueda cargada. Volvé al inicio y buscá un destino.";
+      chips.innerHTML = "";
+    } else {
+      const textoNinos = (ninos > 0) ? `${ninos} niño${ninos > 1 ? "s" : ""}` : "Sin niños";
+      resumen.textContent = `Buscaste en: ${destino} · ${entrada} → ${salida}`;
+
+      // Chips (etiquetas)
+      const chipsData = [
+        `${adultos} adulto${Number(adultos) > 1 ? "s" : ""}`,
+        textoNinos
+      ];
+
+      // Si hay edades, las mostramos
+      if (ninos > 0 && edades.length) {
+        const edadesLimpias = edades.filter(x => String(x).trim() !== "");
+        if (edadesLimpias.length) {
+          chipsData.push(`Edades: ${edadesLimpias.join(", ")}`);
+        }
+      }
+
+      chips.innerHTML = chipsData.map(t => `<span class="chip">${t}</span>`).join("");
+    }
+
+    // 3) Demo de alojamientos + ejemplo de filtro por niños
+    // (Esto es solo para que veas la lógica: si vienen niños, no muestro "Solo adultos")
+    const alojamientosDemo = [
+      { nombre: "Cabaña Familiar", ciudad: "Cerca del centro", precio: 45000, aceptaNinos: true },
+      { nombre: "Depto Solo Adultos", ciudad: "Zona tranquila", precio: 38000, aceptaNinos: false },
+      { nombre: "Casa con Patio", ciudad: "Barrio residencial", precio: 52000, aceptaNinos: true }
+    ];
+
+    const lista = document.getElementById("listaAlojamientos");
+
+    const filtrados = alojamientosDemo.filter(a => {
+      if (ninos > 0 && a.aceptaNinos === false) return false;
+      return true;
+    });
+
+    lista.innerHTML = filtrados.map(a => `
+      <div class="card">
+        <h3 style="margin:0 0 6px;">${a.nombre}</h3>
+        <p class="muted" style="margin:0 0 8px;">${a.ciudad}</p>
+        <p style="margin:0 0 8px;"><b>$${a.precio}</b> por noche</p>
+        <p class="muted" style="margin:0;">
+          ${a.aceptaNinos ? "✅ Apto para niños" : "❌ Solo adultos"}
+        </p>
+      </div>
+    `).join("");
+  </script>
+</body>
 </html>
