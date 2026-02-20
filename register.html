@@ -1,104 +1,91 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="es">
 <head>
-  <title>Publicar alojamiento | TuAloja</title>
-  <script src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crear cuenta - TuAloja</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
-    body { font-family: Arial; max-width: 700px; margin: auto; }
-    input, textarea, select { width: 100%; padding: 10px; margin: 8px 0; }
-    button { background:#0a58ca; color:white; padding:12px; border:none; cursor:pointer; }
-    #map { height: 300px; margin-top: 10px; }
+    .contenedor { max-width: 520px; margin: 0 auto; padding: 20px; }
+    .box { background:#fff; border-radius:16px; padding:18px; box-shadow:0 10px 25px rgba(0,0,0,.08); }
+    label { display:block; font-weight:700; margin: 12px 0 6px; }
+    input { width:100%; padding:12px; border-radius:12px; border:1px solid #d7e0ee; }
+    button { margin-top:14px; width:100%; padding:12px; border:0; border-radius:12px; font-weight:800; cursor:pointer; background:#1b167f; color:#fff; }
+    .muted { color:#5b6472; }
+    .link { display:inline-block; margin-top:10px; }
   </style>
 </head>
-
 <body>
 
-<h2>Publicar alojamiento</h2>
+  <header>
+    <a href="index.html" class="logo"><span class="icono-maleta">🧳</span> TuAloja</a>
+    <nav>
+      <a href="login.html">Iniciar sesión</a>
+      <a href="register.html">Hazte una cuenta</a>
+      <a href="alojamiento.html">Registra tu alojamiento</a>
+      <a href="ayuda.html">Ayuda</a>
+    </nav>
+  </header>
 
-<form id="propertyForm">
+  <main class="contenedor">
+    <div class="box">
+      <h1>Crear cuenta</h1>
+      <p class="muted">Registrate con email y contraseña.</p>
 
-<label>Tipo de propiedad</label>
-<select name="propertyType">
-  <option>Departamento</option>
-  <option>Casa</option>
-</select>
+      <form id="registerForm">
+        <label>Email</label>
+        <input type="email" id="email" required placeholder="tuemail@gmail.com" />
 
-<label>Nombre del alojamiento</label>
-<input name="title" required>
+        <label>Contraseña</label>
+        <input type="password" id="password" required placeholder="Mínimo 6 caracteres" minlength="6" />
 
-<label>Dirección</label>
-<input name="address" required>
+        <label>Confirmar contraseña</label>
+        <input type="password" id="password2" required placeholder="Repetí tu contraseña" minlength="6" />
 
-<label>Ciudad</label>
-<input name="city" required>
+        <button type="submit">Crear cuenta</button>
+      </form>
 
-<div id="map"></div>
+      <a class="link" href="login.html">Ya tengo cuenta → Iniciar sesión</a>
+    </div>
+  </main>
 
-<input type="hidden" name="lat">
-<input type="hidden" name="lng">
+  <script>
+    function getUsers() {
+      return JSON.parse(localStorage.getItem("users") || "[]");
+    }
+    function saveUsers(users) {
+      localStorage.setItem("users", JSON.stringify(users));
+    }
 
-<label>Huéspedes máximos</label>
-<input type="number" name="maxGuests" required>
+    document.getElementById("registerForm").addEventListener("submit", (e) => {
+      e.preventDefault();
 
-<label>Habitaciones</label>
-<input type="number" name="bedrooms" required>
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const pass = document.getElementById("password").value;
+      const pass2 = document.getElementById("password2").value;
 
-<label>Baños</label>
-<input type="number" name="bathrooms" required>
+      if (pass !== pass2) {
+        alert("Las contraseñas no coinciden.");
+        return;
+      }
 
-<label>Precio por noche</label>
-<input type="number" name="price" required>
+      const users = getUsers();
+      const exists = users.some(u => u.email === email);
+      if (exists) {
+        alert("Ese email ya está registrado. Iniciá sesión.");
+        window.location.href = "login.html";
+        return;
+      }
 
-<label>Descripción</label>
-<textarea name="description"></textarea>
+      users.push({ email, pass });
+      saveUsers(users);
 
-<label>Fotos</label>
-<input type="file" multiple>
+      // Dejar sesión iniciada
+      localStorage.setItem("loggedUser", email);
 
-<h3>Verificación del anfitrión</h3>
-
-<label>Nombre del propietario</label>
-<input name="ownerName" required>
-
-<label>WhatsApp</label>
-<input name="ownerPhone" required>
-
-<button type="submit">Publicar propiedad</button>
-
-</form>
-
-<script>
-let map;
-let marker;
-
-function initMap() {
-  const defaultLocation = { lat: -31.865, lng: -59.026 }; // Villaguay
-  map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 13,
-    center: defaultLocation
-  });
-
-  marker = new google.maps.Marker({
-    position: defaultLocation,
-    map: map,
-    draggable: true
-  });
-
-  marker.addListener("dragend", function() {
-    document.querySelector("[name=lat]").value = marker.getPosition().lat();
-    document.querySelector("[name=lng]").value = marker.getPosition().lng();
-  });
-}
-
-window.onload = initMap;
-
-document.getElementById("propertyForm").addEventListener("submit", function(e){
-  e.preventDefault();
-  const data = Object.fromEntries(new FormData(this));
-  localStorage.setItem("propiedad", JSON.stringify(data));
-  alert("Propiedad enviada para revisión");
-});
-</script>
-
+      alert("Cuenta creada ✅");
+      window.location.href = "index.html";
+    });
+  </script>
 </body>
 </html>
