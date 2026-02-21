@@ -612,3 +612,62 @@ header{
   font-size: 16px;
   font-weight: 700;
 }
+/* ===== UNIFICAR ESTÉTICA DE TODOS LOS LINKS DEL MENÚ ===== */
+
+/* Desktop: todos los links iguales (incluye los de #navAuth) */
+#mainNav a,
+#navAuth a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:44px;
+  padding:0 14px;
+  border-radius:12px;
+  background: rgba(255,255,255,0.18);
+  color:#1b167f;
+  font-weight:700;
+  text-decoration:none;
+  border: 1px solid rgba(255,255,255,0.22);
+}
+
+#mainNav a:hover,
+#navAuth a:hover{
+  background: rgba(255,255,255,0.28);
+}
+
+/* Sacar subrayado morado en móvil (links visitados) */
+#mainNav a:visited,
+#navAuth a:visited{
+  color:#1b167f;
+}
+
+/* ===== MENÚ MÓVIL: cuadro transparente bien centrado y sin desalinear ===== */
+@media (max-width: 768px){
+  /* el contenedor del menú */
+  #mainNav{
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(92vw, 420px);
+    box-sizing: border-box;
+  }
+
+  /* todos los items iguales y centrados */
+  #mainNav select,
+  #mainNav a,
+  #navAuth a{
+    width:100%;
+    height:52px;
+    border-radius:14px;
+    box-sizing:border-box;
+  }
+
+  /* #navAuth dentro del menú: sin “saltos raros” */
+  #navAuth{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    align-items:stretch;
+  }
+}
