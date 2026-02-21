@@ -537,3 +537,80 @@ header nav a{
     font-size: 15px;
   }
 }
+/* ===== HAMBURGUESA (mobile) ===== */
+.hamburger{
+  display:none;            /* en PC no se ve */
+  border:0;
+  border-radius:10px;
+  padding:10px 12px;
+  font-size:22px;
+  font-weight:900;
+  cursor:pointer;
+  background: rgba(255,255,255,0.18);
+  color:#1b167f;
+}
+
+/* Nav normal en escritorio */
+.nav{
+  display:flex;
+  gap:15px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+/* MOBILE */
+@media (max-width: 600px){
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+    padding:12px 14px;
+  }
+
+  .hamburger{
+    display:inline-block;  /* en móvil aparece */
+  }
+
+  /* El menú en móvil está "cerrado" por defecto */
+  .nav{
+    width:100%;
+    display:none;
+    flex-direction:column;
+    align-items:stretch;
+    gap:10px;
+    padding:12px;
+    border-radius:14px;
+    background: rgba(255,255,255,0.14);
+  }
+
+  /* Cuando está abierto */
+  .nav.is-open{
+    display:flex;
+  }
+
+  /* Selects y links ocupan todo el ancho */
+  .nav select{
+    width:100%;
+    height:42px;
+    border-radius:10px;
+    padding:8px 10px;
+  }
+
+  .nav a{
+    width:100%;
+    text-align:center;
+    padding:12px;
+    border-radius:12px;
+    background: rgba(255,255,255,0.18);
+    white-space:nowrap;
+  }
+
+  /* Saludo (Hola ...) que no se desborde */
+  #navAuth span{
+    display:block;
+    text-align:center;
+    font-weight:700;
+  }
+}
