@@ -885,3 +885,47 @@ header{
     border-radius:12px;
   }
 }
+/* ===== FIX HEADER PC: logo + menú alineados ===== */
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:nowrap;
+}
+
+.logo{ white-space:nowrap; }
+
+#mainNav{
+  margin-left:auto;     /* empuja el menú a la derecha */
+  align-items:center;
+}
+
+/* ===== FIX selects (idioma / moneda) para que entre el texto ===== */
+#mainNav select{
+  width: 180px;          /* más ancho */
+  min-width: 180px;
+}
+
+/* ===== FIX buscador: botón no más grande que el cuadro ===== */
+.search-box{
+  align-items:center;
+}
+
+.search-box .btn-header{
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height: 1;
+}
+
+/* si tu "cuadro naranja" tiene altura fija, esto evita que se desborde */
+.search-box input,
+.search-box select{
+  height:40px;
+}
+@media (max-width: 600px){
+  #mainNav select{ width:100%; min-width:0; }
+}
