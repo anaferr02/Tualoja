@@ -6,7 +6,6 @@
     <title>Aloja - Alquila fácil, viaja feliz</title>
     <link rel="stylesheet" href="style.css" />
     <style>
-      /* Solo agrego esto para el botón "Buscar" */
       .btn-header {
         background: none;
         border: none;
@@ -23,37 +22,38 @@
       }
     </style>
   </head>
+
   <body>
     <!-- Encabezado -->
     <header>
-  <a href="index.html" class="logo">
-    <span class="icono-maleta">🧳</span> Aloja.com.ar
-  </a>
+      <a href="index.html" class="logo">
+        <span class="icono-maleta">🧳</span> Aloja.com.ar
+      </a>
 
-  <!-- Botón hamburguesa (solo móvil) -->
-  <button class="hamburger" id="hamburgerBtn" type="button">☰</button>
+      <!-- Botón hamburguesa (móvil) -->
+      <button class="hamburger" id="hamburgerBtn" type="button" aria-label="Menú">☰</button>
 
-  <!-- Menú -->
-  <nav id="mainNav" class="nav">
-    <select id="idioma" style="margin-right: 15px">
-      <option value="es">Español</option>
-      <option value="en">English</option>
-      <option value="pt">Português</option>
-    </select>
+      <!-- Menú -->
+      <nav id="mainNav" class="nav">
+        <select id="idioma" style="margin-right: 15px">
+          <option value="es">Español</option>
+          <option value="en">English</option>
+          <option value="pt">Português</option>
+        </select>
 
-    <select id="moneda">
-      <option value="ars">ARS</option>
-      <option value="usd">USD</option>
-      <option value="eur">EUR</option>
-    </select>
+        <select id="moneda">
+          <option value="ars">ARS</option>
+          <option value="usd">USD</option>
+          <option value="eur">EUR</option>
+        </select>
 
-    <!-- Esto queda para el login dinámico -->
-    <span id="navAuth"></span>
+        <!-- Login dinámico -->
+        <span id="navAuth"></span>
 
-    <a href="alojamiento.html">Registra tu alojamiento</a>
-    <a href="ayuda.html">Ayuda</a>
-  </nav>
-</header>
+        <a href="alojamiento.html">Registra tu alojamiento</a>
+        <a href="ayuda.html">Ayuda</a>
+      </nav>
+    </header>
 
     <!-- Eslogan -->
     <section class="hero">
@@ -83,11 +83,10 @@
       <input type="number" id="ninos" placeholder="Cantidad de niños" min="0" />
       <div id="edades-ninos" style="margin-top: 10px"></div>
 
-      <!-- BOTÓN MODIFICADO -->
       <a href="#" class="btn-header" onclick="buscar()">Buscar</a>
     </section>
 
-    <!-- Script original sin tocar -->
+    <!-- Script buscador + traducciones (sin romper) -->
     <script>
       const fechaHoy = new Date().toISOString().split("T")[0];
       const entradaInput = document.getElementById("entrada");
@@ -152,8 +151,6 @@
           subtitulo: "Las mejores opciones para tu próxima estadía.",
           destino: "Destino",
           buscar: "Buscar",
-          iniciar: "Iniciar sesión",
-          registro: "Hazte una cuenta",
           ninos: "Cantidad de niños",
           adultos: "adulto",
         },
@@ -162,8 +159,6 @@
           subtitulo: "The best options for your next stay.",
           destino: "Destination",
           buscar: "Search",
-          iniciar: "Sign in",
-          registro: "Create account",
           ninos: "Number of children",
           adultos: "adult",
         },
@@ -172,8 +167,6 @@
           subtitulo: "As melhores opções para sua próxima estadia.",
           destino: "Destino",
           buscar: "Buscar",
-          iniciar: "Entrar",
-          registro: "Criar conta",
           ninos: "Número de crianças",
           adultos: "adulto",
         },
@@ -187,10 +180,6 @@
         document.querySelector(".hero p").textContent = t.subtitulo;
         document.getElementById("destino").placeholder = t.destino;
         document.querySelector(".btn-header").textContent = t.buscar;
-        document.querySelector('nav a[href="login.html"]').textContent =
-          t.iniciar;
-        document.querySelector('nav a[href="registro.html"]').textContent =
-          t.registro;
         document.getElementById("ninos").placeholder = t.ninos;
 
         const selectAdultos = document.getElementById("adultos");
@@ -213,34 +202,8 @@
         aplicarTraduccion(idiomaGuardado);
       });
     </script>
-    <script>
-  function renderAuthMenu() {
-    const navAuth = document.getElementById("navAuth");
-    if (!navAuth) return;
 
-    const user = localStorage.getItem("loggedUser");
-
-    if (user) {
-      navAuth.innerHTML = `
-        <span style="margin-right:12px; font-weight:700;">Hola, ${user}</span>
-        <a href="#" id="logoutLink">Cerrar sesión</a>
-      `;
-
-      document.getElementById("logoutLink").addEventListener("click", (e) => {
-        e.preventDefault();
-        localStorage.removeItem("loggedUser");
-        window.location.reload();
-      });
-    } else {
-      navAuth.innerHTML = `
-        <a href="login.html">Iniciar sesión</a>
-        <a href="register.html">Hazte una cuenta</a>
-      `;
-    }
-  }
-
-  window.addEventListener("DOMContentLoaded", renderAuthMenu);
-</script>
+    <!-- IMPORTANTE: sacamos renderAuthMenu de acá, lo maneja script.js -->
     <script src="script.js"></script>
   </body>
 </html>
