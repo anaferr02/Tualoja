@@ -614,3 +614,27 @@ header nav a{
     font-weight:700;
   }
 }
+// ===== MENU HAMBURGUESA =====
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("hamburgerBtn");
+  const nav = document.getElementById("mainNav");
+
+  if (!btn || !nav) return;
+
+  const toggle = () => {
+    const isOpen = nav.classList.toggle("is-open");
+    btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    btn.textContent = isOpen ? "✕" : "☰";
+  };
+
+  btn.addEventListener("click", toggle);
+
+  // Cerrar al tocar un link (mejora UX)
+  nav.addEventListener("click", (e) => {
+    if (e.target.tagName === "A" && nav.classList.contains("is-open")) {
+      nav.classList.remove("is-open");
+      btn.setAttribute("aria-expanded", "false");
+      btn.textContent = "☰";
+    }
+  });
+});
