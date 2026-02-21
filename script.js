@@ -73,15 +73,10 @@ function initHamburgerMenu() {
   const nav = document.getElementById("mainNav");
   if (!btn || !nav) return;
 
-  btn.addEventListener("click", () => {
+  btn.onclick = () => {
     nav.classList.toggle("is-open");
-    const abierto = nav.classList.contains("is-open");
-    btn.setAttribute("aria-expanded", abierto ? "true" : "false");
-    btn.textContent = abierto ? "✕" : "☰";
-  });
+    btn.textContent = nav.classList.contains("is-open") ? "✕" : "☰";
+  };
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderAuthMenu();
-  initHamburgerMenu();
-});
+document.addEventListener("DOMContentLoaded", initHamburgerMenu);
