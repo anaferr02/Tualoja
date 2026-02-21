@@ -426,3 +426,51 @@ header nav a{
     justify-content:flex-start;
   }
 }
+/* ===== MOBILE HEADER PROLIGO ===== */
+@media (max-width: 600px) {
+  header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .logo {
+    font-size: 26px;
+    width: 100%;
+  }
+
+  header nav {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* Idioma + moneda en la misma fila, tamaño normal */
+  header nav select {
+    width: calc(50% - 5px);
+    height: 42px;
+    padding: 8px 10px;
+    border-radius: 10px;
+  }
+
+  /* Links en “chips” */
+  header nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.18);
+    white-space: nowrap;
+  }
+}
+/* ===== EDADES DE NIÑOS: que no confunda ===== */
+#edades-ninos input {
+  width: 130px;
+  display: inline-block;
+  margin-top: 8px;
+}
