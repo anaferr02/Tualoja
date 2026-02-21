@@ -671,3 +671,7 @@ header{
     align-items:stretch;
   }
 }
+/* ===== FIX DESKTOP: que el menú no se “desparrame” ===== */
+@media (min-width: 769px){
+  header{
+    padding: 14px 
