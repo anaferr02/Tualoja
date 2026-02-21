@@ -36,8 +36,9 @@ function renderAuthMenu() {
   const user = localStorage.getItem("loggedUser");
 
   if (user) {
-    const nombre = user.split("@")[0]; // muestra solo antes del @
-
+    cconst nombre = user.split("@")[0];
+const nombreCorto = nombre.length > 10 ? nombre.slice(0,10) + "…" : nombre;
+    
     navAuth.innerHTML = `
       <span style="margin-right:12px; font-weight:700;">
         Hola, ${nombre}
