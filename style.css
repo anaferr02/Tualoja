@@ -474,3 +474,22 @@ header nav a{
   display: inline-block;
   margin-top: 8px;
 }
+@media (max-width: 600px) {
+  .search-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px;
+  }
+
+  .search-box input,
+  .search-box select,
+  .search-box .btn-header {
+    width: 100%;
+  }
+
+  .btn-header {
+    text-align: center;
+    padding: 12px;
+  }
+}
