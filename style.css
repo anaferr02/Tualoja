@@ -638,3 +638,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+  @media (max-width: 600px){
+  .nav{ display:none; }
+  .nav.is-open{ display:flex; }
+}
