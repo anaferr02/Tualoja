@@ -614,35 +614,10 @@ header nav a{
     font-weight:700;
   }
 }
-// ===== MENU HAMBURGUESA =====
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("hamburgerBtn");
-  const nav = document.getElementById("mainNav");
+/* PEGÁ ESTO COMO TU style.css (REEMPLAZÁ TODO LO QUE TENÉS DE HAMBURGUESA) */
 
-  if (!btn || !nav) return;
-
-  const toggle = () => {
-    const isOpen = nav.classList.toggle("is-open");
-    btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    btn.textContent = isOpen ? "✕" : "☰";
-  };
-
-  btn.addEventListener("click", toggle);
-
-  // Cerrar al tocar un link (mejora UX)
-  nav.addEventListener("click", (e) => {
-    if (e.target.tagName === "A" && nav.classList.contains("is-open")) {
-      nav.classList.remove("is-open");
-      btn.setAttribute("aria-expanded", "false");
-      btn.textContent = "☰";
-    }
-  });
-});
-  @media (max-width: 600px){
-  .nav{ display:none; }
-  .nav.is-open{ display:flex; }
-}
-  .hamburger{
+/* ===== HAMBURGUESA (CSS) ===== */
+.hamburger{
   display:none;
   border:0;
   border-radius:12px;
@@ -658,14 +633,15 @@ document.addEventListener("DOMContentLoaded", () => {
   display:flex;
   gap:15px;
   align-items:center;
+  flex-wrap:wrap;
 }
 
 @media (max-width: 600px){
-  .hamburger{ display:inline-block; }
+  #hamburgerBtn{ display:inline-block; }
 
-  .nav{
-    width:100%;
+  #mainNav{
     display:none;
+    width:100%;
     flex-direction:column;
     gap:10px;
     padding:12px;
@@ -673,10 +649,10 @@ document.addEventListener("DOMContentLoaded", () => {
     background: rgba(255,255,255,0.14);
   }
 
-  .nav.is-open{ display:flex; }
+  #mainNav.is-open{ display:flex; }
 
-  .nav select,
-  .nav a{
+  #mainNav select,
+  #mainNav a{
     width:100%;
     padding:12px;
     border-radius:12px;
