@@ -36,7 +36,7 @@ function renderAuthMenu() {
   const user = localStorage.getItem("loggedUser");
 
   if (user) {
-    cconst nombre = user.split("@")[0];
+    const nombre = user.split("@")[0];
 const nombreCorto = nombre.length > 10 ? nombre.slice(0,10) + "…" : nombre;
     
     navAuth.innerHTML = `
