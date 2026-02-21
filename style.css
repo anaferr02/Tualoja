@@ -659,3 +659,29 @@ header nav a{
     text-align:center;
   }
 }
+/* PEGÁ ESTO AL FINAL DE style.css */
+
+/* 1) ALINEACIÓN PROLIJA DE TODO LO DEL MENÚ */
+#mainNav select,
+#mainNav a,
+#navAuth a{
+  box-sizing: border-box;
+  width: 100%;
+  display: block;
+  text-align: center;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+/* selects más prolijos */
+#mainNav select{
+  height: 44px;
+  padding: 10px 12px;
+}
+
+/* espacio entre items */
+@media (max-width: 600px){
+  #mainNav{
+    align-items: stretch;
+  }
+}
