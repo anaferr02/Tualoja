@@ -493,3 +493,37 @@ header nav a{
     padding: 12px;
   }
 }
+/* ===== MOBILE HEADER MEJORADO ===== */
+@media (max-width: 600px) {
+  header {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  /* Idioma y moneda más chicos */
+  header nav select {
+    width: 48%;
+    height: 38px;
+    font-size: 14px;
+  }
+
+  /* Saludo */
+  #navAuth span {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  /* Botón cerrar sesión */
+  #navAuth a {
+    display: inline-block;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  /* Botones del menú */
+  header nav a {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
