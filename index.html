@@ -205,5 +205,17 @@
 
     <!-- IMPORTANTE: sacamos renderAuthMenu de acá, lo maneja script.js -->
     <script src="script.js"></script>
+    <script>
+  (function () {
+    const btn = document.getElementById("hamburgerBtn");
+    const nav = document.getElementById("mainNav");
+    if (!btn || !nav) return;
+
+    btn.onclick = function () {
+      nav.classList.toggle("is-open");
+      btn.textContent = nav.classList.contains("is-open") ? "✕" : "☰";
+    };
+  })();
+</script>
   </body>
 </html>
