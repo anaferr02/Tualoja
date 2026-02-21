@@ -63,4 +63,22 @@ const nombreCorto = nombre.length > 10 ? nombre.slice(0,10) + "…" : nombre;
   }
 }
 
-document.addEventListener("DOMContentLoaded", renderAuthMenu);
+// ===== MENU HAMBURGUESA (robusto) =====
+function initHamburgerMenu() {
+  const btn = document.getElementById("hamburgerBtn");
+  const nav = document.getElementById("mainNav");
+
+  if (!btn || !nav) return;
+
+  btn.addEventListener("click", () => {
+    nav.classList.toggle("is-open");
+    const abierto = nav.classList.contains("is-open");
+    btn.setAttribute("aria-expanded", abierto ? "true" : "false");
+    btn.textContent = abierto ? "✕" : "☰";
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderAuthMenu();      // tu menú dinámico (login/logout)
+  initHamburgerMenu();   // hamburguesa
+});
