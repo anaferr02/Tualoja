@@ -675,3 +675,28 @@ header{
 @media (min-width: 769px){
   header{
     padding: 14px 
+    /* ===== DESKTOP: alinear todos los botones del menú ===== */
+@media (min-width: 769px){
+  #mainNav, #navAuth{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  /* mismo alto y centrado vertical */
+  #mainNav a,
+  #navAuth a{
+    height:44px !important;
+    line-height:44px !important;
+    padding:0 16px !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    white-space:nowrap;
+  }
+
+  /* evitar que alguno tenga padding distinto por herencia */
+  #mainNav a * , #navAuth a *{
+    line-height:1 !important;
+  }
+}
