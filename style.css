@@ -700,3 +700,39 @@ header{
     line-height:1 !important;
   }
 }
+  /* ===== FIX DESKTOP: texto en la misma línea para TODOS los links ===== */
+@media (min-width: 601px){
+
+  /* el nav completo centrado */
+  #mainNav{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  /* navAuth también en línea */
+  #navAuth{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  /* TODOS los links iguales (incluye login/registro) */
+  #mainNav a,
+  #navAuth a{
+    height:44px !important;
+    line-height:44px !important;
+    padding:0 16px !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    border-radius:12px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.22);
+    color:#1b167f !important;
+    font-weight:700;
+    text-decoration:none !important;
+    white-space:nowrap;
+  }
+}
