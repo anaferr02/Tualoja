@@ -47,13 +47,12 @@ const nombreCorto = nombre.length > 10 ? nombre.slice(0,10) + "…" : nombre;
     `;
 
     const logout = document.getElementById("logoutLink");
-    if (logout) {
-      logout.addEventListener("click", (e) => {
-        e.preventDefault();
-        localStorage.removeItem("loggedUser");
-        window.location.href = "index.html";
-      });
-    }
+    const logout = document.getElementById("logoutLink");
+    logout?.addEventListener("click", (e) => {
+      e.preventDefault();
+      localStorage.removeItem("loggedUser");
+      window.location.href = "index.html";
+    });
 
   } else {
     navAuth.innerHTML = `
