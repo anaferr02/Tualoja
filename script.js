@@ -34,6 +34,8 @@ if (idiomaSelect) {
 }
 
 // ===== MENU DINÁMICO (login / logout) =====
+// REEMPLAZÁ renderAuthMenu EN script.js POR ESTE (COPIÁ TAL CUAL)
+
 function renderAuthMenu() {
   const navAuth = document.getElementById("navAuth");
   if (!navAuth) return;
@@ -45,20 +47,17 @@ function renderAuthMenu() {
     const nombreCorto = nombre.length > 10 ? nombre.slice(0, 10) + "…" : nombre;
 
     navAuth.innerHTML = `
-      <span style="margin-right:12px; font-weight:700;">
+      <span style="display:block; margin-bottom:8px; font-weight:700; text-align:center;">
         Hola, ${nombreCorto}
       </span>
       <a href="#" id="logoutLink">Cerrar sesión</a>
     `;
 
-    const logout = document.getElementById("logoutLink");
-    if (logout) {
-      logout.addEventListener("click", (e) => {
-        e.preventDefault();
-        localStorage.removeItem("loggedUser");
-        window.location.href = "index.html";
-      });
-    }
+    document.getElementById("logoutLink")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      localStorage.removeItem("loggedUser");
+      window.location.href = "index.html";
+    });
   } else {
     navAuth.innerHTML = `
       <a href="login.html">Iniciar sesión</a>
