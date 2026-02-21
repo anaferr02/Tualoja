@@ -744,3 +744,144 @@ header nav a{
 
   #navAuth .hello{ text-align:center; }
 }
+/* ===== HEADER PROLIJO EN PC + MOVIL ===== */
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:nowrap; /* evita que se rompa en PC */
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+}
+
+/* PC: nav en línea, sin ancho 100% */
+#mainNav{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:nowrap;
+  width:auto;
+  padding:0;
+  background:transparent;
+}
+
+#mainNav select{
+  width:140px;
+  height:38px;
+  padding:6px 10px;
+  border-radius:10px;
+  box-sizing:border-box;
+}
+
+#navAuth{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+#navAuth a{
+  display:inline-block;
+  width:auto;
+  padding:8px 10px;
+  border-radius:10px;
+  text-align:center;
+  box-sizing:border-box;
+  background: rgba(255,255,255,0.18);
+  font-weight:700;
+  text-decoration:none;
+}
+
+/* Botón hamburguesa: solo móvil */
+#hamburgerBtn{ display:none; }
+
+/* ===== BUSCADOR PROLIJO ===== */
+.search-box{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.search-box input,
+.search-box select{
+  height:40px;
+  border-radius:10px;
+  box-sizing:border-box;
+}
+
+.search-box #destino{ width:280px; }
+.search-box #entrada,
+.search-box #salida{ width:150px; }
+.search-box #adultos{ width:140px; }
+.search-box #ninos{ width:180px; }
+
+.search-box .btn-header{
+  height:40px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 16px;
+  border-radius:10px;
+}
+
+/* ===== MÓVIL: hamburguesa al lado del logo + menú desplegable prolijo ===== */
+@media (max-width: 600px){
+  header{ flex-wrap:wrap; }
+
+  #hamburgerBtn{
+    display:inline-block;
+    margin-left:auto; /* queda a la derecha del logo */
+  }
+
+  /* menú oculto/abierto */
+  #mainNav{
+    width:100%;
+    display:none;
+    flex-direction:column;
+    align-items:stretch;
+    gap:10px;
+    padding:12px;
+    border-radius:14px;
+    background: rgba(255,255,255,0.14);
+  }
+  #mainNav.is-open{ display:flex; }
+
+  #mainNav select,
+  #mainNav a,
+  #navAuth a{
+    width:100%;
+    text-align:center;
+    padding:12px;
+    border-radius:12px;
+    box-sizing:border-box;
+  }
+
+  #navAuth{ flex-direction:column; align-items:stretch; }
+
+  /* buscador en columna y botón ancho */
+  .search-box{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .search-box #destino,
+  .search-box #entrada,
+  .search-box #salida,
+  .search-box #adultos,
+  .search-box #ninos{
+    width:100%;
+  }
+
+  .search-box .btn-header{
+    width:100%;
+    height:48px;
+    border-radius:12px;
+  }
+}
