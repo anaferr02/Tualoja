@@ -379,378 +379,22 @@ input {
   padding: 12px 14px;
 }
 /* ===== HEADER RESPONSIVE (CELULAR) ===== */
+
+ 
+/* =========================
+   HEADER + HAMBURGUESA (LIMPIO)
+   ========================= */
+
+/* Desktop */
 header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  flex-wrap:wrap;           /* permite que baje a otra línea si no entra */
-  gap: 12px;
-}
-
-header nav{
-  display:flex;
-  align-items:center;
-  flex-wrap:wrap;           /* links y selects se acomodan */
-  gap: 10px;
-}
-
-/* Que los selects no sean gigantes */
-header nav select{
-  padding: 6px 8px;
-  height: 36px;
-  border-radius: 8px;
-}
-
-/* Links más “tocables” en celular */
-header nav a{
-  padding: 8px 10px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 700;
-  white-space: nowrap;      /* evita cortar palabras raras */
-}
-
-/* En pantallas chicas, apilar ordenado */
-@media (max-width: 600px){
-  header{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .logo{
-    width: 100%;
-  }
-
-  header nav{
-    width: 100%;
-    justify-content:flex-start;
-  }
-}
-/* ===== MOBILE HEADER PROLIGO ===== */
-@media (max-width: 600px) {
-  header {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 12px 14px;
-  }
-
-  .logo {
-    font-size: 26px;
-    width: 100%;
-  }
-
-  header nav {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-  }
-
-  /* Idioma + moneda en la misma fila, tamaño normal */
-  header nav select {
-    width: calc(50% - 5px);
-    height: 42px;
-    padding: 8px 10px;
-    border-radius: 10px;
-  }
-
-  /* Links en “chips” */
-  header nav a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 12px;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.18);
-    white-space: nowrap;
-  }
-}
-/* ===== EDADES DE NIÑOS: que no confunda ===== */
-#edades-ninos input {
-  width: 130px;
-  display: inline-block;
-  margin-top: 8px;
-}
-@media (max-width: 600px) {
-  .search-box {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 18px;
-  }
-
-  .search-box input,
-  .search-box select,
-  .search-box .btn-header {
-    width: 100%;
-  }
-
-  .btn-header {
-    text-align: center;
-    padding: 12px;
-  }
-}
-/* ===== MOBILE HEADER MEJORADO ===== */
-@media (max-width: 600px) {
-  header {
-    padding: 14px;
-    gap: 12px;
-  }
-
-  /* Idioma y moneda más chicos */
-  header nav select {
-    width: 48%;
-    height: 38px;
-    font-size: 14px;
-  }
-
-  /* Saludo */
-  #navAuth span {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 6px;
-  }
-
-  /* Botón cerrar sesión */
-  #navAuth a {
-    display: inline-block;
-    padding: 8px 12px;
-    font-size: 14px;
-  }
-
-  /* Botones del menú */
-  header nav a {
-    font-size: 14px;
-    padding: 10px;
-  }
-}
-@media (max-width: 600px) {
-  .search-box {
-    margin-top: 20px;
-  }
-
-  .search-box input,
-  .search-box select {
-    font-size: 15px;
-  }
-}
-/* ===== HAMBURGUESA (mobile) ===== */
-.hamburger{
-  display:none;            /* en PC no se ve */
-  border:0;
-  border-radius:10px;
-  padding:10px 12px;
-  font-size:22px;
-  font-weight:900;
-  cursor:pointer;
-  background: rgba(255,255,255,0.18);
-  color:#1b167f;
-}
-
-/* Nav normal en escritorio */
-.nav{
-  display:flex;
-  gap:15px;
-  align-items:center;
-  flex-wrap:wrap;
-}
-
-/* MOBILE */
-@media (max-width: 600px){
-  header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    gap:10px;
-    padding:12px 14px;
-  }
-
-  .hamburger{
-    display:inline-block;  /* en móvil aparece */
-  }
-
-  /* El menú en móvil está "cerrado" por defecto */
-  .nav{
-    width:100%;
-    display:none;
-    flex-direction:column;
-    align-items:stretch;
-    gap:10px;
-    padding:12px;
-    border-radius:14px;
-    background: rgba(255,255,255,0.14);
-  }
-
-  /* Cuando está abierto */
-  .nav.is-open{
-    display:flex;
-  }
-
-  /* Selects y links ocupan todo el ancho */
-  .nav select{
-    width:100%;
-    height:42px;
-    border-radius:10px;
-    padding:8px 10px;
-  }
-
-  .nav a{
-    width:100%;
-    text-align:center;
-    padding:12px;
-    border-radius:12px;
-    background: rgba(255,255,255,0.18);
-    white-space:nowrap;
-  }
-
-  /* Saludo (Hola ...) que no se desborde */
-  #navAuth span{
-    display:block;
-    text-align:center;
-    font-weight:700;
-  }
-}
-/* PEGÁ ESTO COMO TU style.css (REEMPLAZÁ TODO LO QUE TENÉS DE HAMBURGUESA) */
-
-/* ===== HAMBURGUESA (CSS) ===== */
-.hamburger{
-  display:none;
-  border:0;
-  border-radius:12px;
-  padding:10px 12px;
-  font-size:22px;
-  font-weight:900;
-  cursor:pointer;
-  background: rgba(255,255,255,0.18);
-  color:#1b167f;
-}
-
-.nav{
-  display:flex;
-  gap:15px;
-  align-items:center;
-  flex-wrap:wrap;
-}
-
-@media (max-width: 600px){
-  #hamburgerBtn{ display:inline-block; }
-
-  #mainNav{
-    display:none;
-    width:100%;
-    flex-direction:column;
-    gap:10px;
-    padding:12px;
-    border-radius:14px;
-    background: rgba(255,255,255,0.14);
-  }
-
-  #mainNav.is-open{ display:flex; }
-
-  #mainNav select,
-  #mainNav a{
-    width:100%;
-    padding:12px;
-    border-radius:12px;
-    text-align:center;
-  }
-}
-/* PEGÁ ESTO AL FINAL DE style.css */
-
-/* 1) ALINEACIÓN PROLIJA DE TODO LO DEL MENÚ */
-#mainNav select,
-#mainNav a,
-#navAuth a{
-  box-sizing: border-box;
-  width: 100%;
-  display: block;
-  text-align: center;
-  padding: 12px;
-  border-radius: 12px;
-}
-
-/* selects más prolijos */
-#mainNav select{
-  height: 44px;
-  padding: 10px 12px;
-}
-
-/* espacio entre items */
-@media (max-width: 600px){
-  #mainNav{
-    align-items: stretch;
-  }
-}
-/* ===== NAV AUTH ===== */
-#navAuth{ display:flex; gap:12px; align-items:center; }
-#navAuth .hello{ font-weight:700; color:#1b167f; }
-#navAuth .btn-nav{
-  padding:8px 10px;
-  border-radius:10px;
-  background: rgba(255,255,255,0.18);
-  text-decoration:none;
-  font-weight:700;
-  color:#1b167f;
-}
-
-/* ===== HAMBURGUESA ===== */
-.hamburger{
-  display:none;
-  border:0;
-  border-radius:12px;
-  padding:10px 12px;
-  font-size:22px;
-  font-weight:900;
-  cursor:pointer;
-  background: rgba(255,255,255,0.18);
-  color:#1b167f;
-}
-
-@media (max-width: 600px){
-  .hamburger{ display:inline-block; }
-
-  #mainNav{
-    width:100%;
-    display:none;
-    flex-direction:column;
-    align-items:stretch;
-    gap:10px;
-    padding:12px;
-    border-radius:14px;
-    background: rgba(255,255,255,0.14);
-  }
-  #mainNav.is-open{ display:flex; }
-
-  #mainNav select,
-  #mainNav a,
-  #navAuth a{
-    width:100%;
-    text-align:center;
-    padding:12px;
-    border-radius:12px;
-    box-sizing:border-box;
-  }
-
-  #navAuth{
-    width:100%;
-    flex-direction:column;
-    align-items:stretch;
-    gap:10px;
-  }
-
-  #navAuth .hello{ text-align:center; }
-}
-/* ===== HEADER PROLIJO EN PC + MOVIL ===== */
-header{
+  background-color: transparent;
+  color:#fff;
+  padding: 15px 30px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:16px;
-  flex-wrap:nowrap; /* evita que se rompa en PC */
+  flex-wrap:nowrap;
 }
 
 .logo{
@@ -760,22 +404,22 @@ header{
   white-space:nowrap;
 }
 
-/* PC: nav en línea, sin ancho 100% */
+#hamburgerBtn{ display:none; }
+
 #mainNav{
   display:flex;
   align-items:center;
   gap:14px;
   flex-wrap:nowrap;
-  width:auto;
-  padding:0;
-  background:transparent;
 }
 
 #mainNav select{
-  width:140px;
-  height:38px;
-  padding:6px 10px;
-  border-radius:10px;
+  width: 190px;          /* para que entre “Español” completo */
+  min-width: 190px;
+  height: 44px;          /* más alto */
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: none;
   box-sizing:border-box;
 }
 
@@ -786,146 +430,134 @@ header{
 }
 
 #navAuth a{
-  display:inline-block;
-  width:auto;
-  padding:8px 10px;
-  border-radius:10px;
-  text-align:center;
-  box-sizing:border-box;
+  padding: 10px 12px;
+  border-radius: 12px;
   background: rgba(255,255,255,0.18);
-  font-weight:700;
   text-decoration:none;
+  font-weight:700;
+  color:#1b167f;
 }
 
-/* Botón hamburguesa: solo móvil */
-#hamburgerBtn{ display:none; }
-
-/* ===== BUSCADOR PROLIJO ===== */
-.search-box{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.search-box input,
-.search-box select{
-  height:40px;
-  border-radius:10px;
-  box-sizing:border-box;
-}
-
-.search-box #destino{ width:280px; }
-.search-box #entrada,
-.search-box #salida{ width:150px; }
-.search-box #adultos{ width:140px; }
-.search-box #ninos{ width:180px; }
-
-.search-box .btn-header{
-  height:40px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:0 16px;
-  border-radius:10px;
-}
-
-/* ===== MÓVIL: hamburguesa al lado del logo + menú desplegable prolijo ===== */
+/* =========================
+   MOBILE
+   ========================= */
 @media (max-width: 600px){
-  header{ flex-wrap:wrap; }
-
-  #hamburgerBtn{
-    display:inline-block;
-    margin-left:auto; /* queda a la derecha del logo */
+  header{
+    padding: 12px 14px;
+    flex-wrap:nowrap;
   }
 
-  /* menú oculto/abierto */
+  /* logo izquierda + hamburguesa derecha */
+  #hamburgerBtn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:44px;
+    height:44px;
+    border:0;
+    border-radius:12px;
+    font-size:22px;
+    font-weight:900;
+    cursor:pointer;
+    background: rgba(255,255,255,0.18);
+    color:#1b167f;
+    margin-left:auto;
+  }
+
+  /* menú cerrado/abierto */
   #mainNav{
     width:100%;
     display:none;
     flex-direction:column;
     align-items:stretch;
-    gap:10px;
+    gap:12px;
     padding:12px;
     border-radius:14px;
     background: rgba(255,255,255,0.14);
   }
   #mainNav.is-open{ display:flex; }
 
+  /* items full width y alineados */
   #mainNav select,
   #mainNav a,
   #navAuth a{
     width:100%;
     text-align:center;
-    padding:12px;
+    padding: 14px 12px;
     border-radius:12px;
     box-sizing:border-box;
   }
 
-  #navAuth{ flex-direction:column; align-items:stretch; }
+  /* selects más altos para que NO se corte texto */
+  #mainNav select{
+    height: 56px;
+    font-size: 16px;
+  }
 
-  /* buscador en columna y botón ancho */
-  .search-box{
+  #navAuth{
+    width:100%;
     flex-direction:column;
     align-items:stretch;
-  }
-
-  .search-box #destino,
-  .search-box #entrada,
-  .search-box #salida,
-  .search-box #adultos,
-  .search-box #ninos{
-    width:100%;
-  }
-
-  .search-box .btn-header{
-    width:100%;
-    height:48px;
-    border-radius:12px;
+    gap:12px;
   }
 }
-/* ===== FIX HEADER PC: logo + menú alineados ===== */
-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  flex-wrap:nowrap;
-}
 
-.logo{ white-space:nowrap; }
-
-#mainNav{
-  margin-left:auto;     /* empuja el menú a la derecha */
-  align-items:center;
-}
-
-/* ===== FIX selects (idioma / moneda) para que entre el texto ===== */
-#mainNav select{
-  width: 180px;          /* más ancho */
-  min-width: 180px;
-}
-
-/* ===== FIX buscador: botón no más grande que el cuadro ===== */
+/* =========================
+   BUSCADOR (Botón dentro del cuadro)
+   ========================= */
 .search-box{
-  align-items:center;
+  background-color: #ffb300;
+  border-radius: 20px;
+  padding: 20px;
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+  max-width: 900px;
+  margin: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-sizing:border-box;
 }
 
+.search-box input,
+.search-box select{
+  height: 44px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  box-sizing:border-box;
+  min-width: 140px;
+}
+
+/* tu botón es <a class="btn-header"> */
 .search-box .btn-header{
-  height: 40px;
-  padding: 0 14px;
+  height: 44px;
+  padding: 0 16px;
   border-radius: 10px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  line-height: 1;
+  text-decoration:none;
+  font-weight:800;
+  box-sizing:border-box;
+  white-space:nowrap;
 }
 
-/* si tu "cuadro naranja" tiene altura fija, esto evita que se desborde */
-.search-box input,
-.search-box select{
-  height:40px;
-}
+/* Mobile: todo en columna */
 @media (max-width: 600px){
-  #mainNav select{ width:100%; min-width:0; }
+  .search-box{
+    flex-direction:column;
+    align-items:stretch;
+    gap:12px;
+  }
+  .search-box input,
+  .search-box select,
+  .search-box .btn-header{
+    width:100%;
+  }
+  .search-box .btn-header{
+    height: 56px;
+    border-radius: 12px;
+  }
 }
