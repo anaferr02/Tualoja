@@ -685,3 +685,62 @@ header nav a{
     align-items: stretch;
   }
 }
+/* ===== NAV AUTH ===== */
+#navAuth{ display:flex; gap:12px; align-items:center; }
+#navAuth .hello{ font-weight:700; color:#1b167f; }
+#navAuth .btn-nav{
+  padding:8px 10px;
+  border-radius:10px;
+  background: rgba(255,255,255,0.18);
+  text-decoration:none;
+  font-weight:700;
+  color:#1b167f;
+}
+
+/* ===== HAMBURGUESA ===== */
+.hamburger{
+  display:none;
+  border:0;
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:22px;
+  font-weight:900;
+  cursor:pointer;
+  background: rgba(255,255,255,0.18);
+  color:#1b167f;
+}
+
+@media (max-width: 600px){
+  .hamburger{ display:inline-block; }
+
+  #mainNav{
+    width:100%;
+    display:none;
+    flex-direction:column;
+    align-items:stretch;
+    gap:10px;
+    padding:12px;
+    border-radius:14px;
+    background: rgba(255,255,255,0.14);
+  }
+  #mainNav.is-open{ display:flex; }
+
+  #mainNav select,
+  #mainNav a,
+  #navAuth a{
+    width:100%;
+    text-align:center;
+    padding:12px;
+    border-radius:12px;
+    box-sizing:border-box;
+  }
+
+  #navAuth{
+    width:100%;
+    flex-direction:column;
+    align-items:stretch;
+    gap:10px;
+  }
+
+  #navAuth .hello{ text-align:center; }
+}
