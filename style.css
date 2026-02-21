@@ -642,3 +642,44 @@ document.addEventListener("DOMContentLoaded", () => {
   .nav{ display:none; }
   .nav.is-open{ display:flex; }
 }
+  .hamburger{
+  display:none;
+  border:0;
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:22px;
+  font-weight:900;
+  cursor:pointer;
+  background: rgba(255,255,255,0.18);
+  color:#1b167f;
+}
+
+.nav{
+  display:flex;
+  gap:15px;
+  align-items:center;
+}
+
+@media (max-width: 600px){
+  .hamburger{ display:inline-block; }
+
+  .nav{
+    width:100%;
+    display:none;
+    flex-direction:column;
+    gap:10px;
+    padding:12px;
+    border-radius:14px;
+    background: rgba(255,255,255,0.14);
+  }
+
+  .nav.is-open{ display:flex; }
+
+  .nav select,
+  .nav a{
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    text-align:center;
+  }
+}
