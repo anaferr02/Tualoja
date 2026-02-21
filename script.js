@@ -41,7 +41,7 @@ const nombreCorto = nombre.length > 10 ? nombre.slice(0,10) + "…" : nombre;
     
     navAuth.innerHTML = `
       <span style="margin-right:12px; font-weight:700;">
-        Hola, ${nombre}
+        Hola, ${nombreCorto}
       </span>
       <a href="#" id="logoutLink">Cerrar sesión</a>
     `;
