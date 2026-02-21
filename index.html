@@ -26,28 +26,36 @@
   <body>
     <!-- Encabezado -->
     <header>
-      <a href="index.html" class="logo">
-        <span class="icono-maleta">🧳</span> Aloja.com.ar</a>
+  <a href="index.html" class="logo">
+    <span class="icono-maleta">🧳</span> Aloja.com.ar
+  </a>
 
-     
-      <nav>
-        <select id="idioma" style="margin-right: 15px">
-          <option value="es">Español</option>
-          <option value="en">English</option>
-          <option value="pt">Português</option>
-        </select>
-        <select id="moneda">
-          <option value="ars">ARS</option>
-          <option value="usd">USD</option>
-          <option value="eur">EUR</option>
-        </select>
-        <div class="cta-buttons"></div>
-        <span id="navAuth"></span>
-        <a href="alojamiento.html">Registra tu alojamiento</a>
-        <a href="ayuda.html">Ayuda</a>
-      </nav>
+  <!-- Botón hamburguesa (solo móvil) -->
+  <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menú" aria-expanded="false">
+    ☰
+  </button>
 
-    </header>
+  <!-- Menú -->
+  <nav id="mainNav" class="nav">
+    <select id="idioma" style="margin-right: 15px">
+      <option value="es">Español</option>
+      <option value="en">English</option>
+      <option value="pt">Português</option>
+    </select>
+
+    <select id="moneda">
+      <option value="ars">ARS</option>
+      <option value="usd">USD</option>
+      <option value="eur">EUR</option>
+    </select>
+
+    <!-- Esto queda para el login dinámico -->
+    <span id="navAuth"></span>
+
+    <a href="alojamiento.html">Registra tu alojamiento</a>
+    <a href="ayuda.html">Ayuda</a>
+  </nav>
+</header>
 
     <!-- Eslogan -->
     <section class="hero">
