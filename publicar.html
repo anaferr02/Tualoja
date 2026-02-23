@@ -3,125 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Publicar alojamiento - TuAloja</title>
-  <style>
-    body{
-      font-family: Arial, sans-serif;
-      margin:0;
-      min-height:100vh;
-      background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-    }
-    .card{
-      background:#fff;
-      width:min(720px, 95vw);
-      border-radius:18px;
-      padding:24px;
-      box-shadow:0 10px 30px rgba(0,0,0,.12);
-    }
-    h1{margin:0 0 8px; color:#1b167f;}
-    p{margin:0 0 18px; color:#333;}
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-    label{font-size:14px; color:#222; display:block; margin-bottom:6px;}
-    input, select, textarea{
-      width:100%;
-      padding:10px;
-      border:1px solid #d6d6d6;
-      border-radius:10px;
-      outline:none;
-    }
-    textarea{min-height:90px; resize:vertical;}
-    .full{grid-column:1 / -1;}
-    .btn{
-      width:100%;
-      border:none;
-      border-radius:12px;
-      padding:12px 14px;
-      background:#1b167f;
-      color:#fff;
-      font-weight:bold;
-      cursor:pointer;
-      margin-top:14px;
-    }
-    .small{font-size:12px; color:#555; margin-top:10px;}
-  </style>
+  <title>Publicar - TuAloja</title>
 </head>
-
 <body>
-  <div class="card">
-    <h1>Publicar alojamiento</h1>
-    <p>Completá los datos y te llega al mail para revisarlo antes de publicarlo.</p>
+  <script>
+    if (localStorage.getItem("tualoja_logged") !== "1") {
+      window.location.href = "login.html";
+    }
+  </script>
 
-    <form action="https://formsubmit.co/alojamientos@tualoja.com" method="POST">
-      <input type="hidden" name="_subject" value="Nuevo alojamiento - TuAloja">
-      <input type="hidden" name="_template" value="table">
-      <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_next" value="https://anaferr02.github.io/Tualoja/gracias.html">
-
-      <div class="grid">
-        <div>
-          <label>Nombre del alojamiento</label>
-          <input name="nombre_alojamiento" required>
-        </div>
-        <div>
-          <label>Tipo</label>
-          <select name="tipo" required>
-            <option value="">Elegir</option>
-            <option>Casa</option>
-            <option>Departamento</option>
-            <option>Cabaña</option>
-            <option>Habitación</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Ciudad</label>
-          <input name="ciudad" required>
-        </div>
-        <div>
-          <label>Dirección aproximada (opcional)</label>
-          <input name="direccion">
-        </div>
-
-        <div>
-          <label>Precio por noche (ARS)</label>
-          <input name="precio_por_noche" type="number" min="0" required>
-        </div>
-        <div>
-          <label>Capacidad (personas)</label>
-          <input name="capacidad" type="number" min="1" required>
-        </div>
-
-        <div class="full">
-          <label>Descripción</label>
-          <textarea name="descripcion" required></textarea>
-        </div>
-
-        <div>
-          <label>Nombre del anfitrión</label>
-          <input name="anfitrion_nombre" required>
-        </div>
-        <div>
-          <label>WhatsApp</label>
-          <input name="anfitrion_whatsapp" required>
-        </div>
-
-        <div class="full">
-          <label>Email del anfitrión</label>
-          <input name="anfitrion_email" type="email" required>
-        </div>
-      </div>
-
-      <button class="btn" type="submit">Enviar publicación</button>
-      <div class="small">Al enviar, aceptás Términos y Política de Privacidad.</div>
-    </form>
-  </div>
+  <h1>Publicar alojamiento (próximo paso)</h1>
+  <p>Acá armamos el formulario por pasos tipo Booking.</p>
 </body>
 </html>
