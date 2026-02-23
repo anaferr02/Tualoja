@@ -4,69 +4,111 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Crear cuenta - TuAloja</title>
-  <link rel="stylesheet" href="style.css" />
   <style>
-    .contenedor { max-width: 520px; margin: 0 auto; padding: 20px; }
-    .box { background:#fff; border-radius:16px; padding:18px; box-shadow:0 10px 25px rgba(0,0,0,.08); }
-    label { display:block; font-weight:700; margin: 12px 0 6px; }
-    input { width:100%; padding:12px; border-radius:12px; border:1px solid #d7e0ee; }
-    button { margin-top:14px; width:100%; padding:12px; border:0; border-radius:12px; font-weight:800; cursor:pointer; background:#1b167f; color:#fff; }
-    .muted { color:#5b6472; }
-    .link { display:inline-block; margin-top:10px; }
+    body{
+      font-family: Arial, sans-serif;
+      margin:0;
+      min-height:100vh;
+      background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .card{
+      background:#fff;
+      width:min(520px, 95vw);
+      border-radius:18px;
+      padding:26px;
+      box-shadow:0 10px 30px rgba(0,0,0,.12);
+    }
+    h1{margin:0 0 8px; color:#1b167f; font-size:34px;}
+    p{margin:0 0 18px; color:#444;}
+    label{display:block; font-size:14px; margin:12px 0 6px; color:#222;}
+    input{
+      width:100%;
+      padding:12px;
+      border:1px solid #d6d6d6;
+      border-radius:12px;
+      outline:none;
+      font-size:14px;
+    }
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:14px;
+      background:#1b167f;
+      color:#fff;
+      font-weight:bold;
+      cursor:pointer;
+      margin-top:16px;
+      font-size:14px;
+    }
+    .link{
+      display:inline-block;
+      margin-top:12px;
+      color:#1b167f;
+      text-decoration: underline;
+      font-size:14px;
+    }
+    .hint{font-size:12px; color:#666; margin-top:10px;}
   </style>
 </head>
+
 <body>
+  <div class="card">
+    <h1>Crear cuenta</h1>
+    <p>Registrate con email y contraseña.</p>
 
-  <header>
-    <a href="index.html" class="logo"><span class="icono-maleta">🧳</span> TuAloja</a>
-    <nav>
-      <span id="navAuth"></span>
-      <a href="alojamiento.html">Registra tu alojamiento</a>
-      <a href="ayuda.html">Ayuda</a>
-    </nav>
-  </header>
+    <form id="registerForm" autocomplete="on">
+      <label>Email</label>
+      <input type="email" name="email" required placeholder="tuemail@ejemplo.com" />
 
-  <main class="contenedor">
-    <div class="box">
-      <h1>Crear cuenta</h1>
-      <p class="muted">Registrate con email y contraseña.</p>
+      <label>Contraseña</label>
+      <input type="password" name="password" required minlength="6" placeholder="Mínimo 6 caracteres" />
 
-      <form action="https://formsubmit.co/alojamientos@tualoja.com" method="POST">
-  <input type="hidden" name="_subject" value="Nuevo alojamiento - TuAloja">
-  <input type="hidden" name="_template" value="table">
-  <input type="hidden" name="_captcha" value="false">
-  <input type="hidden" name="_next" value="https://anaferr02.github.io/Tualoja/gracias.html">
+      <label>Confirmar contraseña</label>
+      <input type="password" name="password2" required minlength="6" placeholder="Repetí la contraseña" />
 
-  <!-- tus inputs acá -->
-  <button type="submit">Publicar alojamiento</button>
-</form>
+      <button class="btn" type="submit">Crear cuenta y continuar</button>
 
       <a class="link" href="login.html">Ya tengo cuenta → Iniciar sesión</a>
-    </div>
-  </main>
+      <div class="hint">Después de crear la cuenta, te llevamos a publicar tu alojamiento.</div>
+    </form>
+  </div>
 
   <script>
-  const form = document.getElementById("registerForm");
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
+    document.getElementById("registerForm").addEventListener("submit", (e) => {
+      e.preventDefault();
 
-    const email = form.querySelector('input[name="email"]').value.trim().toLowerCase();
-    const password = form.querySelector('input[name="password"]').value;
+      const form = e.currentTarget;
+      const email = form.email.value.trim().toLowerCase();
+      const password = form.password.value;
+      const password2 = form.password2.value;
 
-    const users = JSON.parse(localStorage.getItem("tualoja_users") || "[]");
-    if (users.find(u => u.email === email)) {
-      alert("Ese email ya está registrado. Iniciá sesión.");
-      window.location.href = "login.html";
-      return;
-    }
+      if (password !== password2) {
+        alert("Las contraseñas no coinciden.");
+        return;
+      }
 
-    users.push({ email, password });
-    localStorage.setItem("tualoja_users", JSON.stringify(users));
-    localStorage.setItem("tualoja_logged", "1");
-    localStorage.setItem("tualoja_user", email);
+      const users = JSON.parse(localStorage.getItem("tualoja_users") || "[]");
+      if (users.some(u => u.email === email)) {
+        alert("Ese email ya está registrado. Iniciá sesión.");
+        window.location.href = "login.html";
+        return;
+      }
 
-    window.location.href = "publicar.html";
-  });
-</script>
+      users.push({ email, password });
+      localStorage.setItem("tualoja_users", JSON.stringify(users));
+      localStorage.setItem("tualoja_logged", "1");
+      localStorage.setItem("tualoja_user", email);
+
+      // Próximo paso: wizard de publicación
+      window.location.href = "publicar.html";
+    });
+  </script>
 </body>
 </html>
+
+
