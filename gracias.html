@@ -1,78 +1,122 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registro recibido - TuAloja</title>
-    <link rel="stylesheet" href="style.css" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Publicación recibida - TuAloja</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .wrap{ padding:60px 0; }
+    .card{
+      background:#fff;
+      border-radius:18px;
+      padding:28px;
+      box-shadow:0 10px 30px rgba(0,0,0,.12);
+      max-width:780px;
+      margin:auto;
+    }
+    .title{ color:#1b167f; margin:0 0 8px; font-size:32px; }
+    .sub{ margin:0 0 18px; color:#444; font-size:16px; }
+    .steps{
+      margin:18px 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:10px;
+    }
+    .step{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      background:#fafafa;
+      border:1px solid #eee;
+      border-radius:14px;
+      padding:12px 14px;
+    }
+    .n{
+      width:30px; height:30px;
+      border-radius:999px;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(27,22,127,.10);
+      color:#1b167f;
+      font-weight:800;
+      flex:0 0 30px;
+    }
+    .btn-row{ display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; }
+    .btn-light{
+      border:none;
+      background: rgba(0,0,0,.06);
+      padding:12px 16px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:700;
+      text-decoration:none;
+      color:#111;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .small{ margin-top:16px; color:#666; font-size:13px; line-height:1.5; }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:#fff3cd;
+      border:1px solid #ffeeba;
+      color:#856404;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:13px;
+      margin-top:14px;
+    }
+  </style>
+</head>
 
-    <style>
-      .gracias-container {
-        min-height: 80vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        background: #67c7f7;
-        padding: 40px 20px;
-      }
-
-      .gracias-box {
-        background: white;
-        padding: 40px;
-        border-radius: 12px;
-        max-width: 520px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-      }
-
-      .gracias-box h1 {
-        color: #0a6ea8;
-        margin-bottom: 15px;
-      }
-
-      .gracias-box p {
-        color: #444;
-        line-height: 1.6;
-        margin-bottom: 25px;
-      }
-
-      .boton-volver {
-        display: inline-block;
-        background: #0a6ea8;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
-      }
-
-      .boton-volver:hover {
-        background: #095c8c;
-      }
-    </style>
-  </head>
-
-  <body>
-
-    <div class="gracias-container">
-      <div class="gracias-box">
-        <h1>¡Registro recibido!</h1>
-        <p>
-          Gracias por registrar tu alojamiento en <strong>TuAloja</strong>.
-          Nuestro equipo revisará la información y te contactará pronto.
+<body>
+  <section class="seccion seccion-transparente wrap">
+    <div class="contenedor">
+      <div class="card">
+        <h1 class="title">¡Listo! Recibimos tu alojamiento ✅</h1>
+        <p class="sub">
+          Tu publicación fue enviada correctamente. Ahora pasa a revisión antes de aparecer en TuAloja.
         </p>
 
-        <p>
-          Estás un paso más cerca de recibir reservas y ganar más con tu propiedad.
-        </p>
+        <div class="badge">🛡️ Seguridad: revisamos manualmente cada publicación para evitar estafas.</div>
 
-        <a href="index.html" class="boton-volver">Volver al inicio</a>
+        <ul class="steps">
+          <li class="step">
+            <div class="n">1</div>
+            <div>
+              <b>Revisión</b><br>
+              Verificamos que la información sea clara y coherente.
+            </div>
+          </li>
+          <li class="step">
+            <div class="n">2</div>
+            <div>
+              <b>Contacto</b><br>
+              Si falta algo, te escribimos por WhatsApp o mail.
+            </div>
+          </li>
+          <li class="step">
+            <div class="n">3</div>
+            <div>
+              <b>Publicación</b><br>
+              Cuando esté OK, tu alojamiento se publica y empieza a recibir consultas.
+            </div>
+          </li>
+        </ul>
+
+        <div class="btn-row">
+          <a class="btn-principal" href="index.html">Volver al inicio</a>
+          <a class="btn-light" href="publicar.html">Publicar otro alojamiento</a>
+        </div>
+
+        <div class="small">
+          ¿No te llegó confirmación? Revisá spam/promociones o volvé a enviar la publicación.
+        </div>
       </div>
     </div>
-
-    <footer>
-      <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
-    </footer>
-
-  </body>
+  </section>
+</body>
 </html>
