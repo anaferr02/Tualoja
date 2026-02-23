@@ -4,66 +4,94 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Iniciar sesión - TuAloja</title>
-  <link rel="stylesheet" href="style.css" />
   <style>
-    .contenedor { max-width: 520px; margin: 0 auto; padding: 20px; }
-    .box { background:#fff; border-radius:16px; padding:18px; box-shadow:0 10px 25px rgba(0,0,0,.08); }
-    label { display:block; font-weight:700; margin: 12px 0 6px; }
-    input { width:100%; padding:12px; border-radius:12px; border:1px solid #d7e0ee; }
-    button { margin-top:14px; width:100%; padding:12px; border:0; border-radius:12px; font-weight:800; cursor:pointer; background:#1b167f; color:#fff; }
-    .link { display:inline-block; margin-top:10px; }
+    body{
+      font-family: Arial, sans-serif;
+      margin:0;
+      min-height:100vh;
+      background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .card{
+      background:#fff;
+      width:min(520px, 95vw);
+      border-radius:18px;
+      padding:26px;
+      box-shadow:0 10px 30px rgba(0,0,0,.12);
+    }
+    h1{margin:0 0 8px; color:#1b167f; font-size:34px;}
+    p{margin:0 0 18px; color:#444;}
+    label{display:block; font-size:14px; margin:12px 0 6px; color:#222;}
+    input{
+      width:100%;
+      padding:12px;
+      border:1px solid #d6d6d6;
+      border-radius:12px;
+      outline:none;
+      font-size:14px;
+    }
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:14px;
+      background:#1b167f;
+      color:#fff;
+      font-weight:bold;
+      cursor:pointer;
+      margin-top:16px;
+      font-size:14px;
+    }
+    .link{
+      display:inline-block;
+      margin-top:12px;
+      color:#1b167f;
+      text-decoration: underline;
+      font-size:14px;
+    }
   </style>
 </head>
+
 <body>
+  <div class="card">
+    <h1>Iniciar sesión</h1>
+    <p>Ingresá con tu email y contraseña.</p>
 
-  <header>
-    <a href="index.html" class="logo"><span class="icono-maleta">🧳</span> TuAloja</a>
-    <nav>
-      <span id="navAuth"></span>
-      <a href="alojamiento.html">Registra tu alojamiento</a>
-      <a href="ayuda.html">Ayuda</a>
-    </nav>
-  </header>
+    <form id="loginForm" autocomplete="on">
+      <label>Email</label>
+      <input type="email" name="email" required />
 
-  <main class="contenedor">
-    <div class="box">
-      <h1>Iniciar sesión</h1>
+      <label>Contraseña</label>
+      <input type="password" name="password" required />
 
-      <form id="loginForm">
-        <label>Email</label>
-        <input type="email" id="email" required />
-
-        <label>Contraseña</label>
-        <input type="password" id="password" required />
-
-        <button type="submit">Entrar</button>
-      </form>
-
+      <button class="btn" type="submit">Entrar y continuar</button>
       <a class="link" href="register.html">No tengo cuenta → Crear cuenta</a>
-    </div>
-  </main>
+    </form>
+  </div>
 
   <script>
-  const form = document.getElementById("loginForm");
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
 
-    const email = form.querySelector('input[name="email"]').value.trim().toLowerCase();
-    const password = form.querySelector('input[name="password"]').value;
+      const form = e.currentTarget;
+      const email = form.email.value.trim().toLowerCase();
+      const password = form.password.value;
 
-    const users = JSON.parse(localStorage.getItem("tualoja_users") || "[]");
-    const ok = users.find(u => u.email === email && u.password === password);
+      const users = JSON.parse(localStorage.getItem("tualoja_users") || "[]");
+      const ok = users.find(u => u.email === email && u.password === password);
 
-    if (!ok) {
-      alert("Email o contraseña incorrectos.");
-      return;
-    }
+      if (!ok) {
+        alert("Email o contraseña incorrectos.");
+        return;
+      }
 
-    localStorage.setItem("tualoja_logged", "1");
-    localStorage.setItem("tualoja_user", email);
-
-    window.location.href = "publicar.html";
-  });
-</script>
+      localStorage.setItem("tualoja_logged", "1");
+      localStorage.setItem("tualoja_user", email);
+      window.location.href = "publicar.html";
+    });
+  </script>
 </body>
 </html>
