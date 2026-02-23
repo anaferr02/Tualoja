@@ -3,18 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registra tu alojamiento - Aloja</title>
+    <title>Registra tu alojamiento - TuAloja</title>
     <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
 
+    <!-- HERO -->
     <section class="seccion seccion-transparente">
       <div class="contenedor hero-pro">
         <h1>Da de alta tu alojamiento en TuAloja</h1>
         <p>Ganá más dinero, más rápido y llegá a nuevos huéspedes.</p>
-        <a href="publicar.html">Registrar alojamiento</a>
+
+        <!-- Botón principal -->
+        <button id="btnRegistrar" class="btn-principal">
+          Registrar alojamiento
+        </button>
+      </div>
     </section>
 
+    <!-- BENEFICIOS -->
     <section class="seccion seccion-blanca">
       <div class="contenedor grid-beneficios">
 
@@ -36,27 +44,64 @@
       </div>
     </section>
 
-    <!-- FORMULARIO CORREGIDO -->
-    <section id="registro" class="ayuda">
-      <h2>Registrá tu alojamiento</h2>
+    <!-- BLOQUE CENTRAL (TIPO BOOKING) -->
+    <section class="seccion seccion-transparente">
+      <div class="contenedor" style="max-width:900px;">
+        <div style="
+          background:#fff;
+          border-radius:18px;
+          padding:28px;
+          box-shadow:0 10px 30px rgba(0,0,0,.12);
+        ">
+          <h2>Registrá tu alojamiento</h2>
+          <p>
+            Para publicar tu alojamiento necesitás crear una cuenta o iniciar sesión.
+            El proceso es simple y guiado, como en Booking.
+          </p>
 
-      <form action="https://formsubmit.co/alojamientos@tualoja.com" method="POST">
+          <ol style="margin:16px 0 22px; line-height:1.6;">
+            <li>Datos de la propiedad</li>
+            <li>Ubicación</li>
+            <li>Servicios y normas</li>
+            <li>Fotos</li>
+            <li>Precio y disponibilidad</li>
+          </ol>
 
-        <!-- Configuración -->
-        <input type="hidden" name="_subject" value="Nuevo alojamiento registrado en TuAloja">
-        <input type="hidden" name="_captcha" value="false">
-          <input type="hidden" name="_next" value="https://tualoja.com/gracias.html">
-      </form>
+          <button id="btnComenzar" class="btn-principal">
+            Comenzar
+          </button>
+
+          <div style="margin-top:14px;">
+            <a href="register.html">Crear cuenta</a> |
+            <a href="login.html">Iniciar sesión</a>
+          </div>
+        </div>
+      </div>
     </section>
 
+    <!-- FOOTER -->
     <footer>
-      <p>&copy; 2026 Tualoja. Todos los derechos reservados.</p>
+      <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
       <p>
         <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
-        <a href="politica-de-privacidad.html">Política de Privacidad</a> |
-       
+        <a href="politica-de-privacidad.html">Política de Privacidad</a>
       </p>
     </footer>
+
+    <!-- LOGICA DE REDIRECCION -->
+    <script>
+      function irARegistro() {
+        const logueado = localStorage.getItem("tualoja_logged") === "1";
+        if (logueado) {
+          window.location.href = "publicar.html";
+        } else {
+          window.location.href = "register.html";
+        }
+      }
+
+      document.getElementById("btnRegistrar").addEventListener("click", irARegistro);
+      document.getElementById("btnComenzar").addEventListener("click", irARegistro);
+    </script>
 
   </body>
 </html>
