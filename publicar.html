@@ -242,9 +242,18 @@
         <!-- FORM FINAL (se envía en el paso 6) -->
         <form id="pubForm" action="https://formsubmit.co/alojamientos@tualoja.com" method="POST">
           <input type="hidden" name="_subject" value="Nuevo alojamiento - TuAloja">
-          <input type="hidden" name="_template" value="table">
-          <input type="hidden" name="_captcha" value="false">
-          <input type="hidden" name="_next" value="https://tualoja.com/gracias.html">
+<input type="hidden" name="_template" value="table">
+
+<!-- ✅ Autorespuesta al anfitrión (al email que se cargue en name="email") -->
+<input type="hidden" name="_autoresponse" value="¡Gracias! Recibimos tu alojamiento en TuAloja ✅
+
+Tu publicación pasó a revisión para evitar estafas y anuncios falsos.
+Si falta algún dato, te contactamos por WhatsApp o por este mail.
+
+— Equipo TuAloja">
+
+<!-- ✅ Dejá reCAPTCHA habilitado (si lo desactivás, el autoresponse no funciona) -->
+<input type="hidden" name="_next" value="https://tualoja.com/gracias.html">
 
           <!-- Hidden para mandar fotos como texto (nombres) -->
           <input type="hidden" name="fotos_info" id="fotos_info" value="">
@@ -375,7 +384,7 @@
               </div>
               <div class="full">
                 <label>Email del anfitrión *</label>
-                <input type="email" name="anfitrion_email" id="anfitrion_email" required placeholder="tuemail@ejemplo.com" />
+                <input type="email" name="email" id="anfitrion_email" required>
               </div>
             </div>
 
