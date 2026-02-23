@@ -3,16 +3,600 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Publicar - TuAloja</title>
+  <title>Publicar alojamiento - TuAloja</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* Estilos solo para el wizard (no pisa tu web) */
+    .wizard-wrap{ padding:40px 0; }
+    .wizard-card{
+      background:#fff;
+      border-radius:18px;
+      padding:26px;
+      box-shadow:0 10px 30px rgba(0,0,0,.12);
+      max-width:900px;
+      margin:auto;
+    }
+    .wizard-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .wizard-top h1{
+      margin:0;
+      color:#1b167f;
+      font-size:30px;
+    }
+    .wizard-top p{ margin:6px 0 0; color:#444; }
+    .logout{
+      border:none;
+      background: rgba(27,22,127,.08);
+      color:#1b167f;
+      font-weight:800;
+      padding:10px 14px;
+      border-radius:999px;
+      cursor:pointer;
+    }
+
+    .progress{
+      width:100%;
+      height:10px;
+      background: rgba(27,22,127,.10);
+      border-radius:999px;
+      overflow:hidden;
+      margin:10px 0 18px;
+    }
+    .progress > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(135deg, #1b167f, #3a2fcf);
+      border-radius:999px;
+      transition: width .25s ease;
+    }
+
+    .steps{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+      font-size:13px;
+      color:#555;
+    }
+    .chip{
+      padding:6px 10px;
+      border-radius:999px;
+      background:#f3f4ff;
+      border:1px solid rgba(27,22,127,.12);
+    }
+    .chip.active{
+      background: rgba(27,22,127,.10);
+      color:#1b167f;
+      font-weight:800;
+    }
+
+    .step{ display:none; }
+    .step.active{ display:block; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:10px;
+    }
+    @media (max-width:700px){
+      .grid{ grid-template-columns:1fr; }
+    }
+
+    label{ display:block; font-size:14px; margin:10px 0 6px; color:#222; }
+    input, select, textarea{
+      width:100%;
+      padding:12px 14px;
+      border:1px solid #d6d6d6;
+      border-radius:12px;
+      outline:none;
+      font-size:14px;
+      box-sizing:border-box;
+    }
+    textarea{ min-height:90px; resize:vertical; }
+
+    .full{ grid-column:1 / -1; }
+
+    .actions{
+      display:flex;
+      gap:12px;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:18px;
+      flex-wrap:wrap;
+    }
+    .btn-sec{
+      border:none;
+      background: rgba(0,0,0,.06);
+      padding:12px 16px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .btn-next{
+      border:none;
+      border-radius:999px;
+      padding:12px 18px;
+      cursor:pointer;
+      font-weight:800;
+      background: linear-gradient(135deg, #1b167f, #3a2fcf);
+      color:#fff;
+      box-shadow: 0 12px 30px rgba(27,22,127,0.20);
+    }
+
+    .note{
+      margin-top:10px;
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    .checks{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:8px;
+    }
+    @media (max-width:700px){
+      .checks{ grid-template-columns:1fr; }
+    }
+    .check{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      background:#fafafa;
+      border:1px solid #eee;
+      padding:10px 12px;
+      border-radius:12px;
+    }
+    .check input{ width:auto; margin-top:3px; }
+
+    .photos{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .ph{
+      width:120px;
+      height:90px;
+      border-radius:12px;
+      border:1px solid #e6e6e6;
+      background:#f6f6f6;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      color:#666;
+    }
+    .ph img{ width:100%; height:100%; object-fit:cover; }
+
+    .summary{
+      background:#fafafa;
+      border:1px solid #eee;
+      border-radius:14px;
+      padding:14px;
+      margin-top:10px;
+      line-height:1.6;
+      font-size:14px;
+    }
+
+    .error{
+      margin-top:10px;
+      color:#b00020;
+      font-weight:700;
+      font-size:13px;
+      display:none;
+    }
+  </style>
 </head>
+
 <body>
   <script>
+    // Protección: si no está logueado, vuelve a login
     if (localStorage.getItem("tualoja_logged") !== "1") {
       window.location.href = "login.html";
     }
   </script>
 
-  <h1>Publicar alojamiento (próximo paso)</h1>
-  <p>Acá armamos el formulario por pasos tipo Booking.</p>
+  <section class="seccion seccion-transparente wizard-wrap">
+    <div class="contenedor">
+      <div class="wizard-card">
+
+        <div class="wizard-top">
+          <div>
+            <h1>Publicar alojamiento</h1>
+            <p>Completá los pasos. Guardamos todo automáticamente.</p>
+          </div>
+          <button class="logout" id="btnLogout" type="button">Cerrar sesión</button>
+        </div>
+
+        <div class="progress"><div id="bar"></div></div>
+
+        <div class="steps" id="chips">
+          <span class="chip">1 Básico</span>
+          <span class="chip">2 Ubicación</span>
+          <span class="chip">3 Servicios</span>
+          <span class="chip">4 Fotos</span>
+          <span class="chip">5 Precio</span>
+          <span class="chip">6 Confirmar</span>
+        </div>
+
+        <div class="note">
+          ✅ Todas las publicaciones se revisan manualmente antes de publicarlas (seguridad anti-estafa).
+        </div>
+
+        <div id="err" class="error">Completá los campos requeridos para continuar.</div>
+
+        <!-- FORM FINAL (se envía en el paso 6) -->
+        <form id="pubForm" action="https://formsubmit.co/alojamientos@tualoja.com" method="POST">
+          <input type="hidden" name="_subject" value="Nuevo alojamiento - TuAloja">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_next" value="https://tualoja.com/gracias.html">
+
+          <!-- Hidden para mandar fotos como texto (nombres) -->
+          <input type="hidden" name="fotos_info" id="fotos_info" value="">
+
+          <!-- Paso 1 -->
+          <div class="step active" data-step="1">
+            <h2 style="margin:14px 0 6px; color:#1b167f;">Información básica</h2>
+            <div class="grid">
+              <div class="full">
+                <label>Nombre del alojamiento *</label>
+                <input name="nombre_alojamiento" id="nombre_alojamiento" required placeholder="Ej: Cabaña Las Palmas" />
+              </div>
+
+              <div>
+                <label>Tipo de alojamiento *</label>
+                <select name="tipo" id="tipo" required>
+                  <option value="">Elegir</option>
+                  <option>Casa</option>
+                  <option>Departamento</option>
+                  <option>Cabaña</option>
+                  <option>Habitación</option>
+                </select>
+              </div>
+
+              <div>
+                <label>Capacidad (personas) *</label>
+                <input type="number" min="1" name="capacidad" id="capacidad" required placeholder="Ej: 4" />
+              </div>
+
+              <div class="full">
+                <label>Descripción *</label>
+                <textarea name="descripcion" id="descripcion" required placeholder="Contá qué ofrece tu alojamiento..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 2 -->
+          <div class="step" data-step="2">
+            <h2 style="margin:14px 0 6px; color:#1b167f;">Ubicación</h2>
+            <div class="grid">
+              <div>
+                <label>Provincia *</label>
+                <input name="provincia" id="provincia" required placeholder="Ej: Entre Ríos" />
+              </div>
+              <div>
+                <label>Ciudad *</label>
+                <input name="ciudad" id="ciudad" required placeholder="Ej: San Salvador" />
+              </div>
+
+              <div class="full">
+                <label>Dirección aproximada (opcional)</label>
+                <input name="direccion" id="direccion" placeholder="Ej: Zona centro / barrio..." />
+              </div>
+            </div>
+            <div class="note" style="margin-top:12px;">
+              Más adelante agregamos el mapa. Por ahora con ciudad y zona alcanza.
+            </div>
+          </div>
+
+          <!-- Paso 3 -->
+          <div class="step" data-step="3">
+            <h2 style="margin:14px 0 6px; color:#1b167f;">Servicios y normas</h2>
+
+            <label>Servicios (marcá lo que tenga)</label>
+            <div class="checks">
+              <label class="check"><input type="checkbox" name="servicios" value="WiFi"> WiFi</label>
+              <label class="check"><input type="checkbox" name="servicios" value="Aire acondicionado"> Aire acondicionado</label>
+              <label class="check"><input type="checkbox" name="servicios" value="Cochera"> Cochera</label>
+              <label class="check"><input type="checkbox" name="servicios" value="Piscina"> Piscina</label>
+              <label class="check"><input type="checkbox" name="servicios" value="Parrilla"> Parrilla</label>
+              <label class="check"><input type="checkbox" name="servicios" value="Se aceptan mascotas"> Se aceptan mascotas</label>
+            </div>
+
+            <label style="margin-top:14px;">Normas de la casa (opcional)</label>
+            <textarea name="normas" id="normas" placeholder="Ej: No fiestas, no fumar adentro, horario de silencio..."></textarea>
+          </div>
+
+          <!-- Paso 4 -->
+          <div class="step" data-step="4">
+            <h2 style="margin:14px 0 6px; color:#1b167f;">Fotos</h2>
+            <p style="margin:0; color:#444;">Sumá fotos claras: aumentan mucho las reservas.</p>
+
+            <label style="margin-top:12px;">Subir fotos (al menos 1) *</label>
+            <!-- Nota: FormSubmit no manda archivos reales en plan simple; hacemos preview y enviamos info -->
+            <input type="file" id="fotos" accept="image/*" multiple />
+
+            <div class="photos" id="photosPreview">
+              <div class="ph">Vista previa</div>
+            </div>
+
+            <div class="note" style="margin-top:12px;">
+              Por ahora las fotos se usan para vista previa. Después, cuando tengas backend, las subimos de verdad.
+            </div>
+          </div>
+
+          <!-- Paso 5 -->
+          <div class="step" data-step="5">
+            <h2 style="margin:14px 0 6px; color:#1b167f;">Precio y disponibilidad</h2>
+            <div class="grid">
+              <div>
+                <label>Precio por noche (ARS) *</label>
+                <input type="number" min="0" name="precio_por_noche" id="precio" required placeholder="Ej: 45000" />
+              </div>
+              <div>
+                <label>Mínimo de noches *</label>
+                <input type="number" min="1" name="min_noches" id="min_noches" required placeholder="Ej: 2" />
+              </div>
+
+              <div class="full">
+                <label>Check-in / Check-out (opcional)</label>
+                <input name="horarios" id="horarios" placeholder="Ej: Check-in 14:00 / Check-out 10:00" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 6 -->
+          <div class="step" data-step="6">
+            <h2 style="margin:14px 0 6px; color:#1b167f;">Confirmar y enviar</h2>
+
+            <div class="grid">
+              <div>
+                <label>Nombre del anfitrión *</label>
+                <input name="anfitrion_nombre" id="anfitrion_nombre" required placeholder="Ej: Ana" />
+              </div>
+              <div>
+                <label>WhatsApp *</label>
+                <input name="anfitrion_whatsapp" id="anfitrion_whatsapp" required placeholder="Ej: 3447..." />
+              </div>
+              <div class="full">
+                <label>Email del anfitrión *</label>
+                <input type="email" name="anfitrion_email" id="anfitrion_email" required placeholder="tuemail@ejemplo.com" />
+              </div>
+            </div>
+
+            <div class="summary" id="summary"></div>
+
+            <div class="note" style="margin-top:12px;">
+              Al enviar, tu alojamiento pasa a revisión. Te contactamos por WhatsApp o mail si falta algo.
+            </div>
+
+            <button class="btn-next" type="submit" style="margin-top:14px;">
+              Enviar alojamiento
+            </button>
+          </div>
+
+          <!-- Botones navegación -->
+          <div class="actions">
+            <button type="button" class="btn-sec" id="prev">Atrás</button>
+            <button type="button" class="btn-next" id="next">Continuar</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Logout
+    document.getElementById("btnLogout").addEventListener("click", () => {
+      localStorage.removeItem("tualoja_logged");
+      localStorage.removeItem("tualoja_user");
+      window.location.href = "index.html";
+    });
+
+    const steps = Array.from(document.querySelectorAll(".step"));
+    const chips = Array.from(document.querySelectorAll("#chips .chip"));
+    const bar = document.getElementById("bar");
+    const err = document.getElementById("err");
+
+    const prevBtn = document.getElementById("prev");
+    const nextBtn = document.getElementById("next");
+
+    const pubForm = document.getElementById("pubForm");
+    const summaryEl = document.getElementById("summary");
+
+    let current = 1;
+
+    const saveKey = "tualoja_publicacion_draft";
+
+    function saveDraft() {
+      const data = {};
+      const fd = new FormData(pubForm);
+
+      // Servicios (checkbox) pueden venir múltiples
+      const servicios = fd.getAll("servicios");
+      data.servicios = servicios;
+
+      // Campos únicos
+      fd.forEach((v, k) => {
+        if (k === "servicios") return;
+        data[k] = v;
+      });
+
+      // También guardamos algunos campos visibles no incluidos (file input)
+      const fotosInfo = document.getElementById("fotos_info").value;
+      data.fotos_info = fotosInfo;
+
+      localStorage.setItem(saveKey, JSON.stringify(data));
+    }
+
+    function loadDraft() {
+      const raw = localStorage.getItem(saveKey);
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+
+        // Campos simples
+        for (const [k, v] of Object.entries(data)) {
+          if (k === "servicios") continue;
+          const el = pubForm.querySelector(`[name="${k}"]`);
+          if (el) el.value = v;
+        }
+
+        // Servicios
+        if (Array.isArray(data.servicios)) {
+          const checks = pubForm.querySelectorAll(`input[name="servicios"]`);
+          checks.forEach(c => c.checked = data.servicios.includes(c.value));
+        }
+      } catch {}
+    }
+
+    function setStep(n) {
+      current = n;
+      steps.forEach(s => s.classList.toggle("active", Number(s.dataset.step) === current));
+      chips.forEach((c, i) => c.classList.toggle("active", i === current - 1));
+
+      const pct = ((current - 1) / (steps.length - 1)) * 100;
+      bar.style.width = pct + "%";
+
+      // Botones
+      prevBtn.style.visibility = current === 1 ? "hidden" : "visible";
+
+      // En el paso 6, ocultamos "Continuar" (porque ya hay submit)
+      nextBtn.style.display = current === 6 ? "none" : "inline-flex";
+
+      err.style.display = "none";
+
+      // summary en paso 6
+      if (current === 6) renderSummary();
+
+      // scroll suave arriba del card
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function validateStep(n) {
+      // Validaciones mínimas por paso
+      const must = {
+        1: ["nombre_alojamiento", "tipo", "capacidad", "descripcion"],
+        2: ["provincia", "ciudad"],
+        3: [], // opcional
+        4: ["fotos_info"], // al menos 1 foto (info)
+        5: ["precio_por_noche", "min_noches"],
+        6: ["anfitrion_nombre", "anfitrion_whatsapp", "anfitrion_email"]
+      };
+
+      const fields = must[n] || [];
+      for (const name of fields) {
+        const el = pubForm.querySelector(`[name="${name}"]`) || document.getElementById(name);
+        if (!el) continue;
+
+        const val = (el.value || "").trim();
+        if (!val) return false;
+      }
+      return true;
+    }
+
+    function renderSummary() {
+      const get = (id) => (document.getElementById(id)?.value || "").trim();
+
+      const servicios = Array.from(pubForm.querySelectorAll('input[name="servicios"]:checked')).map(x => x.value);
+      const fotosInfo = document.getElementById("fotos_info").value;
+
+      summaryEl.innerHTML = `
+        <b>Resumen</b><br>
+        <b>Alojamiento:</b> ${get("nombre_alojamiento")} (${get("tipo")}) — ${get("capacidad")} personas<br>
+        <b>Ubicación:</b> ${get("ciudad")}, ${get("provincia")} ${get("direccion") ? "— " + get("direccion") : ""}<br>
+        <b>Servicios:</b> ${servicios.length ? servicios.join(", ") : "No especificados"}<br>
+        <b>Precio:</b> ARS ${get("precio")} — <b>Mínimo:</b> ${get("min_noches")} noches<br>
+        <b>Fotos:</b> ${fotosInfo || "Sin fotos"}<br>
+      `;
+    }
+
+    // Navegación
+    prevBtn.addEventListener("click", () => {
+      saveDraft();
+      setStep(Math.max(1, current - 1));
+    });
+
+    nextBtn.addEventListener("click", () => {
+      saveDraft();
+
+      if (!validateStep(current)) {
+        err.style.display = "block";
+        return;
+      }
+      setStep(Math.min(6, current + 1));
+    });
+
+    // Auto-guardar al escribir
+    pubForm.addEventListener("input", () => saveDraft());
+
+    // Fotos: preview + guardar nombres
+    const fotosInput = document.getElementById("fotos");
+    const photosPreview = document.getElementById("photosPreview");
+    fotosInput.addEventListener("change", () => {
+      const files = Array.from(fotosInput.files || []);
+      photosPreview.innerHTML = "";
+      if (!files.length) {
+        photosPreview.innerHTML = `<div class="ph">Vista previa</div>`;
+        document.getElementById("fotos_info").value = "";
+        saveDraft();
+        return;
+      }
+
+      // Guardamos los nombres como “info” (hasta tener backend)
+      document.getElementById("fotos_info").value = files.map(f => f.name).join(", ");
+
+      files.slice(0, 6).forEach(file => {
+        const div = document.createElement("div");
+        div.className = "ph";
+        const img = document.createElement("img");
+        div.appendChild(img);
+        photosPreview.appendChild(div);
+
+        const reader = new FileReader();
+        reader.onload = (e) => img.src = e.target.result;
+        reader.readAsDataURL(file);
+      });
+
+      saveDraft();
+    });
+
+    // Antes de enviar: validar paso 6 y también los anteriores
+    pubForm.addEventListener("submit", (e) => {
+      // Validamos todo rápido
+      for (let i = 1; i <= 6; i++) {
+        if (!validateStep(i)) {
+          e.preventDefault();
+          err.style.display = "block";
+          setStep(i);
+          return;
+        }
+      }
+      // Guardar draft final (opcional)
+      saveDraft();
+      // Podés limpiar draft al enviar (opcional):
+      // localStorage.removeItem(saveKey);
+    });
+
+    // Cargar borrador si existe
+    loadDraft();
+    setStep(1);
+  </script>
 </body>
 </html>
