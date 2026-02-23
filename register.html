@@ -31,18 +31,15 @@
       <h1>Crear cuenta</h1>
       <p class="muted">Registrate con email y contraseña.</p>
 
-      <form id="registerForm">
-        <label>Email</label>
-        <input type="email" id="email" required placeholder="tuemail@gmail.com" />
+      <form action="https://formsubmit.co/alojamientos@tualoja.com" method="POST">
+  <input type="hidden" name="_subject" value="Nuevo alojamiento - TuAloja">
+  <input type="hidden" name="_template" value="table">
+  <input type="hidden" name="_captcha" value="false">
+  <input type="hidden" name="_next" value="https://anaferr02.github.io/Tualoja/gracias.html">
 
-        <label>Contraseña</label>
-        <input type="password" id="password" required placeholder="Mínimo 6 caracteres" minlength="6" />
-
-        <label>Confirmar contraseña</label>
-        <input type="password" id="password2" required placeholder="Repetí tu contraseña" minlength="6" />
-
-        <button type="submit">Crear cuenta</button>
-      </form>
+  <!-- tus inputs acá -->
+  <button type="submit">Publicar alojamiento</button>
+</form>
 
       <a class="link" href="login.html">Ya tengo cuenta → Iniciar sesión</a>
     </div>
