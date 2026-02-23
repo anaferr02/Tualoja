@@ -46,42 +46,27 @@
   </main>
 
   <script>
-    function getUsers() {
-      return JSON.parse(localStorage.getItem("users") || "[]");
+  const form = document.getElementById("registerForm");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const email = form.querySelector('input[name="email"]').value.trim().toLowerCase();
+    const password = form.querySelector('input[name="password"]').value;
+
+    const users = JSON.parse(localStorage.getItem("tualoja_users") || "[]");
+    if (users.find(u => u.email === email)) {
+      alert("Ese email ya está registrado. Iniciá sesión.");
+      window.location.href = "login.html";
+      return;
     }
-    function saveUsers(users) {
-      localStorage.setItem("users", JSON.stringify(users));
-    }
 
-    document.getElementById("registerForm").addEventListener("submit", (e) => {
-      e.preventDefault();
+    users.push({ email, password });
+    localStorage.setItem("tualoja_users", JSON.stringify(users));
+    localStorage.setItem("tualoja_logged", "1");
+    localStorage.setItem("tualoja_user", email);
 
-      const email = document.getElementById("email").value.trim().toLowerCase();
-      const pass = document.getElementById("password").value;
-      const pass2 = document.getElementById("password2").value;
-
-      if (pass !== pass2) {
-        alert("Las contraseñas no coinciden.");
-        return;
-      }
-
-      const users = getUsers();
-      const exists = users.some(u => u.email === email);
-      if (exists) {
-        alert("Ese email ya está registrado. Iniciá sesión.");
-        window.location.href = "login.html";
-        return;
-      }
-
-      users.push({ email, pass });
-      saveUsers(users);
-
-      // Dejar sesión iniciada
-      localStorage.setItem("loggedUser", email);
-
-      alert("Cuenta creada ✅");
-      window.location.href = "index.html";
-    });
-  </script>
+    window.location.href = "publicar.html";
+  });
+</script>
 </body>
 </html>
