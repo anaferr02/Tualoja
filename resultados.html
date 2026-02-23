@@ -149,5 +149,21 @@ chipsData.push(`${etiqueta}: ${edadesLimpias.join(", ")}${sufijo}`);
       </div>
     `).join("");
   </script>
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const destino = localStorage.getItem("destino") || "-";
+    const entrada = localStorage.getItem("entrada") || "-";
+    const salida = localStorage.getItem("salida") || "-";
+    const adultos = localStorage.getItem("adultos") || "1";
+    const ninos = localStorage.getItem("ninos") || "0";
+    const habitaciones = localStorage.getItem("habitaciones") || "1";
+
+    const el = document.getElementById("resumen-busqueda");
+    if (el) {
+      el.textContent =
+        `${destino} · ${entrada} → ${salida} · ${adultos} adulto(s) · ${ninos} niño(s) · ${habitaciones} habitación(es)`;
+    }
+  });
+</script>
 </body>
 </html>
