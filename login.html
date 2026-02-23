@@ -44,28 +44,26 @@
   </main>
 
   <script>
-    function getUsers() {
-      return JSON.parse(localStorage.getItem("users") || "[]");
+  const form = document.getElementById("loginForm");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const email = form.querySelector('input[name="email"]').value.trim().toLowerCase();
+    const password = form.querySelector('input[name="password"]').value;
+
+    const users = JSON.parse(localStorage.getItem("tualoja_users") || "[]");
+    const ok = users.find(u => u.email === email && u.password === password);
+
+    if (!ok) {
+      alert("Email o contraseña incorrectos.");
+      return;
     }
 
-    document.getElementById("loginForm").addEventListener("submit", (e) => {
-      e.preventDefault();
+    localStorage.setItem("tualoja_logged", "1");
+    localStorage.setItem("tualoja_user", email);
 
-      const email = document.getElementById("email").value.trim().toLowerCase();
-      const pass = document.getElementById("password").value;
-
-      const users = getUsers();
-      const ok = users.find(u => u.email === email && u.pass === pass);
-
-      if (!ok) {
-        alert("Email o contraseña incorrectos.");
-        return;
-      }
-
-      localStorage.setItem("loggedUser", email);
-      alert("Sesión iniciada ✅");
-      window.location.href = "index.html";
-    });
-  </script>
+    window.location.href = "publicar.html";
+  });
+</script>
 </body>
 </html>
