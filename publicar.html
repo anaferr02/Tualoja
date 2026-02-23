@@ -234,7 +234,7 @@
         </div>
 
         <div class="note">
-          ✅ Todas las publicaciones se revisan manualmente antes de publicarlas (seguridad anti-estafa).
+  🛡️ Seguridad: revisamos manualmente cada publicación para evitar estafas y anuncios falsos.
         </div>
 
         <div id="err" class="error">Completá los campos requeridos para continuar.</div>
@@ -590,6 +590,7 @@
       }
       // Guardar draft final (opcional)
       saveDraft();
+      localStorage.removeItem("tualoja_publicacion_draft");
       // Podés limpiar draft al enviar (opcional):
       // localStorage.removeItem(saveKey);
     });
