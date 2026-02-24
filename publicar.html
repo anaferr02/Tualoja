@@ -392,12 +392,16 @@ Si falta algún dato, te contactamos por WhatsApp o por este mail.
             <div class="summary" id="summary"></div>
 
             <div class="note" style="margin-top:12px;">
-              Al enviar, tu alojamiento pasa a revisión. Te contactamos por WhatsApp o mail si falta algo.
+              Al enviar, tu alojamiento pasa a revisión. Te contactamos por mail si falta algo.
             </div>
 
-            <button class="btn-next" type="submit" style="margin-top:14px;">
-              Enviar alojamiento
+            <button id="btnEnviar" class="btn-next" type="submit" style="margin-top:14px;">
+            Enviar alojamiento
             </button>
+
+            <p id="enviandoMsg" style="display:none; margin-top:10px; color:#444; font-weight:700;">
+            Enviando… por favor no cierres esta ventana.
+            </p>
           </div>
 
           <!-- Botones navegación -->
@@ -569,14 +573,51 @@ Si falta algún dato, te contactamos por WhatsApp o por este mail.
       saveDraft();
     });
 
-    pubForm.addEventListener("submit", (e) => {
-      for (let i = 1; i <= 6; i++) {
-        if (!validateStep(i)) {
-          e.preventDefault();
-          err.style.display = "block";
-          setStep(i);
-          return;
-        }
+   pubForm.addEventListener("submit", (e) => {
+
+  // ✅ Evitar doble envío + feedback visual
+  if (pubForm.dataset.sending === "1") {
+    e.preventDefault();
+    return;
+  }
+  pubForm.dataset.sending = "1";
+
+  const btnEnviar = document.getElementById("btnEnviar");
+  const enviandoMsg = document.getElementById("enviandoMsg");
+
+  if (btnEnviar) {
+    btnEnviar.disabled = true;
+    btnEnviar.style.opacity = "0.7";
+    btnEnviar.style.cursor = "not-allowed";
+    btnEnviar.textContent = "Enviando…";
+  }
+  if (enviandoMsg) enviandoMsg.style.display = "block";
+
+  // Validamos todo rápido
+  for (let i = 1; i <= 6; i++) {
+    if (!validateStep(i)) {
+      e.preventDefault();
+      err.style.display = "block";
+      setStep(i);
+
+      // 🔁 Si falla validación, re-habilitamos botón
+      pubForm.dataset.sending = "0";
+      if (btnEnviar) {
+        btnEnviar.disabled = false;
+        btnEnviar.style.opacity = "1";
+        btnEnviar.style.cursor = "pointer";
+        btnEnviar.textContent = "Enviar alojamiento";
+      }
+      if (enviandoMsg) enviandoMsg.style.display = "none";
+
+      return;
+    }
+  }
+
+  // Guardar draft final
+  saveDraft();
+  localStorage.removeItem("tualoja_publicacion_draft");
+});
       }
 
       // ✅ Guardamos el email del anfitrión en un hidden extra para que te llegue sí o sí a vos
