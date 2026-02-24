@@ -416,220 +416,115 @@ Si falta algún dato, te contactamos por WhatsApp o por este mail.
   </section>
 
   <script>
-    // Logout
-    document.getElementById("btnLogout").addEventListener("click", () => {
-      localStorage.removeItem("tualoja_logged");
-      localStorage.removeItem("tualoja_user");
-      window.location.href = "index.html";
+  // Logout
+  document.getElementById("btnLogout").addEventListener("click", () => {
+    localStorage.removeItem("tualoja_logged");
+    localStorage.removeItem("tualoja_user");
+    window.location.href = "index.html";
+  });
+
+  const steps = Array.from(document.querySelectorAll(".step"));
+  const chips = Array.from(document.querySelectorAll("#chips .chip"));
+  const bar = document.getElementById("bar");
+  const err = document.getElementById("err");
+
+  const prevBtn = document.getElementById("prev");
+  const nextBtn = document.getElementById("next");
+
+  const pubForm = document.getElementById("pubForm");
+  const summaryEl = document.getElementById("summary");
+
+  let current = 1;
+  const saveKey = "tualoja_publicacion_draft";
+
+  function saveDraft() {
+    const data = {};
+    const fd = new FormData(pubForm);
+
+    data.servicios = fd.getAll("servicios");
+    fd.forEach((v, k) => {
+      if (k !== "servicios") data[k] = v;
     });
 
-    const steps = Array.from(document.querySelectorAll(".step"));
-    const chips = Array.from(document.querySelectorAll("#chips .chip"));
-    const bar = document.getElementById("bar");
-    const err = document.getElementById("err");
+    data.fotos_info = document.getElementById("fotos_info").value;
+    localStorage.setItem(saveKey, JSON.stringify(data));
+  }
 
-    const prevBtn = document.getElementById("prev");
-    const nextBtn = document.getElementById("next");
-
-    const pubForm = document.getElementById("pubForm");
-    const summaryEl = document.getElementById("summary");
-
-    let current = 1;
-
-    const saveKey = "tualoja_publicacion_draft";
-
-    function saveDraft() {
-      const data = {};
-      const fd = new FormData(pubForm);
-
-      const servicios = fd.getAll("servicios");
-      data.servicios = servicios;
-
-      fd.forEach((v, k) => {
+  function loadDraft() {
+    const raw = localStorage.getItem(saveKey);
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      Object.entries(data).forEach(([k, v]) => {
         if (k === "servicios") return;
-        data[k] = v;
+        const el = pubForm.querySelector(`[name="${k}"]`);
+        if (el) el.value = v;
       });
-
-      const fotosInfo = document.getElementById("fotos_info").value;
-      data.fotos_info = fotosInfo;
-
-      localStorage.setItem(saveKey, JSON.stringify(data));
-    }
-
-    function loadDraft() {
-      const raw = localStorage.getItem(saveKey);
-      if (!raw) return;
-      try {
-        const data = JSON.parse(raw);
-
-        for (const [k, v] of Object.entries(data)) {
-          if (k === "servicios") continue;
-          const el = pubForm.querySelector(`[name="${k}"]`);
-          if (el) el.value = v;
-        }
-
-        if (Array.isArray(data.servicios)) {
-          const checks = pubForm.querySelectorAll(`input[name="servicios"]`);
-          checks.forEach(c => c.checked = data.servicios.includes(c.value));
-        }
-      } catch {}
-    }
-
-    function setStep(n) {
-      current = n;
-      steps.forEach(s => s.classList.toggle("active", Number(s.dataset.step) === current));
-      chips.forEach((c, i) => c.classList.toggle("active", i === current - 1));
-
-      const pct = ((current - 1) / (steps.length - 1)) * 100;
-      bar.style.width = pct + "%";
-
-      prevBtn.style.visibility = current === 1 ? "hidden" : "visible";
-      nextBtn.style.display = current === 6 ? "none" : "inline-flex";
-      err.style.display = "none";
-
-      if (current === 6) renderSummary();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function validateStep(n) {
-      const must = {
-        1: ["nombre_alojamiento", "tipo", "capacidad", "descripcion"],
-        2: ["provincia", "ciudad"],
-        3: [],
-        4: ["fotos_info"],
-        5: ["precio_por_noche", "min_noches"],
-        // ✅ FIX: el email real ahora es name="email"
-        6: ["anfitrion_nombre", "anfitrion_whatsapp", "email"]
-      };
-
-      const fields = must[n] || [];
-      for (const name of fields) {
-        const el = pubForm.querySelector(`[name="${name}"]`) || document.getElementById(name);
-        if (!el) continue;
-        const val = (el.value || "").trim();
-        if (!val) return false;
+      if (Array.isArray(data.servicios)) {
+        pubForm.querySelectorAll('input[name="servicios"]').forEach(c => {
+          c.checked = data.servicios.includes(c.value);
+        });
       }
-      return true;
-    }
+    } catch {}
+  }
 
-    function renderSummary() {
-      const get = (id) => (document.getElementById(id)?.value || "").trim();
+  function setStep(n) {
+    current = n;
+    steps.forEach(s => s.classList.toggle("active", +s.dataset.step === current));
+    chips.forEach((c, i) => c.classList.toggle("active", i === current - 1));
+    bar.style.width = ((current - 1) / (steps.length - 1)) * 100 + "%";
+    prevBtn.style.visibility = current === 1 ? "hidden" : "visible";
+    nextBtn.style.display = current === 6 ? "none" : "inline-flex";
+    err.style.display = "none";
+    if (current === 6) renderSummary();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
-      const servicios = Array.from(pubForm.querySelectorAll('input[name="servicios"]:checked')).map(x => x.value);
-      const fotosInfo = document.getElementById("fotos_info").value;
-
-      summaryEl.innerHTML = `
-        <b>Resumen</b><br>
-        <b>Alojamiento:</b> ${get("nombre_alojamiento")} (${get("tipo")}) — ${get("capacidad")} personas<br>
-        <b>Ubicación:</b> ${get("ciudad")}, ${get("provincia")} ${get("direccion") ? "— " + get("direccion") : ""}<br>
-        <b>Servicios:</b> ${servicios.length ? servicios.join(", ") : "No especificados"}<br>
-        <b>Precio:</b> ARS ${get("precio")} — <b>Mínimo:</b> ${get("min_noches")} noches<br>
-        <b>Fotos:</b> ${fotosInfo || "Sin fotos"}<br>
-      `;
-    }
-
-    prevBtn.addEventListener("click", () => {
-      saveDraft();
-      setStep(Math.max(1, current - 1));
+  function validateStep(n) {
+    const must = {
+      1: ["nombre_alojamiento", "tipo", "capacidad", "descripcion"],
+      2: ["provincia", "ciudad"],
+      4: ["fotos_info"],
+      5: ["precio_por_noche", "min_noches"],
+      6: ["anfitrion_nombre", "anfitrion_whatsapp", "email"]
+    };
+    return (must[n] || []).every(name => {
+      const el = pubForm.querySelector(`[name="${name}"]`);
+      return el && el.value.trim();
     });
+  }
 
-    nextBtn.addEventListener("click", () => {
-      saveDraft();
-      if (!validateStep(current)) {
+  function renderSummary() {
+    const get = id => document.getElementById(id)?.value || "";
+    summaryEl.innerHTML = `
+      <b>Alojamiento:</b> ${get("nombre_alojamiento")}<br>
+      <b>Ubicación:</b> ${get("ciudad")}, ${get("provincia")}<br>
+      <b>Precio:</b> ARS ${get("precio")}
+    `;
+  }
+
+  prevBtn.onclick = () => { saveDraft(); setStep(current - 1); };
+  nextBtn.onclick = () => {
+    saveDraft();
+    if (!validateStep(current)) return err.style.display = "block";
+    setStep(current + 1);
+  };
+
+  pubForm.addEventListener("submit", e => {
+    for (let i = 1; i <= 6; i++) {
+      if (!validateStep(i)) {
+        e.preventDefault();
         err.style.display = "block";
+        setStep(i);
         return;
       }
-      setStep(Math.min(6, current + 1));
-    });
-
-    pubForm.addEventListener("input", () => saveDraft());
-
-    const fotosInput = document.getElementById("fotos");
-    const photosPreview = document.getElementById("photosPreview");
-    fotosInput.addEventListener("change", () => {
-      const files = Array.from(fotosInput.files || []);
-      photosPreview.innerHTML = "";
-      if (!files.length) {
-        photosPreview.innerHTML = `<div class="ph">Vista previa</div>`;
-        document.getElementById("fotos_info").value = "";
-        saveDraft();
-        return;
-      }
-
-      document.getElementById("fotos_info").value = files.map(f => f.name).join(", ");
-
-      files.slice(0, 6).forEach(file => {
-        const div = document.createElement("div");
-        div.className = "ph";
-        const img = document.createElement("img");
-        div.appendChild(img);
-        photosPreview.appendChild(div);
-
-        const reader = new FileReader();
-        reader.onload = (e) => img.src = e.target.result;
-        reader.readAsDataURL(file);
-      });
-
-      saveDraft();
-    });
-
-   pubForm.addEventListener("submit", (e) => {
-
-  // ✅ Evitar doble envío + feedback visual
-  if (pubForm.dataset.sending === "1") {
-    e.preventDefault();
-    return;
-  }
-  pubForm.dataset.sending = "1";
-
-  const btnEnviar = document.getElementById("btnEnviar");
-  const enviandoMsg = document.getElementById("enviandoMsg");
-
-  if (btnEnviar) {
-    btnEnviar.disabled = true;
-    btnEnviar.style.opacity = "0.7";
-    btnEnviar.style.cursor = "not-allowed";
-    btnEnviar.textContent = "Enviando…";
-  }
-  if (enviandoMsg) enviandoMsg.style.display = "block";
-
-  // Validamos todo rápido
-  for (let i = 1; i <= 6; i++) {
-    if (!validateStep(i)) {
-      e.preventDefault();
-      err.style.display = "block";
-      setStep(i);
-
-      // 🔁 Si falla validación, re-habilitamos botón
-      pubForm.dataset.sending = "0";
-      if (btnEnviar) {
-        btnEnviar.disabled = false;
-        btnEnviar.style.opacity = "1";
-        btnEnviar.style.cursor = "pointer";
-        btnEnviar.textContent = "Enviar alojamiento";
-      }
-      if (enviandoMsg) enviandoMsg.style.display = "none";
-
-      return;
     }
-  }
+    saveDraft();
+    localStorage.removeItem(saveKey);
+  });
 
-  // Guardar draft final
-  saveDraft();
-  localStorage.removeItem("tualoja_publicacion_draft");
-});
-      }
-
-      // ✅ Guardamos el email del anfitrión en un hidden extra para que te llegue sí o sí a vos
-      const hostEmail = (pubForm.querySelector('[name="email"]')?.value || "").trim();
-      document.getElementById("email_confirmacion").value = hostEmail;
-
-      saveDraft();
-      localStorage.removeItem("tualoja_publicacion_draft");
-    });
-
-    loadDraft();
-    setStep(1);
-  </script>
+  loadDraft();
+  setStep(1);
+</script>
 </body>
 </html>
