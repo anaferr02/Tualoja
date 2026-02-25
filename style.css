@@ -619,3 +619,27 @@ body{
 main{ flex:1; }
 
 footer{ margin-top:auto; }
+.nav{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.nav-link{
+  display:inline-flex;
+  align-items:center;
+  padding:10px 14px;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:600;
+  color:#1b167f;
+  background: rgba(255,255,255,.55);
+  border:1px solid rgba(27,22,127,.12);
+}
+
+.nav-actions{
+  display:flex;
+  gap:10px;
+  margin-left:auto;
+}
