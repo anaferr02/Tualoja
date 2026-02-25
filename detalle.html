@@ -183,5 +183,13 @@
         );
       }
     </script>
+    <form data-booking-form>
+  <input type="date" name="date_from" required />
+  <input type="date" name="date_to" required />
+  <input type="number" name="guests" min="1" value="1" required />
+  <button type="submit">Reservar</button>
+</form>
+
+<script type="module" src="./public/js/detalle.js"></script>
   </body>
 </html>
