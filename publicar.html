@@ -337,6 +337,9 @@ Si falta algún dato, te contactamos por este mail.
 
             <label style="margin-top:12px;">Subir fotos (al menos 1) *</label>
             <input type="file" id="fotos" accept="image/*" multiple />
+            <p id="fotosStatus" style="margin:10px 0 0; color:#444; font-weight:700;">
+            Todavía no cargaste fotos.
+              </p>
 
             <div class="photos" id="photosPreview">
               <div class="ph">Vista previa</div>
@@ -550,16 +553,45 @@ Si falta algún dato, te contactamos por este mail.
     pubForm.addEventListener("input", () => saveDraft());
 
     // ✅ Fotos: preview + guardar nombres (para el mail)
-    fotosInput.addEventListener("change", () => {
-      const files = Array.from(fotosInput.files || []);
-      photosPreview.innerHTML = "";
+    const fotosStatus = document.getElementById("fotosStatus");
 
-      if (!files.length) {
-        photosPreview.innerHTML = `<div class="ph">Vista previa</div>`;
-        fotosInfoHidden.value = "";
-        saveDraft();
-        return;
-      }
+fotosInput.addEventListener("change", () => {
+  const files = Array.from(fotosInput.files || []);
+  photosPreview.innerHTML = "";
+
+  if (!files.length) {
+    photosPreview.innerHTML = `<div class="ph">Vista previa</div>`;
+    fotosInfoHidden.value = "";
+    if (fotosStatus) fotosStatus.textContent = "Todavía no cargaste fotos.";
+    saveDraft();
+    return;
+  }
+
+  // guardamos nombres para el mail
+  fotosInfoHidden.value = files.map(f => f.name).join(", ");
+
+  // texto pro
+  if (fotosStatus) {
+    fotosStatus.textContent = `✅ ${files.length} foto${files.length > 1 ? "s" : ""} cargada${files.length > 1 ? "s" : ""}.`;
+  }
+
+  // preview
+  files.slice(0, 6).forEach(file => {
+    const div = document.createElement("div");
+    div.className = "ph";
+
+    const img = document.createElement("img");
+    div.appendChild(img);
+    photosPreview.appendChild(div);
+
+    const reader = new FileReader();
+    reader.onload = (e) => img.src = e.target.result;
+    reader.readAsDataURL(file);
+  });
+
+  saveDraft();
+  err.style.display = "none";
+});
 
       // mandamos nombres por mail
       fotosInfoHidden.value = files.map(f => f.name).join(", ");
