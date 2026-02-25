@@ -20,6 +20,67 @@
       .btn-header:hover {
         background-color: rgba(255, 255, 255, 0.3);
       }
+      /* ===== Header / Nav más prolijo ===== */
+.top-nav{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.nav-link{
+  display:inline-flex;
+  align-items:center;
+  padding:10px 14px;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:600;
+  color:#1b167f;
+  background: rgba(255,255,255,.55);
+  border:1px solid rgba(27,22,127,.12);
+  backdrop-filter: blur(6px);
+}
+
+.nav-link:hover{
+  background: rgba(255,255,255,.75);
+}
+
+/* Botones login/registro */
+.nav-actions{
+  display:flex;
+  gap:10px;
+  margin-left:auto; /* empuja a la derecha */
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 14px;
+  border-radius:12px;
+  font-weight:700;
+  text-decoration:none;
+  border:1px solid transparent;
+}
+
+.btn-ghost{
+  color:#1b167f;
+  background: rgba(255,255,255,.35);
+  border-color: rgba(27,22,127,.18);
+}
+
+.btn-ghost:hover{
+  background: rgba(255,255,255,.55);
+}
+
+.btn-primary{
+  background:#1b167f;
+  color:#fff;
+}
+
+.btn-primary:hover{
+  filter: brightness(1.05);
+}
     </style>
   </head>
 
