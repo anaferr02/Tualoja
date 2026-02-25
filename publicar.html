@@ -416,12 +416,17 @@ Si falta algún dato, te contactamos por este mail.
   </section>
 
   <script>
+  window.addEventListener("DOMContentLoaded", () => {
+
     // Logout
-    document.getElementById("btnLogout").addEventListener("click", () => {
-      localStorage.removeItem("tualoja_logged");
-      localStorage.removeItem("tualoja_user");
-      window.location.href = "index.html";
-    });
+    const btnLogout = document.getElementById("btnLogout");
+    if (btnLogout) {
+      btnLogout.addEventListener("click", () => {
+        localStorage.removeItem("tualoja_logged");
+        localStorage.removeItem("tualoja_user");
+        window.location.href = "index.html";
+      });
+    }
 
     const steps = Array.from(document.querySelectorAll(".step"));
     const chips = Array.from(document.querySelectorAll("#chips .chip"));
@@ -430,13 +435,20 @@ Si falta algún dato, te contactamos por este mail.
 
     const prevBtn = document.getElementById("prev");
     const nextBtn = document.getElementById("next");
-
     const pubForm = document.getElementById("pubForm");
     const summaryEl = document.getElementById("summary");
 
+    // Elementos fotos
     const fotosInput = document.getElementById("fotos");
     const photosPreview = document.getElementById("photosPreview");
     const fotosInfoHidden = document.getElementById("fotos_info");
+    const fotosStatus = document.getElementById("fotosStatus"); // si existe
+
+    // Guardas de seguridad: si algo esencial falta, no rompemos todo
+    if (!pubForm || !prevBtn || !nextBtn || !bar || !err || steps.length === 0) {
+      console.error("Faltan elementos del wizard (IDs/clases). Revisar #pubForm, #prev, #next, .step, #bar, #err");
+      return;
+    }
 
     let current = 1;
     const saveKey = "tualoja_publicacion_draft";
@@ -445,15 +457,14 @@ Si falta algún dato, te contactamos por este mail.
       const data = {};
       const fd = new FormData(pubForm);
 
-      const servicios = fd.getAll("servicios");
-      data.servicios = servicios;
-
+      data.servicios = fd.getAll("servicios");
       fd.forEach((v, k) => {
         if (k === "servicios") return;
         data[k] = v;
       });
 
-      data.fotos_info = fotosInfoHidden.value || "";
+      // guardamos nombres de fotos (texto)
+      data.fotos_info = (fotosInfoHidden?.value || "");
       localStorage.setItem(saveKey, JSON.stringify(data));
     }
 
@@ -470,12 +481,12 @@ Si falta algún dato, te contactamos por este mail.
         }
 
         if (Array.isArray(data.servicios)) {
-          const checks = pubForm.querySelectorAll(`input[name="servicios"]`);
-          checks.forEach(c => c.checked = data.servicios.includes(c.value));
+          pubForm.querySelectorAll(`input[name="servicios"]`).forEach(c => {
+            c.checked = data.servicios.includes(c.value);
+          });
         }
 
-        // si había fotos_info guardado, lo restauramos (solo texto)
-        if (data.fotos_info) {
+        if (fotosInfoHidden && data.fotos_info) {
           fotosInfoHidden.value = data.fotos_info;
         }
       } catch {}
@@ -503,12 +514,12 @@ Si falta algún dato, te contactamos por este mail.
         2: ["provincia", "ciudad"],
         3: [],
         5: ["precio_por_noche", "min_noches"],
-        6: ["anfitrion_nombre", "email"] // WhatsApp opcional
+        6: ["anfitrion_nombre", "email"] // whatsapp opcional
       };
 
-      // ✅ PASO 4: validamos el file input real (no el hidden)
+      // ✅ Paso 4: validamos archivo real
       if (n === 4) {
-        return (fotosInput.files && fotosInput.files.length > 0);
+        return !!(fotosInput && fotosInput.files && fotosInput.files.length > 0);
       }
 
       const fields = must[n] || [];
@@ -522,9 +533,11 @@ Si falta algún dato, te contactamos por este mail.
     }
 
     function renderSummary() {
+      if (!summaryEl) return;
+
       const get = (id) => (document.getElementById(id)?.value || "").trim();
       const servicios = Array.from(pubForm.querySelectorAll('input[name="servicios"]:checked')).map(x => x.value);
-      const fotosInfo = fotosInfoHidden.value;
+      const fotosInfo = (fotosInfoHidden?.value || "");
 
       summaryEl.innerHTML = `
         <b>Resumen</b><br>
@@ -552,76 +565,49 @@ Si falta algún dato, te contactamos por este mail.
 
     pubForm.addEventListener("input", () => saveDraft());
 
-    // ✅ Fotos: preview + guardar nombres (para el mail)
-    const fotosStatus = document.getElementById("fotosStatus");
+    // ✅ Fotos: preview + status (si existen elementos)
+    if (fotosInput && photosPreview && fotosInfoHidden) {
+      fotosInput.addEventListener("change", () => {
+        const files = Array.from(fotosInput.files || []);
+        photosPreview.innerHTML = "";
 
-fotosInput.addEventListener("change", () => {
-  const files = Array.from(fotosInput.files || []);
-  photosPreview.innerHTML = "";
+        if (!files.length) {
+          photosPreview.innerHTML = `<div class="ph">Vista previa</div>`;
+          fotosInfoHidden.value = "";
+          if (fotosStatus) fotosStatus.textContent = "Todavía no cargaste fotos.";
+          saveDraft();
+          return;
+        }
 
-  if (!files.length) {
-    photosPreview.innerHTML = `<div class="ph">Vista previa</div>`;
-    fotosInfoHidden.value = "";
-    if (fotosStatus) fotosStatus.textContent = "Todavía no cargaste fotos.";
-    saveDraft();
-    return;
-  }
+        fotosInfoHidden.value = files.map(f => f.name).join(", ");
+        if (fotosStatus) {
+          fotosStatus.textContent = `✅ ${files.length} foto${files.length > 1 ? "s" : ""} cargada${files.length > 1 ? "s" : ""}.`;
+        }
 
-  // guardamos nombres para el mail
-  fotosInfoHidden.value = files.map(f => f.name).join(", ");
+        files.slice(0, 6).forEach(file => {
+          const div = document.createElement("div");
+          div.className = "ph";
+          const img = document.createElement("img");
+          div.appendChild(img);
+          photosPreview.appendChild(div);
 
-  // texto pro
-  if (fotosStatus) {
-    fotosStatus.textContent = `✅ ${files.length} foto${files.length > 1 ? "s" : ""} cargada${files.length > 1 ? "s" : ""}.`;
-  }
+          const reader = new FileReader();
+          reader.onload = (e) => img.src = e.target.result;
+          reader.readAsDataURL(file);
+        });
 
-  // preview
-  files.slice(0, 6).forEach(file => {
-    const div = document.createElement("div");
-    div.className = "ph";
-
-    const img = document.createElement("img");
-    div.appendChild(img);
-    photosPreview.appendChild(div);
-
-    const reader = new FileReader();
-    reader.onload = (e) => img.src = e.target.result;
-    reader.readAsDataURL(file);
-  });
-
-  saveDraft();
-  err.style.display = "none";
-});
-
-      // mandamos nombres por mail
-      fotosInfoHidden.value = files.map(f => f.name).join(", ");
-
-      // preview
-      files.slice(0, 6).forEach(file => {
-        const div = document.createElement("div");
-        div.className = "ph";
-
-        const img = document.createElement("img");
-        div.appendChild(img);
-        photosPreview.appendChild(div);
-
-        const reader = new FileReader();
-        reader.onload = (e) => img.src = e.target.result;
-        reader.readAsDataURL(file);
+        err.style.display = "none";
+        saveDraft();
       });
+    }
 
-      saveDraft();
-      err.style.display = "none"; // si estaba el error, lo sacamos al subir foto
-    });
-
-    // ✅ Envío: evitar doble submit + feedback visual
+    // ✅ Envío: evitar doble envío + feedback
     pubForm.addEventListener("submit", (e) => {
       if (pubForm.dataset.sending === "1") {
         e.preventDefault();
         return;
       }
 
-      // Validamos todo
       for (let i = 1; i <= 6; i++) {
         if (!validateStep(i)) {
           e.preventDefault();
@@ -635,7 +621,6 @@ fotosInput.addEventListener("change", () => {
 
       const btnEnviar = document.getElementById("btnEnviar");
       const enviandoMsg = document.getElementById("enviandoMsg");
-
       if (btnEnviar) {
         btnEnviar.disabled = true;
         btnEnviar.style.opacity = "0.7";
@@ -644,13 +629,13 @@ fotosInput.addEventListener("change", () => {
       }
       if (enviandoMsg) enviandoMsg.style.display = "block";
 
-      // Guardar draft final y limpiar
       saveDraft();
       localStorage.removeItem(saveKey);
     });
 
     loadDraft();
     setStep(1);
-  </script>
+  });
+</script>
 </body>
 </html>
