@@ -93,5 +93,22 @@
       window.location.href = "publicar.html";
     });
   </script>
+  <script type="module">
+  import { login } from "./public/js/auth.js";
+
+  const form = document.querySelector("form");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.querySelector('input[type="email"]').value;
+    const password = document.querySelector('input[type="password"]').value;
+
+    try {
+      await login(email, password);
+      location.href = "index.html";
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+</script>
 </body>
 </html>
