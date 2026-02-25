@@ -591,3 +591,20 @@ button.btn-principal {
 .link-secundario:hover::after {
   transform: scaleX(1);
 }
+html, body{
+  height:100%;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+main{
+  flex:1; /* ocupa el espacio y empuja el footer abajo */
+}
+
+footer{
+  margin-top:auto;
+}
