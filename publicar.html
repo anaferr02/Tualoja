@@ -414,6 +414,217 @@ Si falta algún dato, te contactamos por este mail.
       </div>
     </div>
   </section>
+<script>
+    // Protección: si no está logueado, vuelve a login
+    if (localStorage.getItem("tualoja_logged") !== "1") {
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <section class="seccion seccion-transparente wizard-wrap">
+    <div class="contenedor">
+      <div class="wizard-card">
+
+        <div class="wizard-top">
+          <div>
+            <h1>Publicar alojamiento</h1>
+            <p>Completá los pasos. Guardamos todo automáticamente.</p>
+          </div>
+          <button class="logout" id="btnLogout" type="button">Cerrar sesión</button>
+        </div>
+
+        <div class="progress"><div id="bar"></div></div>
+
+        <div class="steps" id="chips">
+          <span class="chip">1 Básico</span>
+          <span class="chip">2 Ubicación</span>
+          <span class="chip">3 Servicios</span>
+          <span class="chip">4 Fotos</span>
+          <span class="chip">5 Precio</span>
+          <span class="chip">6 Confirmar</span>
+        </div>
+
+        <div class="note">
+          🛡️ Seguridad: revisamos manualmente cada publicación para evitar estafas y anuncios falsos.
+        </div>
+
+        <div id="err" class="error">Completá los campos requeridos para continuar.</div>
+
+        <!-- FORM FINAL (se envía en el paso 6) -->
+        <form id="pubForm" action="https://formsubmit.co/alojamientos@tualoja.com" method="POST">
+          <input type="hidden" name="_subject" value="Nuevo alojamiento - TuAloja">
+          <input type="hidden" name="_template" value="table">
+
+          <!-- Autorespuesta al anfitrión (al email que se cargue en name="email") -->
+          <input type="hidden" name="_autoresponse" value="¡Gracias! Recibimos tu alojamiento en TuAloja ✅
+
+Tu publicación pasó a revisión para evitar estafas y anuncios falsos.
+Si falta algún dato, te contactamos por este mail.
+
+— Equipo TuAloja">
+
+          <input type="hidden" name="_next" value="https://tualoja.com/gracias.html">
+
+          <!-- Hidden para mandar fotos como texto (nombres) -->
+          <input type="hidden" name="fotos_info" id="fotos_info" value="">
+
+          <!-- Paso 1 -->
+          <div class="step active" data-step="1">
+            <h2 style="margin:14px 0 6px; color:#1b167f;">Información básica</h2>
+            <div class="grid">
+              <div class="full">
+                <label>Nombre del alojamiento *</label>
+                <input name="nombre_alojamiento" id="nombre_alojamiento" required placeholder="Ej: Cabaña Las Palmas" />
+              </div>
+
+              <div>
+                <label>Tipo de alojamiento *</label>
+                <select name="tipo" id="tipo" required>
+                  <option value="">Elegir</option>
+                  <option>Casa</option>
+                  <option>Departamento</option>
+                  <option>Cabaña</option>
+                  <option>Habitación</option>
+                </select>
+              </div>
+
+              <div>
+                <label>Capacidad (personas) *</label>
+                <input type="number" min="1" name="capacidad" id="capacidad" required placeholder="Ej: 4" />
+              </div>
+
+              <div class="full">
+                <label>Descripción *</label>
+                <textarea name="descripcion" id="descripcion" required placeholder="Contá qué ofrece tu alojamiento..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 2 -->
+          <div class="step" data-step="2">
+            <h2 style="margin:14px 0 6px; color:#1b167f;">Ubicación</h2>
+            <div class="grid">
+              <div>
+                <label>Provincia *</label>
+                <input name="provincia" id="provincia" required placeholder="Ej: Entre Ríos" />
+              </div>
+              <div>
+                <label>Ciudad *</label>
+                <input name="ciudad" id="ciudad" required placeholder="Ej: San Salvador" />
+              </div>
+
+              <div class="full">
+                <label>Dirección aproximada (opcional)</label>
+                <input name="direccion" id="direccion" placeholder="Ej: Zona centro / barrio..." />
+              </div>
+            </div>
+            <div class="note" style="margin-top:12px;">
+              Más adelante agregamos el mapa. Por ahora con ciudad y zona alcanza.
+            </div>
+          </div>
+
+          <!-- Paso 3 -->
+          <div class="step" data-step="3">
+            <h2 style="margin:14px 0 6px; color:#1b167f;">Servicios y normas</h2>
+
+            <label>Servicios (marcá lo que tenga)</label>
+            <div class="checks">
+              <label class="check"><input type="checkbox" name="servicios" value="WiFi"> WiFi</label>
+              <label class="check"><input type="checkbox" name="servicios" value="Aire acondicionado"> Aire acondicionado</label>
+              <label class="check"><input type="checkbox" name="servicios" value="Cochera"> Cochera</label>
+              <label class="check"><input type="checkbox" name="servicios" value="Piscina"> Piscina</label>
+              <label class="check"><input type="checkbox" name="servicios" value="Parrilla"> Parrilla</label>
+              <label class="check"><input type="checkbox" name="servicios" value="Se aceptan mascotas"> Se aceptan mascotas</label>
+            </div>
+
+            <label style="margin-top:14px;">Normas de la casa (opcional)</label>
+            <textarea name="normas" id="normas" placeholder="Ej: No fiestas, no fumar adentro, horario de silencio..."></textarea>
+          </div>
+
+          <!-- Paso 4 -->
+          <div class="step" data-step="4">
+            <h2 style="margin:14px 0 6px; color:#1b167f;">Fotos</h2>
+            <p style="margin:0; color:#444;">Sumá fotos claras: aumentan mucho las reservas.</p>
+
+            <label style="margin-top:12px;">Subir fotos (al menos 3) *</label>
+            <input type="file" id="fotos" accept="image/*" multiple />
+            <p id="fotosStatus" style="margin:10px 0 0; color:#444; font-weight:700;">
+            Todavía no cargaste fotos.
+              </p>
+
+            <div class="photos" id="photosPreview">
+              <div class="ph">Vista previa</div>
+            </div>
+
+            <div class="note" style="margin-top:12px;">
+              Por ahora las fotos se usan para vista previa. Después, cuando tengas backend, las subimos de verdad.
+            </div>
+          </div>
+
+          <!-- Paso 5 -->
+          <div class="step" data-step="5">
+            <h2 style="margin:14px 0 6px; color:#1b167f;">Precio y disponibilidad</h2>
+            <div class="grid">
+              <div>
+                <label>Precio por noche (ARS) *</label>
+                <input type="number" min="0" name="precio_por_noche" id="precio" required placeholder="Ej: 45000" />
+              </div>
+              <div>
+                <label>Mínimo de noches *</label>
+                <input type="number" min="1" name="min_noches" id="min_noches" required placeholder="Ej: 2" />
+              </div>
+
+              <div class="full">
+                <label>Check-in / Check-out (opcional)</label>
+                <input name="horarios" id="horarios" placeholder="Ej: Check-in 14:00 / Check-out 10:00" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 6 -->
+          <div class="step" data-step="6">
+            <h2 style="margin:14px 0 6px; color:#1b167f;">Confirmar y enviar</h2>
+
+            <div class="grid">
+              <div>
+                <label>Nombre del anfitrión *</label>
+                <input name="anfitrion_nombre" id="anfitrion_nombre" required placeholder="Ej: Ana" />
+              </div>
+              <div>
+                <label>WhatsApp (opcional)</label>
+                <input name="anfitrion_whatsapp" id="anfitrion_whatsapp" placeholder="Ej: 3447..." />
+              </div>
+              <div class="full">
+                <label>Email del anfitrión *</label>
+                <input type="email" name="email" id="anfitrion_email" required>
+              </div>
+            </div>
+
+            <div class="summary" id="summary"></div>
+
+            <div class="note" style="margin-top:12px;">
+              Al enviar, tu alojamiento pasa a revisión. Te contactamos por mail si falta algo.
+            </div>
+
+            <button id="btnEnviar" class="btn-next" type="submit" style="margin-top:14px;">
+              Enviar alojamiento
+            </button>
+
+            <p id="enviandoMsg" style="display:none; margin-top:10px; color:#444; font-weight:700;">
+              Enviando… por favor no cierres esta ventana.
+            </p>
+          </div>
+
+          <!-- Botones navegación -->
+          <div class="actions">
+            <button type="button" class="btn-sec" id="prev">Atrás</button>
+            <button type="button" class="btn-next" id="next">Continuar</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </section>
 
   <script>
   window.addEventListener("DOMContentLoaded", () => {
