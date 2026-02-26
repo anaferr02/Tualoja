@@ -643,3 +643,24 @@ footer{ margin-top:auto; }
   gap:10px;
   margin-left:auto;
 }
+/* Header: separar izquierda y derecha */
+#mainNav{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  width:100%;
+}
+
+.nav-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.nav-right{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap; /* si no entra, baja prolijo */
+}
