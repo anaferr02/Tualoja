@@ -1,374 +1,51 @@
-/* ===== Estilo general ===== */
-body {
-  font-family: 'Segoe UI', sans-serif;
-  margin: 0;
-  background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
-  color: #333;
-}
-
-/* ===== Header ===== */
-header {
-  background-color: transparent;
-  color: #fff;
-  padding: 15px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.logo {
-  font-size: 30px;
-  font-weight: bold;
-  color: #1b167f;
-  text-decoration: none;
-}
-
-.logo .icono-maleta {
-  color: #ffb300;
-  margin-right: 5px;
-}
-
-nav {
-  display: flex;
-  gap: 15px;
-}
-
-nav a {
-  color: #1b167f;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 5px 10px;
-  border-radius: 5px;
-}
-
-nav a:hover {
-  background-color: #f0f0f0;
-}
-
-.language-currency {
-  display: flex;
-  gap: 10px;
-}
-
-.language-currency select {
-  padding: 5px;
-  border-radius: 4px;
-  border: none;
-}
-
-/* ===== Hero Section ===== */
-.hero {
-  text-align: center;
-  padding: 40px 20px 20px;
-  color: #1b167f;
-}
-
-.hero h2 {
-  margin-bottom: 10px;
-  font-size: 28px;
-}
-
-.hero p {
-  font-size: 18px;
-  margin-bottom: 30px;
-}
-
-.search-box {
-  background-color: #ffb300;
-  border-radius: 20px;
-  padding: 20px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  max-width: 900px;
-  margin: auto;
-}
-
-.search-box input,
-.search-box select {
-  padding: 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  min-width: 140px;
-}
-
-.search-box button {
-  background-color: #1b167f;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  font-size: 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.search-box button:hover {
-  background-color: #e09c00;
-}
-
-/* ===== Responsive ===== */
-@media screen and (max-width: 768px) {
-  .search-box {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .search-box input,
-  .search-box select,
-  .search-box button {
-    width: 100%;
-  }
-}
-
-.ayuda {
-  padding: 40px 20px;
-  max-width: 800px;
-  margin: auto;
-  background-color: #fff;
-  border-radius: 10px;
-}
-
-.ayuda h2 {
-  font-size: 28px;
-  margin-bottom: 5px;
-}
-
-.ayuda p {
-  font-size: 16px;
-  margin-bottom: 20px;
-}
-
-.boton-ayuda {
-  background-color: #0071c2;
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-bottom: 30px;
-}
-
-.tabs-ayuda {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 30px;
-}
-
-.tabs-ayuda button {
-  background: #f2f2f2;
-  border: 1px solid #ccc;
-  padding: 10px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.tabs-ayuda .tab-activa {
-  background-color: #0071c2;
-  color: white;
-  font-weight: bold;
-  border: none;
-}
-
-.faq {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.faq-item {
-  background-color: #f8f8f8;
-  padding: 15px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.faq-item:hover {
-  background-color: #e6f0ff;
-}
-
-.alerta-seguridad {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeeba;
-  padding: 15px 20px;
-  margin-bottom: 30px;
-  border-radius: 8px;
-  font-size: 15px;
-  position: relative;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.cerrar-alerta {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  background: none;
-  border: none;
-  font-size: 18px;
-  color: #856404;
-  cursor: pointer;
-}
-
-.faq-categoria {
-  margin-bottom: 40px;
-}
-
-.faq-categoria h3,
-.faq-categoria h4 {
-  margin-bottom: 15px;
-  font-size: 20px;
-  color: #333;
-}
-
-.faq-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.faq-respuesta {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #555;
-  display: none;
-}
-
-/* ===== CONTENEDOR CENTRAL ===== */
-.contenedor {
-  width: 90%;
-  max-width: 1100px;
-  margin: auto;
-}
-
-/* ===== SECCIONES TIPO LANDING ===== */
-.seccion {
-  padding: 60px 0;
-}
-
-.seccion-blanca {
-  background: white;
-}
-
-.seccion-transparente {
-  background: transparent;
-}
-
-/* ===== BLOQUE HERO PROFESIONAL ===== */
-.hero-pro {
-  text-align: center;
-  padding: 50px 20px 30px;
-  color: #1b167f;
-}
-
-.hero-pro h1 {
-  font-size: 40px;
-  margin-bottom: 10px;
-}
-
-.hero-pro p {
-  font-size: 18px;
-  margin-bottom: 25px;
-}
-
-/* ===== BOTÓN PRINCIPAL (viejo) ===== */
-.boton-principal {
-  background-color: #1b167f;
-  color: white;
-  padding: 14px 28px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: bold;
-  display: inline-block;
-}
-
-/* ===== TARJETAS DE BENEFICIOS ===== */
-.grid-beneficios {
-  display: flex;
-  gap: 25px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.card-beneficio {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  flex: 1;
-  min-width: 250px;
-  max-width: 320px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-}
-
-/* ===== FORMULARIO PROFESIONAL ===== */
-.formulario-pro {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  max-width: 500px;
-  margin: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.formulario-pro input,
-.formulario-pro button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-}
-
-.ayuda form input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.ayuda form button {
-  width: 100%;
-}
-
-/* Arreglo inputs que se salen del contenedor */
-input,
-select,
-textarea {
+/* ===================== RESET BÁSICO ===================== */
+* {
   box-sizing: border-box;
 }
 
-input {
-  padding: 12px 14px;
+html, body {
+  height: 100%;
+  margin: 0;
 }
 
-/* ========================= HEADER + HAMBURGUESA (LIMPIO) ========================= */
-/* Desktop */
+/* ===================== BODY / LAYOUT ===================== */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* ===================== HEADER ===================== */
 header {
-  background-color: transparent;
-  color: #fff;
   padding: 15px 30px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
-  flex-wrap: nowrap;
 }
 
 .logo {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #1b167f;
+  text-decoration: none;
   white-space: nowrap;
 }
 
+.logo .icono-maleta {
+  color: #ffb300;
+}
+
+/* ===================== NAV ===================== */
 #hamburgerBtn {
   display: none;
 }
@@ -377,98 +54,78 @@ header {
   display: flex;
   align-items: center;
   gap: 14px;
-  flex-wrap: nowrap;
+  width: 100%;
 }
 
-#mainNav select {
-  width: 190px;
-  min-width: 190px;
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-left select {
   height: 44px;
   padding: 10px 12px;
   border-radius: 12px;
   border: none;
-  box-sizing: border-box;
 }
 
-#navAuth {
+.nav-right {
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
-#navAuth a {
-  padding: 10px 12px;
+/* ===================== LINKS / BOTONES NAV ===================== */
+.nav-link {
+  padding: 10px 14px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.18);
   text-decoration: none;
+  font-weight: 600;
+  color: #1b167f;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(27,22,127,0.15);
+}
+
+.btn {
+  padding: 10px 14px;
+  border-radius: 12px;
   font-weight: 700;
+  text-decoration: none;
+}
+
+.btn-ghost {
+  color: #1b167f;
+  background: rgba(255,255,255,0.4);
+  border: 1px solid rgba(27,22,127,0.2);
+}
+
+.btn-primary {
+  background: #1b167f;
+  color: #fff;
+}
+
+/* ===================== HERO ===================== */
+.hero {
+  text-align: center;
+  padding: 40px 20px 20px;
   color: #1b167f;
 }
 
-/* ========================= MOBILE ========================= */
-@media (max-width: 600px) {
-  header {
-    padding: 12px 14px;
-    flex-wrap: nowrap;
-  }
-
-  #hamburgerBtn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border: 0;
-    border-radius: 12px;
-    font-size: 22px;
-    font-weight: 900;
-    cursor: pointer;
-    background: rgba(255, 255, 255, 0.18);
-    color: #1b167f;
-    margin-left: auto;
-  }
-
-  #mainNav {
-    width: 100%;
-    display: none;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    padding: 12px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.14);
-  }
-
-  #mainNav.is-open {
-    display: flex;
-  }
-
-  #mainNav select,
-  #mainNav a,
-  #navAuth a {
-    width: 100%;
-    text-align: center;
-    padding: 14px 12px;
-    border-radius: 12px;
-    box-sizing: border-box;
-  }
-
-  #mainNav select {
-    height: 56px;
-    font-size: 16px;
-  }
-
-  #navAuth {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
+.hero h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
 }
 
-/* ========================= BUSCADOR (Botón dentro del cuadro) ========================= */
+.hero p {
+  font-size: 18px;
+}
+
+/* ===================== SEARCH BOX ===================== */
 .search-box {
-  background-color: #ffb300;
+  background: #ffb300;
   border-radius: 20px;
   padding: 20px;
   display: flex;
@@ -477,8 +134,7 @@ header {
   flex-wrap: wrap;
   max-width: 900px;
   margin: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
 }
 
 .search-box input,
@@ -488,179 +144,96 @@ header {
   border: none;
   border-radius: 10px;
   font-size: 16px;
-  box-sizing: border-box;
   min-width: 140px;
 }
 
-.search-box .btn-header {
+.btn-header {
   height: 44px;
-  padding: 0 16px;
+  padding: 0 18px;
   border-radius: 10px;
+  background: #1b167f;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  text-decoration: none;
-  font-weight: 800;
-  box-sizing: border-box;
-  white-space: nowrap;
 }
 
-@media (max-width: 600px) {
+/* ===================== FOOTER ===================== */
+footer {
+  margin-top: auto;
+  padding: 20px;
+  text-align: center;
+  background: rgba(255,255,255,0.4);
+}
+
+.footer-legal {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.footer-legal a {
+  color: #1b167f;
+  text-decoration: none;
+}
+
+.footer-legal a:hover {
+  text-decoration: underline;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+
+  header {
+    flex-wrap: wrap;
+  }
+
+  #hamburgerBtn {
+    display: inline-flex;
+    margin-left: auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: rgba(255,255,255,0.4);
+    font-size: 22px;
+    cursor: pointer;
+    color: #1b167f;
+  }
+
+  #mainNav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background: rgba(255,255,255,0.35);
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  #mainNav.is-open {
+    display: flex;
+  }
+
+  .nav-left,
+  .nav-right {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nav-left select,
+  .nav-right a {
+    width: 100%;
+    text-align: center;
+  }
+
   .search-box {
     flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
   }
 
   .search-box input,
   .search-box select,
-  .search-box .btn-header {
+  .btn-header {
     width: 100%;
   }
-
-  .search-box .btn-header {
-    height: 56px;
-    border-radius: 12px;
-  }
-}
-
-/* ===================================================================== */
-/* ===== NUEVO: BOTONES PREMIUM PARA ALOJAMIENTO.HTML (Tu pedido) ====== */
-/* ===================================================================== */
-
-/* Botón principal (para <button class="btn-principal"> o <a class="btn-principal">) */
-.btn-principal {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  background: linear-gradient(135deg, #1b167f, #3a2fcf);
-  color: #fff;
-
-  padding: 14px 30px;
-  border-radius: 999px;
-  font-size: 15px;
-  font-weight: 700;
-
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-
-  box-shadow: 0 12px 30px rgba(27, 22, 127, 0.25);
-  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
-}
-
-.btn-principal:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 40px rgba(27, 22, 127, 0.35);
-  filter: brightness(1.05);
-}
-
-.btn-principal:active {
-  transform: translateY(0);
-  box-shadow: 0 10px 25px rgba(27, 22, 127, 0.25);
-}
-
-/* Por si algún estilo viejo pisa los botones */
-button.btn-principal {
-  appearance: none;
-}
-
-/* Link secundario fino */
-.link-secundario {
-  color: #1b167f;
-  font-weight: 600;
-  text-decoration: none;
-  position: relative;
-}
-
-.link-secundario::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 100%;
-  height: 2px;
-  background: #1b167f;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform .25s ease;
-}
-
-.link-secundario:hover::after {
-  transform: scaleX(1);
-}
-html, body{
-  height:100%;
-}
-
-body{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-}
-
-main{
-  flex:1; /* ocupa el espacio y empuja el footer abajo */
-}
-
-footer{
-  margin-top:auto;
-}
-html, body { height: 100%; }
-
-body{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-}
-
-main{ flex:1; }
-
-footer{ margin-top:auto; }
-.nav{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
-}
-
-.nav-link{
-  display:inline-flex;
-  align-items:center;
-  padding:10px 14px;
-  border-radius:12px;
-  text-decoration:none;
-  font-weight:600;
-  color:#1b167f;
-  background: rgba(255,255,255,.55);
-  border:1px solid rgba(27,22,127,.12);
-}
-
-.nav-actions{
-  display:flex;
-  gap:10px;
-  margin-left:auto;
-}
-/* Header: separar izquierda y derecha */
-#mainNav{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  width:100%;
-}
-
-.nav-left{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.nav-right{
-  margin-left:auto;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap; /* si no entra, baja prolijo */
 }
