@@ -51,22 +51,59 @@
     <input type="date" id="entrada" />
     <input type="date" id="salida" />
 
-    <select id="adultos">
-      <option value="1">1 adulto</option>
-      <option value="2">2 adultos</option>
-      <option value="3">3 adultos</option>
-      <option value="4">4 adultos</option>
-      <option value="5">5 adultos</option>
-    </select>
+    <!-- ✅ Selector tipo Booking -->
+    <div class="guests">
+      <button type="button" class="guests-btn" id="guestsBtn" aria-expanded="false">
+        <span id="guestsSummary">1 adulto · 0 niños · 1 habitación</span>
+        <span class="chev">▾</span>
+      </button>
 
-    <input type="number" id="ninos" placeholder="Cantidad de niños" min="0" />
-    <div id="edades-ninos"></div>
+      <div class="guests-panel" id="guestsPanel" aria-hidden="true">
+        <div class="row">
+          <div>
+            <div class="row-title">Adultos</div>
+            <div class="row-sub">13 años o más</div>
+          </div>
+          <div class="stepper">
+            <button type="button" class="step" id="adultsMinus">−</button>
+            <span class="count" id="adultsCount">1</span>
+            <button type="button" class="step" id="adultsPlus">+</button>
+          </div>
+        </div>
 
-    <select id="habitaciones">
-      <option value="1">1 habitación</option>
-      <option value="2">2 habitaciones</option>
-      <option value="3">3 habitaciones</option>
-    </select>
+        <div class="row">
+          <div>
+            <div class="row-title">Niños</div>
+            <div class="row-sub">0–12 años</div>
+          </div>
+          <div class="stepper">
+            <button type="button" class="step" id="kidsMinus">−</button>
+            <span class="count" id="kidsCount">0</span>
+            <button type="button" class="step" id="kidsPlus">+</button>
+          </div>
+        </div>
+
+        <div id="kidsAges" class="kids-ages"></div>
+
+        <div class="row">
+          <div>
+            <div class="row-title">Habitaciones</div>
+          </div>
+          <div class="stepper">
+            <button type="button" class="step" id="roomsMinus">−</button>
+            <span class="count" id="roomsCount">1</span>
+            <button type="button" class="step" id="roomsPlus">+</button>
+          </div>
+        </div>
+
+        <button type="button" class="panel-done" id="guestsDone">Listo</button>
+      </div>
+
+      <!-- ✅ Inputs ocultos para no romper tu buscar()/resultados -->
+      <input type="hidden" id="adultos" value="1" />
+      <input type="hidden" id="ninos" value="0" />
+      <input type="hidden" id="habitaciones" value="1" />
+    </div>
 
     <a href="#" class="btn-header" onclick="buscar()">Buscar</a>
   </section>
@@ -86,6 +123,109 @@
   function buscar(){
     window.location.href="resultados.html";
   }
+
+  // ✅ Panel tipo Booking (adultos/niños/habitaciones + edades)
+  (function(){
+    const btn = document.getElementById("guestsBtn");
+    const panel = document.getElementById("guestsPanel");
+    const done = document.getElementById("guestsDone");
+    const summary = document.getElementById("guestsSummary");
+
+    const adultsH = document.getElementById("adultos");
+    const kidsH = document.getElementById("ninos");
+    const roomsH = document.getElementById("habitaciones");
+
+    const adultsCount = document.getElementById("adultsCount");
+    const kidsCount = document.getElementById("kidsCount");
+    const roomsCount = document.getElementById("roomsCount");
+
+    const adultsMinus = document.getElementById("adultsMinus");
+    const adultsPlus  = document.getElementById("adultsPlus");
+    const kidsMinus   = document.getElementById("kidsMinus");
+    const kidsPlus    = document.getElementById("kidsPlus");
+    const roomsMinus  = document.getElementById("roomsMinus");
+    const roomsPlus   = document.getElementById("roomsPlus");
+
+    const kidsAges = document.getElementById("kidsAges");
+
+    let adults = 1, kids = 0, rooms = 1;
+
+    function updateSummary(){
+      summary.textContent =
+        `${adults} adulto${adults>1?"s":""} · ${kids} niño${kids!==1?"s":""} · ${rooms} habitación${rooms>1?"es":""}`;
+
+      adultsH.value = String(adults);
+      kidsH.value = String(kids);
+      roomsH.value = String(rooms);
+
+      adultsCount.textContent = adults;
+      kidsCount.textContent = kids;
+      roomsCount.textContent = rooms;
+
+      adultsMinus.disabled = adults <= 1;
+      kidsMinus.disabled = kids <= 0;
+      roomsMinus.disabled = rooms <= 1;
+    }
+
+    function renderKidsAges(){
+      kidsAges.innerHTML = "";
+      for(let i=1; i<=kids; i++){
+        const sel = document.createElement("select");
+        sel.name = `edad-nino-${i}`;
+        sel.dataset.index = String(i);
+
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = `Edad niño ${i}`;
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        sel.appendChild(placeholder);
+
+        for(let age=0; age<=17; age++){
+          const opt = document.createElement("option");
+          opt.value = String(age);
+          opt.textContent = `${age} año${age!==1?"s":""}`;
+          sel.appendChild(opt);
+        }
+        kidsAges.appendChild(sel);
+      }
+    }
+
+    function openPanel(){
+      panel.classList.add("open");
+      btn.setAttribute("aria-expanded","true");
+      panel.setAttribute("aria-hidden","false");
+    }
+
+    function closePanel(){
+      panel.classList.remove("open");
+      btn.setAttribute("aria-expanded","false");
+      panel.setAttribute("aria-hidden","true");
+    }
+
+    btn.addEventListener("click", (e)=>{
+      e.preventDefault();
+      panel.classList.contains("open") ? closePanel() : openPanel();
+    });
+
+    done.addEventListener("click", closePanel);
+
+    document.addEventListener("click", (e)=>{
+      if(!panel.contains(e.target) && !btn.contains(e.target)) closePanel();
+    });
+
+    adultsMinus.addEventListener("click", ()=>{ adults = Math.max(1, adults-1); updateSummary(); });
+    adultsPlus.addEventListener("click",  ()=>{ adults = adults+1; updateSummary(); });
+
+    kidsMinus.addEventListener("click", ()=>{ kids = Math.max(0, kids-1); renderKidsAges(); updateSummary(); });
+    kidsPlus.addEventListener("click",  ()=>{ kids = kids+1; renderKidsAges(); updateSummary(); });
+
+    roomsMinus.addEventListener("click", ()=>{ rooms = Math.max(1, rooms-1); updateSummary(); });
+    roomsPlus.addEventListener("click",  ()=>{ rooms = rooms+1; updateSummary(); });
+
+    updateSummary();
+    renderKidsAges();
+  })();
 </script>
 
 <script type="module" src="script.js"></script>
