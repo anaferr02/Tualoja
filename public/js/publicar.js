@@ -9,13 +9,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  // ✅ IMPORTANTE:
+  // En publicar.html usamos FormSubmit (mail). Este archivo NO debe frenar el submit ahí.
+  // Si querés publicar por API, hacelo en otra página (por ej: publicar-api.html).
+  const isWizardFormSubmit =
+    document.querySelector('form[action*="formsubmit.co"]') !== null;
+
+  if (isWizardFormSubmit) {
+    // No tocamos nada: el wizard + FormSubmit funciona normal ✅
+    return;
+  }
+
+  // ⬇️ Si en el futuro tenés otro form (API), ahí sí engancha:
   const form = document.querySelector("form");
   if (!form) return;
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Intento de “enganchar” con inputs típicos
     const title = (document.querySelector('[name="titulo"]')?.value
       || document.querySelector("#titulo")?.value
       || document.querySelector('[name="nombre"]')?.value
