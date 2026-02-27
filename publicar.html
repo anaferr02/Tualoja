@@ -232,24 +232,6 @@
           <span class="chip">5 Precio</span>
           <span class="chip">6 Confirmar</span>
         </div>
-        <div class="form-group">
-  <label style="font-weight:800; color:#1b167f;">Políticas del alojamiento</label>
-
-  <label style="display:flex; gap:10px; align-items:center; margin-top:10px;">
-    <input type="checkbox" id="aceptaMascotas" name="acepta_mascotas" value="Si" />
-    <span>Acepta mascotas</span>
-  </label>
-
-  <label style="display:flex; gap:10px; align-items:center; margin-top:8px;">
-    <input type="checkbox" id="aceptaAsistencia" />
-    <span>Permite animales de asistencia (no se consideran mascotas)</span>
-  </label>
-
-  <p style="margin-top:10px; font-size:13px; opacity:.85;">
-    Al marcar estas opciones declarás que la información es verdadera.
-    <a href="animales-de-asistencia.html">Ver info</a>
-  </p>
-</div>
 
         <div class="note">
           🛡️ Seguridad: revisamos manualmente cada publicación para evitar estafas y anuncios falsos.
@@ -338,8 +320,27 @@ Si falta algún dato, te contactamos por este mail.
               <label class="check"><input type="checkbox" name="servicios" value="Cochera"> Cochera</label>
               <label class="check"><input type="checkbox" name="servicios" value="Piscina"> Piscina</label>
               <label class="check"><input type="checkbox" name="servicios" value="Parrilla"> Parrilla</label>
-              <label class="check"><input type="checkbox" name="servicios" value="Se aceptan mascotas"> Se aceptan mascotas</label>
             </div>
+
+            <!-- ✅ POLÍTICAS (dentro del form y sin duplicar “mascotas”) -->
+            <label style="margin-top:14px; font-weight:800; color:#1b167f;">Políticas del alojamiento</label>
+
+            <div class="checks" style="margin-top:8px;">
+              <label class="check">
+                <input type="checkbox" id="aceptaMascotas" name="acepta_mascotas" value="Si">
+                Acepta mascotas
+              </label>
+
+              <label class="check">
+                <input type="checkbox" id="aceptaAsistencia" name="acepta_asistencia" value="Si">
+                Permite animales de asistencia (no se consideran mascotas)
+              </label>
+            </div>
+
+            <p style="margin-top:10px; font-size:13px; opacity:.85;">
+              Al marcar estas opciones declarás que la información es verdadera.
+              <a href="animales-de-asistencia.html">Ver info</a>
+            </p>
 
             <label style="margin-top:14px;">Normas de la casa (opcional)</label>
             <textarea name="normas" id="normas" placeholder="Ej: No fiestas, no fumar adentro, horario de silencio..."></textarea>
@@ -457,6 +458,9 @@ Si falta algún dato, te contactamos por este mail.
       const fotosInfoHidden = document.getElementById("fotos_info");
       const fotosStatus = document.getElementById("fotosStatus");
 
+      const aceptaMascotas = document.getElementById("aceptaMascotas");
+      const aceptaAsistencia = document.getElementById("aceptaAsistencia");
+
       if (!pubForm || !prevBtn || !nextBtn || !bar || !err || steps.length === 0) {
         console.error("Faltan elementos del wizard. Revisar IDs/clases.");
         return;
@@ -475,6 +479,10 @@ Si falta algún dato, te contactamos por este mail.
           data[k] = v;
         });
 
+        // ✅ Guardar checks aunque no estén marcados (FormData no los incluye si están off)
+        data._aceptaMascotas = !!aceptaMascotas?.checked;
+        data._aceptaAsistencia = !!aceptaAsistencia?.checked;
+
         data.fotos_info = (fotosInfoHidden?.value || "");
         localStorage.setItem(saveKey, JSON.stringify(data));
       }
@@ -487,6 +495,7 @@ Si falta algún dato, te contactamos por este mail.
 
           for (const [k, v] of Object.entries(data)) {
             if (k === "servicios") continue;
+            if (k === "_aceptaMascotas" || k === "_aceptaAsistencia") continue;
             const el = pubForm.querySelector(`[name="${k}"]`);
             if (el) el.value = v;
           }
@@ -495,6 +504,13 @@ Si falta algún dato, te contactamos por este mail.
             pubForm.querySelectorAll(`input[name="servicios"]`).forEach(c => {
               c.checked = data.servicios.includes(c.value);
             });
+          }
+
+          if (typeof data._aceptaMascotas === "boolean" && aceptaMascotas) {
+            aceptaMascotas.checked = data._aceptaMascotas;
+          }
+          if (typeof data._aceptaAsistencia === "boolean" && aceptaAsistencia) {
+            aceptaAsistencia.checked = data._aceptaAsistencia;
           }
 
           if (fotosInfoHidden && data.fotos_info) {
@@ -551,11 +567,15 @@ Si falta algún dato, te contactamos por este mail.
         const servicios = Array.from(pubForm.querySelectorAll('input[name="servicios"]:checked')).map(x => x.value);
         const fotosInfo = (fotosInfoHidden?.value || "");
 
+        const mascotas = aceptaMascotas?.checked ? "Sí" : "No";
+        const asistencia = aceptaAsistencia?.checked ? "Sí" : "No";
+
         summaryEl.innerHTML = `
           <b>Resumen</b><br>
           <b>Alojamiento:</b> ${get("nombre_alojamiento")} (${get("tipo")}) — ${get("capacidad")} personas<br>
           <b>Ubicación:</b> ${get("ciudad")}, ${get("provincia")} ${get("direccion") ? "— " + get("direccion") : ""}<br>
           <b>Servicios:</b> ${servicios.length ? servicios.join(", ") : "No especificados"}<br>
+          <b>Políticas:</b> Mascotas: ${mascotas} — Animal de asistencia: ${asistencia}<br>
           <b>Precio:</b> ARS ${get("precio")} — <b>Mínimo:</b> ${get("min_noches")} noches<br>
           <b>Fotos:</b> ${fotosInfo || "Sin fotos"}<br>
         `;
@@ -579,6 +599,7 @@ Si falta algún dato, te contactamos por este mail.
       });
 
       pubForm.addEventListener("input", () => saveDraft());
+      pubForm.addEventListener("change", () => saveDraft());
 
       if (fotosInput && photosPreview && fotosInfoHidden) {
         fotosInput.addEventListener("change", () => {
@@ -654,16 +675,18 @@ Si falta algún dato, te contactamos por este mail.
       setStep(1);
     });
   </script>
+
   <script type="module" src="./public/js/publicar.js"></script>
+
   <!-- FOOTER -->
-    <footer>
-      <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
-      <div class="footer-legal">
-  <a href="politica-de-privacidad.html">Política de Privacidad</a> |
-  <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
-  <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
-  <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
-</div>
-    </footer>
+  <footer>
+    <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-legal">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a> |
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    </div>
+  </footer>
 </body>
 </html>
