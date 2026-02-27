@@ -202,22 +202,23 @@ footer {
 
   /* menú flotante, sólido y arriba de todo */
   #mainNav {
-    display: none;
-    position: absolute;
-    top: 64px;
-    left: 14px;
-    right: 14px;
-    z-index: 2000;
+  display: none;
+  position: absolute;
+  top: 68px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92vw, 420px);
+  z-index: 2000;
 
-    flex-direction: column;
-    gap: 12px;
+  flex-direction: column;
+  gap: 12px;
 
-    background: #ffffff; /* ✅ ya no transparente */
-    padding: 12px;
-    border-radius: 14px;
-    border: 1px solid rgba(27,22,127,0.12);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.25);
-  }
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(27,22,127,0.12);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+}
 
   #mainNav.is-open { display: flex; }
 
