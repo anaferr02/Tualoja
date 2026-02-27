@@ -100,9 +100,9 @@
       </div>
 
       <!-- ✅ Inputs ocultos para no romper tu buscar()/resultados -->
-      <input type="hidden" id="adultos" value="1" />
+      <input type="hidden" id="adultos" value="0" />
       <input type="hidden" id="ninos" value="0" />
-      <input type="hidden" id="habitaciones" value="1" />
+      <input type="hidden" id="habitaciones" value="0" />
     </div>
 
     <a href="#" class="btn-header" onclick="buscar()">Buscar</a>
@@ -148,7 +148,7 @@
 
     const kidsAges = document.getElementById("kidsAges");
 
-    let adults = 1, kids = 0, rooms = 1;
+    let adults = 0, kids = 0, rooms = 0;
 
     function updateSummary(){
       summary.textContent =
