@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mi cuenta - TuAloja</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+<script>
+  // Protección: si no está logueado, vuelve a login
+  if (localStorage.getItem("tualoja_logged") !== "1") {
+    window.location.href = "login.html";
+  }
+</script>
+
+<header>
+  <a href="index.html" class="logo">
+    <span class="icono-maleta">🧳</span> Tualoja.com
+  </a>
+
+  <nav id="mainNav">
+    <div class="nav-right">
+      <a class="nav-link" href="index.html">Inicio</a>
+      <a class="nav-link" href="publicar.html">Publicar alojamiento</a>
+      <a class="nav-link" href="mis-reservas.html">Mis reservas</a>
+      <a class="btn btn-ghost" href="#" id="logoutBtn">Cerrar sesión</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h2>Mi cuenta</h2>
+    <p id="userInfo"></p>
+  </section>
+
+  <section class="search-box" style="background:#fff;">
+    <a class="btn btn-primary" href="publicar.html">➕ Publicar alojamiento</a>
+    <a class="btn btn-ghost" href="mis-reservas.html">📄 Mis reservas</a>
+  </section>
+</main>
+
+<footer>
+  <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+</footer>
+
+<script>
+  const user = JSON.parse(localStorage.getItem("tualoja_user") || "{}");
+
+  if (user?.email) {
+    document.getElementById("userInfo").textContent =
+      `Sesión iniciada como ${user.email}`;
+  }
+
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.removeItem("tualoja_logged");
+    localStorage.removeItem("tualoja_user");
+    window.location.href = "index.html";
+  });
+</script>
+
+</body>
+</html>
