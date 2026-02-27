@@ -1,7 +1,5 @@
 /* ===================== RESET BÁSICO ===================== */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
   height: 100%;
@@ -18,9 +16,7 @@ body {
   flex-direction: column;
 }
 
-main {
-  flex: 1;
-}
+main { flex: 1; }
 
 /* ===================== HEADER ===================== */
 header {
@@ -41,14 +37,10 @@ header {
   white-space: nowrap;
 }
 
-.logo .icono-maleta {
-  color: #ffb300;
-}
+.logo .icono-maleta { color: #ffb300; }
 
-/* ===================== NAV ===================== */
-#hamburgerBtn {
-  display: none;
-}
+/* ===================== NAV (DESKTOP) ===================== */
+#hamburgerBtn { display: none; }
 
 #mainNav {
   display: flex;
@@ -119,9 +111,7 @@ header {
   margin-bottom: 10px;
 }
 
-.hero p {
-  font-size: 18px;
-}
+.hero p { font-size: 18px; }
 
 /* ===================== SEARCH BOX ===================== */
 .search-box {
@@ -178,18 +168,20 @@ footer {
   text-decoration: none;
 }
 
-.footer-legal a:hover {
-  text-decoration: underline;
-}
+.footer-legal a:hover { text-decoration: underline; }
 
-/* ===================== RESPONSIVE ===================== */
+/* ===================== RESPONSIVE (MOBILE) ===================== */
 @media (max-width: 768px) {
 
+  /* para que el menú flotante se posicione bien */
   header {
-    flex-wrap: wrap;
-    position: relative; 
+    position: relative;
+    z-index: 1000;
+    flex-wrap: nowrap;
+    padding: 12px 14px;
   }
 
+  /* botón ☰ centrado */
   #hamburgerBtn {
     display: inline-flex;
     margin-left: auto;
@@ -197,35 +189,43 @@ footer {
     height: 44px;
     border-radius: 12px;
     border: none;
-    background: rgba(255,255,255,0.4);
-    font-size: 22px;
+    background: rgba(255,255,255,0.45);
+    font-size: 24px;
     cursor: pointer;
     color: #1b167f;
+
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
   }
 
+  /* menú flotante, sólido y arriba de todo */
   #mainNav {
-  display: none;
-  position: absolute;
-  top: 64px;
-  left: 14px;
-  right: 14px;
+    display: none;
+    position: absolute;
+    top: 64px;
+    left: 14px;
+    right: 14px;
+    z-index: 2000;
 
-  flex-direction: column;
-  width: auto;
-  background: rgba(255,255,255,0.55);
-  padding: 12px;
-  border-radius: 14px;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.18);
-}
+    flex-direction: column;
+    gap: 12px;
 
-#mainNav.is-open {
-  display: flex;
-}
+    background: #ffffff; /* ✅ ya no transparente */
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(27,22,127,0.12);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+  }
+
+  #mainNav.is-open { display: flex; }
 
   .nav-left,
   .nav-right {
     flex-direction: column;
     width: 100%;
+    gap: 12px;
   }
 
   .nav-left select,
@@ -234,9 +234,8 @@ footer {
     text-align: center;
   }
 
-  .search-box {
-    flex-direction: column;
-  }
+  /* buscador en columna */
+  .search-box { flex-direction: column; }
 
   .search-box input,
   .search-box select,
