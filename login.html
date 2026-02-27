@@ -4,121 +4,55 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Iniciar sesión - TuAloja</title>
-  <style>
-    body{
-      font-family: Arial, sans-serif;
-      margin:0;
-      min-height:100vh;
-      background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-    }
-    .card{
-      background:#fff;
-      width:min(520px, 95vw);
-      border-radius:18px;
-      padding:26px;
-      box-shadow:0 10px 30px rgba(0,0,0,.12);
-    }
-    h1{margin:0 0 8px; color:#1b167f; font-size:34px;}
-    p{margin:0 0 18px; color:#444;}
-    label{display:block; font-size:14px; margin:12px 0 6px; color:#222;}
-    input{
-      width:100%;
-      padding:12px;
-      border:1px solid #d6d6d6;
-      border-radius:12px;
-      outline:none;
-      font-size:14px;
-    }
-    .btn{
-      width:100%;
-      border:none;
-      border-radius:14px;
-      padding:14px;
-      background:#1b167f;
-      color:#fff;
-      font-weight:bold;
-      cursor:pointer;
-      margin-top:16px;
-      font-size:14px;
-    }
-    .link{
-      display:inline-block;
-      margin-top:12px;
-      color:#1b167f;
-      text-decoration: underline;
-      font-size:14px;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <div class="card">
-    <h1>Iniciar sesión</h1>
-    <p>Ingresá con tu email y contraseña.</p>
+  <main style="max-width:520px;margin:40px auto;padding:0 14px;">
+    <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.12);">
+      <h1 style="margin:0;color:#1b167f;">Iniciar sesión</h1>
+      <p style="margin:8px 0 16px;color:#444;">Ingresá con tu email y contraseña.</p>
 
-    <form id="loginForm" autocomplete="on">
-      <label>Email</label>
-      <input type="email" name="email" required />
+      <form id="loginForm">
+        <label>Email</label>
+        <input id="email" type="email" required />
 
-      <label>Contraseña</label>
-      <input type="password" name="password" required />
+        <label style="margin-top:10px;">Contraseña</label>
+        <input id="password" type="password" required />
 
-      <button class="btn" type="submit">Entrar y continuar</button>
-      <a class="link" href="register.html">No tengo cuenta → Crear cuenta</a>
-    </form>
-  </div>
+        <button class="btn-header" type="submit" style="margin-top:14px;width:100%;">Entrar</button>
+      </form>
 
-  <script>
-    document.getElementById("loginForm").addEventListener("submit", (e) => {
+      <p style="margin:14px 0 0;">
+        <a href="register.html">No tengo cuenta → Crear cuenta</a>
+      </p>
+
+      <p id="err" style="display:none;margin:10px 0 0;color:#b00020;font-weight:700;"></p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { login } from "./public/js/auth.js";
+
+    const form = document.getElementById("loginForm");
+    const err = document.getElementById("err");
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      err.style.display = "none";
 
-      const form = e.currentTarget;
-      const email = form.email.value.trim().toLowerCase();
-      const password = form.password.value;
+      try{
+        await login(
+          document.getElementById("email").value,
+          document.getElementById("password").value
+        );
 
-      const users = JSON.parse(localStorage.getItem("tualoja_users") || "[]");
-      const ok = users.find(u => u.email === email && u.password === password);
-
-      if (!ok) {
-        alert("Email o contraseña incorrectos.");
-        return;
+        // Si venís de publicar, te conviene mandarlo ahí
+        location.href = "publicar.html";
+      } catch(ex){
+        err.textContent = ex.message || "Error";
+        err.style.display = "block";
       }
-
-      localStorage.setItem("tualoja_logged", "1");
-      localStorage.setItem("tualoja_user", email);
-      window.location.href = "publicar.html";
     });
   </script>
-  <script type="module">
-  import { login } from "./public/js/auth.js";
-
-  const form = document.querySelector("form");
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.querySelector('input[type="email"]').value;
-    const password = document.querySelector('input[type="password"]').value;
-
-    try {
-      await login(email, password);
-      location.href = "index.html";
-    } catch (err) {
-      alert(err.message);
-    }
-  });
-</script>
-  <!-- FOOTER -->
-    <footer>
-      <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
-      <div class="footer-legal">
-  <a href="politica-de-privacidad.html">Política de Privacidad</a> |
-  <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
-  <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
-  <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
-</div>
-    </footer>
 </body>
 </html>
