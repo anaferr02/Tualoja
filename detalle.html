@@ -1,195 +1,29 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Detalle del alojamiento - Aloja</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
-    <style>
-      /* Modal */
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 999;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.6);
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalle - TuAloja</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <a class="logo" href="index.html">TuAloja.com</a>
+    <nav id="mainNav" class="nav">
+      <a href="alojamiento.html">Registra tu alojamiento</a>
+      <a href="ayuda.html">Ayuda</a>
+      <span id="navAuth"></span>
+    </nav>
+    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
+  </header>
 
-      .modal-content {
-        background-color: #fff;
-        margin: 10% auto;
-        padding: 20px;
-        border-radius: 16px;
-        width: 90%;
-        max-width: 500px;
-        text-align: center;
-      }
+  <main class="contenedor">
+    <a class="muted" href="resultados.html">← Volver a resultados</a>
+    <div id="detalleWrap"></div>
+    <p id="noExiste" class="muted" style="display:none; margin-top:16px;">Este alojamiento no existe (o fue eliminado).</p>
+  </main>
 
-      .modal-content button {
-        margin: 10px;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-
-      .confirm {
-        background-color: #28a745;
-        color: white;
-      }
-
-      .cancel {
-        background-color: #dc3545;
-        color: white;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Header -->
-    <header>
-      <div class="logo">
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/201/201623.png"
-          alt="Logo"
-        />
-        <h1>
-          <a href="index.html" style="color: white; text-decoration: none"
-            >Aloja.com.ar</a
-          >
-        </h1>
-      </div>
-    </header>
-
-    <!-- Detalle -->
-    <section
-      class="detalle-alojamiento"
-      style="padding: 40px; max-width: 1000px; margin: auto"
-    >
-      <h2 style="color: #0d47a1">Hotel Central Mendoza</h2>
-      <p class="ubicacion" style="font-weight: bold; color: #333">
-        📍 Mendoza, Argentina
-      </p>
-
-      <!-- Info usuario -->
-      <div
-        id="info-reserva"
-        style="margin-top: 10px; font-weight: bold; color: #444"
-      ></div>
-
-      <!-- Galería -->
-      <div
-        class="galeria"
-        style="display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0"
-      >
-        <img
-          src="https://via.placeholder.com/400x250"
-          alt="Foto 1"
-          style="border-radius: 12px; flex: 1 1 30%"
-        />
-        <img
-          src="https://via.placeholder.com/400x250"
-          alt="Foto 2"
-          style="border-radius: 12px; flex: 1 1 30%"
-        />
-        <img
-          src="https://via.placeholder.com/400x250"
-          alt="Foto 3"
-          style="border-radius: 12px; flex: 1 1 30%"
-        />
-      </div>
-
-      <!-- Descripción -->
-      <div
-        class="descripcion"
-        style="
-          background: white;
-          padding: 20px;
-          border-radius: 16px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        "
-      >
-        <p>
-          Este moderno hotel en el centro de Mendoza ofrece habitaciones
-          confortables con aire acondicionado, Wi-Fi gratuito, desayuno incluido
-          y recepción 24hs.
-        </p>
-        <p>
-          <strong>Servicios:</strong> Wi-Fi gratis, Piscina, Estacionamiento,
-          Desayuno, Aire Acondicionado
-        </p>
-        <p><strong>Precio por noche:</strong> $30.000</p>
-        <button
-          onclick="abrirModal()"
-          style="
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-          "
-        >
-          Reservar ahora
-        </button>
-      </div>
-    </section>
-
-    <!-- Modal de confirmación -->
-    <div id="modal" class="modal">
-      <div class="modal-content">
-        <h3>Confirmar Reserva</h3>
-        <p id="resumen-reserva"></p>
-        <button class="confirm" onclick="confirmarReserva()">Confirmar</button>
-        <button class="cancel" onclick="cerrarModal()">Cancelar</button>
-      </div>
-    </div>
-
-    <!-- Script -->
-    <script>
-      // Recuperar datos
-      const destino = localStorage.getItem("destino") || "Destino";
-      const entrada = localStorage.getItem("entrada") || "";
-      const salida = localStorage.getItem("salida") || "";
-      const adultos = localStorage.getItem("adultos") || "1";
-      const ninos = localStorage.getItem("ninos") || "0";
-
-      // Mostrar resumen arriba
-      document.getElementById("info-reserva").innerText =
-        `📅 Reserva: ${entrada} a ${salida} | 👤 Adultos: ${adultos} | 👶 Niños: ${ninos}`;
-
-      // Abrir modal
-      function abrirModal() {
-        document.getElementById("resumen-reserva").innerText =
-          `Hotel Central Mendoza\n📍 ${destino}\nFechas: ${entrada} a ${salida}\nAdultos: ${adultos} | Niños: ${ninos}\n💰 Precio total estimado: $30.000 x noche`;
-        document.getElementById("modal").style.display = "block";
-      }
-
-      // Cerrar modal
-      function cerrarModal() {
-        document.getElementById("modal").style.display = "none";
-      }
-
-      // Confirmar reserva
-      function confirmarReserva() {
-        cerrarModal();
-        alert(
-          "¡Reserva confirmada con éxito! Te enviaremos los detalles por email.",
-        );
-      }
-    </script>
-    <form data-booking-form>
-  <input type="date" name="date_from" required />
-  <input type="date" name="date_to" required />
-  <input type="number" name="guests" min="1" value="1" required />
-  <button type="submit">Reservar</button>
-</form>
-
-<script type="module" src="./public/js/detalle.js"></script>
-  </body>
+  <script src="script.js"></script>
+  <script type="module" src="detalle.js"></script>
+</body>
 </html>
