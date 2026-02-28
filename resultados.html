@@ -3,196 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Resultados - Aloja</title>
+  <title>Resultados - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    /* Solo para que se vea prolijo aunque tu CSS no tenga estilos para esto */
-    .contenedor { max-width: 980px; margin: 0 auto; padding: 20px; }
-    .box {
-      background: white;
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,.08);
-      margin-bottom: 16px;
-    }
-    .titulo { margin: 0 0 6px; }
-    .muted { color: #5b6472; margin: 0; }
-    .chips { display:flex; flex-wrap:wrap; gap:10px; margin-top: 10px; }
-    .chip { background:#eef4ff; color:#1b167f; padding:8px 12px; border-radius:999px; font-weight:700; }
-    .grid { display:grid; gap:12px; }
-    @media(min-width:900px){ .grid { grid-template-columns: 1fr 1fr; } }
-    .card {
-      background:#fff;
-      border:1px solid #eef0f6;
-      border-radius:16px;
-      padding:14px;
-    }
-    .btn {
-      display:inline-block;
-      padding:10px 14px;
-      border-radius:12px;
-      text-decoration:none;
-      font-weight:800;
-      background:#1b167f;
-      color:#fff;
-      margin-top: 10px;
-    }
-  </style>
 </head>
-
 <body>
-  <header>
-    <a href="index.html" class="logo"><span class="icono-maleta">🧳</span> Aloja.com.ar</a>
-    <nav>
-      <span id="navAuth"></span>
+  <header class="header">
+    <a class="logo" href="index.html">TuAloja.com</a>
+    <nav id="mainNav" class="nav">
       <a href="alojamiento.html">Registra tu alojamiento</a>
       <a href="ayuda.html">Ayuda</a>
+      <span id="navAuth"></span>
     </nav>
+    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
   </header>
 
   <main class="contenedor">
-    <!-- Resumen de búsqueda -->
-    <section class="box">
-      <h1 class="titulo">Resultados</h1>
-      <p class="muted" id="resumenTexto">Cargando tu búsqueda...</p>
+    <h1>Resultados</h1>
+    <p id="resumenBusqueda" class="muted"></p>
 
-      <div class="chips" id="chips"></div>
-
+    <div style="margin: 12px 0;">
       <a class="btn" href="index.html">Cambiar búsqueda</a>
-    </section>
+    </div>
 
-    <!-- Zona donde luego van los alojamientos -->
-    <section class="box">
-      <h2 class="titulo" style="font-size:18px;">Alojamientos (demo)</h2>
-      <p class="muted">Todavía no estás filtrando una base real. Esto es solo para ver que el buscador funciona.</p>
-
-      <div class="grid" id="listaAlojamientos"></div>
+    <section>
+      <h2>Alojamientos</h2>
+      <div id="gridResultados" class="grid-resultados"></div>
+      <p id="emptyResultados" class="muted" style="display:none;">No hay alojamientos todavía. Publicá el primero 🙌</p>
     </section>
   </main>
 
-  <script>
-    // 1) Leer lo que guardó el index
-    const destino = localStorage.getItem("destino") || "";
-    const entrada = localStorage.getItem("entrada") || "";
-    const salida = localStorage.getItem("salida") || "";
-    const adultos = localStorage.getItem("adultos") || "1";
-    const ninos = parseInt(localStorage.getItem("ninos")) || 0;
-
-    let edades = [];
-    try {
-      edades = JSON.parse(localStorage.getItem("edades_ninos") || "[]");
-    } catch (e) {
-      edades = [];
-    }
-
-    // 2) Mostrar resumen arriba
-    const resumen = document.getElementById("resumenTexto");
-    const chips = document.getElementById("chips");
-
-    // Si entraron a resultados sin buscar, los mandamos al inicio
-    if (!destino || !entrada || !salida) {
-      resumen.textContent = "No hay una búsqueda cargada. Volvé al inicio y buscá un destino.";
-      chips.innerHTML = "";
-    } else {
-      const textoNinos = (ninos > 0) ? `${ninos} niño${ninos > 1 ? "s" : ""}` : "Sin niños";
-      resumen.textContent = `Buscaste en: ${destino} · ${entrada} → ${salida}`;
-
-      // Chips (etiquetas)
-      const chipsData = [
-        `${adultos} adulto${Number(adultos) > 1 ? "s" : ""}`,
-        textoNinos
-      ];
-
-      // Si hay edades, las mostramos
-      if (ninos > 0 && edades.length) {
-        const edadesLimpias = edades.filter(x => String(x).trim() !== "");
-        if (edadesLimpias.length) {
-          const etiqueta = (ninos === 1) ? "Edad del niño" : "Edades de los niños";
-
-        // Si hay 1 sola edad y es 1 => "año", si es 2 o más => "años"
-let sufijo = " años";
-if (edadesLimpias.length === 1) {
-  const edadNum = parseInt(edadesLimpias[0], 10);
-  sufijo = (edadNum === 1) ? " año" : " años";
-}
-
-chipsData.push(`${etiqueta}: ${edadesLimpias.join(", ")}${sufijo}`);
-        }
-      }
-
-      chips.innerHTML = chipsData.map(t => `<span class="chip">${t}</span>`).join("");
-    }
-
-    // 3) Demo de alojamientos + ejemplo de filtro por niños
-    // (Esto es solo para que veas la lógica: si vienen niños, no muestro "Solo adultos")
-    const alojamientosDemo = [
-      { nombre: "Cabaña Familiar", ciudad: "Cerca del centro", precio: 45000, aceptaNinos: true },
-      { nombre: "Depto Solo Adultos", ciudad: "Zona tranquila", precio: 38000, aceptaNinos: false },
-      { nombre: "Casa con Patio", ciudad: "Barrio residencial", precio: 52000, aceptaNinos: true }
-    ];
-    <div id="resumen-busqueda" class="resumen-busqueda"></div>
-    const lista = document.getElementById("listaAlojamientos");
-
-    const filtrados = alojamientosDemo.filter(a => {
-      if (ninos > 0 && a.aceptaNinos === false) return false;
-      return true;
-    });
-
-    lista.innerHTML = filtrados.map(a => `
-      <div class="card">
-        <h3 style="margin:0 0 6px;">${a.nombre}</h3>
-        <p class="muted" style="margin:0 0 8px;">${a.ciudad}</p>
-        <p style="margin:0 0 8px;"><b>$${a.precio}</b> por noche</p>
-        <p class="muted" style="margin:0;">
-          ${a.aceptaNinos ? "✅ Apto para niños" : "❌ Solo adultos"}
-        </p>
-      </div>
-    `).join("");
-  </script>
-  <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const destino = localStorage.getItem("destino") || "-";
-    const entrada = localStorage.getItem("entrada") || "-";
-    const salida = localStorage.getItem("salida") || "-";
-    const adultos = localStorage.getItem("adultos") || "1";
-    const ninos = localStorage.getItem("ninos") || "0";
-    const habitaciones = localStorage.getItem("habitaciones") || "1";
-
-    const el = document.getElementById("resumen-busqueda");
-    if (el) {
-      el.textContent =
-        `${destino} · ${entrada} → ${salida} · ${adultos} adulto(s) · ${ninos} niño(s) · ${habitaciones} habitación(es)`;
-    }
-  });
-</script>
-  <div id="resultados"></div>
-
-<script type="module">
-  import { api } from "./public/js/api.js";
-
-  const params = new URLSearchParams(location.search);
-  const city = params.get("city") || "";
-  const date_from = params.get("date_from") || "";
-  const date_to = params.get("date_to") || "";
-  const guests = params.get("guests") || "";
-
-  const qs = new URLSearchParams();
-  if (city) qs.set("city", city);
-  if (date_from) qs.set("date_from", date_from);
-  if (date_to) qs.set("date_to", date_to);
-  if (guests) qs.set("guests", guests);
-
-  const rows = await api(`/listings?${qs.toString()}`);
-  const box = document.getElementById("resultados");
-  box.innerHTML = rows.map(r => `
-    <div style="padding:12px;margin:10px 0;border-radius:12px;background:#fff;">
-      <div style="font-weight:700;">${r.title}</div>
-      <div>${r.city}, ${r.province}</div>
-      <div>$${r.price_per_night} por noche</div>
-      ${r.estimated_total ? `<div>Total (${r.nights} noches): $${r.estimated_total}</div>` : ""}
-      <a href="detalle.html?id=${r.id}">Ver</a>
-    </div>
-  `).join("");
-</script>
+  <script src="script.js"></script>
+  <script type="module" src="seed.js"></script>
+  <script type="module" src="resultados.js"></script>
 </body>
 </html>
