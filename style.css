@@ -451,6 +451,19 @@ footer {
 }
 
 .hero-pro .btn-principal {
+  background: #1b167f;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform .15s ease, box-shadow .15s ease;
+  box-shadow: 0 8px 20px rgba(27,22,127,.35);
+}
+
+.btn-principal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(27,22,127,.45);
+}.btn-principal {
   padding: 14px 36px;
   font-size: 16px;
   border-radius: 999px;
