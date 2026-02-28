@@ -1,110 +1,98 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registra tu alojamiento - TuAloja</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registra tu alojamiento - TuAloja</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
 
-  <body>
+<body>
 
-    <!-- HERO -->
-    <section class="seccion seccion-transparente">
-      <div class="contenedor hero-pro">
-        <h1>Da de alta tu alojamiento en TuAloja</h1>
-        <p>Ganá más dinero, más rápido y llegá a nuevos huéspedes.</p>
+  <!-- HERO -->
+  <section class="seccion seccion-transparente">
+    <div class="contenedor hero-pro">
+      <h1>Da de alta tu alojamiento en TuAloja</h1>
+      <p>Ganá más dinero, más rápido y llegá a nuevos huéspedes.</p>
 
-        <!-- Botón principal -->
-        <button id="btnRegistrar" class="btn-principal">
+      <button id="btnRegistrar" class="btn-principal" type="button">
         Registrar alojamiento
+      </button>
+    </div>
+  </section>
+
+  <!-- BENEFICIOS -->
+  <section class="seccion seccion-blanca">
+    <div class="contenedor grid-beneficios">
+      <div class="card-beneficio">
+        <h3>Pagos sin complicaciones</h3>
+        <p>Nos encargamos del proceso de cobro.</p>
+      </div>
+
+      <div class="card-beneficio">
+        <h3>Mayor visibilidad</h3>
+        <p>Tu propiedad aparece ante miles de usuarios.</p>
+      </div>
+
+      <div class="card-beneficio">
+        <h3>Sin costos fijos</h3>
+        <p>Solo pagás comisión por reservas confirmadas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOQUE CENTRAL -->
+  <section class="seccion seccion-transparente">
+    <div class="contenedor">
+      <div class="card-registro-pro">
+        <h2>Registrá tu alojamiento</h2>
+        <p>
+          Para publicar tu alojamiento necesitás crear una cuenta o iniciar sesión.
+          El proceso es simple y guiado.
+        </p>
+
+        <ol class="lista-pasos">
+          <li>Datos de la propiedad</li>
+          <li>Ubicación</li>
+          <li>Servicios y normas</li>
+          <li>Fotos</li>
+          <li>Precio y disponibilidad</li>
+        </ol>
+
+        <button id="btnComenzar" class="btn-principal" type="button">
+          Comenzar
         </button>
-      </div>
-    </section>
 
-    <!-- BENEFICIOS -->
-    <section class="seccion seccion-blanca">
-      <div class="contenedor grid-beneficios">
-
-        <div class="card-beneficio">
-          <h3>Pagos sin complicaciones</h3>
-          <p>Nos encargamos del proceso de cobro.</p>
-        </div>
-
-        <div class="card-beneficio">
-          <h3>Mayor visibilidad</h3>
-          <p>Tu propiedad aparece ante miles de usuarios.</p>
-        </div>
-
-        <div class="card-beneficio">
-          <h3>Sin costos fijos</h3>
-          <p>Solo pagás comisión por reservas confirmadas.</p>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- BLOQUE CENTRAL (TIPO BOOKING) -->
-    <section class="seccion seccion-transparente">
-      <div class="contenedor" style="max-width:900px;">
-        <div style="
-          background:#fff;
-          border-radius:18px;
-          padding:28px;
-          box-shadow:0 10px 30px rgba(0,0,0,.12);
-        ">
-          <h2>Registrá tu alojamiento</h2>
-          <p>
-            Para publicar tu alojamiento necesitás crear una cuenta o iniciar sesión.
-            El proceso es simple y guiado.
-          </p>
-
-          <ol style="margin:16px 0 22px; line-height:1.6;">
-            <li>Datos de la propiedad</li>
-            <li>Ubicación</li>
-            <li>Servicios y normas</li>
-            <li>Fotos</li>
-            <li>Precio y disponibilidad</li>
-          </ol>
-
-          <button id="btnComenzar" class="btn-principal">
-            Comenzar
-          </button>
-
-          <div style="margin-top:14px;">
-            <a href="register.html" class="link-secundario">Crear cuenta</a>
-&nbsp;·&nbsp;
-<a href="login.html" class="link-secundario">Iniciar sesión</a>
-          </div>
+        <div class="links-auth">
+          <a href="register.html" class="link-secundario">Crear cuenta</a>
+          <span class="dot">·</span>
+          <a href="login.html" class="link-secundario">Iniciar sesión</a>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- FOOTER -->
-    <footer>
-      <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
-      <div class="footer-legal">
-  <a href="politica-de-privacidad.html">Política de Privacidad</a> |
-  <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
-  <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
-  <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
-</div>
-    </footer>
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-legal">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a> |
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    </div>
+  </footer>
 
-    <!-- LOGICA DE REDIRECCION -->
-    <script>
-      function irARegistro() {
-        const logueado = localStorage.getItem("tualoja_logged") === "1";
-        if (logueado) {
-          window.location.href = "publicar.html";
-        } else {
-          window.location.href = "register.html";
-        }
-      }
+  <!-- LOGICA DE REDIRECCION -->
+  <script>
+    function irARegistro() {
+      const logueado = localStorage.getItem("tualoja_logged") === "1";
+      window.location.href = logueado ? "publicar.html" : "register.html";
+    }
 
-      document.getElementById("btnRegistrar").addEventListener("click", irARegistro);
-      document.getElementById("btnComenzar").addEventListener("click", irARegistro);
-    </script>
+    document.getElementById("btnRegistrar")?.addEventListener("click", irARegistro);
+    document.getElementById("btnComenzar")?.addEventListener("click", irARegistro);
+  </script>
 
-  </body>
+</body>
 </html>
