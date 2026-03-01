@@ -471,3 +471,22 @@ footer {
 .grid-beneficios {
   margin-bottom: 80px;
 }
+/* Pantallas de login/register: centrado + que no se cruce el footer */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+.auth-page footer {
+  position: static;
+  margin-top: 20px;
+}
