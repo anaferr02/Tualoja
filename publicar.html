@@ -7,501 +7,233 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* ✅ Estilo local SOLO para esta página (no rompe el resto) */
     .publish-wrap{ max-width: 980px; margin: 24px auto 40px; padding: 0 16px; }
     .publish-card{
-      background: rgba(255,255,255,.85);
-      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.9);
       border-radius: 22px;
       box-shadow: 0 18px 40px rgba(0,0,0,.12);
       padding: 18px;
     }
     .publish-top{
       display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
-      margin-bottom: 10px;
     }
-    .publish-top h1{ margin:0; }
-    .muted{ opacity: .85; }
-
+    .muted{ opacity:.85; }
     .publish-section{
-      background: rgba(255,255,255,.65);
-      border: 1px solid rgba(0,0,0,.06);
+      background: rgba(255,255,255,.7);
       border-radius: 18px;
       padding: 14px;
-      margin-top: 12px;
+      margin-top: 14px;
     }
-    .publish-section h3{ margin: 0 0 10px; }
-
-    .grid-2{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-    @media (max-width: 720px){ .grid-2{ grid-template-columns: 1fr; } }
-
-    /* inputs */
-    .publish-card label{ display:block; font-weight: 600; margin-top: 10px; }
-    .publish-card input, .publish-card select, .publish-card textarea{
-      width:100%; box-sizing:border-box;
-      margin-top: 6px;
-      padding: 12px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(0,0,0,.12);
-      background: #fff;
-      outline: none;
+    .grid-2{ display:grid; grid-template-columns: repeat(2,1fr); gap:12px; }
+    @media(max-width:720px){ .grid-2{ grid-template-columns:1fr; } }
+    label{ font-weight:600; margin-top:10px; display:block; }
+    input, textarea, select{
+      width:100%; margin-top:6px; padding:12px;
+      border-radius:14px; border:1px solid rgba(0,0,0,.15);
     }
-    .publish-card textarea{ resize: vertical; }
-
-    .help{
-      display:block;
-      font-size: 12px;
-      opacity: .85;
-      margin-top: 6px;
-      line-height: 1.3;
-    }
-
-    .checks{
-      display:flex; flex-wrap:wrap; gap:10px;
-    }
+    textarea{ resize:vertical; }
+    .help{ font-size:12px; opacity:.8; margin-top:6px; display:block; }
+    .checks{ display:flex; flex-wrap:wrap; gap:10px; }
     .checks label{
-      margin:0; font-weight: 500;
-      display:inline-flex; gap:8px; align-items:center;
-      padding: 10px 12px;
-      border-radius: 999px;
       background: rgba(0,0,0,.05);
-      border: 1px solid rgba(0,0,0,.06);
+      padding:10px 12px; border-radius:999px;
+      display:flex; gap:6px; align-items:center;
     }
 
-    /* Fotos */
     .preview-grid{
       display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
+      grid-template-columns: repeat(auto-fill,minmax(140px,1fr));
+      gap:12px; margin-top:12px;
     }
     .preview-item{
-      border-radius: 16px;
-      overflow: hidden;
-      background: rgba(255,255,255,.75);
-      border: 1px solid rgba(0,0,0,.08);
+      border-radius:16px; overflow:hidden;
+      background:#fff;
     }
-    .preview-item img{
-      width:100%; height:120px; object-fit:cover; display:block;
-    }
+    .preview-item img{ width:100%; height:120px; object-fit:cover; }
     .preview-actions{
-      display:flex; justify-content:space-between; align-items:center;
-      gap:8px; padding: 8px 10px; font-size: 12px;
+      display:flex; justify-content:space-between; padding:8px; font-size:12px;
     }
-    .mini-btn{
-      border:0; cursor:pointer;
-      padding: 7px 10px;
-      border-radius: 12px;
-      background: rgba(0,0,0,.08);
-    }
+    .mini-btn{ border:0; border-radius:12px; padding:6px 10px; cursor:pointer; }
     .mini-badge{
-      font-size: 11px;
-      padding: 5px 10px;
-      border-radius: 999px;
-      background: rgba(0,0,0,.65);
-      color:#fff;
-      white-space:nowrap;
+      background:#000; color:#fff;
+      border-radius:999px; padding:4px 8px;
     }
-
-    .publish-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
-    .btn{ cursor:pointer; }
   </style>
 </head>
 
 <body>
-  <!-- 🔒 Protección: solo logueado -->
-  <script>
-    if (localStorage.getItem("tualoja_logged") !== "1") {
-      localStorage.setItem("redirect_after_login", "publicar.html");
-      location.href = "login.html";
-    }
-  </script>
+<script>
+  if(localStorage.getItem("tualoja_logged")!=="1"){
+    localStorage.setItem("redirect_after_login","publicar.html");
+    location.href="login.html";
+  }
+</script>
 
-  <header class="header">
-    <a class="logo" href="index.html">TuAloja.com</a>
-    <nav id="mainNav" class="nav">
-      <a href="alojamiento.html">Registrá tu alojamiento</a>
-      <a href="ayuda.html">Ayuda</a>
-      <span id="navAuth"></span>
-    </nav>
-    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
-  </header>
+<header class="header">
+  <a class="logo" href="index.html">TuAloja.com</a>
+</header>
 
-  <main class="publish-wrap">
-    <div class="publish-card">
-      <div class="publish-top">
-        <div>
-          <h1>Publicar alojamiento</h1>
-          <p class="muted" style="margin:6px 0 0;">
-            Subí fotos, completá datos y publicá. 
-          </p>
-        </div>
-        <button class="btn btn-outline" type="button" id="btnLogout">Cerrar sesión</button>
+<main class="publish-wrap">
+  <div class="publish-card">
+
+    <div class="publish-top">
+      <div>
+        <h1>Publicar alojamiento</h1>
+        <p class="muted">Completá los datos para publicar tu alojamiento</p>
       </div>
+      <button id="btnLogout">Cerrar sesión</button>
+    </div>
 
-      <form id="publishForm">
-        <!-- INFO BÁSICA -->
-        <section class="publish-section">
-          <h3>Información básica</h3>
+    <form id="publishForm">
 
-          <label>Nombre del alojamiento *</label>
-          <input name="titulo" required placeholder="Ej: Cabaña en el río" />
+      <section class="publish-section">
+        <h3>Información básica</h3>
 
-          <div class="grid-2">
-            <div>
-              <label>Tipo de alojamiento *</label>
-              <select name="tipo" required>
-                <option value="">Elegí una opción</option>
-                <option>Departamento</option>
-                <option>Casa</option>
-                <option>Cabaña</option>
-                <option>Habitación</option>
-                <option>Hotel</option>
-                <option>Hostel</option>
-                <option>Otro</option>
-              </select>
-            </div>
-            <div>
-              <label>Capacidad (huéspedes) *</label>
-              <input name="capacidad" type="number" min="1" required placeholder="Ej: 4" />
-            </div>
+        <label>Nombre del alojamiento *</label>
+        <input name="titulo" required>
+
+        <div class="grid-2">
+          <div>
+            <label>Tipo *</label>
+            <select name="tipo" required>
+              <option value="">Elegí</option>
+              <option>Casa</option><option>Departamento</option>
+              <option>Cabaña</option><option>Habitación</option>
+              <option>Hotel</option><option>Hostel</option>
+            </select>
           </div>
-
-          <label>Descripción *</label>
-          <textarea name="descripcion" rows="4" required placeholder="Contá lo mejor del alojamiento..."></textarea>
-        </section>
-
-        <!-- UBICACIÓN -->
-        <section class="publish-section">
-          <h3>Ubicación</h3>
-
-          <div class="grid-2">
-            <div>
-              <label>Provincia *</label>
-              <input name="provincia" required placeholder="Ej: Entre Ríos" />
-            </div>
-            <div>
-              <label>Ciudad *</label>
-              <input name="ciudad" required placeholder="Ej: Villa Elisa" />
-            </div>
+          <div>
+            <label>Capacidad *</label>
+            <input type="number" min="1" name="capacidad" required>
           </div>
-
-          <!-- ✅ AHORA OBLIGATORIA -->
-          <label>Dirección (obligatoria) *</label>
-          <input name="direccion" required minlength="5" placeholder="Ej: Calle y número (no se publica)" />
-          <small class="help">La dirección no será pública. Se usa para verificación y evitar estafas.</small>
-
-          <label>Código postal (opcional)</label>
-          <input name="cp" placeholder="Ej: 3265" />
-        </section>
-
-        <!-- SERVICIOS -->
-        <section class="publish-section">
-          <h3>Servicios</h3>
-          <div class="checks">
-            <label><input type="checkbox" name="servicios" value="Wifi" /> Wifi</label>
-            <label><input type="checkbox" name="servicios" value="Aire acondicionado" /> Aire acondicionado</label>
-            <label><input type="checkbox" name="servicios" value="Calefacción" /> Calefacción</label>
-            <label><input type="checkbox" name="servicios" value="Cocina" /> Cocina</label>
-            <label><input type="checkbox" name="servicios" value="Estacionamiento" /> Estacionamiento</label>
-            <label><input type="checkbox" name="servicios" value="Pileta" /> Pileta</label>
-            <label><input type="checkbox" name="servicios" value="Parrilla" /> Parrilla</label>
-            <label><input type="checkbox" name="servicios" value="Mascotas" /> Mascotas</label>
-          </div>
-        </section>
-
-        <!-- FOTOS -->
-        <section class="publish-section">
-          <h3>Fotos</h3>
-          <p class="muted" style="margin-top:-6px;">
-            Subí varias. Podés <strong>borrar</strong> y elegir <strong>portada</strong>.
-          </p>
-
-          <input id="fotos" type="file" accept="image/*" multiple />
-          <div id="preview" class="preview-grid"></div>
-          <small class="help">Si no elegís portada, se usa automáticamente la primera. Si borrás la portada, se reasigna.</small>
-        </section>
-
-        <!-- PRECIO -->
-        <section class="publish-section">
-          <h3>Precio</h3>
-
-          <div class="grid-2">
-            <div>
-              <label>Precio por noche (ARS) *</label>
-              <input name="precio" type="number" min="0" required placeholder="Ej: 35000" />
-            </div>
-            <div>
-              <!-- ✅ DEFAULT 30 -->
-              <label>Máximo de noches (opcional)</label>
-              <input name="maxNoches" type="number" min="1" max="365" placeholder="Ej: 14" />
-              <small class="help">Si lo dejás vacío, se toma 30 (recomendado).</small>
-            </div>
-          </div>
-        </section>
-
-        <!-- ANFITRIÓN -->
-        <section class="publish-section">
-          <h3>Datos del anfitrión</h3>
-
-          <div class="grid-2">
-            <div>
-              <label>Nombre del anfitrión *</label>
-              <input name="anfitrion" required placeholder="Ej: Ana Laura" />
-            </div>
-            <div>
-              <label>Teléfono (opcional)</label>
-              <input name="telefono" placeholder="Ej: +54 9 3447..." />
-            </div>
-          </div>
-
-          <label>Email de contacto *</label>
-          <input name="email" type="email" required placeholder="Ej: contacto@tualoja.com" />
-        </section>
-
-        <div class="publish-actions">
-          <button class="btn" type="submit">Publicar</button>
-          <a class="btn btn-outline" href="index.html">Volver a inicio</a>
         </div>
 
-        <p class="muted" id="msg" style="margin-top:12px;"></p>
-      </form>
+        <label>Descripción *</label>
+        <textarea name="descripcion" rows="4" required></textarea>
+      </section>
 
-      <!-- ✅ FORM OCULTO PARA ENVIAR EMAIL (sin CORS, confiable en GitHub Pages) -->
-      <form id="mailForm" action="https://formsubmit.co/alojamientos@tualoja.com" method="POST" style="display:none;">
-        <input type="hidden" name="_subject" value="TuAloja - Nueva publicación" />
-        <input type="hidden" name="_captcha" value="false" />
-        <input type="hidden" name="_template" value="table" />
-        <input type="hidden" name="_replyto" id="mf_replyto" value="" />
-        <input type="hidden" name="Título" id="mf_titulo" value="" />
-        <input type="hidden" name="Tipo" id="mf_tipo" value="" />
-        <input type="hidden" name="Capacidad" id="mf_capacidad" value="" />
-        <input type="hidden" name="Provincia" id="mf_provincia" value="" />
-        <input type="hidden" name="Ciudad" id="mf_ciudad" value="" />
-        <input type="hidden" name="Dirección" id="mf_direccion" value="" />
-        <input type="hidden" name="Precio" id="mf_precio" value="" />
-        <input type="hidden" name="Máximo noches" id="mf_maxnoches" value="" />
-        <input type="hidden" name="Anfitrión" id="mf_anfitrion" value="" />
-        <input type="hidden" name="Teléfono" id="mf_telefono" value="" />
-        <input type="hidden" name="Email anfitrión" id="mf_email" value="" />
-        <input type="hidden" name="Servicios" id="mf_servicios" value="" />
-      </form>
-    </div>
-  </main>
+      <section class="publish-section">
+        <h3>Ubicación</h3>
 
-  <footer class="footer-ayuda">
-    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
-    <div class="footer-links">
-      <a href="politica-de-privacidad.html">Política de Privacidad</a>
-      <span>|</span>
-      <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
-      <span>|</span>
-      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
-      <span>|</span>
-      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
-    </div>
-  </footer>
+        <div class="grid-2">
+          <div><label>Provincia *</label><input name="provincia" required></div>
+          <div><label>Ciudad *</label><input name="ciudad" required></div>
+        </div>
 
-  <script src="script.js"></script>
-  <script>
-    // Logout
-    document.getElementById("btnLogout").addEventListener("click", () => {
-      localStorage.setItem("tualoja_logged", "0");
-      localStorage.removeItem("tualoja_user");
-      location.href = "index.html";
-    });
+        <label>Dirección (obligatoria) *</label>
+        <input name="direccion" required minlength="5">
+        <small class="help">No se publica. Se usa para verificación y evitar estafas.</small>
+      </section>
 
-    // Fotos: preview + borrar + portada
-    const fotosInput = document.getElementById("fotos");
-    const preview = document.getElementById("preview");
-    let fotos = []; // [{b64,isCover}]
+      <section class="publish-section">
+        <h3>Fotos</h3>
+        <input id="fotos" type="file" multiple accept="image/*">
+        <div id="preview" class="preview-grid"></div>
+        <small class="help">Si no elegís portada, se asigna automáticamente.</small>
+      </section>
 
-    function asegurarPortada() {
-      if (!fotos.length) return;
-      const hayCover = fotos.some(x => x.isCover);
-      if (!hayCover) fotos[0].isCover = true;
-    }
+      <section class="publish-section">
+        <h3>Precio</h3>
+        <div class="grid-2">
+          <div>
+            <label>Precio por noche (Pesos Argentinos) *</label>
+            <input name="precio" type="number" required>
+            <small class="help">Precio orientativo. El pago se coordina con el anfitrión.</small>
+          </div>
+          <div>
+            <label>Máximo de noches</label>
+            <input name="maxNoches" type="number" min="1" max="365">
+            <small class="help">Si se deja vacío, se toma 30.</small>
+          </div>
+        </div>
+      </section>
 
-    fotosInput.addEventListener("change", async () => {
-      const files = Array.from(fotosInput.files || []);
-      if (!files.length) return;
+      <section class="publish-section">
+        <h3>Datos del anfitrión</h3>
+        <label>Nombre *</label>
+        <input name="anfitrion" required>
 
-      for (const file of files) {
-        const b64 = await fileToBase64(file);
-        fotos.push({ b64, isCover: false });
-      }
+        <label>Email *</label>
+        <input name="email" type="email" required>
+      </section>
 
-      // ✅ si no hay portada todavía, la primera queda como portada
-      asegurarPortada();
+      <button type="submit">Publicar</button>
+      <p id="msg" class="muted"></p>
+    </form>
 
-      fotosInput.value = "";
-      renderFotos();
-    });
+    <!-- MAIL -->
+    <form id="mailForm" action="https://formsubmit.co/alojamientos@tualoja.com" method="POST" style="display:none;">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_subject" value="Nueva publicación - TuAloja">
+      <input type="hidden" name="email" id="mf_email_to">
+      <input type="hidden" name="_autoresponse" id="mf_autoresponse">
+    </form>
 
-    function renderFotos() {
-      // ✅ aseguramos consistencia siempre
-      asegurarPortada();
+  </div>
+</main>
 
-      preview.innerHTML = "";
-      fotos.forEach((ph, idx) => {
-        const item = document.createElement("div");
-        item.className = "preview-item";
+<script>
+const fotosInput=document.getElementById("fotos");
+const preview=document.getElementById("preview");
+let fotos=[];
 
-        const img = document.createElement("img");
-        img.src = ph.b64;
+function asegurarPortada(){
+  if(fotos.length && !fotos.some(f=>f.isCover)) fotos[0].isCover=true;
+}
 
-        const actions = document.createElement("div");
-        actions.className = "preview-actions";
+fotosInput.addEventListener("change",async()=>{
+  for(const f of fotosInput.files){
+    const r=new FileReader();
+    r.onload=()=>{ fotos.push({b64:r.result,isCover:false}); asegurarPortada(); render(); };
+    r.readAsDataURL(f);
+  }
+  fotosInput.value="";
+});
 
-        const left = document.createElement("div");
-        left.style.display = "flex";
-        left.style.gap = "8px";
+function render(){
+  asegurarPortada();
+  preview.innerHTML="";
+  fotos.forEach((f,i)=>{
+    const d=document.createElement("div");
+    d.className="preview-item";
+    d.innerHTML=`<img src="${f.b64}">
+      <div class="preview-actions">
+        <button class="mini-btn">Portada</button>
+        <button class="mini-btn">Borrar</button>
+        <span class="mini-badge">${f.isCover?"Portada":i+1}</span>
+      </div>`;
+    d.querySelectorAll("button")[0].onclick=()=>{fotos.forEach(x=>x.isCover=false);f.isCover=true;render();}
+    d.querySelectorAll("button")[1].onclick=()=>{const was=f.isCover;fotos.splice(i,1);if(was) asegurarPortada();render();}
+    preview.appendChild(d);
+  });
+}
 
-        const btnCover = document.createElement("button");
-        btnCover.type = "button";
-        btnCover.className = "mini-btn";
-        btnCover.textContent = "Portada";
-        btnCover.onclick = () => {
-          fotos = fotos.map((x, i) => ({ ...x, isCover: i === idx }));
-          renderFotos();
-        };
+document.getElementById("publishForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const f=e.target;
 
-        const btnDel = document.createElement("button");
-        btnDel.type = "button";
-        btnDel.className = "mini-btn";
-        btnDel.textContent = "Borrar";
-        btnDel.onclick = () => {
-          const wasCover = fotos[idx]?.isCover;
-          fotos.splice(idx, 1);
+  const maxNoches=parseInt(f.maxNoches.value||"30",10);
+  const data={
+    titulo:f.titulo.value,
+    precio:f.precio.value,
+    moneda:"ARS",
+    maxNoches
+  };
 
-          // ✅ si borró portada, reasignar automáticamente
-          if (wasCover && fotos.length) {
-            fotos = fotos.map((x,i)=>({ ...x, isCover: i===0 }));
-          }
-          renderFotos();
-        };
+  document.getElementById("mf_email_to").value=f.email.value;
+  document.getElementById("mf_autoresponse").value=
+`Hola ${f.anfitrion.value},
 
-        left.appendChild(btnCover);
-        left.appendChild(btnDel);
+Recibimos tu publicación en TuAloja.
+Precio: $${data.precio} ARS
+Estado: Pendiente de revisión.
 
-        const badge = document.createElement("span");
-        badge.className = "mini-badge";
-        badge.textContent = ph.isCover ? "Portada" : `${idx + 1}/${fotos.length}`;
+Equipo TuAloja`;
 
-        actions.appendChild(left);
-        actions.appendChild(badge);
-
-        item.appendChild(img);
-        item.appendChild(actions);
-        preview.appendChild(item);
-      });
-    }
-
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const r = new FileReader();
-        r.onload = () => resolve(String(r.result));
-        r.onerror = reject;
-        r.readAsDataURL(file);
-      });
-    }
-
-    // Publicar (localStorage) + ir a gracias.html + enviar aviso
-    document.getElementById("publishForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const f = e.currentTarget;
-
-      // ✅ Dirección obligatoria (por si el navegador no valida)
-      if (!f.direccion.value.trim()) {
-        alert("La dirección es obligatoria.");
-        f.direccion.focus();
-        return;
-      }
-
-      // ✅ Máximo noches: default 30 + límites
-      let maxNoches = parseInt(f.maxNoches.value || "30", 10);
-      if (Number.isNaN(maxNoches)) maxNoches = 30;
-      if (maxNoches < 1) maxNoches = 1;
-      if (maxNoches > 365) maxNoches = 365;
-
-      // Guardamos el value normalizado para que no quede “mal”
-      f.maxNoches.value = String(maxNoches);
-
-      // ✅ Fotos: aseguramos portada antes de ordenar
-      asegurarPortada();
-
-      const servicios = Array.from(f.querySelectorAll('input[name="servicios"]:checked')).map(i => i.value);
-
-      // portada primero
-      const fotosOrdenadas = [...fotos].sort((a,b) => (b.isCover ? 1 : 0) - (a.isCover ? 1 : 0));
-      const fotosBase64 = fotosOrdenadas.map(x => x.b64);
-
-      const data = {
-        id: "alo_" + Date.now(),
-        titulo: f.titulo.value.trim(),
-        tipo: f.tipo.value,
-        capacidad: Number(f.capacidad.value),
-        descripcion: f.descripcion.value.trim(),
-        direccion: f.direccion.value.trim(),
-        ciudad: f.ciudad.value.trim(),
-        provincia: f.provincia.value.trim(),
-        cp: f.cp.value.trim(),
-        servicios,
-        fotos: fotosBase64,
-        precio: Number(f.precio.value),
-        maxNoches,
-        anfitrion: f.anfitrion.value.trim(),
-        telefono: f.telefono.value.trim(),
-        email: f.email.value.trim()
-      };
-
-      const arr = JSON.parse(localStorage.getItem("tualoja_listings") || "[]");
-      arr.unshift(data);
-      localStorage.setItem("tualoja_listings", JSON.stringify(arr));
-
-      // ✅ Mensaje inmediato
-      document.getElementById("msg").textContent = "✅ Publicado. Enviando confirmación…";
-
-      // ✅ Enviar email REAL (sin fetch, sin CORS) usando un form oculto
-      try {
-        document.getElementById("mf_replyto").value = data.email;
-        document.getElementById("mf_titulo").value = data.titulo;
-        document.getElementById("mf_tipo").value = data.tipo;
-        document.getElementById("mf_capacidad").value = String(data.capacidad);
-        document.getElementById("mf_provincia").value = data.provincia;
-        document.getElementById("mf_ciudad").value = data.ciudad;
-        document.getElementById("mf_direccion").value = data.direccion;
-        document.getElementById("mf_precio").value = String(data.precio);
-        document.getElementById("mf_maxnoches").value = String(data.maxNoches);
-        document.getElementById("mf_anfitrion").value = data.anfitrion;
-        document.getElementById("mf_telefono").value = data.telefono || "-";
-        document.getElementById("mf_email").value = data.email;
-        document.getElementById("mf_servicios").value = servicios.length ? servicios.join(", ") : "-";
-
-        // Mandamos con sendBeacon si está disponible (no bloquea)
-        const mailForm = document.getElementById("mailForm");
-        const fd = new FormData(mailForm);
-
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon(mailForm.action, fd);
-        } else {
-          // fallback: submit real en segundo plano (abre/recarga si no se usa target)
-          // así evitamos eso:
-          mailForm.target = "_self";
-          mailForm.submit();
-          return;
-        }
-      } catch (err) {
-        // si falla, igual seguimos
-      }
-
-      document.getElementById("msg").textContent = "✅ Publicado. Redirigiendo…";
-
-      // ✅ Redirigir a gracias
-      setTimeout(() => {
-        location.href = "gracias.html";
-      }, 600);
-    });
-  </script>
+  navigator.sendBeacon(document.getElementById("mailForm").action,new FormData(document.getElementById("mailForm")));
+  location.href="gracias.html";
+});
+</script>
 </body>
 </html>
