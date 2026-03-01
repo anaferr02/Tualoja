@@ -5,53 +5,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Publicar alojamiento - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
+
   <style>
-    /* Solo para las fotos (no te cambia el estilo general) */
+    /* ✅ Estilo local SOLO para esta página (no rompe el resto) */
+    .publish-wrap{ max-width: 980px; margin: 24px auto 40px; padding: 0 16px; }
+    .publish-card{
+      background: rgba(255,255,255,.85);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 22px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.12);
+      padding: 18px;
+    }
+    .publish-top{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+    .publish-top h1{ margin:0; }
+    .muted{ opacity: .85; }
+
+    .publish-section{
+      background: rgba(255,255,255,.65);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 18px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .publish-section h3{ margin: 0 0 10px; }
+
+    .grid-2{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    @media (max-width: 720px){ .grid-2{ grid-template-columns: 1fr; } }
+
+    /* inputs */
+    .publish-card label{ display:block; font-weight: 600; margin-top: 10px; }
+    .publish-card input, .publish-card select, .publish-card textarea{
+      width:100%; box-sizing:border-box;
+      margin-top: 6px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: #fff;
+      outline: none;
+    }
+    .publish-card textarea{ resize: vertical; }
+
+    .checks{
+      display:flex; flex-wrap:wrap; gap:10px;
+    }
+    .checks label{
+      margin:0; font-weight: 500;
+      display:inline-flex; gap:8px; align-items:center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.05);
+      border: 1px solid rgba(0,0,0,.06);
+    }
+
+    /* Fotos */
     .preview-grid{
       display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 12px;
       margin-top: 12px;
     }
     .preview-item{
-      border-radius: 14px;
+      border-radius: 16px;
       overflow: hidden;
-      background: rgba(255,255,255,.6);
+      background: rgba(255,255,255,.75);
       border: 1px solid rgba(0,0,0,.08);
     }
     .preview-item img{
-      width:100%;
-      height:110px;
-      object-fit:cover;
-      display:block;
+      width:100%; height:120px; object-fit:cover; display:block;
     }
     .preview-actions{
-      display:flex;
-      justify-content:space-between;
-      gap:8px;
-      padding:8px;
-      font-size:12px;
-      align-items:center;
+      display:flex; justify-content:space-between; align-items:center;
+      gap:8px; padding: 8px 10px; font-size: 12px;
     }
     .mini-btn{
-      border: 0;
-      cursor:pointer;
-      padding:6px 8px;
-      border-radius: 10px;
+      border:0; cursor:pointer;
+      padding: 7px 10px;
+      border-radius: 12px;
       background: rgba(0,0,0,.08);
     }
     .mini-badge{
-      font-size:11px;
-      padding: 4px 8px;
+      font-size: 11px;
+      padding: 5px 10px;
       border-radius: 999px;
       background: rgba(0,0,0,.65);
       color:#fff;
+      white-space:nowrap;
     }
+
+    .publish-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
+    .btn{ cursor:pointer; }
   </style>
 </head>
-<body>
 
-  <!-- 🔒 Protección: si no está logueada, vuelve a login -->
+<body>
+  <!-- 🔒 Protección: solo logueado -->
   <script>
     if (localStorage.getItem("tualoja_logged") !== "1") {
       localStorage.setItem("redirect_after_login", "publicar.html");
@@ -59,6 +109,7 @@
     }
   </script>
 
+  <!-- 🔁 Importante: dejá tu header real (igual que index.html) -->
   <header class="header">
     <a class="logo" href="index.html">TuAloja.com</a>
     <nav id="mainNav" class="nav">
@@ -69,115 +120,141 @@
     <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
   </header>
 
-  <main class="contenedor">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin: 18px 0;">
-      <div>
-        <h1 style="margin:0;">Publicar alojamiento</h1>
-        <p class="muted" style="margin:6px 0 0;">MVP sin mapa (gratis). Luego lo sumamos.</p>
+  <main class="publish-wrap">
+    <div class="publish-card">
+      <div class="publish-top">
+        <div>
+          <h1>Publicar alojamiento</h1>
+          <p class="muted" style="margin:6px 0 0;">
+            Subí fotos, completá datos y publicá. (MVP: se guarda en tu navegador)
+          </p>
+        </div>
+        <button class="btn btn-outline" type="button" id="btnLogout">Cerrar sesión</button>
       </div>
-      <button class="btn btn-outline" type="button" id="btnLogout">Cerrar sesión</button>
+
+      <form id="publishForm">
+        <!-- INFO BÁSICA -->
+        <section class="publish-section">
+          <h3>Información básica</h3>
+
+          <label>Nombre del alojamiento *</label>
+          <input name="titulo" required placeholder="Ej: Cabaña en el río" />
+
+          <div class="grid-2">
+            <div>
+              <label>Tipo de alojamiento *</label>
+              <select name="tipo" required>
+                <option value="">Elegí una opción</option>
+                <option>Departamento</option>
+                <option>Casa</option>
+                <option>Cabaña</option>
+                <option>Habitación</option>
+                <option>Hotel</option>
+                <option>Hostel</option>
+                <option>Otro</option>
+              </select>
+            </div>
+            <div>
+              <label>Capacidad (huéspedes) *</label>
+              <input name="capacidad" type="number" min="1" required placeholder="Ej: 4" />
+            </div>
+          </div>
+
+          <label>Descripción *</label>
+          <textarea name="descripcion" rows="4" required placeholder="Contá lo mejor del alojamiento..."></textarea>
+        </section>
+
+        <!-- UBICACIÓN (sin Maps) -->
+        <section class="publish-section">
+          <h3>Ubicación</h3>
+
+          <div class="grid-2">
+            <div>
+              <label>Provincia *</label>
+              <input name="provincia" required placeholder="Ej: Entre Ríos" />
+            </div>
+            <div>
+              <label>Ciudad *</label>
+              <input name="ciudad" required placeholder="Ej: Villa Elisa" />
+            </div>
+          </div>
+
+          <label>Dirección aproximada (opcional)</label>
+          <input name="direccion" placeholder="Ej: a 3 cuadras de la plaza..." />
+
+          <label>Código postal (opcional)</label>
+          <input name="cp" placeholder="Ej: 3265" />
+        </section>
+
+        <!-- SERVICIOS -->
+        <section class="publish-section">
+          <h3>Servicios</h3>
+          <div class="checks">
+            <label><input type="checkbox" name="servicios" value="Wifi" /> Wifi</label>
+            <label><input type="checkbox" name="servicios" value="Aire acondicionado" /> Aire acondicionado</label>
+            <label><input type="checkbox" name="servicios" value="Calefacción" /> Calefacción</label>
+            <label><input type="checkbox" name="servicios" value="Cocina" /> Cocina</label>
+            <label><input type="checkbox" name="servicios" value="Estacionamiento" /> Estacionamiento</label>
+            <label><input type="checkbox" name="servicios" value="Pileta" /> Pileta</label>
+            <label><input type="checkbox" name="servicios" value="Parrilla" /> Parrilla</label>
+            <label><input type="checkbox" name="servicios" value="Mascotas" /> Mascotas</label>
+          </div>
+        </section>
+
+        <!-- FOTOS -->
+        <section class="publish-section">
+          <h3>Fotos</h3>
+          <p class="muted" style="margin-top:-6px;">
+            Subí varias. Podés <strong>borrar</strong> y elegir <strong>portada</strong>.
+          </p>
+
+          <input id="fotos" type="file" accept="image/*" multiple />
+          <div id="preview" class="preview-grid"></div>
+        </section>
+
+        <!-- PRECIO -->
+        <section class="publish-section">
+          <h3>Precio</h3>
+
+          <div class="grid-2">
+            <div>
+              <label>Precio por noche (ARS) *</label>
+              <input name="precio" type="number" min="0" required placeholder="Ej: 35000" />
+            </div>
+            <div>
+              <label>Máximo de noches (opcional)</label>
+              <input name="maxNoches" type="number" min="1" placeholder="Ej: 14" />
+            </div>
+          </div>
+        </section>
+
+        <!-- ANFITRIÓN -->
+        <section class="publish-section">
+          <h3>Datos del anfitrión</h3>
+
+          <div class="grid-2">
+            <div>
+              <label>Nombre del anfitrión *</label>
+              <input name="anfitrion" required placeholder="Ej: Ana Laura" />
+            </div>
+            <div>
+              <label>Teléfono (opcional)</label>
+              <input name="telefono" placeholder="Ej: +54 9 3447..." />
+            </div>
+          </div>
+
+          <label>Email de contacto *</label>
+          <input name="email" type="email" required placeholder="Ej: contacto@tualoja.com" />
+        </section>
+
+        <div class="publish-actions">
+          <button class="btn" type="submit">Publicar</button>
+          <a class="btn btn-outline" href="index.html">Volver a inicio</a>
+        </div>
+
+        <p class="muted" id="msg" style="margin-top:12px;"></p>
+      </form>
     </div>
-
-    <form id="publishForm" class="card" style="padding:16px;">
-      <!-- INFO BÁSICA -->
-      <h2 style="margin-top:0;">Información básica</h2>
-
-      <label>Nombre del alojamiento *</label>
-      <input name="titulo" required placeholder="Ej: Cabaña en el río" />
-
-      <label>Tipo de alojamiento *</label>
-      <select name="tipo" required>
-        <option value="">Elegí una opción</option>
-        <option>Departamento</option>
-        <option>Casa</option>
-        <option>Cabaña</option>
-        <option>Habitación</option>
-        <option>Hotel</option>
-        <option>Hostel</option>
-        <option>Otro</option>
-      </select>
-
-      <label>Capacidad (huéspedes) *</label>
-      <input name="capacidad" type="number" min="1" required placeholder="Ej: 4" />
-
-      <label>Descripción *</label>
-      <textarea name="descripcion" rows="4" required placeholder="Contá lo mejor del alojamiento..."></textarea>
-
-      <hr style="margin: 16px 0; opacity:.3;" />
-
-      <!-- UBICACIÓN (sin mapa) -->
-      <h2>Ubicación</h2>
-
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
-        <div>
-          <label>Provincia *</label>
-          <input name="provincia" required placeholder="Ej: Entre Ríos" />
-        </div>
-        <div>
-          <label>Ciudad *</label>
-          <input name="ciudad" required placeholder="Ej: Villa Elisa" />
-        </div>
-      </div>
-
-      <label>Dirección aproximada (opcional)</label>
-      <input name="direccion" placeholder="Ej: zona centro / cerca de..." />
-
-      <label>Código postal (opcional)</label>
-      <input name="cp" placeholder="Ej: 3265" />
-
-      <hr style="margin: 16px 0; opacity:.3;" />
-
-      <!-- SERVICIOS -->
-      <h2>Servicios</h2>
-      <div class="checks">
-        <label><input type="checkbox" name="servicios" value="Wifi" /> Wifi</label>
-        <label><input type="checkbox" name="servicios" value="Aire acondicionado" /> Aire acondicionado</label>
-        <label><input type="checkbox" name="servicios" value="Calefacción" /> Calefacción</label>
-        <label><input type="checkbox" name="servicios" value="Cocina" /> Cocina</label>
-        <label><input type="checkbox" name="servicios" value="Estacionamiento" /> Estacionamiento</label>
-        <label><input type="checkbox" name="servicios" value="Pileta" /> Pileta</label>
-        <label><input type="checkbox" name="servicios" value="Parrilla" /> Parrilla</label>
-        <label><input type="checkbox" name="servicios" value="Mascotas" /> Acepta mascotas</label>
-      </div>
-
-      <hr style="margin: 16px 0; opacity:.3;" />
-
-      <!-- FOTOS -->
-      <h2>Fotos</h2>
-      <p class="muted" style="margin-top:-6px;">Podés subir varias. Podés borrar y elegir portada.</p>
-      <input id="fotos" type="file" accept="image/*" multiple />
-      <div id="preview" class="preview-grid"></div>
-
-      <hr style="margin: 16px 0; opacity:.3;" />
-
-      <!-- PRECIO -->
-      <h2>Precio</h2>
-      <label>Precio por noche (ARS) *</label>
-      <input name="precio" type="number" min="0" required placeholder="Ej: 35000" />
-
-      <label>Máximo de noches (opcional)</label>
-      <input name="maxNoches" type="number" min="1" placeholder="Ej: 14" />
-
-      <hr style="margin: 16px 0; opacity:.3;" />
-
-      <!-- ANFITRIÓN -->
-      <h2>Datos del anfitrión</h2>
-      <label>Nombre del anfitrión *</label>
-      <input name="anfitrion" required placeholder="Ej: Ana Laura" />
-
-      <label>Teléfono (opcional)</label>
-      <input name="telefono" placeholder="Ej: +54 9 3447..." />
-
-      <label>Email de contacto *</label>
-      <input name="email" type="email" required placeholder="Ej: contacto@tualoja.com" />
-
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 16px;">
-        <button class="btn" type="submit" id="btnPublish">Publicar</button>
-        <a class="btn btn-outline" href="index.html">Cancelar</a>
-      </div>
-
-      <p class="muted" id="msg" style="margin-top:12px;"></p>
-    </form>
   </main>
 
   <footer class="footer-ayuda">
@@ -205,9 +282,7 @@
     // Fotos: preview + borrar + portada
     const fotosInput = document.getElementById("fotos");
     const preview = document.getElementById("preview");
-
-    // [{b64, isCover}]
-    let fotos = [];
+    let fotos = []; // [{b64,isCover}]
 
     fotosInput.addEventListener("change", async () => {
       const files = Array.from(fotosInput.files || []);
@@ -215,10 +290,10 @@
 
       for (const file of files) {
         const b64 = await fileToBase64(file);
-        fotos.push({ b64, isCover: fotos.length === 0 }); // primera = portada
+        fotos.push({ b64, isCover: fotos.length === 0 });
       }
 
-      fotosInput.value = ""; // permite volver a seleccionar las mismas
+      fotosInput.value = "";
       renderFotos();
     });
 
@@ -237,37 +312,36 @@
         const left = document.createElement("div");
         left.style.display = "flex";
         left.style.gap = "8px";
-        left.style.alignItems = "center";
 
         const btnCover = document.createElement("button");
         btnCover.type = "button";
         btnCover.className = "mini-btn";
         btnCover.textContent = "Portada";
-        btnCover.addEventListener("click", () => {
+        btnCover.onclick = () => {
           fotos = fotos.map((x, i) => ({ ...x, isCover: i === idx }));
           renderFotos();
-        });
+        };
 
         const btnDel = document.createElement("button");
         btnDel.type = "button";
         btnDel.className = "mini-btn";
         btnDel.textContent = "Borrar";
-        btnDel.addEventListener("click", () => {
+        btnDel.onclick = () => {
           const wasCover = fotos[idx]?.isCover;
           fotos.splice(idx, 1);
           if (wasCover && fotos.length) fotos[0].isCover = true;
           renderFotos();
-        });
+        };
 
         left.appendChild(btnCover);
         left.appendChild(btnDel);
 
-        const right = document.createElement("span");
-        right.className = "mini-badge";
-        right.textContent = ph.isCover ? "Portada" : `${idx + 1}/${fotos.length}`;
+        const badge = document.createElement("span");
+        badge.className = "mini-badge";
+        badge.textContent = ph.isCover ? "Portada" : `${idx + 1}/${fotos.length}`;
 
         actions.appendChild(left);
-        actions.appendChild(right);
+        actions.appendChild(badge);
 
         item.appendChild(img);
         item.appendChild(actions);
@@ -284,13 +358,12 @@
       });
     }
 
-    // Publicar: guarda en localStorage
-    document.getElementById("publishForm").addEventListener("submit", (e) => {
+    // Publicar (localStorage) + ir a gracias.html + enviar aviso (FormSubmit opcional)
+    document.getElementById("publishForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const f = e.currentTarget;
 
-      const servicios = Array.from(f.querySelectorAll('input[name="servicios"]:checked'))
-        .map(i => i.value);
+      const servicios = Array.from(f.querySelectorAll('input[name="servicios"]:checked')).map(i => i.value);
 
       // portada primero
       const fotosOrdenadas = [...fotos].sort((a,b) => (b.isCover ? 1 : 0) - (a.isCover ? 1 : 0));
@@ -319,10 +392,37 @@
       arr.unshift(data);
       localStorage.setItem("tualoja_listings", JSON.stringify(arr));
 
-      document.getElementById("msg").textContent = "✅ Publicado (guardado en tu navegador).";
-      f.reset();
-      preview.innerHTML = "";
-      fotos = [];
+      // ✅ Mensaje inmediato
+      document.getElementById("msg").textContent = "✅ Publicado. Redirigiendo…";
+
+      // ✅ Envío de email (FRONTEND) usando FormSubmit
+      // Nota: FormSubmit envía a tu casilla (alojamientos@tualoja.com) pero el "from" real depende del proveedor.
+      // Primero tenés que activar FormSubmit 1 vez: mandar un form manual desde el sitio.
+      try {
+        const fd = new FormData();
+        fd.append("Asunto", "Nueva publicación en TuAloja");
+        fd.append("Título", data.titulo);
+        fd.append("Ciudad", data.ciudad);
+        fd.append("Provincia", data.provincia);
+        fd.append("Precio", String(data.precio));
+        fd.append("Email anfitrión", data.email);
+        fd.append("Teléfono", data.telefono);
+        fd.append("_subject", "TuAloja - Nueva publicación");
+        fd.append("_template", "table");
+
+        // ⚠️ Cambiá el mail por tu casilla real
+        await fetch("https://formsubmit.co/alojamientos@tualoja.com", {
+          method: "POST",
+          body: fd
+        });
+      } catch {
+        // si falla, igual seguimos
+      }
+
+      // ✅ Redirigir a gracias
+      setTimeout(() => {
+        location.href = "gracias.html";
+      }, 600);
     });
   </script>
 </body>
