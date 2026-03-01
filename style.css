@@ -895,3 +895,25 @@ main.ayuda p{
   line-height: 1.65;
   background: #ffffff;
 }
+.mas-consultas{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.consulta-chip{
+  display:inline-block;
+  padding:10px 16px;
+  border-radius:999px;
+  background:#f4f7ff;
+  border:1px solid rgba(27,22,127,.15);
+  color:#1b167f;
+  font-weight:700;
+  text-decoration:none;
+  transition:all .15s ease;
+}
+
+.consulta-chip:hover{
+  background:#e9edff;
+  transform:translateY(-1px);
+}
