@@ -3,112 +3,152 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Datos de la reserva - Aloja</title>
+  <title>Datos de la reserva - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
 
+<body>
   <header>
     <div class="container">
-      <h1><a href="index.html" style="color: white; text-decoration: none;">Aloja</a></h1>
+      <h1><a href="index.html" style="color:white;text-decoration:none;">TuAloja</a></h1>
     </div>
   </header>
 
-  <main class="ayuda">
-    <p><a href="ayuda.html">Página de Ayuda</a> > Preguntas frecuentes</p>
-    <h2>Datos de la reserva</h2>
+  <main class="info-wrap">
+    <div class="info-card">
 
-    <div class="faq-lista">
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          ¿Cómo puedo recibir más información sobre la habitación o las instalaciones y servicios del alojamiento?
-        </div>
-        <div class="faq-respuesta">
-          En la confirmación de tu reserva encontrarás los datos sobre las instalaciones y servicios de tu alojamiento.
-        </div>
-      </div>
+      <p style="margin:0 0 10px; font-size:14px;">
+        <a href="ayuda.html">Ayuda</a> <span style="opacity:.7;">›</span> Datos de la reserva
+      </p>
 
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          ¿Puedo pedir una cama supletoria o una cuna para un niño?
-        </div>
-        <div class="faq-respuesta">
-          Depende de las condiciones del alojamiento. Los cargos adicionales por niños, incluidas las camas supletorias y las cunas, no están incluidos en el precio de la reserva. Para más información, ponte en contacto con el alojamiento directamente.
-        </div>
+      <h2>Datos de la reserva</h2>
+      <p class="info-sub">
+        Información sobre habitaciones, cambios, check-in y datos de tu reserva.
+      </p>
+
+      <div class="info-box">
+        <strong>Consejo:</strong>
+        <p style="margin:8px 0 0;">
+          Revisá siempre el email de confirmación: ahí están los datos más importantes de tu reserva.
+        </p>
       </div>
 
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          No encuentro mi e-mail de confirmación. ¿Qué debo hacer?
-        </div>
-        <div class="faq-respuesta">
-          Mira en tu bandeja de entrada y en las carpetas de correo no deseado o spam. Si sigues sin encontrar la confirmación, ve a aloja.com/help y te la enviaremos de nuevo.
+      <!-- FAQ -->
+      <div class="faq-lista faq-pro">
 
+        <div class="faq-item">
+          <div class="faq-pregunta" onclick="toggleRespuesta(this)">
+            ¿Cómo puedo recibir más información sobre la habitación o las instalaciones?
+          </div>
+          <div class="faq-respuesta">
+            En la confirmación de tu reserva vas a encontrar el detalle de las instalaciones,
+            servicios y características del alojamiento.
+          </div>
         </div>
+
+        <div class="faq-item">
+          <div class="faq-pregunta" onclick="toggleRespuesta(this)">
+            ¿Puedo pedir una cama supletoria o una cuna?
+          </div>
+          <div class="faq-respuesta">
+            Depende del alojamiento. Las camas supletorias y cunas pueden tener cargos adicionales
+            y no suelen estar incluidas en el precio. Contactá directamente al alojamiento.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-pregunta" onclick="toggleRespuesta(this)">
+            No encuentro mi e-mail de confirmación. ¿Qué hago?
+          </div>
+          <div class="faq-respuesta">
+            Revisá la bandeja de entrada y la carpeta de spam.
+            Si no aparece, ingresá a la página de ayuda y solicitá que te lo reenvíen.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-pregunta" onclick="toggleRespuesta(this)">
+            ¿Debo pagar el importe completo de los niños?
+          </div>
+          <div class="faq-respuesta">
+            Los cargos por niños, si aplican, no suelen estar incluidos en el precio inicial.
+            Consultá con el alojamiento si corresponde un pago adicional.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-pregunta" onclick="toggleRespuesta(this)">
+            ¿Cuál es la diferencia entre habitación doble y doble con dos camas?
+          </div>
+          <div class="faq-respuesta">
+            La habitación doble tiene una cama matrimonial.
+            La doble con dos camas tiene dos camas individuales.
+            Algunas habitaciones pueden configurarse de ambas maneras.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-pregunta" onclick="toggleRespuesta(this)">
+            Llegaré fuera del horario de check-in, ¿puedo ingresar igual?
+          </div>
+          <div class="faq-respuesta">
+            Depende del alojamiento. Podés solicitar check-in tardío o comunicarte con el anfitrión
+            para coordinar tu llegada.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-pregunta" onclick="toggleRespuesta(this)">
+            ¿Puedo realizar cambios en mi reserva?
+          </div>
+          <div class="faq-respuesta">
+            Sí. Según las condiciones del alojamiento, podés:
+            <ul>
+              <li>Cambiar fechas</li>
+              <li>Modificar horarios</li>
+              <li>Editar datos del huésped</li>
+              <li>Cancelar la reserva</li>
+              <li>Contactar al alojamiento</li>
+            </ul>
+          </div>
+        </div>
+
       </div>
 
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          ¿Tendré que realizar el pago completo de los niños?
-        </div>
-        <div class="faq-respuesta">
-          Los cargos adicionales por niños, si aplican, no están incluidos en el precio de la reserva. Ponte en contacto con el alojamiento directamente para ver si debes realizar algún pago por los niños y cuándo.
-        </div>
+      <!-- BOTONES -->
+      <div class="info-actions">
+        <a href="index.html" class="btn-info">Ir al inicio</a>
+        <a href="ayuda.html" class="btn-info btn-outline">Volver a Ayuda</a>
       </div>
 
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          ¿Cuál es la diferencia entre una Habitación Doble y una Habitación Doble - 2 camas?
-        </div>
-        <div class="faq-respuesta">
-          Una Habitación Doble dispone de una cama doble y una Habitación Doble - 2 camas cuenta con 2 camas individuales. Una Habitación Doble - 1 o 2 camas puede configurarse para tener 1 cama doble o 2 camas individuales. El alojamiento hará lo posible por gestionar tus necesidades.
-        </div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          Llegaré fuera del horario de check-in. ¿Podré hacerlo igualmente?
-        </div>
-        <div class="faq-respuesta">
-          Depende del alojamiento. Aunque las peticiones no se pueden garantizar, el alojamiento hará lo posible por gestionar tus necesidades. Puedes hacer lo siguiente:
-          Solicitar check-in/check-out antes o más tarde de lo habitual
-          Contactar con el alojamiento
-        </div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          ¿Puedo realizar cambios en mi reserva (i.e. cambio de fechas)?
-        </div>
-        <div class="faq-respuesta">
-          Sí, puedes realizar cambios en tu reserva desde el e-mail de confirmación o en Booking.com. Según las condiciones del alojamiento, puedes hacer lo siguiente:
-          Cambiar las horas de check-in/check-out
-          Cambiar la fecha
-          Anular la reserva
-          Editar los datos de la tarjeta de crédito
-          Cambiar los datos del cliente
-          Seleccionar el tipo de cama
-          Cambiar el tipo de habitación
-          Añadir una habitación
-          Añadir una comida
-          Hacer una petición
-          Contactar con el alojamiento
-        </div>
-      </div>
     </div>
   </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-ayuda">
+    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-links">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a>
+      <span>|</span>
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
+      <span>|</span>
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
+      <span>|</span>
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    </div>
+  </footer>
 
   <script>
     function toggleRespuesta(elemento) {
       const item = elemento.parentElement;
       const respuesta = item.querySelector('.faq-respuesta');
-      const estaVisible = respuesta.style.display === 'block';
+      const visible = respuesta.style.display === 'block';
 
-      document.querySelectorAll('.faq-respuesta').forEach(r => r.style.display = 'none');
+      document.querySelectorAll('.faq-respuesta')
+        .forEach(r => r.style.display = 'none');
 
-      if (!estaVisible) {
-        respuesta.style.display = 'block';
-      }
+      if (!visible) respuesta.style.display = 'block';
     }
   </script>
-
 </body>
 </html>
