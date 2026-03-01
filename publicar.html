@@ -6,96 +6,311 @@
   <title>Publicar alojamiento - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <script>
-    // Protección simple (si ya la usabas, la mantenemos)
-    if (localStorage.getItem("tualoja_logged") === "0") {
-      window.location.href = "login.html";
-    }
-  </script>
 
-  <header class="header">
-    <a class="logo" href="index.html">TuAloja.com</a>
-    <nav id="mainNav" class="nav">
-      <a href="alojamiento.html">Registra tu alojamiento</a>
-      <a href="ayuda.html">Ayuda</a>
-      <span id="navAuth"></span>
-    </nav>
-    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
+<body>
+  <header>
+    <div class="container">
+      <h1><a href="index.html" style="color:white;text-decoration:none;">TuAloja</a></h1>
+    </div>
   </header>
 
-  <main class="contenedor">
-    <h1>Publicar alojamiento</h1>
-    <p class="muted">Completá los campos. Guardamos tu publicación y aparece en Resultados.</p>
+  <main class="publish-wrap">
+    <div class="publish-card">
 
-    <form id="formPublicar" class="form">
-      <h2>Información básica</h2>
-      <label>Nombre del alojamiento *</label>
-      <input id="titulo" required />
-
-      <label>Tipo de alojamiento *</label>
-      <select id="tipo" required>
-        <option value="">Elegir</option>
-        <option>Casa</option>
-        <option>Departamento</option>
-        <option>Cabaña</option>
-        <option>Habitación</option>
-      </select>
-
-      <label>Capacidad (personas) *</label>
-      <input id="capacidad" type="number" min="1" required />
-
-      <label>Descripción *</label>
-      <textarea id="descripcion" rows="4" required></textarea>
-
-      <h2>Ubicación</h2>
-      <label>Provincia *</label>
-      <input id="provincia" required />
-
-      <label>Ciudad *</label>
-      <input id="ciudad" required />
-
-      <label>Zona / dirección aproximada (opcional)</label>
-      <input id="zona" />
-
-      <h2>Servicios</h2>
-      <div class="checks">
-        <label><input type="checkbox" value="WiFi" class="serv" /> WiFi</label>
-        <label><input type="checkbox" value="Aire acondicionado" class="serv" /> Aire acondicionado</label>
-        <label><input type="checkbox" value="Cochera" class="serv" /> Cochera</label>
-        <label><input type="checkbox" value="Piscina" class="serv" /> Piscina</label>
-        <label><input type="checkbox" value="Parrilla" class="serv" /> Parrilla</label>
-        <label><input type="checkbox" value="Se aceptan mascotas" class="serv" /> Se aceptan mascotas</label>
+      <div class="publish-top">
+        <div>
+          <h2>Publicar alojamiento</h2>
+          <p class="muted">Completá los datos. Guardamos la ubicación exacta con Google Maps.</p>
+        </div>
+        <button class="btn-info btn-outline" type="button" id="btnLogout">Cerrar sesión</button>
       </div>
 
-      <h2>Fotos (mínimo 3)</h2>
-      <input id="fotos" type="file" accept="image/*" multiple />
-      <p id="fotosHint" class="muted">Todavía no cargaste fotos.</p>
-      <div id="previewFotos" class="preview"></div>
+      <form id="publishForm">
 
-      <h2>Precio</h2>
-      <label>Precio por noche (ARS) *</label>
-      <input id="precio" type="number" min="0" required />
+        <!-- INFO BÁSICA -->
+        <section class="publish-section">
+          <h3>Información básica</h3>
 
-      <label>Mínimo de noches *</label>
-      <input id="minNoches" type="number" min="1" value="1" required />
+          <label>Nombre del alojamiento *</label>
+          <input name="titulo" required placeholder="Ej: Cabaña en el río" />
 
-      <h2>Datos del anfitrión</h2>
-      <label>Nombre del anfitrión *</label>
-      <input id="anfitrionNombre" required />
+          <label>Tipo de alojamiento *</label>
+          <select name="tipo" required>
+            <option value="">Elegí una opción</option>
+            <option>Departamento</option>
+            <option>Casa</option>
+            <option>Cabaña</option>
+            <option>Habitación</option>
+            <option>Hotel</option>
+            <option>Hostel</option>
+            <option>Otro</option>
+          </select>
 
-      <label>WhatsApp (opcional, ej: 5493447xxxxxx)</label>
-      <input id="anfitrionWhatsapp" />
+          <label>Capacidad (huéspedes) *</label>
+          <input name="capacidad" type="number" min="1" required placeholder="Ej: 4" />
 
-      <label>Email del anfitrión *</label>
-      <input id="anfitrionEmail" type="email" required />
+          <label>Descripción *</label>
+          <textarea name="descripcion" rows="4" required placeholder="Contá lo mejor del alojamiento..."></textarea>
+        </section>
 
-      <button class="btn" type="submit">Publicar</button>
-      <p id="msg" class="muted" style="margin-top:10px;"></p>
-    </form>
+        <!-- UBICACIÓN + MAPA -->
+        <section class="publish-section">
+          <h3>Ubicación</h3>
+
+          <div class="grid-2">
+            <div>
+              <label>Dirección (para ubicar en el mapa) *</label>
+              <input id="direccion" name="direccion" required placeholder="Ej: Av. San Martín 123" />
+            </div>
+            <div>
+              <label>Ciudad *</label>
+              <input name="ciudad" required placeholder="Ej: Mendoza" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label>Provincia *</label>
+              <input name="provincia" required placeholder="Ej: Mendoza" />
+            </div>
+            <div>
+              <label>Código postal (opcional)</label>
+              <input name="cp" placeholder="Ej: 5500" />
+            </div>
+          </div>
+
+          <div class="map-actions">
+            <button type="button" class="btn-info" id="btnBuscarMapa">Buscar en mapa</button>
+            <span class="muted" style="font-size:13px;">
+              Tip: mové el pin para ajustar la ubicación exacta.
+            </span>
+          </div>
+
+          <div id="map" class="map-box"></div>
+
+          <!-- Guardamos coordenadas -->
+          <input type="hidden" id="lat" name="lat" />
+          <input type="hidden" id="lng" name="lng" />
+
+          <div class="info-box" style="margin-top:14px;">
+            <strong>Privacidad:</strong>
+            <p style="margin:8px 0 0;">
+              La ubicación exacta puede mostrarse solo después de confirmar una reserva.
+              (Después lo implementamos en el detalle).
+            </p>
+          </div>
+        </section>
+
+        <!-- SERVICIOS -->
+        <section class="publish-section">
+          <h3>Servicios</h3>
+
+          <div class="checks">
+            <label><input type="checkbox" name="servicios" value="Wifi" /> Wifi</label>
+            <label><input type="checkbox" name="servicios" value="Aire acondicionado" /> Aire acondicionado</label>
+            <label><input type="checkbox" name="servicios" value="Calefacción" /> Calefacción</label>
+            <label><input type="checkbox" name="servicios" value="Cocina" /> Cocina</label>
+            <label><input type="checkbox" name="servicios" value="Estacionamiento" /> Estacionamiento</label>
+            <label><input type="checkbox" name="servicios" value="Pileta" /> Pileta</label>
+            <label><input type="checkbox" name="servicios" value="Mascotas" /> Acepta mascotas</label>
+          </div>
+        </section>
+
+        <!-- FOTOS -->
+        <section class="publish-section">
+          <h3>Fotos</h3>
+          <p class="muted" style="margin-top:-6px;">Podés subir varias (MVP: se guardan en el navegador).</p>
+
+          <input id="fotos" type="file" accept="image/*" multiple />
+          <div id="preview" class="preview"></div>
+        </section>
+
+        <!-- PRECIO -->
+        <section class="publish-section">
+          <h3>Precio</h3>
+
+          <label>Precio por noche (ARS) *</label>
+          <input name="precio" type="number" min="0" required placeholder="Ej: 45000" />
+
+          <label>Máximo de noches (opcional)</label>
+          <input name="maxNoches" type="number" min="1" placeholder="Ej: 14" />
+        </section>
+
+        <!-- ANFITRIÓN -->
+        <section class="publish-section">
+          <h3>Datos del anfitrión</h3>
+
+          <label>Nombre del anfitrión *</label>
+          <input name="anfitrion" required placeholder="Ej: Ana Laura" />
+
+          <label>Teléfono (opcional)</label>
+          <input name="telefono" placeholder="Ej: +54 9 3447..." />
+
+          <label>Email de contacto *</label>
+          <input name="email" type="email" required placeholder="Ej: contacto@tualoja.com" />
+        </section>
+
+        <div class="publish-actions">
+          <button class="btn-info" type="submit">Publicar</button>
+          <a class="btn-info btn-outline" href="index.html">Cancelar</a>
+        </div>
+
+        <p class="muted" id="msg" style="margin-top:14px;"></p>
+      </form>
+    </div>
   </main>
 
-  <script src="script.js"></script>
-  <script type="module" src="publicar.js"></script>
+  <footer class="footer-ayuda">
+    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-links">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a>
+      <span>|</span>
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
+      <span>|</span>
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
+      <span>|</span>
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    </div>
+  </footer>
+
+  <script>
+    // --- protección simple ---
+    if (localStorage.getItem("tualoja_logged") !== "1") {
+      location.href = "login.html";
+    }
+
+    document.getElementById("btnLogout").addEventListener("click", () => {
+      localStorage.setItem("tualoja_logged", "0");
+      localStorage.removeItem("tualoja_user");
+      location.href = "index.html";
+    });
+
+    // --- MAPA Google ---
+    let map, marker, geocoder;
+
+    function setLatLng(lat, lng) {
+      document.getElementById("lat").value = lat;
+      document.getElementById("lng").value = lng;
+    }
+
+    function initMap() {
+      const centro = { lat: -34.6037, lng: -58.3816 }; // default ARG
+
+      geocoder = new google.maps.Geocoder();
+
+      map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 12,
+        center: centro,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false
+      });
+
+      marker = new google.maps.Marker({
+        position: centro,
+        map,
+        draggable: true
+      });
+
+      setLatLng(centro.lat, centro.lng);
+
+      marker.addListener("dragend", () => {
+        const pos = marker.getPosition();
+        setLatLng(pos.lat(), pos.lng());
+      });
+
+      document.getElementById("btnBuscarMapa").addEventListener("click", () => {
+        const dir = document.getElementById("direccion").value.trim();
+        if (!dir) return alert("Escribí una dirección para buscar en el mapa.");
+
+        geocoder.geocode({ address: dir }, (results, status) => {
+          if (status !== "OK" || !results?.[0]) {
+            alert("No pudimos encontrar esa dirección. Probá con más detalle.");
+            return;
+          }
+          const loc = results[0].geometry.location;
+          map.setCenter(loc);
+          map.setZoom(15);
+          marker.setPosition(loc);
+          setLatLng(loc.lat(), loc.lng());
+        });
+      });
+    }
+
+    // --- FOTOS (preview) ---
+    const fotosInput = document.getElementById("fotos");
+    const preview = document.getElementById("preview");
+    let fotosBase64 = [];
+
+    fotosInput.addEventListener("change", async () => {
+      preview.innerHTML = "";
+      fotosBase64 = [];
+
+      const files = Array.from(fotosInput.files || []);
+      for (const file of files) {
+        const b64 = await fileToBase64(file);
+        fotosBase64.push(b64);
+
+        const img = document.createElement("img");
+        img.className = "preview-img";
+        img.src = b64;
+        preview.appendChild(img);
+      }
+    });
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // --- SUBMIT (MVP localStorage) ---
+    document.getElementById("publishForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const f = e.currentTarget;
+
+      const servicios = Array.from(f.querySelectorAll('input[name="servicios"]:checked'))
+        .map(i => i.value);
+
+      const data = {
+        id: "alo_" + Date.now(),
+        titulo: f.titulo.value.trim(),
+        tipo: f.tipo.value,
+        capacidad: Number(f.capacidad.value),
+        descripcion: f.descripcion.value.trim(),
+        direccion: f.direccion.value.trim(),
+        ciudad: f.ciudad.value.trim(),
+        provincia: f.provincia.value.trim(),
+        cp: f.cp.value.trim(),
+        lat: f.lat.value,
+        lng: f.lng.value,
+        servicios,
+        fotos: fotosBase64,
+        precio: Number(f.precio.value),
+        maxNoches: f.maxNoches.value ? Number(f.maxNoches.value) : null,
+        anfitrion: f.anfitrion.value.trim(),
+        telefono: f.telefono.value.trim(),
+        email: f.email.value.trim()
+      };
+
+      const arr = JSON.parse(localStorage.getItem("tualoja_listings") || "[]");
+      arr.unshift(data);
+      localStorage.setItem("tualoja_listings", JSON.stringify(arr));
+
+      document.getElementById("msg").textContent = "✅ Publicado. Ahora podés verlo en resultados cuando lo conectemos.";
+      f.reset();
+      preview.innerHTML = "";
+      fotosBase64 = [];
+    });
+  </script>
+
+  <!-- Google Maps: poné tu API KEY -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap">
+  </script>
 </body>
 </html>
