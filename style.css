@@ -650,3 +650,40 @@ main.ayuda p{
 .footer-links span{
   opacity: .6;
 }
+/* ===== TEMAS PRINCIPALES ===== */
+.temas-principales{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0 28px;
+}
+
+.tema-btn{
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid rgba(27,22,127,0.2);
+  color: #1b167f;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.tema-btn:hover{
+  background: #f4f7ff;
+}
+/* ===== MAS CONSULTAS ===== */
+.ayuda-lista{
+  margin-top: 10px;
+}
+
+.ayuda-item{
+  padding: 10px 0;
+  font-size: 15px;
+  color: #1b167f;
+  border-bottom: 1px solid rgba(27,22,127,0.15);
+}
+
+.ayuda-item:last-child{
+  border-bottom: none;
+}
