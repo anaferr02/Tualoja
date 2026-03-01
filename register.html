@@ -10,11 +10,22 @@
       margin:0;
       min-height:100vh;
       background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
+    }
+
+    /* Layout para que el footer NO se cruce */
+    .auth-page{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+    .auth-main{
+      flex:1;
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:20px;
+      padding:40px 16px;
     }
+
     .card{
       background:#fff;
       width:min(520px, 95vw);
@@ -44,6 +55,12 @@
       cursor:pointer;
       margin-top:16px;
       font-size:14px;
+      box-shadow: 0 8px 20px rgba(27,22,127,.35);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(27,22,127,.45);
     }
     .link{
       display:inline-block;
@@ -53,30 +70,56 @@
       font-size:14px;
     }
     .hint{font-size:12px; color:#666; margin-top:10px;}
+
+    footer{
+      text-align:center;
+      padding:18px 12px;
+      font-size:12px;
+      color:#1b167f;
+    }
+    .footer-legal a{
+      color:#1b167f;
+      text-decoration: underline;
+      margin:0 4px;
+      font-size:12px;
+    }
   </style>
 </head>
 
-<body>
-  <div class="card">
-    <h1>Crear cuenta</h1>
-    <p>Registrate con email y contraseña.</p>
+<body class="auth-page">
+  <main class="auth-main">
+    <div class="card">
+      <h1>Crear cuenta</h1>
+      <p>Registrate con email y contraseña.</p>
 
-    <form id="registerForm" autocomplete="on">
-      <label>Email</label>
-      <input type="email" name="email" required placeholder="tuemail@ejemplo.com" />
+      <form id="registerForm" autocomplete="on">
+        <label>Email</label>
+        <input type="email" name="email" required placeholder="tuemail@ejemplo.com" />
 
-      <label>Contraseña</label>
-      <input type="password" name="password" required minlength="6" placeholder="Mínimo 6 caracteres" />
+        <label>Contraseña</label>
+        <input type="password" name="password" required minlength="6" placeholder="Mínimo 6 caracteres" />
 
-      <label>Confirmar contraseña</label>
-      <input type="password" name="password2" required minlength="6" placeholder="Repetí la contraseña" />
+        <label>Confirmar contraseña</label>
+        <input type="password" name="password2" required minlength="6" placeholder="Repetí la contraseña" />
 
-      <button class="btn" type="submit">Crear cuenta y continuar</button>
+        <button class="btn" type="submit">Crear cuenta y continuar</button>
 
-      <a class="link" href="login.html">Ya tengo cuenta → Iniciar sesión</a>
-      <div class="hint">Después de crear la cuenta, te llevamos a publicar tu alojamiento.</div>
-    </form>
-  </div>
+        <a class="link" href="login.html">Ya tengo cuenta → Iniciar sesión</a>
+        <div class="hint">Después de crear la cuenta, te llevamos a publicar tu alojamiento.</div>
+      </form>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-legal">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a> |
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    </div>
+  </footer>
 
   <script>
     document.getElementById("registerForm").addEventListener("submit", (e) => {
@@ -104,41 +147,8 @@
       localStorage.setItem("tualoja_logged", "1");
       localStorage.setItem("tualoja_user", email);
 
-      // Próximo paso: wizard de publicación
       window.location.href = "publicar.html";
     });
   </script>
-  <script type="module">
-  import { register } from "./public/js/auth.js";
-
-  const form = document.querySelector("form");
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = document.querySelector('input[name="name"]')?.value
-      || document.querySelector('input[type="text"]')?.value;
-
-    const email = document.querySelector('input[type="email"]').value;
-    const password = document.querySelector('input[type="password"]').value;
-
-    try {
-      await register(name, email, password);
-      location.href = "index.html";
-    } catch (err) {
-      alert(err.message);
-    }
-  });
-</script>
-  <!-- FOOTER -->
-    <footer>
-      <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
-      <div class="footer-legal">
-  <a href="politica-de-privacidad.html">Política de Privacidad</a> |
-  <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
-  <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
-  <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
-</div>
-    </footer>
 </body>
 </html>
-
-
