@@ -15,54 +15,60 @@
   </header>
 
   <main class="ayuda-wrap">
-    <!-- Alerta seguridad -->
-    <div class="alerta-seguridad" id="alertaSeguridad">
-      <button class="cerrar-alerta" type="button" onclick="cerrarAlerta()">×</button>
-      <strong>⚠️ Garantizá tu seguridad online</strong>
-      <p>Por motivos de seguridad, nunca compartas tus datos personales ni los de tu tarjeta por teléfono, email o chat.</p>
+    <!-- PANEL BLANCO (como la imagen 1) -->
+    <div class="ayuda-panel">
+
+      <!-- Alerta seguridad -->
+      <div class="alerta-seguridad" id="alertaSeguridad">
+        <button class="cerrar-alerta" type="button" onclick="cerrarAlerta()">×</button>
+        <strong>⚠️ Garantizá tu seguridad online</strong>
+        <p>Por motivos de seguridad, nunca compartas tus datos personales ni los de tu tarjeta por teléfono, email o chat.</p>
+      </div>
+
+      <!-- Título -->
+      <section class="ayuda-hero">
+        <h2>Centro de ayuda</h2>
+        <p>Estamos disponibles 24 h al día</p>
+        <button class="boton-ayuda" type="button">Recibir ayuda con una reserva</button>
+      </section>
+
+      <!-- Tabs -->
+      <div class="tabs-ayuda">
+        <button class="tab-activa" type="button">🏨 Alojamiento</button>
+        <button type="button">🚗 Alquiler de coches</button>
+        <button type="button">✈️ Vuelos</button>
+        <button type="button">🚕 Taxis aeropuerto</button>
+        <button type="button">🛡️ Seguro</button>
+        <button type="button">➕ Otro</button>
+      </div>
+
+      <!-- Temas principales -->
+      <section class="ayuda-seccion">
+        <h3>Temas principales</h3>
+        <div class="temas-principales">
+          <a href="cancelaciones.html" class="tema-btn">Cancelaciones</a>
+          <a href="pago.html" class="tema-btn">Pago</a>
+          <a href="datos-reserva.html" class="tema-btn">Datos de la reserva</a>
+          <a href="comunicaciones.html" class="tema-btn">Comunicaciones</a>
+          <a href="estilo-hospedaje.html" class="tema-btn">Estilos de hospedaje</a>
+          <a href="animales-de-asistencia.html" class="tema-btn">Animales de asistencia</a>
+          <a href="#" class="tema-btn">+ Otro</a>
+        </div>
+      </section>
+
+      <!-- Más consultas (chips) -->
+      <section class="ayuda-seccion">
+        <h3>Más consultas</h3>
+        <div class="mas-consultas">
+          <div class="consulta-chip">Precios</div>
+          <div class="consulta-chip">Tarjetas de crédito</div>
+          <div class="consulta-chip">Condiciones del alojamiento</div>
+          <div class="consulta-chip">Instalaciones y servicios</div>
+          <div class="consulta-chip">Seguridad y sensibilización</div>
+        </div>
+      </section>
+
     </div>
-
-    <!-- Título -->
-    <section class="ayuda-hero">
-      <h2>Centro de ayuda</h2>
-      <p>Estamos disponibles 24 h al día</p>
-      <button class="boton-ayuda" type="button">Recibir ayuda con una reserva</button>
-    </section>
-
-    <!-- Tabs -->
-    <div class="tabs-ayuda">
-      <button class="tab-activa" type="button">🏨 Alojamiento</button>
-      <button type="button">🚗 Alquiler de coches</button>
-      <button type="button">✈️ Vuelos</button>
-      <button type="button">🚕 Taxis aeropuerto</button>
-      <button type="button">🛡️ Seguro</button>
-      <button type="button">➕ Otro</button>
-    </div>
-
-    <!-- Links principales -->
-    <section class="ayuda-seccion">
-      <h3>Temas principales</h3>
-      <div class="temas-principales">
-  <a href="cancelaciones.html" class="tema-btn">Cancelaciones</a>
-  <a href="pago.html" class="tema-btn">Pago</a>
-  <a href="datos-reserva.html" class="tema-btn">Datos de la reserva</a>
-  <a href="comunicaciones.html" class="tema-btn">Comunicaciones</a>
-  <a href="estilo-hospedaje.html" class="tema-btn">Estilos de hospedaje</a>
-  <a href="animales-de-asistencia.html" class="tema-btn">Animales de asistencia</a>
-</div>
-    </section>
-
-    <!-- FAQ simple (texto) -->
-    <section class="ayuda-seccion">
-      <h3>Más consultas</h3>
-      <div class="ayuda-lista">
-  <div class="ayuda-item">Precios</div>
-  <div class="ayuda-item">Tarjetas de crédito</div>
-  <div class="ayuda-item">Condiciones del alojamiento</div>
-  <div class="ayuda-item">Instalaciones y servicios</div>
-  <div class="ayuda-item">Seguridad y sensibilización</div>
-</div>
-    </section>
   </main>
 
   <script>
@@ -71,17 +77,18 @@
       if (alerta) alerta.style.display = "none";
     }
   </script>
+
   <footer class="footer-ayuda">
-  <p>© 2026 TuAloja. Todos los derechos reservados.</p>
-  <div class="footer-links">
-    <a href="politica-de-privacidad.html">Política de Privacidad</a>
-    <span>|</span>
-    <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
-    <span>|</span>
-    <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
-    <span>|</span>
-    <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
-  </div>
-</footer>
+    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-links">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a>
+      <span>|</span>
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
+      <span>|</span>
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
+      <span>|</span>
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    </div>
+  </footer>
 </body>
 </html>
