@@ -778,3 +778,69 @@ main.ayuda p{
 .footer-links span{
   opacity: .6;
 }
+/* ===== PÁGINAS INFO (AYUDA / ESTILO / ANIMALES) ===== */
+.info-wrap{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.info-card{
+  max-width: 720px;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.95);
+  border-radius: 22px;
+  padding: 32px;
+  box-shadow: 0 25px 60px rgba(0,0,0,.18);
+}
+
+.info-card h2{
+  margin: 0 0 6px;
+  font-size: 30px;
+  color:#1b167f;
+}
+
+.info-sub{
+  margin: 0 0 20px;
+  color:#555;
+}
+
+.info-box{
+  background:#fff3cd;
+  border-left:6px solid #ffb300;
+  padding:14px 16px;
+  border-radius:12px;
+  margin-bottom:20px;
+}
+
+.info-card h3{
+  margin-top:22px;
+  color:#1b167f;
+}
+
+.info-card ul{
+  padding-left:20px;
+  line-height:1.6;
+}
+
+.info-actions{
+  display:flex;
+  gap:12px;
+  margin-top:26px;
+  flex-wrap: wrap;
+}
+
+.btn-info{
+  padding:12px 18px;
+  border-radius:999px;
+  background:#1b167f;
+  color:#fff;
+  text-decoration:none;
+  font-weight:700;
+}
+
+.btn-info.btn-outline{
+  background:#fff;
+  color:#1b167f;
+  border:1px solid rgba(27,22,127,.25);
+}
