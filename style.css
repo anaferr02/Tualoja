@@ -615,3 +615,38 @@ main.ayuda p{
   color:#333;
   font-weight:600;
 }
+/* ===== FOOTER AYUDA ===== */
+.footer-ayuda{
+  margin-top: 60px;
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #1b167f;
+  background: rgba(255,255,255,0.35);
+}
+
+.footer-ayuda p{
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.footer-links{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.footer-links a{
+  color: #1b167f;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer-links a:hover{
+  text-decoration: underline;
+}
+
+.footer-links span{
+  opacity: .6;
+}
