@@ -3,84 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Estilo de hospedaje - Aloja</title>
+  <title>Estilo de hospedaje - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
   <header>
     <div class="container">
-      <h1><a href="index.html" style="color: white; text-decoration: none;">Aloja</a></h1>
+      <h1><a href="index.html" style="color:white;text-decoration:none;">TuAloja</a></h1>
     </div>
   </header>
 
-  <main class="ayuda">
-    <p><a href="ayuda.html">Página de Ayuda</a> > Preguntas frecuentes</p>
-    <h2>Estilo de hospedaje</h2>
+  <main class="info-wrap">
+    <div class="info-card">
 
-    <div class="faq-lista">
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          ¿Qué diferencia hay entre una habitación doble y una habitación doble - 2 camas?
-        </div>
-        <div class="faq-respuesta">
-          Una habitación doble tiene una cama doble, mientras que una habitación doble - 2 camas cuenta con 2 individuales. Si se trata de una habitación doble - 1 o 2 camas, puede referirse a cualquiera de las dos opciones anteriores. Podrás indicar el tipo de cama que prefieres en el apartado de peticiones especiales, durante el proceso de reserva.
-        </div>
+      <h2>Estilo de hospedaje</h2>
+      <p class="info-sub">
+        Información para huéspedes y anfitriones
+      </p>
+
+      <div class="info-box">
+        <strong>¿Qué es el estilo de hospedaje?</strong>
+        <p>
+          El estilo de hospedaje define el tipo de experiencia que ofrece un alojamiento,
+          incluyendo normas, convivencia, servicios y modalidad de uso.
+        </p>
       </div>
 
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          ¿Qué significa "no reembolsable" o "cancelación gratis"?
-        </div>
-        <div class="faq-respuesta">
-          Cada habitación o alojamiento tiene unas condiciones distintas que establece el propio alojamiento.
-          "No reembolsable" significa se aplicarán cargos si cancelas o modificas la reserva. Este cargo se indica en las condiciones durante el proceso de reserva y en la confirmación de la reserva.
-          "Cancelación gratis" significa que puedes cambiar o modificar la reserva de forma gratuita, si se hace dentro del plazo establecido por el alojamiento (por ejemplo, "puedes cancelar hasta x días" o "puedes cancelar antes del dd/mm/aa hh:mm"). Este plazo se indica en las condiciones durante el proceso de reserva y en la confirmación de la reserva.
-        </div>
+      <h3>Tipos de hospedaje</h3>
+      <ul>
+        <li>🏠 Alojamiento completo</li>
+        <li>🚪 Habitación privada</li>
+        <li>🛏️ Habitación compartida</li>
+      </ul>
+
+      <h3>Recomendaciones para huéspedes</h3>
+      <ul>
+        <li>Leer atentamente las normas del alojamiento</li>
+        <li>Respetar horarios y espacios comunes</li>
+        <li>Consultar al anfitrión ante cualquier duda</li>
+      </ul>
+
+      <h3>Recomendaciones para anfitriones</h3>
+      <ul>
+        <li>Indicar claramente el estilo del hospedaje</li>
+        <li>Detallar normas y servicios incluidos</li>
+        <li>Mantener comunicación clara con los huéspedes</li>
+      </ul>
+
+      <!-- BOTONES -->
+      <div class="info-actions">
+        <a href="index.html" class="btn-info">Ir al inicio</a>
+        <a href="ayuda.html" class="btn-info btn-outline">Volver a Ayuda</a>
       </div>
 
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          ¿Puedo anular o cambiar las fechas de una reserva no reembolsable?
-        </div>
-        <div class="faq-respuesta">
-          Las reservas no reembolsables por lo general no permiten cambios, pero algunos alojamientos ofrecen excepciones. Revisá tus condiciones.
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          ¿Cómo puedo saber si mi reserva se ha anulado?
-        </div>
-        <div class="faq-respuesta">
-          Recibirás un email de confirmación. También podés verificar el estado en la sección “Mis reservas”.
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          ¿Dónde puedo ver las condiciones de cancelación?
-        </div>
-        <div class="faq-respuesta">
-          Antes de reservar, las condiciones aparecen debajo del tipo de habitación. También están en tu email de confirmación.
-        </div>
-      </div>
     </div>
   </main>
 
-  <script>
-    function toggleRespuesta(elemento) {
-      const item = elemento.parentElement;
-      const respuesta = item.querySelector('.faq-respuesta');
-      const estaVisible = respuesta.style.display === 'block';
-
-      document.querySelectorAll('.faq-respuesta').forEach(r => r.style.display = 'none');
-
-      if (!estaVisible) {
-        respuesta.style.display = 'block';
-      }
-    }
-  </script>
+  <!-- FOOTER -->
+  <footer class="footer-ayuda">
+    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-links">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a>
+      <span>|</span>
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
+      <span>|</span>
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
+      <span>|</span>
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    </div>
+  </footer>
 
 </body>
 </html>
