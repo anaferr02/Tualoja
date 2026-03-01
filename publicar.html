@@ -48,6 +48,14 @@
     }
     .publish-card textarea{ resize: vertical; }
 
+    .help{
+      display:block;
+      font-size: 12px;
+      opacity: .85;
+      margin-top: 6px;
+      line-height: 1.3;
+    }
+
     .checks{
       display:flex; flex-wrap:wrap; gap:10px;
     }
@@ -109,7 +117,6 @@
     }
   </script>
 
-  <!-- 🔁 Importante: dejá tu header real (igual que index.html) -->
   <header class="header">
     <a class="logo" href="index.html">TuAloja.com</a>
     <nav id="mainNav" class="nav">
@@ -164,7 +171,7 @@
           <textarea name="descripcion" rows="4" required placeholder="Contá lo mejor del alojamiento..."></textarea>
         </section>
 
-        <!-- UBICACIÓN (sin Maps) -->
+        <!-- UBICACIÓN -->
         <section class="publish-section">
           <h3>Ubicación</h3>
 
@@ -179,8 +186,10 @@
             </div>
           </div>
 
-          <label>Dirección aproximada (opcional)</label>
-          <input name="direccion" placeholder="Ej: a 3 cuadras de la plaza..." />
+          <!-- ✅ AHORA OBLIGATORIA -->
+          <label>Dirección (obligatoria) *</label>
+          <input name="direccion" required minlength="5" placeholder="Ej: Calle y número (no se publica)" />
+          <small class="help">La dirección no será pública. Se usa para verificación y evitar estafas.</small>
 
           <label>Código postal (opcional)</label>
           <input name="cp" placeholder="Ej: 3265" />
@@ -210,6 +219,7 @@
 
           <input id="fotos" type="file" accept="image/*" multiple />
           <div id="preview" class="preview-grid"></div>
+          <small class="help">Si no elegís portada, se usa automáticamente la primera. Si borrás la portada, se reasigna.</small>
         </section>
 
         <!-- PRECIO -->
@@ -222,8 +232,10 @@
               <input name="precio" type="number" min="0" required placeholder="Ej: 35000" />
             </div>
             <div>
+              <!-- ✅ DEFAULT 30 -->
               <label>Máximo de noches (opcional)</label>
-              <input name="maxNoches" type="number" min="1" placeholder="Ej: 14" />
+              <input name="maxNoches" type="number" min="1" max="365" placeholder="Ej: 14" />
+              <small class="help">Si lo dejás vacío, se toma 30 (recomendado).</small>
             </div>
           </div>
         </section>
@@ -253,6 +265,26 @@
         </div>
 
         <p class="muted" id="msg" style="margin-top:12px;"></p>
+      </form>
+
+      <!-- ✅ FORM OCULTO PARA ENVIAR EMAIL (sin CORS, confiable en GitHub Pages) -->
+      <form id="mailForm" action="https://formsubmit.co/alojamientos@tualoja.com" method="POST" style="display:none;">
+        <input type="hidden" name="_subject" value="TuAloja - Nueva publicación" />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="hidden" name="_replyto" id="mf_replyto" value="" />
+        <input type="hidden" name="Título" id="mf_titulo" value="" />
+        <input type="hidden" name="Tipo" id="mf_tipo" value="" />
+        <input type="hidden" name="Capacidad" id="mf_capacidad" value="" />
+        <input type="hidden" name="Provincia" id="mf_provincia" value="" />
+        <input type="hidden" name="Ciudad" id="mf_ciudad" value="" />
+        <input type="hidden" name="Dirección" id="mf_direccion" value="" />
+        <input type="hidden" name="Precio" id="mf_precio" value="" />
+        <input type="hidden" name="Máximo noches" id="mf_maxnoches" value="" />
+        <input type="hidden" name="Anfitrión" id="mf_anfitrion" value="" />
+        <input type="hidden" name="Teléfono" id="mf_telefono" value="" />
+        <input type="hidden" name="Email anfitrión" id="mf_email" value="" />
+        <input type="hidden" name="Servicios" id="mf_servicios" value="" />
       </form>
     </div>
   </main>
@@ -284,20 +316,32 @@
     const preview = document.getElementById("preview");
     let fotos = []; // [{b64,isCover}]
 
+    function asegurarPortada() {
+      if (!fotos.length) return;
+      const hayCover = fotos.some(x => x.isCover);
+      if (!hayCover) fotos[0].isCover = true;
+    }
+
     fotosInput.addEventListener("change", async () => {
       const files = Array.from(fotosInput.files || []);
       if (!files.length) return;
 
       for (const file of files) {
         const b64 = await fileToBase64(file);
-        fotos.push({ b64, isCover: fotos.length === 0 });
+        fotos.push({ b64, isCover: false });
       }
+
+      // ✅ si no hay portada todavía, la primera queda como portada
+      asegurarPortada();
 
       fotosInput.value = "";
       renderFotos();
     });
 
     function renderFotos() {
+      // ✅ aseguramos consistencia siempre
+      asegurarPortada();
+
       preview.innerHTML = "";
       fotos.forEach((ph, idx) => {
         const item = document.createElement("div");
@@ -329,7 +373,11 @@
         btnDel.onclick = () => {
           const wasCover = fotos[idx]?.isCover;
           fotos.splice(idx, 1);
-          if (wasCover && fotos.length) fotos[0].isCover = true;
+
+          // ✅ si borró portada, reasignar automáticamente
+          if (wasCover && fotos.length) {
+            fotos = fotos.map((x,i)=>({ ...x, isCover: i===0 }));
+          }
           renderFotos();
         };
 
@@ -358,10 +406,29 @@
       });
     }
 
-    // Publicar (localStorage) + ir a gracias.html + enviar aviso (FormSubmit opcional)
+    // Publicar (localStorage) + ir a gracias.html + enviar aviso
     document.getElementById("publishForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const f = e.currentTarget;
+
+      // ✅ Dirección obligatoria (por si el navegador no valida)
+      if (!f.direccion.value.trim()) {
+        alert("La dirección es obligatoria.");
+        f.direccion.focus();
+        return;
+      }
+
+      // ✅ Máximo noches: default 30 + límites
+      let maxNoches = parseInt(f.maxNoches.value || "30", 10);
+      if (Number.isNaN(maxNoches)) maxNoches = 30;
+      if (maxNoches < 1) maxNoches = 1;
+      if (maxNoches > 365) maxNoches = 365;
+
+      // Guardamos el value normalizado para que no quede “mal”
+      f.maxNoches.value = String(maxNoches);
+
+      // ✅ Fotos: aseguramos portada antes de ordenar
+      asegurarPortada();
 
       const servicios = Array.from(f.querySelectorAll('input[name="servicios"]:checked')).map(i => i.value);
 
@@ -382,7 +449,7 @@
         servicios,
         fotos: fotosBase64,
         precio: Number(f.precio.value),
-        maxNoches: f.maxNoches.value ? Number(f.maxNoches.value) : null,
+        maxNoches,
         anfitrion: f.anfitrion.value.trim(),
         telefono: f.telefono.value.trim(),
         email: f.email.value.trim()
@@ -393,31 +460,42 @@
       localStorage.setItem("tualoja_listings", JSON.stringify(arr));
 
       // ✅ Mensaje inmediato
-      document.getElementById("msg").textContent = "✅ Publicado. Redirigiendo…";
+      document.getElementById("msg").textContent = "✅ Publicado. Enviando confirmación…";
 
-      // ✅ Envío de email (FRONTEND) usando FormSubmit
-      // Nota: FormSubmit envía a tu casilla (alojamientos@tualoja.com) pero el "from" real depende del proveedor.
-      // Primero tenés que activar FormSubmit 1 vez: mandar un form manual desde el sitio.
+      // ✅ Enviar email REAL (sin fetch, sin CORS) usando un form oculto
       try {
-        const fd = new FormData();
-        fd.append("Asunto", "Nueva publicación en TuAloja");
-        fd.append("Título", data.titulo);
-        fd.append("Ciudad", data.ciudad);
-        fd.append("Provincia", data.provincia);
-        fd.append("Precio", String(data.precio));
-        fd.append("Email anfitrión", data.email);
-        fd.append("Teléfono", data.telefono);
-        fd.append("_subject", "TuAloja - Nueva publicación");
-        fd.append("_template", "table");
+        document.getElementById("mf_replyto").value = data.email;
+        document.getElementById("mf_titulo").value = data.titulo;
+        document.getElementById("mf_tipo").value = data.tipo;
+        document.getElementById("mf_capacidad").value = String(data.capacidad);
+        document.getElementById("mf_provincia").value = data.provincia;
+        document.getElementById("mf_ciudad").value = data.ciudad;
+        document.getElementById("mf_direccion").value = data.direccion;
+        document.getElementById("mf_precio").value = String(data.precio);
+        document.getElementById("mf_maxnoches").value = String(data.maxNoches);
+        document.getElementById("mf_anfitrion").value = data.anfitrion;
+        document.getElementById("mf_telefono").value = data.telefono || "-";
+        document.getElementById("mf_email").value = data.email;
+        document.getElementById("mf_servicios").value = servicios.length ? servicios.join(", ") : "-";
 
-        // ⚠️ Cambiá el mail por tu casilla real
-        await fetch("https://formsubmit.co/alojamientos@tualoja.com", {
-          method: "POST",
-          body: fd
-        });
-      } catch {
+        // Mandamos con sendBeacon si está disponible (no bloquea)
+        const mailForm = document.getElementById("mailForm");
+        const fd = new FormData(mailForm);
+
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(mailForm.action, fd);
+        } else {
+          // fallback: submit real en segundo plano (abre/recarga si no se usa target)
+          // así evitamos eso:
+          mailForm.target = "_self";
+          mailForm.submit();
+          return;
+        }
+      } catch (err) {
         // si falla, igual seguimos
       }
+
+      document.getElementById("msg").textContent = "✅ Publicado. Redirigiendo…";
 
       // ✅ Redirigir a gracias
       setTimeout(() => {
