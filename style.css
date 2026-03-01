@@ -498,3 +498,127 @@ form {
 form > * {
   margin-bottom: 12px;
 }
+/* ===== AYUDA (CENTRO) ===== */
+.ayuda-wrap{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.alerta-seguridad{
+  background:#fff3cd;
+  border-left:6px solid #ffb300;
+  border-radius:14px;
+  padding:14px 16px;
+  position: relative;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  margin-bottom: 24px;
+}
+
+.alerta-seguridad p{
+  margin:8px 0 0;
+  color:#333;
+  font-size:14px;
+  line-height:1.4;
+}
+
+.cerrar-alerta{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:34px;
+  height:34px;
+  border:none;
+  border-radius:10px;
+  background:#fff;
+  cursor:pointer;
+  font-size:18px;
+}
+
+.ayuda-hero h2{
+  margin: 0 0 6px;
+  font-size: 32px;
+}
+
+.ayuda-hero p{
+  margin: 0 0 16px;
+  color:#444;
+}
+
+.boton-ayuda{
+  background:#1b167f;
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  padding:12px 18px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(27,22,127,.35);
+}
+
+.tabs-ayuda{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin: 22px 0 26px;
+}
+
+.tabs-ayuda button{
+  border:1px solid #d0d0d0;
+  background:#fff;
+  padding:8px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.tabs-ayuda .tab-activa{
+  border-color:#1b167f;
+  color:#1b167f;
+  font-weight:700;
+}
+
+.ayuda-seccion{
+  background:#fff;
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  margin-bottom: 16px;
+}
+
+.ayuda-seccion h3{
+  margin:0 0 12px;
+  color:#1b167f;
+}
+
+.ayuda-grid-links{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.ayuda-link{
+  display:block;
+  padding:12px 14px;
+  border-radius:14px;
+  background:#f4f7ff;
+  color:#1b167f;
+  text-decoration:none;
+  font-weight:600;
+}
+
+.ayuda-link:hover{
+  text-decoration: underline;
+}
+
+.ayuda-lista{
+  display:grid;
+  gap:10px;
+}
+
+.ayuda-item{
+  padding:12px 14px;
+  border-radius:14px;
+  background:#f6f6f6;
+  color:#333;
+}
