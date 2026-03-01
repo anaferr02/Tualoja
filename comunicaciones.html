@@ -3,53 +3,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Comunicaciones - Aloja</title>
+  <title>Comunicaciones - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
 
+<body>
   <header>
     <div class="container">
-      <h1><a href="index.html" style="color: white; text-decoration: none;">Aloja</a></h1>
+      <h1><a href="index.html" style="color:white;text-decoration:none;">TuAloja</a></h1>
     </div>
   </header>
 
-  <main class="ayuda">
-    <p><a href="ayuda.html">Página de Ayuda</a> > Preguntas frecuentes</p>
-    <h2>Comunicaciones</h2>
+  <main class="info-wrap">
+    <div class="info-card">
 
-    <div class="faq-lista">
-      <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleRespuesta(this)">
-          ¿Por qué la dirección de e-mail del alojamiento termina en @property.aloja.com?
-        </div>
-        <div class="faq-respuesta">
-          Para proteger la privacidad, Aloja genera direcciones de correo alias temporales tanto para vos como para el alojamiento. Todo lo que envíes (textos, imágenes o archivos hasta 15 MB) se reenvía automáticamente al destino.
+      <p style="margin:0 0 10px; font-size:14px;">
+        <a href="ayuda.html">Ayuda</a> <span style="opacity:.7;">›</span> Comunicaciones
+      </p>
 
-          Por seguridad, usamos sistemas que detectan contenido malicioso, spam o archivos peligrosos (.exe, .zip, .rar). Si ves algo sospechoso en un mensaje, podés reportarlo desde el enlace que aparece al pie del correo.
+      <h2>Comunicaciones</h2>
+      <p class="info-sub">
+        Información sobre mensajes, correos y privacidad en la comunicación entre huéspedes y alojamientos.
+      </p>
 
-          No respondemos por el contenido de esos mensajes, ya que son enviados directamente por el alojamiento. Si preferís no usar esta herramienta, podés optar por no comunicarte mediante estos correos temporales.
-        </div>
+      <div class="info-box">
+        <strong>Importante:</strong>
+        <p style="margin:8px 0 0;">
+          Para proteger tu privacidad, TuAloja utiliza direcciones de correo temporales (alias)
+          al comunicarte con los alojamientos.
+        </p>
       </div>
 
-      
+      <!-- FAQ -->
+      <div class="faq-lista faq-pro">
+
+        <div class="faq-item">
+          <div class="faq-pregunta" onclick="toggleRespuesta(this)">
+            ¿Por qué la dirección de e-mail del alojamiento termina en @property.tualoja.com?
+          </div>
+          <div class="faq-respuesta">
+            Para proteger la privacidad, TuAloja genera direcciones de correo alias temporales
+            tanto para vos como para el alojamiento.
+            <br><br>
+            Todo lo que envíes (mensajes, imágenes o archivos de hasta 15 MB) se reenvía
+            automáticamente al destinatario real.
+            <br><br>
+            Por seguridad, usamos sistemas que detectan contenido malicioso, spam o archivos
+            peligrosos (.exe, .zip, .rar).
+            <br><br>
+            Si detectás algo sospechoso, podés reportarlo desde el enlace que figura al pie del correo.
+            TuAloja no es responsable por el contenido de los mensajes enviados directamente
+            por el alojamiento.
+          </div>
+        </div>
+
       </div>
+
+      <!-- BOTONES -->
+      <div class="info-actions">
+        <a href="index.html" class="btn-info">Ir al inicio</a>
+        <a href="ayuda.html" class="btn-info btn-outline">Volver a Ayuda</a>
+      </div>
+
     </div>
   </main>
+
+  <!-- FOOTER LEGAL -->
+  <footer class="footer-ayuda">
+    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-links">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a>
+      <span>|</span>
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
+      <span>|</span>
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
+      <span>|</span>
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    </div>
+  </footer>
 
   <script>
     function toggleRespuesta(elemento) {
       const item = elemento.parentElement;
       const respuesta = item.querySelector('.faq-respuesta');
-      const estaVisible = respuesta.style.display === 'block';
+      const visible = respuesta.style.display === 'block';
 
-      document.querySelectorAll('.faq-respuesta').forEach(r => r.style.display = 'none');
+      document.querySelectorAll('.faq-respuesta')
+        .forEach(r => r.style.display = 'none');
 
-      if (!estaVisible) {
-        respuesta.style.display = 'block';
-      }
+      if (!visible) respuesta.style.display = 'block';
     }
   </script>
-
 </body>
 </html>
