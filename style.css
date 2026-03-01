@@ -687,3 +687,94 @@ main.ayuda p{
 .ayuda-item:last-child{
   border-bottom: none;
 }
+/* ===== AYUDA: PANEL BLANCO + CHIPS (como imagen 1) ===== */
+.ayuda-wrap{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.ayuda-panel{
+  background: rgba(255,255,255,0.92);
+  border-radius: 26px;
+  padding: 34px;
+  box-shadow: 0 25px 70px rgba(0,0,0,.18);
+  backdrop-filter: blur(6px);
+}
+
+/* Temas principales: chips */
+.temas-principales{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top: 12px;
+}
+
+.tema-btn{
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #f6f7fb;
+  border: 1px solid rgba(27,22,127,0.12);
+  color: #333;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.tema-btn:hover{
+  background:#ffffff;
+  border-color: rgba(27,22,127,0.18);
+}
+
+/* Más consultas: chips */
+.mas-consultas{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top: 12px;
+}
+
+.consulta-chip{
+  padding: 10px 14px;
+  border-radius: 14px;
+  background:#f6f6f6;
+  border: 1px solid rgba(27,22,127,0.10);
+  color:#333;
+  font-weight: 600;
+}
+
+/* Footer ayuda */
+.footer-ayuda{
+  margin-top: 26px;
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #1b167f;
+  background: rgba(255,255,255,0.35);
+}
+
+.footer-ayuda p{
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.footer-links{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.footer-links a{
+  color: #1b167f;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer-links a:hover{
+  text-decoration: underline;
+}
+
+.footer-links span{
+  opacity: .6;
+}
