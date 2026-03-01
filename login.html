@@ -4,54 +4,154 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Iniciar sesión - TuAloja</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      margin:0;
+      min-height:100vh;
+      background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
+    }
+
+    .auth-page{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+    .auth-main{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px 16px;
+    }
+
+    .card{
+      background:#fff;
+      width:min(520px, 95vw);
+      border-radius:18px;
+      padding:26px;
+      box-shadow:0 10px 30px rgba(0,0,0,.12);
+    }
+    h1{margin:0 0 8px; color:#1b167f; font-size:34px;}
+    p{margin:0 0 18px; color:#444;}
+    label{display:block; font-size:14px; margin:12px 0 6px; color:#222;}
+    input{
+      width:100%;
+      padding:12px;
+      border:1px solid #d6d6d6;
+      border-radius:12px;
+      outline:none;
+      font-size:14px;
+    }
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:14px;
+      background:#1b167f;
+      color:#fff;
+      font-weight:bold;
+      cursor:pointer;
+      margin-top:16px;
+      font-size:14px;
+      box-shadow: 0 8px 20px rgba(27,22,127,.35);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(27,22,127,.45);
+    }
+    .link{
+      display:inline-block;
+      margin-top:12px;
+      color:#1b167f;
+      text-decoration: underline;
+      font-size:14px;
+    }
+    .hint{font-size:12px; color:#666; margin-top:10px;}
+
+    .err{
+      display:none;
+      margin:12px 0 0;
+      color:#b00020;
+      font-weight:700;
+      font-size:13px;
+    }
+
+    footer{
+      text-align:center;
+      padding:18px 12px;
+      font-size:12px;
+      color:#1b167f;
+    }
+    .footer-legal a{
+      color:#1b167f;
+      text-decoration: underline;
+      margin:0 4px;
+      font-size:12px;
+    }
+  </style>
 </head>
-<body>
-  <main style="max-width:520px;margin:40px auto;padding:0 14px;">
-    <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.12);">
-      <h1 style="margin:0;color:#1b167f;">Iniciar sesión</h1>
-      <p style="margin:8px 0 16px;color:#444;">Ingresá con tu email y contraseña.</p>
 
-      <form id="loginForm">
+<body class="auth-page">
+  <main class="auth-main">
+    <div class="card">
+      <h1>Iniciar sesión</h1>
+      <p>Ingresá con tu email y contraseña.</p>
+
+      <form id="loginForm" autocomplete="on">
         <label>Email</label>
-        <input id="email" type="email" required />
+        <input id="email" type="email" required placeholder="tuemail@ejemplo.com" />
 
-        <label style="margin-top:10px;">Contraseña</label>
-        <input id="password" type="password" required />
+        <label>Contraseña</label>
+        <input id="password" type="password" required placeholder="Tu contraseña" />
 
-        <button class="btn-header" type="submit" style="margin-top:14px;width:100%;">Entrar</button>
+        <button class="btn" type="submit">Entrar</button>
+
+        <a class="link" href="register.html">No tengo cuenta → Crear cuenta</a>
+        <div class="hint">Si iniciás sesión, te llevamos a publicar tu alojamiento.</div>
+
+        <p id="err" class="err"></p>
       </form>
-
-      <p style="margin:14px 0 0;">
-        <a href="register.html">No tengo cuenta → Crear cuenta</a>
-      </p>
-
-      <p id="err" style="display:none;margin:10px 0 0;color:#b00020;font-weight:700;"></p>
     </div>
   </main>
 
-  <script type="module">
-    import { login } from "./public/js/auth.js";
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-legal">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a> |
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    </div>
+  </footer>
 
+  <script>
     const form = document.getElementById("loginForm");
     const err = document.getElementById("err");
 
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
       err.style.display = "none";
+      err.textContent = "";
 
-      try{
-        await login(
-          document.getElementById("email").value,
-          document.getElementById("password").value
-        );
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
 
-        // Si venís de publicar, te conviene mandarlo ahí
-        location.href = "publicar.html";
-      } catch(ex){
-        err.textContent = ex.message || "Error";
+      const users = JSON.parse(localStorage.getItem("tualoja_users") || "[]");
+      const user = users.find(u => u.email === email && u.password === password);
+
+      if (!user) {
+        err.textContent = "Email o contraseña incorrectos.";
         err.style.display = "block";
+        return;
       }
+
+      localStorage.setItem("tualoja_logged", "1");
+      localStorage.setItem("tualoja_user", email);
+
+      window.location.href = "publicar.html";
     });
   </script>
 </body>
