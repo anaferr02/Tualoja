@@ -1243,3 +1243,22 @@ main.ayuda p{
   align-items: center;
   flex-direction: column;
 }
+.gracias-wrap {
+  width: 100%;
+  min-height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.gracias-wrap h2 {
+  margin-bottom: 10px;
+}
+
+.gracias-wrap p {
+  max-width: 480px;
+}
