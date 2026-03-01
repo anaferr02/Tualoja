@@ -17,46 +17,48 @@
     <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
   </header>
 
-  <main class="contenedor" style="max-width: 980px;">
-    <section style="text-align:center; margin: 30px 0 18px;">
+  <main class="contenedor">
+    <section style="text-align:center; margin: 26px 0 18px;">
       <h1>Da de alta tu alojamiento en TuAloja</h1>
-      <p class="muted">Ganá más dinero, más rápido y llegá a nuevos huéspedes.</p>
+      <p class="muted">Ganá más visibilidad y recibí reservas. Publicar es simple.</p>
 
-      <div style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <div style="margin-top: 12px;">
         <button class="btn" id="btnComenzar" type="button">Registrar alojamiento</button>
-        <a class="btn btn-outline" href="index.html">Volver al inicio</a>
       </div>
     </section>
 
-    <section style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:14px; margin: 18px 0;">
-      <article class="card" style="padding:14px;">
+    <section style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 18px 0;">
+      <article class="card" style="padding: 14px;">
         <h3>Pagos sin complicaciones</h3>
-        <p class="muted">Nos encargamos del proceso de cobro.</p>
+        <p class="muted">Organizá tus reservas y coordiná con huéspedes fácilmente.</p>
       </article>
-      <article class="card" style="padding:14px;">
+
+      <article class="card" style="padding: 14px;">
         <h3>Mayor visibilidad</h3>
-        <p class="muted">Tu propiedad aparece ante miles de usuarios.</p>
+        <p class="muted">Tu alojamiento aparece en los resultados para nuevos usuarios.</p>
       </article>
-      <article class="card" style="padding:14px;">
+
+      <article class="card" style="padding: 14px;">
         <h3>Sin costos fijos</h3>
-        <p class="muted">Solo pagás comisión por reservas confirmadas.</p>
+        <p class="muted">Publicar es gratis en este MVP. Luego mejoramos el sistema.</p>
       </article>
     </section>
 
-    <section class="card" style="padding:16px; max-width: 560px; margin: 0 auto 30px;">
-      <h2 style="margin-top:0;">Registrá tu alojamiento</h2>
-      <p class="muted">Para publicar tu alojamiento necesitás crear una cuenta o iniciar sesión. El proceso es simple y guiado.</p>
-      <ol class="muted" style="line-height: 1.6;">
-        <li>Datos de la propiedad</li>
+    <section class="card" style="padding: 16px; max-width: 680px; margin: 0 auto 26px;">
+      <h2 style="margin-top:0;">Cómo funciona</h2>
+      <p class="muted">Para publicar, necesitás iniciar sesión. El formulario está guiado.</p>
+      <ol class="muted" style="line-height: 1.8; margin: 10px 0 0;">
+        <li>Información básica</li>
         <li>Ubicación</li>
-        <li>Servicios y normas</li>
+        <li>Servicios</li>
         <li>Fotos</li>
-        <li>Precio y disponibilidad</li>
+        <li>Precio y contacto</li>
       </ol>
 
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
-        <a class="btn btn-outline" href="register.html">Crear cuenta</a>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px;">
         <a class="btn btn-outline" href="login.html">Iniciar sesión</a>
+        <!-- si tu archivo de crear cuenta tiene otro nombre, cambiá este link -->
+        <a class="btn btn-outline" href="register.html">Crear cuenta</a>
       </div>
     </section>
   </main>
@@ -76,7 +78,7 @@
 
   <script src="script.js"></script>
   <script>
-    // Botón Comenzar: si no está logueada -> login, si está -> publicar
+    // Mantiene tu flujo: si no está logueada -> login, si está -> publicar
     document.getElementById("btnComenzar").addEventListener("click", () => {
       if (localStorage.getItem("tualoja_logged") !== "1") {
         localStorage.setItem("redirect_after_login", "publicar.html");
