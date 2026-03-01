@@ -61,6 +61,8 @@
       transform: translateY(-2px);
       box-shadow: 0 12px 28px rgba(27,22,127,.45);
     }
+
+    /* links */
     .link{
       display:inline-block;
       margin-top:12px;
@@ -68,6 +70,15 @@
       text-decoration: underline;
       font-size:14px;
     }
+    .link-center{
+      display:block;
+      margin-top:14px;
+      text-align:center;
+      color:#1b167f;
+      font-size:14px;
+      text-decoration: underline;
+    }
+
     .hint{font-size:12px; color:#666; margin-top:10px;}
 
     .err{
@@ -107,6 +118,9 @@
         <input id="password" type="password" required placeholder="Tu contraseña" />
 
         <button class="btn" type="submit">Entrar</button>
+
+        <!-- ✅ NUEVO: olvidé contraseña -->
+        <a class="link-center" href="recuperar.html">¿Olvidaste tu contraseña?</a>
 
         <a class="link" href="register.html">No tengo cuenta → Crear cuenta</a>
         <div class="hint">Si iniciás sesión, te llevamos a publicar tu alojamiento.</div>
