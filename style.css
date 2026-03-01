@@ -498,13 +498,15 @@ form {
 form > * {
   margin-bottom: 12px;
 }
-/* ===== AYUDA (CENTRO) ===== */
+/* ===== AYUDA (SOLO ESTA SECCIÓN) ===== */
+main.ayuda,
 .ayuda-wrap{
   max-width: 1100px;
   margin: 0 auto;
   padding: 40px 20px;
 }
 
+/* Alerta */
 .alerta-seguridad{
   background:#fff3cd;
   border-left:6px solid #ffb300;
@@ -535,27 +537,33 @@ form > * {
   font-size:18px;
 }
 
-.ayuda-hero h2{
+/* Título */
+.ayuda-hero h2,
+main.ayuda h2{
   margin: 0 0 6px;
   font-size: 32px;
+  color:#1b167f;
 }
 
-.ayuda-hero p{
+.ayuda-hero p,
+main.ayuda p{
   margin: 0 0 16px;
   color:#444;
 }
 
+/* Botón ayuda */
 .boton-ayuda{
   background:#1b167f;
   color:#fff;
   border:none;
   border-radius:999px;
   padding:12px 18px;
-  font-weight:700;
+  font-weight:800;
   cursor:pointer;
   box-shadow:0 8px 20px rgba(27,22,127,.35);
 }
 
+/* Tabs */
 .tabs-ayuda{
   display:flex;
   flex-wrap:wrap;
@@ -564,7 +572,7 @@ form > * {
 }
 
 .tabs-ayuda button{
-  border:1px solid #d0d0d0;
+  border:1px solid rgba(27,22,127,0.18);
   background:#fff;
   padding:8px 14px;
   border-radius:999px;
@@ -575,50 +583,35 @@ form > * {
 .tabs-ayuda .tab-activa{
   border-color:#1b167f;
   color:#1b167f;
-  font-weight:700;
+  font-weight:900;
 }
 
-.ayuda-seccion{
+/* FAQ */
+.faq{
   background:#fff;
   border-radius:18px;
   padding:18px;
   box-shadow:0 10px 25px rgba(0,0,0,.08);
-  margin-bottom: 16px;
 }
 
-.ayuda-seccion h3{
-  margin:0 0 12px;
-  color:#1b167f;
-}
-
-.ayuda-grid-links{
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
-}
-
-.ayuda-link{
+.faq a,
+.faq .faq-item{
   display:block;
   padding:12px 14px;
   border-radius:14px;
+  margin:10px 0;
   background:#f4f7ff;
   color:#1b167f;
   text-decoration:none;
-  font-weight:600;
+  font-weight:700;
 }
 
-.ayuda-link:hover{
+.faq a:hover{
   text-decoration: underline;
 }
 
-.ayuda-lista{
-  display:grid;
-  gap:10px;
-}
-
-.ayuda-item{
-  padding:12px 14px;
-  border-radius:14px;
+.faq .faq-item{
   background:#f6f6f6;
   color:#333;
+  font-weight:600;
 }
