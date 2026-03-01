@@ -3,96 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registra tu alojamiento - TuAloja</title>
+  <title>Registrá tu alojamiento - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+  <header class="header">
+    <a class="logo" href="index.html">TuAloja.com</a>
+    <nav id="mainNav" class="nav">
+      <a href="alojamiento.html">Registrá tu alojamiento</a>
+      <a href="ayuda.html">Ayuda</a>
+      <span id="navAuth"></span>
+    </nav>
+    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
+  </header>
 
-  <!-- HERO -->
-  <section class="seccion seccion-transparente">
-    <div class="contenedor hero-pro">
+  <main class="contenedor" style="max-width: 980px;">
+    <section style="text-align:center; margin: 30px 0 18px;">
       <h1>Da de alta tu alojamiento en TuAloja</h1>
-      <p>Ganá más dinero, más rápido y llegá a nuevos huéspedes.</p>
+      <p class="muted">Ganá más dinero, más rápido y llegá a nuevos huéspedes.</p>
 
-      <button id="btnRegistrar" class="btn-principal" type="button">
-        Registrar alojamiento
-      </button>
-    </div>
-  </section>
+      <div style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button class="btn" id="btnComenzar" type="button">Registrar alojamiento</button>
+        <a class="btn btn-outline" href="index.html">Volver al inicio</a>
+      </div>
+    </section>
 
-  <!-- BENEFICIOS -->
-  <section class="seccion seccion-blanca">
-    <div class="contenedor grid-beneficios">
-      <div class="card-beneficio">
+    <section style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:14px; margin: 18px 0;">
+      <article class="card" style="padding:14px;">
         <h3>Pagos sin complicaciones</h3>
-        <p>Nos encargamos del proceso de cobro.</p>
-      </div>
-
-      <div class="card-beneficio">
+        <p class="muted">Nos encargamos del proceso de cobro.</p>
+      </article>
+      <article class="card" style="padding:14px;">
         <h3>Mayor visibilidad</h3>
-        <p>Tu propiedad aparece ante miles de usuarios.</p>
-      </div>
-
-      <div class="card-beneficio">
+        <p class="muted">Tu propiedad aparece ante miles de usuarios.</p>
+      </article>
+      <article class="card" style="padding:14px;">
         <h3>Sin costos fijos</h3>
-        <p>Solo pagás comisión por reservas confirmadas.</p>
+        <p class="muted">Solo pagás comisión por reservas confirmadas.</p>
+      </article>
+    </section>
+
+    <section class="card" style="padding:16px; max-width: 560px; margin: 0 auto 30px;">
+      <h2 style="margin-top:0;">Registrá tu alojamiento</h2>
+      <p class="muted">Para publicar tu alojamiento necesitás crear una cuenta o iniciar sesión. El proceso es simple y guiado.</p>
+      <ol class="muted" style="line-height: 1.6;">
+        <li>Datos de la propiedad</li>
+        <li>Ubicación</li>
+        <li>Servicios y normas</li>
+        <li>Fotos</li>
+        <li>Precio y disponibilidad</li>
+      </ol>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
+        <a class="btn btn-outline" href="register.html">Crear cuenta</a>
+        <a class="btn btn-outline" href="login.html">Iniciar sesión</a>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- BLOQUE CENTRAL -->
-  <section class="seccion seccion-transparente">
-    <div class="contenedor">
-      <div class="card-registro-pro">
-        <h2>Registrá tu alojamiento</h2>
-        <p>
-          Para publicar tu alojamiento necesitás crear una cuenta o iniciar sesión.
-          El proceso es simple y guiado.
-        </p>
-
-        <ol class="lista-pasos">
-          <li>Datos de la propiedad</li>
-          <li>Ubicación</li>
-          <li>Servicios y normas</li>
-          <li>Fotos</li>
-          <li>Precio y disponibilidad</li>
-        </ol>
-
-        <button id="btnComenzar" class="btn-principal" type="button">
-          Comenzar
-        </button>
-
-        <div class="links-auth">
-          <a href="register.html" class="link-secundario">Crear cuenta</a>
-          <span class="dot">·</span>
-          <a href="login.html" class="link-secundario">Iniciar sesión</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
-    <div class="footer-legal">
-      <a href="politica-de-privacidad.html">Política de Privacidad</a> |
-      <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
-      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
+  <footer class="footer-ayuda">
+    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-links">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a>
+      <span>|</span>
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
+      <span>|</span>
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
+      <span>|</span>
       <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
     </div>
   </footer>
 
-  <!-- LOGICA DE REDIRECCION -->
+  <script src="script.js"></script>
   <script>
-    function irARegistro() {
-      const logueado = localStorage.getItem("tualoja_logged") === "1";
-      window.location.href = logueado ? "publicar.html" : "register.html";
-    }
-
-    document.getElementById("btnRegistrar")?.addEventListener("click", irARegistro);
-    document.getElementById("btnComenzar")?.addEventListener("click", irARegistro);
+    // Botón Comenzar: si no está logueada -> login, si está -> publicar
+    document.getElementById("btnComenzar").addEventListener("click", () => {
+      if (localStorage.getItem("tualoja_logged") !== "1") {
+        localStorage.setItem("redirect_after_login", "publicar.html");
+        location.href = "login.html";
+      } else {
+        location.href = "publicar.html";
+      }
+    });
   </script>
-
 </body>
 </html>
