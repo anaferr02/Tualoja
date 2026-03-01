@@ -1236,3 +1236,10 @@ main.ayuda p{
 .help-grid .pill {
   background: #f7f8fc;
 }
+.gracias {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
