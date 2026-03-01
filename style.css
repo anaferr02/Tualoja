@@ -844,3 +844,26 @@ main.ayuda p{
   color:#1b167f;
   border:1px solid rgba(27,22,127,.25);
 }
+/* ===== FAQ PRO (para páginas tipo Pago) ===== */
+.faq-pro .faq-item{
+  border: 1px solid rgba(27,22,127,0.12);
+  border-radius: 14px;
+  background: #fff;
+  margin: 10px 0;
+  overflow: hidden;
+}
+
+.faq-pro .faq-pregunta{
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 800;
+  color: #1b167f;
+  background: #f4f7ff;
+}
+
+.faq-pro .faq-respuesta{
+  display: none;
+  padding: 14px 16px;
+  color: #333;
+  line-height: 1.6;
+}
