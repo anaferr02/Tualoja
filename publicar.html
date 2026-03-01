@@ -5,222 +5,125 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Publicar alojamiento - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
-
-  <!-- estilos mínimos para la galería (no rompe tu CSS) -->
-  <style>
-    .preview-grid{
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
-    }
-    .ph-card{
-      position: relative;
-      border-radius: 12px;
-      overflow: hidden;
-      background: rgba(255,255,255,.55);
-      border: 1px solid rgba(0,0,0,.08);
-    }
-    .ph-card img{
-      width: 100%;
-      height: 110px;
-      object-fit: cover;
-      display:block;
-    }
-    .ph-actions{
-      display:flex;
-      gap:8px;
-      padding: 8px;
-      align-items:center;
-      justify-content: space-between;
-      font-size: 12px;
-    }
-    .ph-btn{
-      border: 0;
-      padding: 6px 8px;
-      border-radius: 10px;
-      cursor: pointer;
-      background: rgba(0,0,0,.08);
-    }
-    .ph-badge{
-      position:absolute;
-      top:8px;
-      left:8px;
-      background: rgba(0,0,0,.65);
-      color: #fff;
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-    }
-    .ph-empty{
-      font-size: 13px;
-      opacity: .8;
-      margin-top: 10px;
-    }
-    .bottom-links{
-      display:flex;
-      justify-content:center;
-      margin-top: 14px;
-    }
-  </style>
 </head>
-
 <body>
-  <header>
-    <div class="container">
-      <h1><a href="index.html" style="color:white;text-decoration:none;">TuAloja</a></h1>
-    </div>
+
+  <!-- 🔒 PROTECCIÓN: si no está logueado, vuelve a login -->
+  <script>
+    if (localStorage.getItem("tualoja_logged") !== "1") {
+      localStorage.setItem("redirect_after_login", "publicar.html");
+      location.href = "login.html";
+    }
+  </script>
+
+  <header class="header">
+    <a class="logo" href="index.html">TuAloja.com</a>
+    <nav id="mainNav" class="nav">
+      <a href="alojamiento.html">Registrá tu alojamiento</a>
+      <a href="ayuda.html">Ayuda</a>
+      <span id="navAuth"></span>
+    </nav>
+    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
   </header>
 
-  <main class="publish-wrap">
-    <div class="publish-card">
+  <main class="contenedor" style="max-width: 980px;">
+    <div class="publish-top" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin: 18px 0;">
+      <div>
+        <h1 style="margin:0;">Publicar alojamiento</h1>
+        <p class="muted" style="margin:6px 0 0;">Por ahora sin mapa (gratis). Luego lo sumamos.</p>
+      </div>
+      <button class="btn btn-outline" type="button" id="btnLogout">Cerrar sesión</button>
+    </div>
 
-      <div class="publish-top">
-        <div>
-          <h2>Publicar alojamiento</h2>
-          <p class="muted">Completá los datos. Guardamos la ubicación exacta con Google Maps.</p>
-        </div>
-        <button class="btn-info btn-outline" type="button" id="btnLogout">Cerrar sesión</button>
+    <form id="publishForm" class="card" style="padding:16px;">
+      <h2 style="margin-top:0;">Información básica</h2>
+
+      <label>Nombre del alojamiento *</label>
+      <input name="titulo" required placeholder="Ej: Cabaña en el río" />
+
+      <label>Tipo de alojamiento *</label>
+      <select name="tipo" required>
+        <option value="">Elegí una opción</option>
+        <option>Departamento</option>
+        <option>Casa</option>
+        <option>Cabaña</option>
+        <option>Habitación</option>
+        <option>Hotel</option>
+        <option>Hostel</option>
+        <option>Otro</option>
+      </select>
+
+      <label>Capacidad (huéspedes) *</label>
+      <input name="capacidad" type="number" min="1" required placeholder="Ej: 4" />
+
+      <label>Descripción *</label>
+      <textarea name="descripcion" rows="4" required placeholder="Contá lo mejor del alojamiento..."></textarea>
+
+      <hr style="margin: 16px 0; opacity:.3;" />
+
+      <h2>Ubicación</h2>
+
+      <label>Provincia *</label>
+      <input name="provincia" required placeholder="Ej: Entre Ríos" />
+
+      <label>Ciudad *</label>
+      <input name="ciudad" required placeholder="Ej: Villa Elisa" />
+
+      <label>Dirección aproximada (opcional)</label>
+      <input name="direccion" placeholder="Ej: zona centro / a 3 cuadras de..." />
+
+      <label>Código postal (opcional)</label>
+      <input name="cp" placeholder="Ej: 3265" />
+
+      <hr style="margin: 16px 0; opacity:.3;" />
+
+      <h2>Servicios</h2>
+      <div class="checks">
+        <label><input type="checkbox" name="servicios" value="Wifi" /> Wifi</label>
+        <label><input type="checkbox" name="servicios" value="Aire acondicionado" /> Aire acondicionado</label>
+        <label><input type="checkbox" name="servicios" value="Calefacción" /> Calefacción</label>
+        <label><input type="checkbox" name="servicios" value="Cocina" /> Cocina</label>
+        <label><input type="checkbox" name="servicios" value="Estacionamiento" /> Estacionamiento</label>
+        <label><input type="checkbox" name="servicios" value="Pileta" /> Pileta</label>
+        <label><input type="checkbox" name="servicios" value="Parrilla" /> Parrilla</label>
+        <label><input type="checkbox" name="servicios" value="Mascotas" /> Acepta mascotas</label>
       </div>
 
-      <form id="publishForm">
+      <hr style="margin: 16px 0; opacity:.3;" />
 
-        <!-- INFO BÁSICA -->
-        <section class="publish-section">
-          <h3>Información básica</h3>
+      <h2>Fotos</h2>
+      <p class="muted" style="margin-top:-6px;">Podés subir varias. (MVP: quedan guardadas en el navegador)</p>
+      <input id="fotos" type="file" accept="image/*" multiple />
+      <div id="preview" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap:12px; margin-top:12px;"></div>
 
-          <label>Nombre del alojamiento *</label>
-          <input name="titulo" required placeholder="Ej: Cabaña en el río" />
+      <hr style="margin: 16px 0; opacity:.3;" />
 
-          <label>Tipo de alojamiento *</label>
-          <select name="tipo" required>
-            <option value="">Elegí una opción</option>
-            <option>Departamento</option>
-            <option>Casa</option>
-            <option>Cabaña</option>
-            <option>Habitación</option>
-            <option>Hotel</option>
-            <option>Hostel</option>
-            <option>Otro</option>
-          </select>
+      <h2>Precio</h2>
+      <label>Precio por noche (ARS) *</label>
+      <input name="precio" type="number" min="0" required placeholder="Ej: 35000" />
 
-          <label>Capacidad (huéspedes) *</label>
-          <input name="capacidad" type="number" min="1" required placeholder="Ej: 4" />
+      <label>Mínimo de noches (opcional)</label>
+      <input name="minNoches" type="number" min="1" placeholder="Ej: 2" />
 
-          <label>Descripción *</label>
-          <textarea name="descripcion" rows="4" required placeholder="Contá lo mejor del alojamiento..."></textarea>
-        </section>
+      <hr style="margin: 16px 0; opacity:.3;" />
 
-        <!-- UBICACIÓN + MAPA -->
-        <section class="publish-section">
-          <h3>Ubicación</h3>
+      <h2>Datos del anfitrión</h2>
+      <label>Nombre del anfitrión *</label>
+      <input name="anfitrion" required placeholder="Ej: Ana Laura" />
 
-          <div class="grid-2">
-            <div>
-              <label>Dirección (para ubicar en el mapa) *</label>
-              <input id="direccion" name="direccion" required placeholder="Ej: Av. San Martín 123" />
-            </div>
-            <div>
-              <label>Ciudad *</label>
-              <input name="ciudad" required placeholder="Ej: Mendoza" />
-            </div>
-          </div>
+      <label>WhatsApp (opcional)</label>
+      <input name="telefono" placeholder="Ej: +54 9 3447..." />
 
-          <div class="grid-2">
-            <div>
-              <label>Provincia *</label>
-              <input name="provincia" required placeholder="Ej: Mendoza" />
-            </div>
-            <div>
-              <label>Código postal (opcional)</label>
-              <input name="cp" placeholder="Ej: 5500" />
-            </div>
-          </div>
+      <label>Email del anfitrión *</label>
+      <input name="email" type="email" required placeholder="Ej: contacto@tualoja.com" />
 
-          <div class="map-actions">
-            <button type="button" class="btn-info" id="btnBuscarMapa">Buscar en mapa</button>
-            <span class="muted" style="font-size:13px;">
-              Tip: mové el pin para ajustar la ubicación exacta.
-            </span>
-          </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+        <button class="btn" type="submit">Publicar</button>
+        <a class="btn btn-outline" href="index.html">Cancelar</a>
+      </div>
 
-          <div id="map" class="map-box"></div>
-
-          <!-- Guardamos coordenadas -->
-          <input type="hidden" id="lat" name="lat" />
-          <input type="hidden" id="lng" name="lng" />
-
-          <div class="info-box" style="margin-top:14px;">
-            <strong>Privacidad:</strong>
-            <p style="margin:8px 0 0;">
-              La ubicación exacta puede mostrarse solo después de confirmar una reserva.
-              (Después lo implementamos en el detalle).
-            </p>
-          </div>
-        </section>
-
-        <!-- SERVICIOS -->
-        <section class="publish-section">
-          <h3>Servicios</h3>
-
-          <div class="checks">
-            <label><input type="checkbox" name="servicios" value="Wifi" /> Wifi</label>
-            <label><input type="checkbox" name="servicios" value="Aire acondicionado" /> Aire acondicionado</label>
-            <label><input type="checkbox" name="servicios" value="Calefacción" /> Calefacción</label>
-            <label><input type="checkbox" name="servicios" value="Cocina" /> Cocina</label>
-            <label><input type="checkbox" name="servicios" value="Estacionamiento" /> Estacionamiento</label>
-            <label><input type="checkbox" name="servicios" value="Pileta" /> Pileta</label>
-            <label><input type="checkbox" name="servicios" value="Mascotas" /> Acepta mascotas</label>
-          </div>
-        </section>
-
-        <!-- FOTOS -->
-        <section class="publish-section">
-          <h3>Fotos</h3>
-          <p class="muted" style="margin-top:-6px;">Podés subir varias. Podés borrar una foto o elegir la portada antes de publicar.</p>
-
-          <input id="fotos" type="file" accept="image/*" multiple />
-          <div id="preview" class="preview-grid"></div>
-          <div id="previewEmpty" class="ph-empty">Todavía no subiste fotos.</div>
-        </section>
-
-        <!-- PRECIO -->
-        <section class="publish-section">
-          <h3>Precio</h3>
-
-          <label>Precio por noche (ARS) *</label>
-          <input name="precio" type="number" min="0" required placeholder="Ej: 45000" />
-
-          <label>Máximo de noches (opcional)</label>
-          <input name="maxNoches" type="number" min="1" placeholder="Ej: 14" />
-        </section>
-
-        <!-- ANFITRIÓN -->
-        <section class="publish-section">
-          <h3>Datos del anfitrión</h3>
-
-          <label>Nombre del anfitrión *</label>
-          <input name="anfitrion" required placeholder="Ej: Ana Laura" />
-
-          <label>Teléfono (opcional)</label>
-          <input name="telefono" placeholder="Ej: +54 9 3447..." />
-
-          <label>Email de contacto *</label>
-          <input name="email" type="email" required placeholder="Ej: contacto@tualoja.com" />
-        </section>
-
-        <div class="publish-actions">
-          <button class="btn-info" type="submit" id="btnPublish">Publicar</button>
-          <a class="btn-info btn-outline" href="index.html">Cancelar</a>
-        </div>
-
-        <div class="bottom-links">
-          <a class="btn-info btn-outline" href="index.html">← Volver al inicio</a>
-        </div>
-
-        <p class="muted" id="msg" style="margin-top:14px;"></p>
-      </form>
-    </div>
+      <p class="muted" id="msg" style="margin-top:12px;"></p>
+    </form>
   </main>
 
   <footer class="footer-ayuda">
@@ -236,154 +139,37 @@
     </div>
   </footer>
 
+  <script src="script.js"></script>
   <script>
-    // --- protección simple ---
-    if (localStorage.getItem("tualoja_logged") !== "1") {
-      location.href = "login.html";
-    }
-
     document.getElementById("btnLogout").addEventListener("click", () => {
       localStorage.setItem("tualoja_logged", "0");
       localStorage.removeItem("tualoja_user");
       location.href = "index.html";
     });
 
-    // --- MAPA Google ---
-    let map, marker, geocoder;
-
-    function setLatLng(lat, lng) {
-      document.getElementById("lat").value = lat;
-      document.getElementById("lng").value = lng;
-    }
-
-    function initMap() {
-      const centro = { lat: -34.6037, lng: -58.3816 }; // default ARG
-      geocoder = new google.maps.Geocoder();
-
-      map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 12,
-        center: centro,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false
-      });
-
-      marker = new google.maps.Marker({
-        position: centro,
-        map,
-        draggable: true
-      });
-
-      setLatLng(centro.lat, centro.lng);
-
-      marker.addListener("dragend", () => {
-        const pos = marker.getPosition();
-        setLatLng(pos.lat(), pos.lng());
-      });
-
-      document.getElementById("btnBuscarMapa").addEventListener("click", () => {
-        const dir = document.getElementById("direccion").value.trim();
-        if (!dir) return alert("Escribí una dirección para buscar en el mapa.");
-
-        geocoder.geocode({ address: dir }, (results, status) => {
-          if (status !== "OK" || !results?.[0]) {
-            alert("No pudimos encontrar esa dirección. Probá con más detalle.");
-            return;
-          }
-          const loc = results[0].geometry.location;
-          map.setCenter(loc);
-          map.setZoom(15);
-          marker.setPosition(loc);
-          setLatLng(loc.lat(), loc.lng());
-        });
-      });
-    }
-
-    // --- FOTOS (preview + borrar + portada) ---
+    // Fotos preview (simple)
     const fotosInput = document.getElementById("fotos");
     const preview = document.getElementById("preview");
-    const previewEmpty = document.getElementById("previewEmpty");
-
-    // guardamos objetos: { b64, name, isCover }
-    let fotos = [];
+    let fotosBase64 = [];
 
     fotosInput.addEventListener("change", async () => {
-      const files = Array.from(fotosInput.files || []);
-      if (!files.length) return;
+      preview.innerHTML = "";
+      fotosBase64 = [];
 
-      // sumamos a lo existente (no resetea)
+      const files = Array.from(fotosInput.files || []);
       for (const file of files) {
         const b64 = await fileToBase64(file);
-        fotos.push({ b64, name: file.name, isCover: fotos.length === 0 }); // primera foto = portada por defecto
-      }
-
-      // limpiar input para que puedas volver a elegir las mismas fotos si querés
-      fotosInput.value = "";
-      renderFotos();
-    });
-
-    function renderFotos() {
-      preview.innerHTML = "";
-      previewEmpty.style.display = fotos.length ? "none" : "block";
-
-      fotos.forEach((ph, idx) => {
-        const card = document.createElement("div");
-        card.className = "ph-card";
+        fotosBase64.push(b64);
 
         const img = document.createElement("img");
-        img.src = ph.b64;
-
-        if (ph.isCover) {
-          const badge = document.createElement("div");
-          badge.className = "ph-badge";
-          badge.textContent = "Portada";
-          card.appendChild(badge);
-        }
-
-        const actions = document.createElement("div");
-        actions.className = "ph-actions";
-
-        const left = document.createElement("div");
-        left.style.display = "flex";
-        left.style.gap = "8px";
-        left.style.alignItems = "center";
-
-        const btnCover = document.createElement("button");
-        btnCover.type = "button";
-        btnCover.className = "ph-btn";
-        btnCover.textContent = "Hacer portada";
-        btnCover.addEventListener("click", () => {
-          fotos = fotos.map((x, i) => ({ ...x, isCover: i === idx }));
-          renderFotos();
-        });
-
-        const btnDel = document.createElement("button");
-        btnDel.type = "button";
-        btnDel.className = "ph-btn";
-        btnDel.textContent = "Borrar";
-        btnDel.addEventListener("click", () => {
-          const wasCover = fotos[idx]?.isCover;
-          fotos.splice(idx, 1);
-          // si borró la portada, marcamos la primera como portada
-          if (wasCover && fotos.length) fotos[0].isCover = true;
-          renderFotos();
-        });
-
-        left.appendChild(btnCover);
-        left.appendChild(btnDel);
-
-        const right = document.createElement("div");
-        right.style.opacity = ".7";
-        right.textContent = `${idx + 1}/${fotos.length}`;
-
-        actions.appendChild(left);
-        actions.appendChild(right);
-
-        card.appendChild(img);
-        card.appendChild(actions);
-        preview.appendChild(card);
-      });
-    }
+        img.src = b64;
+        img.style.width = "100%";
+        img.style.height = "110px";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "12px";
+        preview.appendChild(img);
+      }
+    });
 
     function fileToBase64(file) {
       return new Promise((resolve, reject) => {
@@ -394,105 +180,42 @@
       });
     }
 
-    // --- SUBMIT: localStorage + email (FormSubmit AJAX) + redirect a gracias.html ---
-    const FORM_ENDPOINT = "https://formsubmit.co/ajax/alojamientos@tualoja.com";
-
-    document.getElementById("publishForm").addEventListener("submit", async (e) => {
+    // Guardar en localStorage
+    document.getElementById("publishForm").addEventListener("submit", (e) => {
       e.preventDefault();
       const f = e.currentTarget;
-      const msg = document.getElementById("msg");
-      const btn = document.getElementById("btnPublish");
 
-      msg.textContent = "";
-      btn.disabled = true;
-      btn.textContent = "Publicando...";
+      const servicios = Array.from(f.querySelectorAll('input[name="servicios"]:checked'))
+        .map(i => i.value);
 
-      try {
-        const servicios = Array.from(f.querySelectorAll('input[name="servicios"]:checked')).map(i => i.value);
+      const data = {
+        id: "alo_" + Date.now(),
+        titulo: f.titulo.value.trim(),
+        tipo: f.tipo.value,
+        capacidad: Number(f.capacidad.value),
+        descripcion: f.descripcion.value.trim(),
+        provincia: f.provincia.value.trim(),
+        ciudad: f.ciudad.value.trim(),
+        direccion: f.direccion.value.trim(),
+        cp: f.cp.value.trim(),
+        servicios,
+        fotos: fotosBase64,
+        precio: Number(f.precio.value),
+        minNoches: f.minNoches.value ? Number(f.minNoches.value) : null,
+        anfitrion: f.anfitrion.value.trim(),
+        telefono: f.telefono.value.trim(),
+        email: f.email.value.trim()
+      };
 
-        // ordenamos: portada primero
-        const fotosOrdenadas = [...fotos].sort((a,b) => (b.isCover ? 1 : 0) - (a.isCover ? 1 : 0));
-        const fotosBase64 = fotosOrdenadas.map(x => x.b64);
+      const arr = JSON.parse(localStorage.getItem("tualoja_listings") || "[]");
+      arr.unshift(data);
+      localStorage.setItem("tualoja_listings", JSON.stringify(arr));
 
-        const data = {
-          id: "alo_" + Date.now(),
-          titulo: f.titulo.value.trim(),
-          tipo: f.tipo.value,
-          capacidad: Number(f.capacidad.value),
-          descripcion: f.descripcion.value.trim(),
-          direccion: f.direccion.value.trim(),
-          ciudad: f.ciudad.value.trim(),
-          provincia: f.provincia.value.trim(),
-          cp: f.cp.value.trim(),
-          lat: f.lat.value,
-          lng: f.lng.value,
-          servicios,
-          fotos: fotosBase64,
-          precio: Number(f.precio.value),
-          maxNoches: f.maxNoches.value ? Number(f.maxNoches.value) : null,
-          anfitrion: f.anfitrion.value.trim(),
-          telefono: f.telefono.value.trim(),
-          email: f.email.value.trim()
-        };
-
-        // 1) Guardar en localStorage (tu MVP)
-        const arr = JSON.parse(localStorage.getItem("tualoja_listings") || "[]");
-        arr.unshift(data);
-        localStorage.setItem("tualoja_listings", JSON.stringify(arr));
-
-        // 2) Enviar email a alojamientos@tualoja.com y CC al anfitrión (FormSubmit)
-        //    Nota: FormSubmit soporta _cc, _next, _replyto, _subject, etc. :contentReference[oaicite:7]{index=7}
-        const payload = {
-          _subject: "Nueva publicación de alojamiento - TuAloja",
-          _replyto: data.email,
-          _cc: data.email, // copia al anfitrión
-          _template: "table",
-
-          titulo: data.titulo,
-          tipo: data.tipo,
-          capacidad: String(data.capacidad),
-          descripcion: data.descripcion,
-          direccion: data.direccion,
-          ciudad: data.ciudad,
-          provincia: data.provincia,
-          cp: data.cp || "-",
-          lat: data.lat,
-          lng: data.lng,
-          servicios: data.servicios.join(", ") || "-",
-          precio: String(data.precio),
-          maxNoches: data.maxNoches ? String(data.maxNoches) : "-",
-          anfitrion: data.anfitrion,
-          telefono: data.telefono || "-",
-          email: data.email
-        };
-
-        // Enviamos por AJAX JSON (FormSubmit muestra ejemplos AJAX) :contentReference[oaicite:8]{index=8}
-        const res = await fetch(FORM_ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Accept": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        // Si fallara el email, igual ya quedó en localStorage
-        if (!res.ok) {
-          console.warn("FormSubmit no respondió OK:", res.status);
-        }
-
-        // 3) Redirigir a gracias
-        location.href = "gracias.html";
-
-      } catch (err) {
-        console.error(err);
-        msg.textContent = "❌ Hubo un error al publicar. Probá de nuevo.";
-        btn.disabled = false;
-        btn.textContent = "Publicar";
-      }
+      document.getElementById("msg").textContent = "✅ Publicado (guardado en tu navegador).";
+      f.reset();
+      preview.innerHTML = "";
+      fotosBase64 = [];
     });
-  </script>
-
-  <!-- Google Maps: poné tu API KEY -->
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap">
   </script>
 </body>
 </html>
