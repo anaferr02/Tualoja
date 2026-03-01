@@ -5,51 +5,106 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Alojamiento recibido - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    .page-center {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 14px;
+      box-sizing: border-box;
+    }
+
+    .card-gracias {
+      background: #fff;
+      border-radius: 20px;
+      padding: 36px 28px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.12);
+      width: 100%;
+      max-width: 720px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .card-gracias h1 {
+      color: #1b167f;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .card-gracias p {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 18px;
+    }
+
+    .note {
+      margin: 16px auto;
+      max-width: 520px;
+      text-align: left;
+      color: #333;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .contacto {
+      margin-top: 18px;
+      color: #444;
+      font-size: 15px;
+    }
+
+    .contacto a {
+      color: #1b167f;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .volver {
+      margin-top: 24px;
+    }
+  </style>
 </head>
 
 <body>
 
-  <section class="seccion seccion-transparente">
-    <div class="contenedor" style="max-width:720px;">
+  <div class="page-center">
+    <div class="card-gracias">
 
-      <div style="
-        background:#fff;
-        border-radius:20px;
-        padding:36px 28px;
-        box-shadow:0 12px 30px rgba(0,0,0,.12);
-        text-align:center;
-      ">
-        <h1 style="color:#1b167f; margin-bottom:10px;">
-          ¡Recibimos tu alojamiento! 🎉
-        </h1>
+      <h1>¡Recibimos tu alojamiento! 🎉</h1>
 
-        <p style="font-size:16px; color:#333; margin-bottom:18px;">
-          Gracias por confiar en <b>TuAloja</b>.  
-          Tu publicación fue enviada correctamente.
-        </p>
+      <p>
+        Gracias por confiar en <b>TuAloja</b>.<br>
+        Tu publicación fue enviada correctamente.
+      </p>
 
-        <div class="note" style="margin:16px auto; max-width:520px; text-align:left;">
-          🛡️ <b>Revisión de seguridad</b><br>
-          Cada alojamiento pasa por una revisión manual para evitar estafas y anuncios falsos.
-          Si necesitamos algún dato adicional, te vamos a contactar por correo electrónico.
-        </div>
+      <div class="note">
+        🛡️ <b>Revisión de seguridad</b><br>
+        Cada alojamiento pasa por una revisión manual para evitar estafas y anuncios falsos.
+        Si necesitamos algún dato adicional, te vamos a contactar por correo electrónico.
+      </div>
 
-        <p style="margin-top:18px; color:#444;">
-  📩 Te enviamos un correo de confirmación.  
-  Si necesitás agregar o corregir algún dato, podés escribirnos a  
-  <a href="mailto:alojamientos@tualoja.com"><b>alojamientos@tualoja.com</b></a>
-</p>
+      <div class="contacto">
+        📩 Te enviamos un correo de confirmación.<br>
+        Si necesitás agregar o corregir algún dato, escribinos a
+        <a href="mailto:alojamientos@tualoja.com">alojamientos@tualoja.com</a>
+      </div>
 
-        <div style="margin-top:24px;">
-          <a href="index.html" class="btn-principal" style="text-decoration:none;">
-            Volver al inicio
-          </a>
-        </div>
-
+      <div class="volver">
+        <a href="index.html" class="btn-principal">
+          Volver al inicio
+        </a>
       </div>
 
     </div>
-  </section>
+  </div>
 
 </body>
 </html>
