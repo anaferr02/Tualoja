@@ -5,10 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Publicar alojamiento - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Solo para las fotos (no te cambia el estilo general) */
+    .preview-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .preview-item{
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255,255,255,.6);
+      border: 1px solid rgba(0,0,0,.08);
+    }
+    .preview-item img{
+      width:100%;
+      height:110px;
+      object-fit:cover;
+      display:block;
+    }
+    .preview-actions{
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      padding:8px;
+      font-size:12px;
+      align-items:center;
+    }
+    .mini-btn{
+      border: 0;
+      cursor:pointer;
+      padding:6px 8px;
+      border-radius: 10px;
+      background: rgba(0,0,0,.08);
+    }
+    .mini-badge{
+      font-size:11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.65);
+      color:#fff;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- 🔒 PROTECCIÓN: si no está logueado, vuelve a login -->
+  <!-- 🔒 Protección: si no está logueada, vuelve a login -->
   <script>
     if (localStorage.getItem("tualoja_logged") !== "1") {
       localStorage.setItem("redirect_after_login", "publicar.html");
@@ -26,16 +69,17 @@
     <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
   </header>
 
-  <main class="contenedor" style="max-width: 980px;">
-    <div class="publish-top" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin: 18px 0;">
+  <main class="contenedor">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin: 18px 0;">
       <div>
         <h1 style="margin:0;">Publicar alojamiento</h1>
-        <p class="muted" style="margin:6px 0 0;">Por ahora sin mapa (gratis). Luego lo sumamos.</p>
+        <p class="muted" style="margin:6px 0 0;">MVP sin mapa (gratis). Luego lo sumamos.</p>
       </div>
       <button class="btn btn-outline" type="button" id="btnLogout">Cerrar sesión</button>
     </div>
 
     <form id="publishForm" class="card" style="padding:16px;">
+      <!-- INFO BÁSICA -->
       <h2 style="margin-top:0;">Información básica</h2>
 
       <label>Nombre del alojamiento *</label>
@@ -61,22 +105,29 @@
 
       <hr style="margin: 16px 0; opacity:.3;" />
 
+      <!-- UBICACIÓN (sin mapa) -->
       <h2>Ubicación</h2>
 
-      <label>Provincia *</label>
-      <input name="provincia" required placeholder="Ej: Entre Ríos" />
-
-      <label>Ciudad *</label>
-      <input name="ciudad" required placeholder="Ej: Villa Elisa" />
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+        <div>
+          <label>Provincia *</label>
+          <input name="provincia" required placeholder="Ej: Entre Ríos" />
+        </div>
+        <div>
+          <label>Ciudad *</label>
+          <input name="ciudad" required placeholder="Ej: Villa Elisa" />
+        </div>
+      </div>
 
       <label>Dirección aproximada (opcional)</label>
-      <input name="direccion" placeholder="Ej: zona centro / a 3 cuadras de..." />
+      <input name="direccion" placeholder="Ej: zona centro / cerca de..." />
 
       <label>Código postal (opcional)</label>
       <input name="cp" placeholder="Ej: 3265" />
 
       <hr style="margin: 16px 0; opacity:.3;" />
 
+      <!-- SERVICIOS -->
       <h2>Servicios</h2>
       <div class="checks">
         <label><input type="checkbox" name="servicios" value="Wifi" /> Wifi</label>
@@ -91,34 +142,37 @@
 
       <hr style="margin: 16px 0; opacity:.3;" />
 
+      <!-- FOTOS -->
       <h2>Fotos</h2>
-      <p class="muted" style="margin-top:-6px;">Podés subir varias. (MVP: quedan guardadas en el navegador)</p>
+      <p class="muted" style="margin-top:-6px;">Podés subir varias. Podés borrar y elegir portada.</p>
       <input id="fotos" type="file" accept="image/*" multiple />
-      <div id="preview" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap:12px; margin-top:12px;"></div>
+      <div id="preview" class="preview-grid"></div>
 
       <hr style="margin: 16px 0; opacity:.3;" />
 
+      <!-- PRECIO -->
       <h2>Precio</h2>
       <label>Precio por noche (ARS) *</label>
       <input name="precio" type="number" min="0" required placeholder="Ej: 35000" />
 
-      <label>Mínimo de noches (opcional)</label>
-      <input name="minNoches" type="number" min="1" placeholder="Ej: 2" />
+      <label>Máximo de noches (opcional)</label>
+      <input name="maxNoches" type="number" min="1" placeholder="Ej: 14" />
 
       <hr style="margin: 16px 0; opacity:.3;" />
 
+      <!-- ANFITRIÓN -->
       <h2>Datos del anfitrión</h2>
       <label>Nombre del anfitrión *</label>
       <input name="anfitrion" required placeholder="Ej: Ana Laura" />
 
-      <label>WhatsApp (opcional)</label>
+      <label>Teléfono (opcional)</label>
       <input name="telefono" placeholder="Ej: +54 9 3447..." />
 
-      <label>Email del anfitrión *</label>
+      <label>Email de contacto *</label>
       <input name="email" type="email" required placeholder="Ej: contacto@tualoja.com" />
 
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
-        <button class="btn" type="submit">Publicar</button>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 16px;">
+        <button class="btn" type="submit" id="btnPublish">Publicar</button>
         <a class="btn btn-outline" href="index.html">Cancelar</a>
       </div>
 
@@ -141,46 +195,96 @@
 
   <script src="script.js"></script>
   <script>
+    // Logout
     document.getElementById("btnLogout").addEventListener("click", () => {
       localStorage.setItem("tualoja_logged", "0");
       localStorage.removeItem("tualoja_user");
       location.href = "index.html";
     });
 
-    // Fotos preview (simple)
+    // Fotos: preview + borrar + portada
     const fotosInput = document.getElementById("fotos");
     const preview = document.getElementById("preview");
-    let fotosBase64 = [];
+
+    // [{b64, isCover}]
+    let fotos = [];
 
     fotosInput.addEventListener("change", async () => {
-      preview.innerHTML = "";
-      fotosBase64 = [];
-
       const files = Array.from(fotosInput.files || []);
+      if (!files.length) return;
+
       for (const file of files) {
         const b64 = await fileToBase64(file);
-        fotosBase64.push(b64);
-
-        const img = document.createElement("img");
-        img.src = b64;
-        img.style.width = "100%";
-        img.style.height = "110px";
-        img.style.objectFit = "cover";
-        img.style.borderRadius = "12px";
-        preview.appendChild(img);
+        fotos.push({ b64, isCover: fotos.length === 0 }); // primera = portada
       }
+
+      fotosInput.value = ""; // permite volver a seleccionar las mismas
+      renderFotos();
     });
 
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result));
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+    function renderFotos() {
+      preview.innerHTML = "";
+      fotos.forEach((ph, idx) => {
+        const item = document.createElement("div");
+        item.className = "preview-item";
+
+        const img = document.createElement("img");
+        img.src = ph.b64;
+
+        const actions = document.createElement("div");
+        actions.className = "preview-actions";
+
+        const left = document.createElement("div");
+        left.style.display = "flex";
+        left.style.gap = "8px";
+        left.style.alignItems = "center";
+
+        const btnCover = document.createElement("button");
+        btnCover.type = "button";
+        btnCover.className = "mini-btn";
+        btnCover.textContent = "Portada";
+        btnCover.addEventListener("click", () => {
+          fotos = fotos.map((x, i) => ({ ...x, isCover: i === idx }));
+          renderFotos();
+        });
+
+        const btnDel = document.createElement("button");
+        btnDel.type = "button";
+        btnDel.className = "mini-btn";
+        btnDel.textContent = "Borrar";
+        btnDel.addEventListener("click", () => {
+          const wasCover = fotos[idx]?.isCover;
+          fotos.splice(idx, 1);
+          if (wasCover && fotos.length) fotos[0].isCover = true;
+          renderFotos();
+        });
+
+        left.appendChild(btnCover);
+        left.appendChild(btnDel);
+
+        const right = document.createElement("span");
+        right.className = "mini-badge";
+        right.textContent = ph.isCover ? "Portada" : `${idx + 1}/${fotos.length}`;
+
+        actions.appendChild(left);
+        actions.appendChild(right);
+
+        item.appendChild(img);
+        item.appendChild(actions);
+        preview.appendChild(item);
       });
     }
 
-    // Guardar en localStorage
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result));
+        r.onerror = reject;
+        r.readAsDataURL(file);
+      });
+    }
+
+    // Publicar: guarda en localStorage
     document.getElementById("publishForm").addEventListener("submit", (e) => {
       e.preventDefault();
       const f = e.currentTarget;
@@ -188,20 +292,24 @@
       const servicios = Array.from(f.querySelectorAll('input[name="servicios"]:checked'))
         .map(i => i.value);
 
+      // portada primero
+      const fotosOrdenadas = [...fotos].sort((a,b) => (b.isCover ? 1 : 0) - (a.isCover ? 1 : 0));
+      const fotosBase64 = fotosOrdenadas.map(x => x.b64);
+
       const data = {
         id: "alo_" + Date.now(),
         titulo: f.titulo.value.trim(),
         tipo: f.tipo.value,
         capacidad: Number(f.capacidad.value),
         descripcion: f.descripcion.value.trim(),
-        provincia: f.provincia.value.trim(),
-        ciudad: f.ciudad.value.trim(),
         direccion: f.direccion.value.trim(),
+        ciudad: f.ciudad.value.trim(),
+        provincia: f.provincia.value.trim(),
         cp: f.cp.value.trim(),
         servicios,
         fotos: fotosBase64,
         precio: Number(f.precio.value),
-        minNoches: f.minNoches.value ? Number(f.minNoches.value) : null,
+        maxNoches: f.maxNoches.value ? Number(f.maxNoches.value) : null,
         anfitrion: f.anfitrion.value.trim(),
         telefono: f.telefono.value.trim(),
         email: f.email.value.trim()
@@ -214,7 +322,7 @@
       document.getElementById("msg").textContent = "✅ Publicado (guardado en tu navegador).";
       f.reset();
       preview.innerHTML = "";
-      fotosBase64 = [];
+      fotos = [];
     });
   </script>
 </body>
