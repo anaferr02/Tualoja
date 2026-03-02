@@ -35,8 +35,8 @@
       <a class="nav-link" href="alojamiento.html">Registra tu alojamiento</a>
       <a class="nav-link" href="ayuda.html">Ayuda</a>
       <div id="authArea">
-      <a class="btn btn-ghost" href="login.html">Iniciar sesión</a>
-      <a class="btn btn-primary" href="register.html">Hazte una cuenta</a>
+        <a class="btn btn-ghost" href="login.html">Iniciar sesión</a>
+        <a class="btn btn-primary" href="register.html">Hazte una cuenta</a>
       </div>
     </div>
   </nav>
@@ -101,13 +101,96 @@
         <button type="button" class="panel-done" id="guestsDone">Listo</button>
       </div>
 
-      <!-- ✅ Inputs ocultos para no romper tu buscar()/resultados -->
-      <input type="hidden" id="adultos" value="0" />
+      <!-- ✅ Inputs ocultos (ahora coherentes con el selector) -->
+      <input type="hidden" id="adultos" value="1" />
       <input type="hidden" id="ninos" value="0" />
-      <input type="hidden" id="habitaciones" value="0" />
+      <input type="hidden" id="habitaciones" value="1" />
     </div>
 
     <a href="#" class="btn-header" onclick="buscar()">Buscar</a>
+  </section>
+
+  <!-- ✅ NUEVO: Destacados (MISMO estilo) -->
+  <section style="max-width:1100px;margin:26px auto 0;padding:0 20px;">
+    <h2 style="color:#1b167f;margin:0 0 10px;">Alojamientos destacados</h2>
+    <p class="muted" style="margin:0 0 14px;">Explorá opciones populares y verificadas.</p>
+
+    <div class="grid-resultados">
+      <article class="card">
+        <div class="card-media">
+          <div class="card-img placeholder">Foto del alojamiento</div>
+          <div class="card-badges">
+            <span class="badge">Destacado</span>
+            <span class="badge">Ubicación verificada</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Departamento céntrico</h3>
+          <div class="card-meta">San Salvador, Entre Ríos · 2 huéspedes</div>
+          <div class="card-price">$ 35.000 / noche</div>
+          <a class="btn btn-primary" href="resultados.html">Ver opciones</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-media">
+          <div class="card-img placeholder">Foto del alojamiento</div>
+          <div class="card-badges">
+            <span class="badge">Familiar</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Casa con patio</h3>
+          <div class="card-meta">Villa Elisa · 4 huéspedes</div>
+          <div class="card-price">$ 52.000 / noche</div>
+          <a class="btn btn-primary" href="resultados.html">Ver opciones</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-media">
+          <div class="card-img placeholder">Foto del alojamiento</div>
+          <div class="card-badges">
+            <span class="badge">Cabaña</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Cabaña tranquila</h3>
+          <div class="card-meta">Termas / Naturaleza · 3 huéspedes</div>
+          <div class="card-price">$ 44.000 / noche</div>
+          <a class="btn btn-primary" href="resultados.html">Ver opciones</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-media">
+          <div class="card-img placeholder">Foto del alojamiento</div>
+          <div class="card-badges">
+            <span class="badge">Promo</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Habitación privada</h3>
+          <div class="card-meta">Zona segura · 1–2 huéspedes</div>
+          <div class="card-price">$ 22.000 / noche</div>
+          <a class="btn btn-primary" href="resultados.html">Ver opciones</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ✅ NUEVO: Confianza (ligero, sin cambiar estilo) -->
+  <section style="max-width:1100px;margin:26px auto 40px;padding:0 20px;">
+    <h2 style="color:#1b167f;margin:0 0 10px;">Reservá con confianza</h2>
+    <div>
+      <span class="badge">Ubicaciones verificables</span>
+      <span class="badge">Política anti-estafas</span>
+      <span class="badge">Soporte por correo</span>
+      <span class="badge">Términos y condiciones claros</span>
+    </div>
+    <p class="muted" style="margin-top:12px;">
+      Tip: revisá siempre la ubicación y las fotos. Si algo no cierra, consultanos desde Ayuda.
+    </p>
   </section>
 </main>
 
@@ -150,7 +233,8 @@
 
     const kidsAges = document.getElementById("kidsAges");
 
-    let adults = 0, kids = 0, rooms = 0;
+    // ✅ FIX: arrancar coherente con tu UI
+    let adults = 1, kids = 0, rooms = 1;
 
     function updateSummary(){
       summary.textContent =
@@ -231,7 +315,7 @@
 </script>
 
 <script type="module" src="script.js"></script>
-  <script>
+<script>
   const authArea = document.getElementById("authArea");
   const logged = localStorage.getItem("tualoja_logged");
   const user = JSON.parse(localStorage.getItem("tualoja_user") || "{}");
@@ -242,5 +326,6 @@
     `;
   }
 </script>
+
 </body>
 </html>
