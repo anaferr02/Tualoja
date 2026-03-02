@@ -1,127 +1,25 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tualoja - Alquila fácil, viaja feliz</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
+<section class="home-wrap">
+  <div class="home-panel">
 
-<body>
-
-<header>
-  <a href="index.html" class="logo">
-    <span class="icono-maleta">🧳</span> Tualoja.com
-  </a>
-
-  <button class="hamburger" id="hamburgerBtn" type="button">☰</button>
-
-  <nav id="mainNav">
-    <div class="nav-left">
-      <select id="idioma">
-        <option value="es">Español</option>
-        <option value="en">English</option>
-        <option value="pt">Português</option>
-      </select>
-
-      <select id="moneda">
-        <option value="ars">ARS</option>
-        <option value="usd">USD</option>
-        <option value="eur">EUR</option>
-      </select>
-    </div>
-
-    <div class="nav-right">
-      <a class="nav-link" href="alojamiento.html">Registra tu alojamiento</a>
-      <a class="nav-link" href="ayuda.html">Ayuda</a>
-      <div id="authArea">
-        <a class="btn btn-ghost" href="login.html">Iniciar sesión</a>
-        <a class="btn btn-primary" href="register.html">Hazte una cuenta</a>
+    <div class="home-head">
+      <div>
+        <h2>Alojamientos destacados</h2>
+        <p>Explorá opciones populares y verificadas.</p>
+      </div>
+      <div class="home-actions">
+        <a class="btn btn-ghost" href="resultados.html">Ver todos</a>
+        <a class="btn btn-primary" href="alojamiento.html">Publicar</a>
       </div>
     </div>
-  </nav>
-</header>
-
-<main>
-  <section class="hero">
-    <h2>Alquila fácil, viaja feliz</h2>
-    <p>Las mejores opciones para tu próxima estadía.</p>
-  </section>
-
-  <section class="search-box">
-    <input type="text" id="destino" placeholder="Destino" />
-    <input type="date" id="entrada" />
-    <input type="date" id="salida" />
-
-    <!-- ✅ Selector tipo Booking -->
-    <div class="guests">
-      <button type="button" class="guests-btn" id="guestsBtn" aria-expanded="false">
-        <span id="guestsSummary">1 adulto · 0 niños · 1 habitación</span>
-        <span class="chev">▾</span>
-      </button>
-
-      <div class="guests-panel" id="guestsPanel" aria-hidden="true">
-        <div class="row">
-          <div>
-            <div class="row-title">Adultos</div>
-            <div class="row-sub">13 años o más</div>
-          </div>
-          <div class="stepper">
-            <button type="button" class="step" id="adultsMinus">−</button>
-            <span class="count" id="adultsCount">1</span>
-            <button type="button" class="step" id="adultsPlus">+</button>
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <div class="row-title">Niños</div>
-            <div class="row-sub">0–12 años</div>
-          </div>
-          <div class="stepper">
-            <button type="button" class="step" id="kidsMinus">−</button>
-            <span class="count" id="kidsCount">0</span>
-            <button type="button" class="step" id="kidsPlus">+</button>
-          </div>
-        </div>
-
-        <div id="kidsAges" class="kids-ages"></div>
-
-        <div class="row">
-          <div>
-            <div class="row-title">Habitaciones</div>
-          </div>
-          <div class="stepper">
-            <button type="button" class="step" id="roomsMinus">−</button>
-            <span class="count" id="roomsCount">1</span>
-            <button type="button" class="step" id="roomsPlus">+</button>
-          </div>
-        </div>
-
-        <button type="button" class="panel-done" id="guestsDone">Listo</button>
-      </div>
-
-      <!-- ✅ Inputs ocultos (ahora coherentes con el selector) -->
-      <input type="hidden" id="adultos" value="1" />
-      <input type="hidden" id="ninos" value="0" />
-      <input type="hidden" id="habitaciones" value="1" />
-    </div>
-
-    <a href="#" class="btn-header" onclick="buscar()">Buscar</a>
-  </section>
-
-  <!-- ✅ NUEVO: Destacados (MISMO estilo) -->
-  <section style="max-width:1100px;margin:26px auto 0;padding:0 20px;">
-    <h2 style="color:#1b167f;margin:0 0 10px;">Alojamientos destacados</h2>
-    <p class="muted" style="margin:0 0 14px;">Explorá opciones populares y verificadas.</p>
 
     <div class="grid-resultados">
+      <!-- Card 1 -->
       <article class="card">
         <div class="card-media">
           <div class="card-img placeholder">Foto del alojamiento</div>
           <div class="card-badges">
             <span class="badge">Destacado</span>
-            <span class="badge">Ubicación verificada</span>
+            <span class="badge">Verificado</span>
           </div>
         </div>
         <div class="card-body">
@@ -132,6 +30,7 @@
         </div>
       </article>
 
+      <!-- Card 2 -->
       <article class="card">
         <div class="card-media">
           <div class="card-img placeholder">Foto del alojamiento</div>
@@ -147,6 +46,7 @@
         </div>
       </article>
 
+      <!-- Card 3 -->
       <article class="card">
         <div class="card-media">
           <div class="card-img placeholder">Foto del alojamiento</div>
@@ -156,12 +56,13 @@
         </div>
         <div class="card-body">
           <h3 class="card-title">Cabaña tranquila</h3>
-          <div class="card-meta">Termas / Naturaleza · 3 huéspedes</div>
+          <div class="card-meta">Naturaleza · 3 huéspedes</div>
           <div class="card-price">$ 44.000 / noche</div>
           <a class="btn btn-primary" href="resultados.html">Ver opciones</a>
         </div>
       </article>
 
+      <!-- Card 4 -->
       <article class="card">
         <div class="card-media">
           <div class="card-img placeholder">Foto del alojamiento</div>
@@ -177,155 +78,49 @@
         </div>
       </article>
     </div>
-  </section>
 
-  <!-- ✅ NUEVO: Confianza (ligero, sin cambiar estilo) -->
-  <section style="max-width:1100px;margin:26px auto 40px;padding:0 20px;">
-    <h2 style="color:#1b167f;margin:0 0 10px;">Reservá con confianza</h2>
-    <div>
+    <hr style="border:none;border-top:1px solid rgba(0,0,0,.08);margin:22px 0;">
+
+    <div class="home-head">
+      <div>
+        <h2>Reservá con confianza</h2>
+        <p>Políticas claras + ubicación verificable para evitar estafas.</p>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px;">
       <span class="badge">Ubicaciones verificables</span>
       <span class="badge">Política anti-estafas</span>
       <span class="badge">Soporte por correo</span>
-      <span class="badge">Términos y condiciones claros</span>
+      <span class="badge">Términos claros</span>
     </div>
-    <p class="muted" style="margin-top:12px;">
-      Tip: revisá siempre la ubicación y las fotos. Si algo no cierra, consultanos desde Ayuda.
-    </p>
-  </section>
-</main>
 
-<footer>
-  <p>© 2026 TuAloja. Todos los derechos reservados.</p>
-  <div class="footer-legal">
-    <a href="politica-de-privacidad.html">Política de Privacidad</a> |
-    <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
-    <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
-    <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    <!-- Reseñas (simple, pero queda como la maqueta) -->
+    <div class="grid-resultados">
+      <article class="card">
+        <div class="card-body">
+          <h3 class="card-title">“Muy fácil de usar”</h3>
+          <p class="card-sub muted"> Informacion clara.</p>
+          <div class="card-meta">⭐️⭐️⭐️⭐️⭐️ — Mariana</div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-body">
+          <h3 class="card-title">“Me dio confianza”</h3>
+          <p class="card-sub muted">Pude revisar ubicación y políticas antes de reservar.</p>
+          <div class="card-meta">⭐️⭐️⭐️⭐️⭐️ — Lucas</div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-body">
+          <h3 class="card-title">“Publicar fue simple”</h3>
+          <p class="card-sub muted">Subí fotos y cargué datos en pocos minutos.</p>
+          <div class="card-meta">⭐️⭐️⭐️⭐️⭐️ — Anfitrión</div>
+        </div>
+      </article>
+    </div>
+
   </div>
-</footer>
-
-<script>
-  function buscar(){
-    window.location.href="resultados.html";
-  }
-
-  // ✅ Panel tipo Booking (adultos/niños/habitaciones + edades)
-  (function(){
-    const btn = document.getElementById("guestsBtn");
-    const panel = document.getElementById("guestsPanel");
-    const done = document.getElementById("guestsDone");
-    const summary = document.getElementById("guestsSummary");
-
-    const adultsH = document.getElementById("adultos");
-    const kidsH = document.getElementById("ninos");
-    const roomsH = document.getElementById("habitaciones");
-
-    const adultsCount = document.getElementById("adultsCount");
-    const kidsCount = document.getElementById("kidsCount");
-    const roomsCount = document.getElementById("roomsCount");
-
-    const adultsMinus = document.getElementById("adultsMinus");
-    const adultsPlus  = document.getElementById("adultsPlus");
-    const kidsMinus   = document.getElementById("kidsMinus");
-    const kidsPlus    = document.getElementById("kidsPlus");
-    const roomsMinus  = document.getElementById("roomsMinus");
-    const roomsPlus   = document.getElementById("roomsPlus");
-
-    const kidsAges = document.getElementById("kidsAges");
-
-    // ✅ FIX: arrancar coherente con tu UI
-    let adults = 1, kids = 0, rooms = 1;
-
-    function updateSummary(){
-      summary.textContent =
-        `${adults} adulto${adults>1?"s":""} · ${kids} niño${kids!==1?"s":""} · ${rooms} habitación${rooms>1?"es":""}`;
-
-      adultsH.value = String(adults);
-      kidsH.value = String(kids);
-      roomsH.value = String(rooms);
-
-      adultsCount.textContent = adults;
-      kidsCount.textContent = kids;
-      roomsCount.textContent = rooms;
-
-      adultsMinus.disabled = adults <= 1;
-      kidsMinus.disabled = kids <= 0;
-      roomsMinus.disabled = rooms <= 1;
-    }
-
-    function renderKidsAges(){
-      kidsAges.innerHTML = "";
-      for(let i=1; i<=kids; i++){
-        const sel = document.createElement("select");
-        sel.name = `edad-nino-${i}`;
-        sel.dataset.index = String(i);
-
-        const placeholder = document.createElement("option");
-        placeholder.value = "";
-        placeholder.textContent = `Edad niño ${i}`;
-        placeholder.disabled = true;
-        placeholder.selected = true;
-        sel.appendChild(placeholder);
-
-        for(let age=0; age<=17; age++){
-          const opt = document.createElement("option");
-          opt.value = String(age);
-          opt.textContent = `${age} año${age!==1?"s":""}`;
-          sel.appendChild(opt);
-        }
-        kidsAges.appendChild(sel);
-      }
-    }
-
-    function openPanel(){
-      panel.classList.add("open");
-      btn.setAttribute("aria-expanded","true");
-      panel.setAttribute("aria-hidden","false");
-    }
-
-    function closePanel(){
-      panel.classList.remove("open");
-      btn.setAttribute("aria-expanded","false");
-      panel.setAttribute("aria-hidden","true");
-    }
-
-    btn.addEventListener("click", (e)=>{
-      e.preventDefault();
-      panel.classList.contains("open") ? closePanel() : openPanel();
-    });
-
-    done.addEventListener("click", closePanel);
-
-    document.addEventListener("click", (e)=>{
-      if(!panel.contains(e.target) && !btn.contains(e.target)) closePanel();
-    });
-
-    adultsMinus.addEventListener("click", ()=>{ adults = Math.max(1, adults-1); updateSummary(); });
-    adultsPlus.addEventListener("click",  ()=>{ adults = adults+1; updateSummary(); });
-
-    kidsMinus.addEventListener("click", ()=>{ kids = Math.max(0, kids-1); renderKidsAges(); updateSummary(); });
-    kidsPlus.addEventListener("click",  ()=>{ kids = kids+1; renderKidsAges(); updateSummary(); });
-
-    roomsMinus.addEventListener("click", ()=>{ rooms = Math.max(1, rooms-1); updateSummary(); });
-    roomsPlus.addEventListener("click",  ()=>{ rooms = rooms+1; updateSummary(); });
-
-    updateSummary();
-    renderKidsAges();
-  })();
-</script>
-
-<script type="module" src="script.js"></script>
-<script>
-  const authArea = document.getElementById("authArea");
-  const logged = localStorage.getItem("tualoja_logged");
-  const user = JSON.parse(localStorage.getItem("tualoja_user") || "{}");
-
-  if (logged === "1" && user?.email) {
-    authArea.innerHTML = `
-      <a class="btn btn-primary" href="mi-cuenta.html">Cuenta</a>
-    `;
-  }
-</script>
-
-</body>
-</html>
+</section>
