@@ -2,65 +2,265 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mi cuenta - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .page-wrap{ max-width: 980px; margin: 24px auto 40px; padding: 0 16px; }
+    .card{
+      background: rgba(255,255,255,.85);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 22px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.12);
+      padding: 18px;
+    }
+    .top{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+    .top h1{ margin:0; }
+    .muted{ opacity:.85; }
+
+    .grid-2{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    @media (max-width: 720px){ .grid-2{ grid-template-columns: 1fr; } }
+
+    .box{
+      background: rgba(255,255,255,.65);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 18px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .box h3{ margin:0 0 10px; }
+
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top: 10px;
+    }
+    .mini-btn{
+      border:0; cursor:pointer;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.08);
+    }
+    .mini-btn.primary{
+      background:#1b167f;
+      color:#fff;
+      font-weight: 800;
+    }
+    .mini-btn.danger{
+      background: rgba(176,0,32,.12);
+      color:#b00020;
+      font-weight: 800;
+    }
+
+    label{ display:block; font-weight: 600; margin-top: 10px; }
+    input{
+      width:100%;
+      box-sizing:border-box;
+      margin-top: 6px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: #fff;
+      outline: none;
+    }
+    .msg{
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color:#1b167f;
+      display:none;
+    }
+    .err{
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color:#b00020;
+      display:none;
+    }
+  </style>
 </head>
 
 <body>
+  <!-- 🔒 Protección: solo logueado -->
+  <script>
+    if (localStorage.getItem("tualoja_logged") !== "1") {
+      localStorage.setItem("redirect_after_login", "mi-cuenta.html");
+      location.href = "login.html";
+    }
+  </script>
 
-<script>
-  // Protección: si no está logueado, vuelve a login
-  if (localStorage.getItem("tualoja_logged") !== "1") {
-    window.location.href = "login.html";
-  }
-</script>
+  <header class="header">
+    <a class="logo" href="index.html">TuAloja.com</a>
+    <nav id="mainNav" class="nav">
+      <a href="mi-cuenta.html">Mi cuenta</a>
+      <a href="mis-reservas.html">Mis reservas</a>
+      <a href="publicar.html">Publicar</a>
+      <a href="panel-anfitrion.html">Panel anfitrión</a>
+      <span id="navAuth"></span>
+    </nav>
+    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
+  </header>
 
-<header>
-  <a href="index.html" class="logo">
-    <span class="icono-maleta">🧳</span> Tualoja.com
-  </a>
+  <main class="page-wrap">
+    <div class="card">
+      <div class="top">
+        <div>
+          <h1>Mi cuenta</h1>
+          <p class="muted" style="margin:6px 0 0;">
+            Tu perfil y accesos rápidos.
+          </p>
+        </div>
+        <button class="mini-btn danger" id="btnLogout" type="button">Cerrar sesión</button>
+      </div>
 
-  <nav id="mainNav">
-    <div class="nav-right">
-      <a class="nav-link" href="index.html">Inicio</a>
-      <a class="nav-link" href="publicar.html">Publicar alojamiento</a>
-      <a class="nav-link" href="mis-reservas.html">Mis reservas</a>
-      <a class="btn btn-ghost" href="#" id="logoutBtn">Cerrar sesión</a>
+      <!-- DATOS -->
+      <section class="box">
+        <h3>Datos</h3>
+        <div class="grid-2">
+          <div>
+            <label>Nombre</label>
+            <input id="name" placeholder="Tu nombre" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input id="email" disabled />
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="mini-btn primary" id="btnSave" type="button">Guardar</button>
+        </div>
+
+        <div id="msg" class="msg"></div>
+      </section>
+
+      <!-- ACCESOS -->
+      <section class="box">
+        <h3>Accesos rápidos</h3>
+        <div class="row">
+          <a class="mini-btn" href="mis-reservas.html">Ver mis reservas</a>
+          <a class="mini-btn" href="panel-anfitrion.html">Panel anfitrión</a>
+          <a class="mini-btn primary" href="publicar.html">+ Publicar alojamiento</a>
+        </div>
+        <p class="muted" style="margin:10px 0 0;">
+          Tip: si publicás desde otro celular o navegador, en MVP no se ven porque se guarda localmente.
+        </p>
+      </section>
+
+      <!-- CAMBIAR CONTRASEÑA (MVP) -->
+      <section class="box">
+        <h3>Cambiar contraseña</h3>
+
+        <div class="grid-2">
+          <div>
+            <label>Nueva contraseña</label>
+            <input id="pass1" type="password" placeholder="Nueva contraseña" />
+          </div>
+          <div>
+            <label>Repetir contraseña</label>
+            <input id="pass2" type="password" placeholder="Repetir contraseña" />
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="mini-btn" id="btnPass" type="button">Actualizar contraseña</button>
+        </div>
+
+        <div id="err" class="err"></div>
+        <div id="ok" class="msg"></div>
+      </section>
     </div>
-  </nav>
-</header>
+  </main>
 
-<main>
-  <section class="hero">
-    <h2>Mi cuenta</h2>
-    <p id="userInfo"></p>
-  </section>
+  <footer class="footer-ayuda">
+    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+  </footer>
 
-  <section class="search-box" style="background:#fff;">
-    <a class="btn btn-primary" href="publicar.html">➕ Publicar alojamiento</a>
-    <a class="btn btn-ghost" href="mis-reservas.html">📄 Mis reservas</a>
-  </section>
-</main>
+  <script>
+    const usersKey = "tualoja_users";
+    const myEmail = (localStorage.getItem("tualoja_user") || "").toLowerCase();
 
-<footer>
-  <p>© 2026 TuAloja. Todos los derechos reservados.</p>
-</footer>
+    const emailEl = document.getElementById("email");
+    const nameEl = document.getElementById("name");
+    const msg = document.getElementById("msg");
 
-<script>
-  const user = JSON.parse(localStorage.getItem("tualoja_user") || "{}");
+    const err = document.getElementById("err");
+    const ok = document.getElementById("ok");
 
-  if (user?.email) {
-    document.getElementById("userInfo").textContent =
-      `Sesión iniciada como ${user.email}`;
-  }
+    function loadUsers() {
+      return JSON.parse(localStorage.getItem(usersKey) || "[]");
+    }
+    function saveUsers(u) {
+      localStorage.setItem(usersKey, JSON.stringify(u));
+    }
 
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    localStorage.removeItem("tualoja_logged");
-    localStorage.removeItem("tualoja_user");
-    window.location.href = "index.html";
-  });
-</script>
+    // Cargar datos
+    (function init(){
+      emailEl.value = myEmail || "";
+      const users = loadUsers();
+      const user = users.find(u => (u.email || "").toLowerCase() === myEmail);
+      nameEl.value = user?.name || "";
+    })();
 
+    // Guardar nombre
+    document.getElementById("btnSave").addEventListener("click", () => {
+      msg.style.display = "none";
+      const name = nameEl.value.trim();
+      const users = loadUsers();
+      const idx = users.findIndex(u => (u.email || "").toLowerCase() === myEmail);
+      if (idx === -1) return;
+
+      users[idx].name = name;
+      saveUsers(users);
+
+      msg.textContent = "✅ Datos guardados.";
+      msg.style.display = "block";
+    });
+
+    // Cambiar contraseña
+    document.getElementById("btnPass").addEventListener("click", () => {
+      err.style.display = "none";
+      ok.style.display = "none";
+
+      const p1 = document.getElementById("pass1").value;
+      const p2 = document.getElementById("pass2").value;
+
+      if (p1.length < 4) {
+        err.textContent = "La contraseña debe tener al menos 4 caracteres.";
+        err.style.display = "block";
+        return;
+      }
+      if (p1 !== p2) {
+        err.textContent = "Las contraseñas no coinciden.";
+        err.style.display = "block";
+        return;
+      }
+
+      const users = loadUsers();
+      const idx = users.findIndex(u => (u.email || "").toLowerCase() === myEmail);
+      if (idx === -1) return;
+
+      users[idx].password = p1;
+      saveUsers(users);
+
+      ok.textContent = "✅ Contraseña actualizada.";
+      ok.style.display = "block";
+
+      document.getElementById("pass1").value = "";
+      document.getElementById("pass2").value = "";
+    });
+
+    // Logout
+    document.getElementById("btnLogout").addEventListener("click", () => {
+      localStorage.setItem("tualoja_logged", "0");
+      localStorage.removeItem("tualoja_user");
+      location.href = "index.html";
+    });
+  </script>
+
+  <script src="script.js"></script>
 </body>
 </html>
