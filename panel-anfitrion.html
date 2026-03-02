@@ -4,14 +4,444 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel anfitrión - TuAloja</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .page-wrap{ max-width: 1040px; margin: 24px auto 40px; padding: 0 16px; }
+    .card{
+      background: rgba(255,255,255,.85);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 22px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.12);
+      padding: 18px;
+    }
+    .top{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+      margin-bottom: 12px;
+    }
+    .top h1{ margin:0; }
+    .muted{ opacity:.85; }
+    .btn{ cursor:pointer; }
+    .btn-row{ display:flex; gap:10px; flex-wrap:wrap; }
+
+    .list{ margin-top: 12px; display:grid; gap: 12px; }
+    .item{
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 18px;
+      padding: 14px;
+      display:grid;
+      grid-template-columns: 150px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    @media (max-width: 720px){
+      .item{ grid-template-columns: 1fr; }
+    }
+
+    .thumb{
+      width: 100%;
+      height: 120px;
+      border-radius: 14px;
+      overflow:hidden;
+      background: rgba(0,0,0,.06);
+      border: 1px solid rgba(0,0,0,.08);
+    }
+    .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .meta h3{ margin:0 0 4px; }
+    .meta p{ margin:0; color:#333; }
+
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .chip{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.08);
+      border: 1px solid rgba(0,0,0,.06);
+      white-space: nowrap;
+    }
+    .chip-strong{
+      background: rgba(27,22,127,.12);
+      border-color: rgba(27,22,127,.22);
+      color:#1b167f;
+      font-weight: 700;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .mini-btn{
+      border:0; cursor:pointer;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.08);
+    }
+    .mini-btn.danger{
+      background: rgba(176,0,32,.12);
+      color:#b00020;
+      font-weight: 700;
+    }
+
+    /* Modal simple */
+    .modal-backdrop{
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 50;
+    }
+    .modal{
+      width: min(720px, 96vw);
+      background:#fff;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.20);
+    }
+    .modal-top{
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+      margin-bottom: 10px;
+    }
+    .modal-top h2{ margin:0; color:#1b167f; }
+    .close-x{
+      border:0; cursor:pointer;
+      background: rgba(0,0,0,.08);
+      border-radius: 12px;
+      padding: 8px 10px;
+    }
+    .grid-2{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    @media (max-width: 720px){ .grid-2{ grid-template-columns: 1fr; } }
+    label{ display:block; font-weight: 600; margin-top: 10px; }
+    input, textarea{
+      width:100%;
+      box-sizing:border-box;
+      margin-top: 6px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: #fff;
+      outline: none;
+    }
+    textarea{ resize: vertical; }
+    .modal-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
+    .primary{
+      border:0; cursor:pointer;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background:#1b167f;
+      color:#fff;
+      font-weight: 800;
+    }
+  </style>
 </head>
+
 <body>
-  <h2>Mis alojamientos</h2>
-  <div data-mis-alojamientos></div>
+  <!-- 🔒 Protección: solo logueado -->
+  <script>
+    if (localStorage.getItem("tualoja_logged") !== "1") {
+      localStorage.setItem("redirect_after_login", "panel-anfitrion.html");
+      location.href = "login.html";
+    }
+  </script>
 
-  <h2>Reservas recibidas</h2>
-  <div data-reservas-host></div>
+  <header class="header">
+    <a class="logo" href="index.html">TuAloja.com</a>
+    <nav id="mainNav" class="nav">
+      <a href="publicar.html">Publicar alojamiento</a>
+      <a href="ayuda.html">Ayuda</a>
+      <span id="navAuth"></span>
+    </nav>
+    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
+  </header>
 
-  <script type="module" src="./public/js/panel-anfitrion.js"></script>
+  <main class="page-wrap">
+    <div class="card">
+      <div class="top">
+        <div>
+          <h1>Panel anfitrión</h1>
+          <p class="muted" style="margin:6px 0 0;">
+            Acá ves tus publicaciones (guardadas en este navegador).
+          </p>
+        </div>
+
+        <div class="btn-row">
+          <a class="btn btn-outline" href="publicar.html">+ Publicar</a>
+          <button class="btn btn-outline" id="btnLogout" type="button">Cerrar sesión</button>
+        </div>
+      </div>
+
+      <div id="summary" class="muted"></div>
+      <div id="list" class="list"></div>
+      <p id="empty" class="muted" style="display:none; margin-top:12px;">
+        Todavía no tenés publicaciones. Tocá “+ Publicar”.
+      </p>
+    </div>
+  </main>
+
+  <!-- Modal editar -->
+  <div id="backdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-top">
+        <h2>Editar publicación</h2>
+        <button class="close-x" id="closeModal" type="button">✕</button>
+      </div>
+
+      <form id="editForm">
+        <input type="hidden" name="id" />
+
+        <label>Título</label>
+        <input name="titulo" required />
+
+        <div class="grid-2">
+          <div>
+            <label>Precio por noche (ARS)</label>
+            <input name="precio" type="number" min="0" required />
+          </div>
+          <div>
+            <label>Máximo de noches</label>
+            <input name="maxNoches" type="number" min="1" max="365" />
+          </div>
+        </div>
+
+        <label>Descripción</label>
+        <textarea name="descripcion" rows="4" required></textarea>
+
+        <div class="modal-actions">
+          <button class="primary" type="submit">Guardar cambios</button>
+          <button class="btn btn-outline" id="cancelModal" type="button">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer-ayuda">
+    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
+    // Logout
+    document.getElementById("btnLogout").addEventListener("click", () => {
+      localStorage.setItem("tualoja_logged", "0");
+      localStorage.removeItem("tualoja_user");
+      location.href = "index.html";
+    });
+
+    // Helpers storage
+    const KEY = "tualoja_listings";
+    const myEmail = (localStorage.getItem("tualoja_user") || "").toLowerCase();
+
+    function loadAll() {
+      return JSON.parse(localStorage.getItem(KEY) || "[]");
+    }
+    function saveAll(arr) {
+      localStorage.setItem(KEY, JSON.stringify(arr));
+    }
+
+    function coverFromFotos(listing) {
+      if (!listing?.fotos?.length) return "";
+      // En publicar ya mandás portada primero, pero por las dudas:
+      return listing.fotos[0];
+    }
+
+    function formatARS(n) {
+      const num = Number(n || 0);
+      try {
+        return num.toLocaleString("es-AR");
+      } catch {
+        return String(num);
+      }
+    }
+
+    function render() {
+      const list = document.getElementById("list");
+      const empty = document.getElementById("empty");
+      const summary = document.getElementById("summary");
+
+      const all = loadAll();
+
+      // Mis publicaciones = las que coinciden por email
+      const mine = all.filter(x => (x.email || "").toLowerCase() === myEmail);
+
+      summary.textContent = `Publicaciones: ${mine.length}`;
+
+      list.innerHTML = "";
+
+      if (!mine.length) {
+        empty.style.display = "block";
+        return;
+      }
+      empty.style.display = "none";
+
+      mine.forEach((x) => {
+        const item = document.createElement("div");
+        item.className = "item";
+
+        const imgWrap = document.createElement("div");
+        imgWrap.className = "thumb";
+        const cover = coverFromFotos(x);
+        if (cover) {
+          const img = document.createElement("img");
+          img.src = cover;
+          img.alt = x.titulo || "Alojamiento";
+          imgWrap.appendChild(img);
+        }
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.innerHTML = `
+          <h3>${escapeHTML(x.titulo || "Sin título")}</h3>
+          <p><b>${escapeHTML(x.ciudad || "-")}</b>, ${escapeHTML(x.provincia || "-")}</p>
+          <div class="chips">
+            <span class="chip chip-strong">⏳ Pendiente de revisión</span>
+            <span class="chip">ARS $${formatARS(x.precio)}</span>
+            <span class="chip">Máx. noches: ${x.maxNoches ?? 30}</span>
+            <span class="chip">ID: ${escapeHTML(x.id || "")}</span>
+          </div>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const btnEdit = document.createElement("button");
+        btnEdit.type = "button";
+        btnEdit.className = "mini-btn";
+        btnEdit.textContent = "Editar";
+        btnEdit.onclick = () => openEdit(x.id);
+
+        const btnCopy = document.createElement("button");
+        btnCopy.type = "button";
+        btnCopy.className = "mini-btn";
+        btnCopy.textContent = "Copiar ID";
+        btnCopy.onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(x.id || "");
+            toast("✅ ID copiado");
+          } catch {
+            toast("No pude copiar. Copialo manualmente.");
+          }
+        };
+
+        const btnDel = document.createElement("button");
+        btnDel.type = "button";
+        btnDel.className = "mini-btn danger";
+        btnDel.textContent = "Eliminar";
+        btnDel.onclick = () => {
+          const ok = confirm("¿Eliminar esta publicación?");
+          if (!ok) return;
+          const all2 = loadAll().filter(z => z.id !== x.id);
+          saveAll(all2);
+          render();
+          toast("✅ Eliminado");
+        };
+
+        actions.appendChild(btnEdit);
+        actions.appendChild(btnCopy);
+        actions.appendChild(btnDel);
+
+        meta.appendChild(actions);
+
+        item.appendChild(imgWrap);
+        item.appendChild(meta);
+        list.appendChild(item);
+      });
+    }
+
+    // Modal editar
+    const backdrop = document.getElementById("backdrop");
+    const editForm = document.getElementById("editForm");
+
+    function openEdit(id) {
+      const all = loadAll();
+      const item = all.find(x => x.id === id);
+      if (!item) return;
+
+      editForm.id.value = item.id;
+      editForm.titulo.value = item.titulo || "";
+      editForm.precio.value = Number(item.precio || 0);
+      editForm.maxNoches.value = item.maxNoches ?? 30;
+      editForm.descripcion.value = item.descripcion || "";
+
+      backdrop.style.display = "flex";
+    }
+
+    function closeEdit() {
+      backdrop.style.display = "none";
+    }
+
+    document.getElementById("closeModal").addEventListener("click", closeEdit);
+    document.getElementById("cancelModal").addEventListener("click", closeEdit);
+    backdrop.addEventListener("click", (e) => {
+      if (e.target === backdrop) closeEdit();
+    });
+
+    editForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const id = editForm.id.value;
+
+      // default maxNoches 30 + límites
+      let maxNoches = parseInt(editForm.maxNoches.value || "30", 10);
+      if (Number.isNaN(maxNoches)) maxNoches = 30;
+      if (maxNoches < 1) maxNoches = 1;
+      if (maxNoches > 365) maxNoches = 365;
+
+      const all = loadAll();
+      const idx = all.findIndex(x => x.id === id);
+      if (idx === -1) return;
+
+      all[idx].titulo = editForm.titulo.value.trim();
+      all[idx].precio = Number(editForm.precio.value || 0);
+      all[idx].maxNoches = maxNoches;
+      all[idx].descripcion = editForm.descripcion.value.trim();
+      // moneda fija
+      all[idx].moneda = "ARS";
+
+      saveAll(all);
+      closeEdit();
+      render();
+      toast("✅ Guardado");
+    });
+
+    // Toast simple
+    let toastTimer = null;
+    function toast(msg) {
+      clearTimeout(toastTimer);
+      let el = document.getElementById("toast");
+      if (!el) {
+        el = document.createElement("div");
+        el.id = "toast";
+        el.style.position = "fixed";
+        el.style.left = "50%";
+        el.style.bottom = "18px";
+        el.style.transform = "translateX(-50%)";
+        el.style.background = "rgba(0,0,0,.75)";
+        el.style.color = "#fff";
+        el.style.padding = "10px 14px";
+        el.style.borderRadius = "999px";
+        el.style.fontSize = "13px";
+        el.style.zIndex = "999";
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      el.style.display = "block";
+      toastTimer = setTimeout(() => { el.style.display = "none"; }, 1600);
+    }
+
+    function escapeHTML(str) {
+      return String(str || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // Init
+    render();
+  </script>
 </body>
 </html>
