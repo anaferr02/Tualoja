@@ -4,11 +4,413 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mis reservas - TuAloja</title>
-</head>
-<body>
-  <h2>Mis reservas</h2>
-  <div data-reservas></div>
+  <link rel="stylesheet" href="style.css" />
 
-  <script type="module" src="./public/js/mis-reservas.js"></script>
+  <style>
+    .page-wrap{ max-width: 1040px; margin: 24px auto 40px; padding: 0 16px; }
+    .card{
+      background: rgba(255,255,255,.85);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 22px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.12);
+      padding: 18px;
+    }
+    .top{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+      margin-bottom: 12px;
+    }
+    .top h1{ margin:0; }
+    .muted{ opacity:.85; }
+
+    .btn{ cursor:pointer; }
+    .btn-row{ display:flex; gap:10px; flex-wrap:wrap; }
+
+    .list{ margin-top: 12px; display:grid; gap: 12px; }
+
+    .item{
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 18px;
+      padding: 14px;
+      display:grid;
+      grid-template-columns: 150px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    @media (max-width: 720px){
+      .item{ grid-template-columns: 1fr; }
+    }
+
+    .thumb{
+      width: 100%;
+      height: 120px;
+      border-radius: 14px;
+      overflow:hidden;
+      background: rgba(0,0,0,.06);
+      border: 1px solid rgba(0,0,0,.08);
+    }
+    .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .meta h3{ margin:0 0 4px; }
+    .meta p{ margin:0; color:#333; }
+
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .chip{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.08);
+      border: 1px solid rgba(0,0,0,.06);
+      white-space: nowrap;
+    }
+    .chip-strong{
+      background: rgba(27,22,127,.12);
+      border-color: rgba(27,22,127,.22);
+      color:#1b167f;
+      font-weight: 800;
+    }
+    .chip-ok{
+      background: rgba(0,128,0,.10);
+      border-color: rgba(0,128,0,.20);
+      color: rgba(0,128,0,.95);
+      font-weight: 800;
+    }
+    .chip-bad{
+      background: rgba(176,0,32,.10);
+      border-color: rgba(176,0,32,.20);
+      color:#b00020;
+      font-weight: 800;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .mini-btn{
+      border:0; cursor:pointer;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.08);
+    }
+    .mini-btn.danger{
+      background: rgba(176,0,32,.12);
+      color:#b00020;
+      font-weight: 800;
+    }
+
+    .hr{
+      height:1px; background: rgba(0,0,0,.08); border:0; margin: 12px 0;
+    }
+
+    /* formulario demo */
+    .demo{
+      margin-top: 12px;
+      background: rgba(255,255,255,.6);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .grid-2{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    @media (max-width: 720px){ .grid-2{ grid-template-columns: 1fr; } }
+    label{ display:block; font-weight: 600; margin-top: 10px; }
+    input{
+      width:100%;
+      box-sizing:border-box;
+      margin-top: 6px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: #fff;
+      outline: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 🔒 Protección: solo logueado -->
+  <script>
+    if (localStorage.getItem("tualoja_logged") !== "1") {
+      localStorage.setItem("redirect_after_login", "mis-reservas.html");
+      location.href = "login.html";
+    }
+  </script>
+
+  <header class="header">
+    <a class="logo" href="index.html">TuAloja.com</a>
+    <nav id="mainNav" class="nav">
+      <a href="mis-reservas.html">Mis reservas</a>
+      <a href="publicar.html">Publicar alojamiento</a>
+      <a href="panel-anfitrion.html">Panel anfitrión</a>
+      <span id="navAuth"></span>
+    </nav>
+    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
+  </header>
+
+  <main class="page-wrap">
+    <div class="card">
+      <div class="top">
+        <div>
+          <h1>Mis reservas</h1>
+          <p class="muted" style="margin:6px 0 0;">
+            Acá ves tus reservas (guardadas en este navegador).
+          </p>
+        </div>
+
+        <div class="btn-row">
+          <a class="btn btn-outline" href="index.html">Volver</a>
+          <button class="btn btn-outline" id="btnLogout" type="button">Cerrar sesión</button>
+        </div>
+      </div>
+
+      <div id="summary" class="muted"></div>
+      <div id="list" class="list"></div>
+      <p id="empty" class="muted" style="display:none; margin-top:12px;">
+        Todavía no tenés reservas.
+      </p>
+
+      <hr class="hr" />
+
+      <!-- DEMO: crear una reserva de prueba para ver cómo queda -->
+      <section class="demo">
+        <h3 style="margin:0 0 6px;">Crear reserva de prueba (solo MVP)</h3>
+        <p class="muted" style="margin:0 0 12px;">
+          Esto es solo para que veas el panel funcionando. Después lo conectamos con el flujo real.
+        </p>
+
+        <form id="demoForm">
+          <div class="grid-2">
+            <div>
+              <label>Título del alojamiento</label>
+              <input name="titulo" required placeholder="Ej: Cabaña en el río" />
+            </div>
+            <div>
+              <label>Ubicación</label>
+              <input name="ubicacion" required placeholder="Ej: Villa Elisa, Entre Ríos" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label>Check-in (YYYY-MM-DD)</label>
+              <input name="checkin" required placeholder="2026-03-10" />
+            </div>
+            <div>
+              <label>Check-out (YYYY-MM-DD)</label>
+              <input name="checkout" required placeholder="2026-03-12" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label>Total (ARS)</label>
+              <input name="total" type="number" min="0" required placeholder="Ej: 70000" />
+            </div>
+            <div>
+              <label>Cantidad de huéspedes</label>
+              <input name="huespedes" type="number" min="1" required placeholder="Ej: 2" />
+            </div>
+          </div>
+
+          <button class="btn" type="submit">+ Agregar reserva</button>
+          <p class="muted" id="demoMsg" style="margin-top:10px;"></p>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer-ayuda">
+    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
+    // Logout
+    document.getElementById("btnLogout").addEventListener("click", () => {
+      localStorage.setItem("tualoja_logged", "0");
+      localStorage.removeItem("tualoja_user");
+      location.href = "index.html";
+    });
+
+    const KEY = "tualoja_bookings";
+    const myEmail = (localStorage.getItem("tualoja_user") || "").toLowerCase();
+
+    function loadAll() {
+      return JSON.parse(localStorage.getItem(KEY) || "[]");
+    }
+    function saveAll(arr) {
+      localStorage.setItem(KEY, JSON.stringify(arr));
+    }
+
+    function formatARS(n) {
+      const num = Number(n || 0);
+      try { return num.toLocaleString("es-AR"); } catch { return String(num); }
+    }
+
+    function statusChip(status) {
+      if (status === "confirmada") return `<span class="chip chip-ok">✅ Confirmada</span>`;
+      if (status === "cancelada") return `<span class="chip chip-bad">❌ Cancelada</span>`;
+      return `<span class="chip chip-strong">⏳ Pendiente</span>`;
+    }
+
+    function render() {
+      const list = document.getElementById("list");
+      const empty = document.getElementById("empty");
+      const summary = document.getElementById("summary");
+
+      const all = loadAll();
+      const mine = all.filter(x => (x.userEmail || "").toLowerCase() === myEmail);
+
+      summary.textContent = `Reservas: ${mine.length}`;
+      list.innerHTML = "";
+
+      if (!mine.length) {
+        empty.style.display = "block";
+        return;
+      }
+      empty.style.display = "none";
+
+      mine.forEach((x) => {
+        const item = document.createElement("div");
+        item.className = "item";
+
+        const thumb = document.createElement("div");
+        thumb.className = "thumb";
+        if (x.cover) {
+          const img = document.createElement("img");
+          img.src = x.cover;
+          img.alt = x.title || "Reserva";
+          thumb.appendChild(img);
+        }
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+
+        meta.innerHTML = `
+          <h3>${escapeHTML(x.title || "Reserva")}</h3>
+          <p><b>${escapeHTML(x.location || "-")}</b></p>
+          <div class="chips">
+            ${statusChip(x.status)}
+            <span class="chip">Check-in: ${escapeHTML(x.checkin || "-")}</span>
+            <span class="chip">Check-out: ${escapeHTML(x.checkout || "-")}</span>
+            <span class="chip">Huéspedes: ${escapeHTML(String(x.guests ?? "-"))}</span>
+            <span class="chip">Total: ARS $${formatARS(x.total)}</span>
+            <span class="chip">Código: ${escapeHTML(x.code || "")}</span>
+          </div>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const btnCopy = document.createElement("button");
+        btnCopy.type = "button";
+        btnCopy.className = "mini-btn";
+        btnCopy.textContent = "Copiar código";
+        btnCopy.onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(x.code || "");
+            toast("✅ Código copiado");
+          } catch {
+            toast("No pude copiar. Copialo manualmente.");
+          }
+        };
+
+        actions.appendChild(btnCopy);
+
+        if (x.status !== "cancelada") {
+          const btnCancel = document.createElement("button");
+          btnCancel.type = "button";
+          btnCancel.className = "mini-btn danger";
+          btnCancel.textContent = "Cancelar";
+          btnCancel.onclick = () => {
+            const ok = confirm("¿Querés cancelar esta reserva?");
+            if (!ok) return;
+
+            const all2 = loadAll();
+            const idx = all2.findIndex(z => z.id === x.id);
+            if (idx !== -1) {
+              all2[idx].status = "cancelada";
+              saveAll(all2);
+              render();
+              toast("✅ Reserva cancelada");
+            }
+          };
+          actions.appendChild(btnCancel);
+        }
+
+        meta.appendChild(actions);
+
+        item.appendChild(thumb);
+        item.appendChild(meta);
+        list.appendChild(item);
+      });
+    }
+
+    // Demo: agregar reserva de prueba
+    document.getElementById("demoForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const f = e.currentTarget;
+      const demoMsg = document.getElementById("demoMsg");
+
+      const booking = {
+        id: "book_" + Date.now(),
+        code: "TA-" + Math.random().toString(16).slice(2, 8).toUpperCase(),
+        userEmail: myEmail,
+        title: f.titulo.value.trim(),
+        location: f.ubicacion.value.trim(),
+        checkin: f.checkin.value.trim(),
+        checkout: f.checkout.value.trim(),
+        guests: Number(f.huespedes.value),
+        total: Number(f.total.value),
+        currency: "ARS",
+        status: "pendiente",
+        cover: "" // si después conectamos con alojamientos, ponemos la foto portada
+      };
+
+      const all = loadAll();
+      all.unshift(booking);
+      saveAll(all);
+
+      demoMsg.textContent = "✅ Reserva de prueba creada.";
+      f.reset();
+      render();
+    });
+
+    // Toast simple
+    let toastTimer = null;
+    function toast(msg) {
+      clearTimeout(toastTimer);
+      let el = document.getElementById("toast");
+      if (!el) {
+        el = document.createElement("div");
+        el.id = "toast";
+        el.style.position = "fixed";
+        el.style.left = "50%";
+        el.style.bottom = "18px";
+        el.style.transform = "translateX(-50%)";
+        el.style.background = "rgba(0,0,0,.75)";
+        el.style.color = "#fff";
+        el.style.padding = "10px 14px";
+        el.style.borderRadius = "999px";
+        el.style.fontSize = "13px";
+        el.style.zIndex = "999";
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      el.style.display = "block";
+      toastTimer = setTimeout(() => { el.style.display = "none"; }, 1600);
+    }
+
+    function escapeHTML(str) {
+      return String(str || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    render();
+  </script>
 </body>
 </html>
