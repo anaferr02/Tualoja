@@ -112,27 +112,39 @@ header {
 .hero {
   text-align: center;
   color: #1b167f;
-  padding: 70px 20px 34px;
-
-  /* Fondo ilustrado (nubes + montañas) SIN fotos */
-  background:
-    /* nubes suaves arriba */
-    radial-gradient(circle at 20% 25%, rgba(255,255,255,.55) 0 18%, transparent 19%),
-    radial-gradient(circle at 45% 18%, rgba(255,255,255,.48) 0 16%, transparent 17%),
-    radial-gradient(circle at 70% 26%, rgba(255,255,255,.52) 0 18%, transparent 19%),
-    radial-gradient(circle at 85% 18%, rgba(255,255,255,.42) 0 14%, transparent 15%),
-
-    /* degradado cielo */
-    linear-gradient(180deg, rgba(120,205,255,.92), rgba(95,208,255,.92)),
-
-    /* montañas (SVG inline) */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='520' viewBox='0 0 1600 520'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='0' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='%23eaf6ff'/%3E%3Cstop offset='1' stop-color='%23cfe9ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1600' height='520' fill='url(%23g)'/%3E%3Cpath d='M0 410 C180 360 240 360 420 410 C580 465 690 465 850 410 C1030 350 1140 350 1320 410 C1460 455 1540 455 1600 420 L1600 520 L0 520 Z' fill='%23d7eeff'/%3E%3Cpath d='M0 440 C220 390 300 390 520 440 C700 485 820 485 1000 440 C1180 395 1320 395 1600 448 L1600 520 L0 520 Z' fill='%23c6e6ff'/%3E%3Cpath d='M0 465 C260 420 360 420 620 465 C820 502 950 502 1140 465 C1360 420 1460 420 1600 468 L1600 520 L0 520 Z' fill='%23b6dcff'/%3E%3C/svg%3E");
-  background-size: auto, auto, auto, auto, auto, cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  /* para que el fondo “abrace” el contenido */
+  padding: 80px 20px 60px;
   position: relative;
+
+  background:
+    /* NUBES */
+    radial-gradient(circle at 15% 20%, rgba(255,255,255,.45) 0 18%, transparent 19%),
+    radial-gradient(circle at 45% 15%, rgba(255,255,255,.40) 0 20%, transparent 21%),
+    radial-gradient(circle at 75% 22%, rgba(255,255,255,.42) 0 18%, transparent 19%),
+
+    /* CIELO */
+    linear-gradient(
+      180deg,
+      #9fe2ff 0%,
+      #6fd3ff 55%,
+      #5fd0ff 100%
+    ),
+
+    /* MONTAÑAS (ABAJO DE TODO) */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 400'%3E%3Cpath d='M0 260 C150 220 250 220 400 260 C560 310 700 310 860 260 C1040 210 1180 210 1360 260 C1480 300 1550 300 1600 270 L1600 400 L0 400 Z' fill='%23d8eeff'/%3E%3Cpath d='M0 300 C200 260 320 260 520 300 C700 340 850 340 1050 300 C1250 260 1400 260 1600 310 L1600 400 L0 400 Z' fill='%23c4e3ff'/%3E%3Cpath d='M0 330 C240 300 360 300 620 330 C820 360 980 360 1200 330 C1420 300 1500 300 1600 340 L1600 400 L0 400 Z' fill='%23b1d9ff'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat;
+  background-size:
+    auto,
+    auto,
+    auto,
+    cover,
+    100% 160px;      /* 👈 tamaño de montañas */
+  background-position:
+    center,
+    center,
+    center,
+    center,
+    bottom;          /* 👈 montañas abajo */
 }
 .hero h2 {
   font-size: 48px;
