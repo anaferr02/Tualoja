@@ -111,40 +111,16 @@ header {
 /* ===================== HERO PRO ===================== */
 .hero {
   text-align: center;
+  padding: 70px 20px 50px;
   color: #1b167f;
-  padding: 80px 20px 60px;
-  position: relative;
 
-  background:
-    /* NUBES */
-    radial-gradient(circle at 15% 20%, rgba(255,255,255,.45) 0 18%, transparent 19%),
-    radial-gradient(circle at 45% 15%, rgba(255,255,255,.40) 0 20%, transparent 21%),
-    radial-gradient(circle at 75% 22%, rgba(255,255,255,.42) 0 18%, transparent 19%),
-
-    /* CIELO */
-    linear-gradient(
-      180deg,
-      #9fe2ff 0%,
-      #6fd3ff 55%,
-      #5fd0ff 100%
-    ),
-
-    /* MONTAÑAS (ABAJO DE TODO) */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 400'%3E%3Cpath d='M0 260 C150 220 250 220 400 260 C560 310 700 310 860 260 C1040 210 1180 210 1360 260 C1480 300 1550 300 1600 270 L1600 400 L0 400 Z' fill='%23d8eeff'/%3E%3Cpath d='M0 300 C200 260 320 260 520 300 C700 340 850 340 1050 300 C1250 260 1400 260 1600 310 L1600 400 L0 400 Z' fill='%23c4e3ff'/%3E%3Cpath d='M0 330 C240 300 360 300 620 330 C820 360 980 360 1200 330 C1420 300 1500 300 1600 340 L1600 400 L0 400 Z' fill='%23b1d9ff'/%3E%3C/svg%3E");
-
-  background-repeat: no-repeat;
-  background-size:
-    auto,
-    auto,
-    auto,
-    cover,
-    100% 160px;      /* 👈 tamaño de montañas */
-  background-position:
-    center,
-    center,
-    center,
-    center,
-    bottom;          /* 👈 montañas abajo */
+  /* Fondo liso elegante */
+  background: linear-gradient(
+    180deg,
+    #9fe2ff 0%,
+    #6fd3ff 60%,
+    #5fd0ff 100%
+  );
 }
 .hero h2 {
   font-size: 48px;
