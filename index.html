@@ -9,10 +9,7 @@
 /* ===================== RESET BÁSICO ===================== */
 * { box-sizing: border-box; }
 
-html, body {
-  height: 100%;
-  margin: 0;
-}
+html, body { height: 100%; margin: 0; }
 
 /* ===================== BODY / LAYOUT ===================== */
 body {
@@ -115,19 +112,13 @@ header {
   color: #1b167f;
 
   /* Fondo liso elegante */
-  background: linear-gradient(
-    180deg,
-    #9fe2ff 0%,
-    #6fd3ff 60%,
-    #5fd0ff 100%
-  );
+  background: linear-gradient(180deg, #9fe2ff 0%, #6fd3ff 60%, #5fd0ff 100%);
 }
 .hero h2 {
   font-size: 48px;
   margin: 0 0 10px;
   letter-spacing: -0.5px;
 }
-
 .hero p {
   font-size: 22px;
   margin: 0 0 10px;
@@ -211,10 +202,7 @@ header {
   font-weight: 900;
 }
 
-.guests-btn .chev{
-  font-size: 16px;
-  opacity: .8;
-}
+.guests-btn .chev{ font-size: 16px; opacity: .8; }
 
 .guests-panel{
   display: none;
@@ -232,7 +220,8 @@ header {
 
 .guests-panel.open{ display: block; }
 
-.row{
+/* ✅ FIX: estas reglas quedan SOLO para el panel (evita romper otras páginas) */
+.guests-panel .row{
   display:flex;
   align-items:center;
   justify-content: space-between;
@@ -240,19 +229,11 @@ header {
   padding: 12px 0;
   border-bottom: 1px solid rgba(0,0,0,0.06);
 }
-
-.row:last-of-type{ border-bottom: none; }
-
-.row-title{ font-weight: 900; color:#1b167f; }
-.row-sub{ font-size: 12px; opacity: .75; }
-
-.stepper{
-  display:flex;
-  align-items:center;
-  gap: 10px;
-}
-
-.step{
+.guests-panel .row:last-of-type{ border-bottom: none; }
+.guests-panel .row-title{ font-weight: 900; color:#1b167f; }
+.guests-panel .row-sub{ font-size: 12px; opacity: .75; }
+.guests-panel .stepper{ display:flex; align-items:center; gap: 10px; }
+.guests-panel .step{
   width: 38px;
   height: 38px;
   border-radius: 999px;
@@ -263,18 +244,8 @@ header {
   font-weight: 900;
   cursor:pointer;
 }
-
-.step:disabled{
-  opacity: .4;
-  cursor: not-allowed;
-}
-
-.count{
-  min-width: 22px;
-  text-align:center;
-  font-weight: 900;
-  color:#1b167f;
-}
+.guests-panel .step:disabled{ opacity: .4; cursor: not-allowed; }
+.guests-panel .count{ min-width: 22px; text-align:center; font-weight: 900; color:#1b167f; }
 
 .kids-ages{
   padding: 10px 0;
@@ -302,7 +273,6 @@ header {
   font-weight: 900;
   cursor: pointer;
 }
-
 .panel-done:hover{ filter: brightness(1.05); }
 
 /* ===================== CTA anfitrión PRO ===================== */
@@ -342,6 +312,17 @@ header {
   filter: brightness(1.03);
 }
 
+/* ✅ NUEVO: 3 líneas de confianza */
+.host-proof, .host-types, .host-time{
+  margin: 10px 0 0;
+  color: #1b167f;
+  font-weight: 800;
+  opacity: .85;
+  font-size: 14px;
+}
+.host-types{ opacity: .78; font-weight: 700; }
+.host-time{ opacity: .80; font-weight: 700; }
+
 /* ===================== CÓMO FUNCIONA (PANEL PRO) ===================== */
 .how-it-works{
   max-width: 1120px;
@@ -380,10 +361,7 @@ header {
   text-align: center;
 }
 
-.how-emoji{
-  font-size: 42px;
-  margin-bottom: 10px;
-}
+.how-emoji{ font-size: 42px; margin-bottom: 10px; }
 
 .how-title{
   color: #1b167f;
@@ -408,16 +386,8 @@ footer {
   background: rgba(255,255,255,0.40);
 }
 
-.footer-legal {
-  margin-top: 10px;
-  font-size: 14px;
-}
-
-.footer-legal a {
-  color: #1b167f;
-  text-decoration: none;
-}
-
+.footer-legal { margin-top: 10px; font-size: 14px; }
+.footer-legal a { color: #1b167f; text-decoration: none; }
 .footer-legal a:hover { text-decoration: underline; }
 
 /* ===================== RESPONSIVE ===================== */
@@ -425,10 +395,7 @@ footer {
   .how-cards{ grid-template-columns: 1fr; }
   .hero h2{ font-size: 34px; }
   .hero p{ font-size: 18px; }
-  .hero-trust{
-    border-radius: 16px;
-    line-height: 1.35;
-  }
+  .hero-trust{ border-radius: 16px; line-height: 1.35; }
 }
 
 @media (max-width: 768px) {
@@ -450,7 +417,6 @@ footer {
     font-size: 24px;
     cursor: pointer;
     color: #1b167f;
-
     align-items: center;
     justify-content: center;
     line-height: 1;
@@ -501,10 +467,7 @@ footer {
     max-width: 100%;
   }
 
-  .guests-panel{
-    left: 0;
-    right: 0;
-  }
+  .guests-panel{ left: 0; right: 0; }
 }
   </style>
 </head>
@@ -534,7 +497,8 @@ footer {
     </div>
 
     <div class="nav-right">
-      <a class="nav-link" href="alojamiento.html">Registra tu alojamiento</a>
+      <!-- ✅ Cambiado -->
+      <a class="nav-link" href="alojamiento.html">Publicar alojamiento</a>
       <a class="nav-link" href="ayuda.html">Ayuda</a>
       <div id="authArea">
         <a class="btn btn-ghost" href="login.html">Iniciar sesión</a>
@@ -615,10 +579,17 @@ footer {
   </section>
 
   <section class="host-cta">
+    <!-- ✅ Cambiado (huéspedes) -->
     <p class="host-cta-text">
-      ¿Tenés un alojamiento? Publicalo gratis y empezá a recibir reservas.
+      ¿Tenés un alojamiento? Publicalo gratis y empezá a recibir huéspedes.
     </p>
+
     <a class="host-cta-btn" href="alojamiento.html">Publicar mi alojamiento</a>
+
+    <!-- ✅ NUEVO -->
+    <p class="host-proof">Publicar es gratis · Sin costos fijos · Activación rápida</p>
+    <p class="host-types">Casas · Departamentos · Cabañas · Habitaciones · Quinchos</p>
+    <p class="host-time">⏱ Publicar tu alojamiento toma menos de 3 minutos</p>
   </section>
 
   <section class="how-it-works">
