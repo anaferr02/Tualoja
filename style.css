@@ -108,3 +108,53 @@
     line-height: 1.35;
   }
 }
+/* ===== FIX HEADER en alojamiento.html (usa .header y .nav) ===== */
+.header{
+  padding: 15px 30px;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap:16px;
+}
+
+.header .logo{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:28px;
+  font-weight:bold;
+  color:#1b167f;
+  text-decoration:none;
+  white-space: nowrap;
+}
+
+/* nav simple en alojamiento */
+.header .nav{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-left:auto;
+}
+
+.header .nav a{
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-decoration:none;
+  font-weight:700;
+  color:#1b167f;
+  background: rgba(255,255,255,0.65);
+  border: 1px solid rgba(27,22,127,0.15);
+}
+
+/* mobile */
+@media (max-width:768px){
+  .header{
+    padding:12px 14px;
+    flex-wrap:wrap;
+  }
+  .header .nav{
+    width:100%;
+    justify-content:flex-start;
+  }
+}
