@@ -114,15 +114,26 @@ header {
   color: #1b167f;
   padding: 70px 20px 34px;
 
-  /* Fondo tipo “pro” (paisaje) */
+  /* Fondo ilustrado (nubes + montañas) SIN fotos */
   background:
-    radial-gradient(circle at 50% 20%, rgba(255,255,255,.40), rgba(255,255,255,0) 55%),
-    linear-gradient(180deg, rgba(120,205,255,.80), rgba(95,208,255,.92)),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1800&q=80");
-  background-size: cover;
-  background-position: center bottom;
-}
+    /* nubes suaves arriba */
+    radial-gradient(circle at 20% 25%, rgba(255,255,255,.55) 0 18%, transparent 19%),
+    radial-gradient(circle at 45% 18%, rgba(255,255,255,.48) 0 16%, transparent 17%),
+    radial-gradient(circle at 70% 26%, rgba(255,255,255,.52) 0 18%, transparent 19%),
+    radial-gradient(circle at 85% 18%, rgba(255,255,255,.42) 0 14%, transparent 15%),
 
+    /* degradado cielo */
+    linear-gradient(180deg, rgba(120,205,255,.92), rgba(95,208,255,.92)),
+
+    /* montañas (SVG inline) */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='520' viewBox='0 0 1600 520'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='0' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='%23eaf6ff'/%3E%3Cstop offset='1' stop-color='%23cfe9ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1600' height='520' fill='url(%23g)'/%3E%3Cpath d='M0 410 C180 360 240 360 420 410 C580 465 690 465 850 410 C1030 350 1140 350 1320 410 C1460 455 1540 455 1600 420 L1600 520 L0 520 Z' fill='%23d7eeff'/%3E%3Cpath d='M0 440 C220 390 300 390 520 440 C700 485 820 485 1000 440 C1180 395 1320 395 1600 448 L1600 520 L0 520 Z' fill='%23c6e6ff'/%3E%3Cpath d='M0 465 C260 420 360 420 620 465 C820 502 950 502 1140 465 C1360 420 1460 420 1600 468 L1600 520 L0 520 Z' fill='%23b6dcff'/%3E%3C/svg%3E");
+  background-size: auto, auto, auto, auto, auto, cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* para que el fondo “abrace” el contenido */
+  position: relative;
+}
 .hero h2 {
   font-size: 48px;
   margin: 0 0 10px;
