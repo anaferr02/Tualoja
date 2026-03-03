@@ -4,14 +4,193 @@
   <meta charset="UTF-8">
   <title>Registrá tu alojamiento – TuAloja</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+
+  <style>
+/* ===================== RESET BÁSICO ===================== */
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+
+body{
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
+  color: #333;
+  min-height: 100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ===================== HEADER (mismo look que tu sitio) ===================== */
+header{
+  padding: 15px 30px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:28px;
+  font-weight:900;
+  color:#1b167f;
+  text-decoration:none;
+  white-space:nowrap;
+}
+
+.logo .icono-maleta{ color:#ffb300; }
+
+.nav-simple{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.nav-simple a{
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-decoration:none;
+  font-weight:700;
+  color:#1b167f;
+  background: rgba(255,255,255,0.65);
+  border: 1px solid rgba(27,22,127,0.15);
+}
+
+.nav-simple a:hover{ filter: brightness(1.03); }
+
+/* ===================== CONTENEDOR ESTILO "CENTRO DE AYUDA" ===================== */
+.page-soft{
+  padding: 40px 16px 60px;
+}
+
+.help-wrap{
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.help-card{
+  background: #fff;
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.15);
+}
+
+.help-alert{
+  background: linear-gradient(90deg, #ffe7b3, #fff2cc);
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 22px;
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.help-alert strong{ display:block; color:#1b167f; }
+
+.help-title{
+  font-size: 34px;
+  margin: 0 0 6px;
+  color: #1b167f;
+}
+
+.help-sub{
+  color:#555;
+  margin: 0 0 18px;
+}
+
+.pill-row{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom: 22px;
+}
+
+.pill{
+  background:#f4f6fb;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 15px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+  cursor:pointer;
+  text-decoration:none;
+  color:#1b167f;
+  font-weight:800;
+}
+
+.pill.primary{
+  background: linear-gradient(90deg, #1b167f, #3a35c9);
+  color:#fff;
+  box-shadow: 0 10px 22px rgba(27,22,127,.30);
+}
+
+.help-section h2{
+  margin-top: 26px;
+  margin-bottom: 12px;
+  color:#1b167f;
+}
+
+.help-grid{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.help-grid .pill{
+  background:#f7f8fc;
+  font-weight:700;
+  color:#333;
+}
+
+/* ===================== FOOTER ===================== */
+.footer-ayuda{
+  margin-top:auto;
+  padding: 24px 16px;
+  text-align:center;
+  font-size: 14px;
+  color:#1b167f;
+  background: rgba(255,255,255,0.35);
+}
+
+.footer-ayuda p{
+  margin: 0 0 8px;
+  font-weight:600;
+}
+
+.footer-links{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:6px;
+}
+
+.footer-links a{
+  color:#1b167f;
+  text-decoration:none;
+  font-weight:500;
+}
+.footer-links a:hover{ text-decoration:underline; }
+.footer-links span{ opacity:.6; }
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width:768px){
+  header{ padding: 12px 14px; flex-wrap:wrap; }
+  .nav-simple{ width:100%; justify-content:flex-start; }
+  .help-title{ font-size: 28px; }
+  .help-card{ padding: 20px; }
+}
+  </style>
 </head>
+
 <body>
 
-<!-- 🔁 USÁ TU HEADER REAL (copiado de index.html) -->
-<header class="header">
-  <a class="logo" href="index.html">TuAloja.com</a>
-  <nav class="nav">
+<header>
+  <a class="logo" href="index.html">
+    <span class="icono-maleta">🧳</span> TuAloja.com
+  </a>
+
+  <nav class="nav-simple">
     <a href="alojamiento.html">Registrá tu alojamiento</a>
     <a href="ayuda.html">Ayuda</a>
   </nav>
@@ -66,17 +245,17 @@
 </div>
 
 <footer class="footer-ayuda">
-    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
-    <div class="footer-links">
-      <a href="politica-de-privacidad.html">Política de Privacidad</a>
-      <span>|</span>
-      <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
-      <span>|</span>
-      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
-      <span>|</span>
-      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
-    </div>
-  </footer>
+  <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+  <div class="footer-links">
+    <a href="politica-de-privacidad.html">Política de Privacidad</a>
+    <span>|</span>
+    <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
+    <span>|</span>
+    <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
+    <span>|</span>
+    <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+  </div>
+</footer>
 
 <script>
   document.getElementById("btnComenzar").onclick = () => {
