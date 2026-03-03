@@ -35,8 +35,8 @@
       <a class="nav-link" href="alojamiento.html">Registra tu alojamiento</a>
       <a class="nav-link" href="ayuda.html">Ayuda</a>
       <div id="authArea">
-      <a class="btn btn-ghost" href="login.html">Iniciar sesión</a>
-      <a class="btn btn-primary" href="register.html">Hazte una cuenta</a>
+        <a class="btn btn-ghost" href="login.html">Iniciar sesión</a>
+        <a class="btn btn-primary" href="register.html">Hazte una cuenta</a>
       </div>
     </div>
   </nav>
@@ -46,6 +46,11 @@
   <section class="hero">
     <h2>Alquila fácil, viaja feliz</h2>
     <p>Las mejores opciones para tu próxima estadía.</p>
+
+    <!-- ✅ confianza (nuevo) -->
+    <p class="hero-trust">
+      Plataforma argentina para hospedajes temporarios · Reservas simples y contacto con el anfitrión
+    </p>
   </section>
 
   <section class="search-box">
@@ -102,12 +107,45 @@
       </div>
 
       <!-- ✅ Inputs ocultos para no romper tu buscar()/resultados -->
-      <input type="hidden" id="adultos" value="0" />
+      <!-- 🔧 arreglado: antes estaban en 0 y no coincidía con el texto -->
+      <input type="hidden" id="adultos" value="1" />
       <input type="hidden" id="ninos" value="0" />
-      <input type="hidden" id="habitaciones" value="0" />
+      <input type="hidden" id="habitaciones" value="1" />
     </div>
 
     <a href="#" class="btn-header" onclick="buscar()">Buscar</a>
+  </section>
+
+  <!-- ✅ CTA anfitrión (nuevo) -->
+  <section class="host-cta">
+    <p class="host-cta-text">
+      ¿Tenés un alojamiento? Publicalo gratis y empezá a recibir reservas.
+    </p>
+    <a class="host-cta-btn" href="alojamiento.html">Publicar mi alojamiento</a>
+  </section>
+
+  <!-- ✅ Cómo funciona (nuevo) -->
+  <section class="how-it-works">
+    <h3>¿Cómo funciona?</h3>
+    <div class="how-cards">
+      <div class="how-card">
+        <div class="how-emoji">🏠</div>
+        <div class="how-title">Publicá tu alojamiento</div>
+        <div class="how-sub">Cargá fotos, ubicación y precio.</div>
+      </div>
+
+      <div class="how-card">
+        <div class="how-emoji">📅</div>
+        <div class="how-title">Recibí reservas directas</div>
+        <div class="how-sub">Sin vueltas, con confirmación.</div>
+      </div>
+
+      <div class="how-card">
+        <div class="how-emoji">💬</div>
+        <div class="how-title">Contactá al huésped</div>
+        <div class="how-sub">Coordiná detalles sin intermediarios.</div>
+      </div>
+    </div>
   </section>
 </main>
 
@@ -150,7 +188,8 @@
 
     const kidsAges = document.getElementById("kidsAges");
 
-    let adults = 0, kids = 0, rooms = 0;
+    // 🔧 arreglado: iniciar con 1 adulto, 0 niños, 1 habitación (como Booking)
+    let adults = 1, kids = 0, rooms = 1;
 
     function updateSummary(){
       summary.textContent =
@@ -231,7 +270,7 @@
 </script>
 
 <script type="module" src="script.js"></script>
-  <script>
+<script>
   const authArea = document.getElementById("authArea");
   const logged = localStorage.getItem("tualoja_logged");
   const user = JSON.parse(localStorage.getItem("tualoja_user") || "{}");
@@ -244,4 +283,3 @@
 </script>
 </body>
 </html>
-
