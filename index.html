@@ -4,7 +4,488 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tualoja - Alquila fácil, viaja feliz</title>
-  <link rel="stylesheet" href="/main.css">
+
+  <style>
+/* ===================== RESET BÁSICO ===================== */
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+/* ===================== BODY / LAYOUT ===================== */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main { flex: 1; }
+
+/* ===================== HEADER ===================== */
+header {
+  padding: 15px 30px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #1b167f;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.logo .icono-maleta { color: #ffb300; }
+
+/* ===================== NAV (DESKTOP) ===================== */
+#hamburgerBtn { display: none; }
+
+#mainNav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-left select {
+  height: 44px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: none;
+}
+
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ===================== LINKS / BOTONES NAV ===================== */
+.nav-link {
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #1b167f;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(27,22,127,0.15);
+}
+
+.btn {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.btn-ghost {
+  color: #1b167f;
+  background: rgba(255,255,255,0.4);
+  border: 1px solid rgba(27,22,127,0.2);
+}
+
+.btn-primary {
+  background: #1b167f;
+  color: #fff;
+}
+
+/* ===================== HERO ===================== */
+.hero {
+  text-align: center;
+  padding: 40px 20px 20px;
+  color: #1b167f;
+}
+
+.hero h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.hero p { font-size: 18px; }
+
+/* ===================== SEARCH BOX ===================== */
+.search-box {
+  background: #ffb300;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 900px;
+  margin: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+
+.search-box input,
+.search-box select {
+  height: 44px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  min-width: 140px;
+  background: rgba(255,255,255,.95);
+}
+
+.btn-header {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 10px;
+  background: #1b167f;
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===================== FOOTER ===================== */
+footer {
+  margin-top: auto;
+  padding: 20px;
+  text-align: center;
+  background: rgba(255,255,255,0.4);
+}
+
+.footer-legal {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.footer-legal a {
+  color: #1b167f;
+  text-decoration: none;
+}
+
+.footer-legal a:hover { text-decoration: underline; }
+
+/* ===================================================================== */
+/* ===================== SELECTOR TIPO BOOKING ===================== */
+/* ===================================================================== */
+.guests {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+}
+
+.guests-btn{
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255,255,255,.95);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-size: 15px;
+  cursor: pointer;
+  color: #1b167f;
+  font-weight: 700;
+}
+
+.guests-btn .chev{
+  font-size: 16px;
+  opacity: .8;
+}
+
+.guests-panel{
+  display: none;
+  position: absolute;
+  top: calc(44px + 10px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid rgba(27,22,127,0.12);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+  z-index: 50;
+}
+
+.guests-panel.open{ display: block; }
+
+.row{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.row:last-of-type{ border-bottom: none; }
+
+.row-title{ font-weight: 900; color:#1b167f; }
+.row-sub{ font-size: 12px; opacity: .75; }
+
+.stepper{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+
+.step{
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid rgba(27,22,127,0.2);
+  background: #f4fbff;
+  color:#1b167f;
+  font-size: 18px;
+  font-weight: 900;
+  cursor:pointer;
+}
+
+.step:disabled{
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.count{
+  min-width: 22px;
+  text-align:center;
+  font-weight: 900;
+  color:#1b167f;
+}
+
+.kids-ages{
+  padding: 10px 0;
+  display:flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kids-ages select{
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(27,22,127,0.15);
+  padding: 10px 12px;
+  background: rgba(255,255,255,.95);
+}
+
+.panel-done{
+  width: 100%;
+  margin-top: 10px;
+  height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: #1b167f;
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.panel-done:hover{ filter: brightness(1.05); }
+
+/* ===================== RESPONSIVE (MOBILE) ===================== */
+@media (max-width: 768px) {
+
+  header {
+    position: relative;
+    z-index: 1000;
+    flex-wrap: nowrap;
+    padding: 12px 14px;
+  }
+
+  #hamburgerBtn {
+    display: inline-flex;
+    margin-left: auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: rgba(255,255,255,0.45);
+    font-size: 24px;
+    cursor: pointer;
+    color: #1b167f;
+
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+  }
+
+  #mainNav {
+    display: none;
+    position: absolute;
+    top: 68px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(92vw, 420px);
+    z-index: 2000;
+
+    flex-direction: column;
+    gap: 12px;
+
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(27,22,127,0.12);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+  }
+
+  #mainNav.is-open { display: flex; }
+
+  .nav-left,
+  .nav-right {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .nav-left select,
+  .nav-right a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .search-box { flex-direction: column; }
+
+  .search-box input,
+  .search-box select,
+  .btn-header,
+  .guests {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .guests-panel{
+    left: 0;
+    right: 0;
+  }
+}
+
+/* =========================================================
+   HOME: Confianza + CTA anfitrión + Cómo funciona (NUEVO)
+========================================================= */
+
+/* Línea de confianza debajo del título */
+.hero-trust{
+  margin: 10px auto 0;
+  max-width: 780px;
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(27,22,127,0.85);
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(27,22,127,0.12);
+  border-radius: 999px;
+  padding: 10px 14px;
+  display: inline-block;
+}
+
+/* CTA anfitrión debajo del buscador */
+.host-cta{
+  text-align: center;
+  padding: 18px 16px 10px;
+  margin-top: 14px;
+}
+
+.host-cta-text{
+  margin: 0 0 12px;
+  color: #1b167f;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.host-cta-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  padding: 0 26px;
+  border-radius: 999px;
+  background: #1b167f;
+  color: #fff;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 10px 22px rgba(27,22,127,.35);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+.host-cta-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(27,22,127,.42);
+  filter: brightness(1.03);
+}
+
+/* Sección "Cómo funciona" */
+.how-it-works{
+  max-width: 980px;
+  margin: 26px auto 40px;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.how-it-works h3{
+  margin: 0 0 14px;
+  color: #1b167f;
+  font-size: 22px;
+}
+
+.how-cards{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.how-card{
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(27,22,127,0.10);
+  border-radius: 18px;
+  padding: 16px 16px 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.10);
+  text-align: center;
+}
+
+.how-emoji{
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.how-title{
+  color: #1b167f;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+
+.how-sub{
+  margin: 0;
+  color: #333;
+  opacity: .85;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 900px){
+  .how-cards{ grid-template-columns: 1fr; }
+  .hero-trust{
+    border-radius: 16px;
+    line-height: 1.35;
+  }
+}
+  </style>
 </head>
 
 <body>
@@ -47,7 +528,6 @@
     <h2>Alquila fácil, viaja feliz</h2>
     <p>Las mejores opciones para tu próxima estadía.</p>
 
-    <!-- ✅ confianza (nuevo) -->
     <p class="hero-trust">
       Plataforma argentina para hospedajes temporarios · Reservas simples y contacto con el anfitrión
     </p>
@@ -58,7 +538,6 @@
     <input type="date" id="entrada" />
     <input type="date" id="salida" />
 
-    <!-- ✅ Selector tipo Booking -->
     <div class="guests">
       <button type="button" class="guests-btn" id="guestsBtn" aria-expanded="false">
         <span id="guestsSummary">1 adulto · 0 niños · 1 habitación</span>
@@ -106,8 +585,6 @@
         <button type="button" class="panel-done" id="guestsDone">Listo</button>
       </div>
 
-      <!-- ✅ Inputs ocultos para no romper tu buscar()/resultados -->
-      <!-- 🔧 arreglado: antes estaban en 0 y no coincidía con el texto -->
       <input type="hidden" id="adultos" value="1" />
       <input type="hidden" id="ninos" value="0" />
       <input type="hidden" id="habitaciones" value="1" />
@@ -116,7 +593,6 @@
     <a href="#" class="btn-header" onclick="buscar()">Buscar</a>
   </section>
 
-  <!-- ✅ CTA anfitrión (nuevo) -->
   <section class="host-cta">
     <p class="host-cta-text">
       ¿Tenés un alojamiento? Publicalo gratis y empezá a recibir reservas.
@@ -124,7 +600,6 @@
     <a class="host-cta-btn" href="alojamiento.html">Publicar mi alojamiento</a>
   </section>
 
-  <!-- ✅ Cómo funciona (nuevo) -->
   <section class="how-it-works">
     <h3>¿Cómo funciona?</h3>
     <div class="how-cards">
@@ -164,7 +639,6 @@
     window.location.href="resultados.html";
   }
 
-  // ✅ Panel tipo Booking (adultos/niños/habitaciones + edades)
   (function(){
     const btn = document.getElementById("guestsBtn");
     const panel = document.getElementById("guestsPanel");
@@ -188,7 +662,6 @@
 
     const kidsAges = document.getElementById("kidsAges");
 
-    // 🔧 arreglado: iniciar con 1 adulto, 0 niños, 1 habitación (como Booking)
     let adults = 1, kids = 0, rooms = 1;
 
     function updateSummary(){
