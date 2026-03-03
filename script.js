@@ -17,17 +17,23 @@ function setupHamburgerMenu() {
     toggleNav();
   });
 
-  // Cerrar al clickear un link dentro del nav
+  // Evita que clicks dentro del nav cierren por el listener global
   nav.addEventListener("click", (e) => {
-    if (e.target && e.target.tagName === "A") {
-      closeNav();
-    }
+    e.stopPropagation();
+
+    // Cerrar al clickear un link dentro del nav
+    if (e.target && e.target.tagName === "A") closeNav();
   });
 
   // Cerrar si se hace click fuera
   document.addEventListener("click", (e) => {
     const clickedInside = nav.contains(e.target) || btn.contains(e.target);
     if (!clickedInside) closeNav();
+  });
+
+  // Cerrar con ESC
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeNav();
   });
 
   // Reset si se agranda la pantalla
@@ -37,20 +43,41 @@ function setupHamburgerMenu() {
 }
 
 /* =========================
-   MENÚ DE USUARIO (AUTH)
+   AUTH UI (soporta 2 variantes)
+   - Variante A: #userMenu + #userDropdown
+   - Variante B: #authArea (como tu index)
 ========================= */
-async function setupUserMenu() {
-  await refreshMe();
-  const user = getUser();
+function renderAuthArea(user) {
+  const authArea = document.getElementById("authArea");
+  if (!authArea) return;
 
+  if (user) {
+    authArea.innerHTML = `
+      <a class="btn btn-primary" href="mi-cuenta.html">Cuenta</a>
+      <a class="btn btn-ghost" href="#" id="logoutBtnAuthArea">Salir</a>
+    `;
+
+    const btn = document.getElementById("logoutBtnAuthArea");
+    if (btn) {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        logout();
+      });
+    }
+  } else {
+    authArea.innerHTML = `
+      <a class="btn btn-ghost" href="login.html">Iniciar sesión</a>
+      <a class="btn btn-primary" href="register.html">Hazte una cuenta</a>
+    `;
+  }
+}
+
+function renderUserMenu(user) {
   const userMenu = document.getElementById("userMenu");
   const userDropdown = document.getElementById("userDropdown");
-
-  // Si la página no tiene menú de usuario, no hacemos nada
   if (!userMenu || !userDropdown) return;
 
   if (user) {
-    // 🔐 USUARIO LOGUEADO
     userMenu.innerHTML = `<i class="fas fa-user"></i> ${user.name || "Mi cuenta"}`;
 
     userDropdown.innerHTML = `
@@ -67,9 +94,7 @@ async function setupUserMenu() {
         logout();
       });
     }
-
   } else {
-    // 👤 USUARIO NO LOGUEADO
     userMenu.innerHTML = `<i class="fas fa-user"></i> Cuenta`;
 
     userDropdown.innerHTML = `
@@ -82,10 +107,19 @@ async function setupUserMenu() {
   }
 }
 
+async function setupAuthUI() {
+  await refreshMe();
+  const user = getUser();
+
+  // Actualiza la UI según lo que exista en esa página
+  renderAuthArea(user);
+  renderUserMenu(user);
+}
+
 /* =========================
    INIT
 ========================= */
 document.addEventListener("DOMContentLoaded", async () => {
   setupHamburgerMenu();
-  await setupUserMenu();
+  await setupAuthUI();
 });
