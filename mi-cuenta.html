@@ -84,11 +84,10 @@
 </head>
 
 <body>
-  <!-- 🔒 Protección: solo logueado -->
+  <!-- 🔒 Protección: solo logueado (vuelve a esta página) -->
   <script>
     if (localStorage.getItem("tualoja_logged") !== "1") {
-      localStorage.setItem("redirect_after_login", "mi-cuenta.html");
-      location.href = "login.html";
+      location.href = "login.html?next=" + encodeURIComponent("mi-cuenta.html");
     }
   </script>
 
@@ -179,9 +178,12 @@
     <p>© 2026 TuAloja. Todos los derechos reservados.</p>
   </footer>
 
-  <script>
+  <script type="module">
+    import { logout, getUser } from "./public/js/auth.js";
+
     const usersKey = "tualoja_users";
-    const myEmail = (localStorage.getItem("tualoja_user") || "").toLowerCase();
+    const userObj = getUser();                 // ✅ ahora es {id,name,email}
+    const myEmail = (userObj?.email || "").toLowerCase();
 
     const emailEl = document.getElementById("email");
     const nameEl = document.getElementById("name");
@@ -191,7 +193,8 @@
     const ok = document.getElementById("ok");
 
     function loadUsers() {
-      return JSON.parse(localStorage.getItem(usersKey) || "[]");
+      try { return JSON.parse(localStorage.getItem(usersKey) || "[]"); }
+      catch { return []; }
     }
     function saveUsers(u) {
       localStorage.setItem(usersKey, JSON.stringify(u));
@@ -202,7 +205,7 @@
       emailEl.value = myEmail || "";
       const users = loadUsers();
       const user = users.find(u => (u.email || "").toLowerCase() === myEmail);
-      nameEl.value = user?.name || "";
+      nameEl.value = user?.name || userObj?.name || "";
     })();
 
     // Guardar nombre
@@ -215,6 +218,16 @@
 
       users[idx].name = name;
       saveUsers(users);
+
+      // ✅ actualizar también el user de sesión (para que menú/headers muestren el nombre)
+      const raw = localStorage.getItem("tualoja_user");
+      try {
+        const u = raw ? JSON.parse(raw) : null;
+        if (u) {
+          u.name = name;
+          localStorage.setItem("tualoja_user", JSON.stringify(u));
+        }
+      } catch {}
 
       msg.textContent = "✅ Datos guardados.";
       msg.style.display = "block";
@@ -255,9 +268,7 @@
 
     // Logout
     document.getElementById("btnLogout").addEventListener("click", () => {
-      localStorage.setItem("tualoja_logged", "0");
-      localStorage.removeItem("tualoja_user");
-      location.href = "index.html";
+      logout();
     });
   </script>
 
