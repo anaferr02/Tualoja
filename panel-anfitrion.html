@@ -141,11 +141,10 @@
 </head>
 
 <body>
-  <!-- 🔒 Protección: solo logueado -->
+  <!-- 🔒 Protección: solo logueado (vuelve a esta página) -->
   <script>
     if (localStorage.getItem("tualoja_logged") !== "1") {
-      localStorage.setItem("redirect_after_login", "panel-anfitrion.html");
-      location.href = "login.html";
+      location.href = "login.html?next=" + encodeURIComponent("panel-anfitrion.html");
     }
   </script>
 
@@ -223,20 +222,22 @@
     <p>© 2026 TuAloja. Todos los derechos reservados.</p>
   </footer>
 
-  <script>
+  <script type="module">
+    import { logout, getUser } from "./public/js/auth.js";
+
     // Logout
     document.getElementById("btnLogout").addEventListener("click", () => {
-      localStorage.setItem("tualoja_logged", "0");
-      localStorage.removeItem("tualoja_user");
-      location.href = "index.html";
+      logout();
     });
 
     // Helpers storage
     const KEY = "tualoja_listings";
-    const myEmail = (localStorage.getItem("tualoja_user") || "").toLowerCase();
+    const userObj = getUser();
+    const myEmail = (userObj?.email || "").toLowerCase(); // ✅ ahora sale del JSON
 
     function loadAll() {
-      return JSON.parse(localStorage.getItem(KEY) || "[]");
+      try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
+      catch { return []; }
     }
     function saveAll(arr) {
       localStorage.setItem(KEY, JSON.stringify(arr));
@@ -244,17 +245,12 @@
 
     function coverFromFotos(listing) {
       if (!listing?.fotos?.length) return "";
-      // En publicar ya mandás portada primero, pero por las dudas:
       return listing.fotos[0];
     }
 
     function formatARS(n) {
       const num = Number(n || 0);
-      try {
-        return num.toLocaleString("es-AR");
-      } catch {
-        return String(num);
-      }
+      try { return num.toLocaleString("es-AR"); } catch { return String(num); }
     }
 
     function render() {
@@ -263,12 +259,9 @@
       const summary = document.getElementById("summary");
 
       const all = loadAll();
-
-      // Mis publicaciones = las que coinciden por email
       const mine = all.filter(x => (x.email || "").toLowerCase() === myEmail);
 
       summary.textContent = `Publicaciones: ${mine.length}`;
-
       list.innerHTML = "";
 
       if (!mine.length) {
@@ -383,7 +376,6 @@
       e.preventDefault();
       const id = editForm.id.value;
 
-      // default maxNoches 30 + límites
       let maxNoches = parseInt(editForm.maxNoches.value || "30", 10);
       if (Number.isNaN(maxNoches)) maxNoches = 30;
       if (maxNoches < 1) maxNoches = 1;
@@ -397,7 +389,6 @@
       all[idx].precio = Number(editForm.precio.value || 0);
       all[idx].maxNoches = maxNoches;
       all[idx].descripcion = editForm.descripcion.value.trim();
-      // moneda fija
       all[idx].moneda = "ARS";
 
       saveAll(all);
@@ -440,7 +431,6 @@
         .replaceAll("'", "&#039;");
     }
 
-    // Init
     render();
   </script>
 </body>
