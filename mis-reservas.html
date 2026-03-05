@@ -129,11 +129,10 @@
 </head>
 
 <body>
-  <!-- 🔒 Protección: solo logueado -->
+  <!-- 🔒 Protección: solo logueado (vuelve a esta página) -->
   <script>
     if (localStorage.getItem("tualoja_logged") !== "1") {
-      localStorage.setItem("redirect_after_login", "mis-reservas.html");
-      location.href = "login.html";
+      location.href = "login.html?next=" + encodeURIComponent("mis-reservas.html");
     }
   </script>
 
@@ -224,19 +223,21 @@
     <p>© 2026 TuAloja. Todos los derechos reservados.</p>
   </footer>
 
-  <script>
+  <script type="module">
+    import { logout, getUser } from "./public/js/auth.js";
+
     // Logout
     document.getElementById("btnLogout").addEventListener("click", () => {
-      localStorage.setItem("tualoja_logged", "0");
-      localStorage.removeItem("tualoja_user");
-      location.href = "index.html";
+      logout();
     });
 
     const KEY = "tualoja_bookings";
-    const myEmail = (localStorage.getItem("tualoja_user") || "").toLowerCase();
+    const userObj = getUser();
+    const myEmail = (userObj?.email || "").toLowerCase(); // ✅ ahora sale del JSON
 
     function loadAll() {
-      return JSON.parse(localStorage.getItem(KEY) || "[]");
+      try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
+      catch { return []; }
     }
     function saveAll(arr) {
       localStorage.setItem(KEY, JSON.stringify(arr));
@@ -364,7 +365,7 @@
         total: Number(f.total.value),
         currency: "ARS",
         status: "pendiente",
-        cover: "" // si después conectamos con alojamientos, ponemos la foto portada
+        cover: ""
       };
 
       const all = loadAll();
