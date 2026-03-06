@@ -197,6 +197,59 @@
       color:#fff;
       font-weight: 800;
     }
+    .hamburger{
+  font-size:20px;
+  background:none;
+  border:none;
+  cursor:pointer;
+}
+
+@media (max-width:800px){
+
+  .nav{
+    display:none;
+    position:absolute;
+    right:20px;
+    top:70px;
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .nav-open{
+    display:flex;
+  }
+
+}
+    .btn-outline{
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,.15);
+  background:white;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btn-outline:hover{
+  background:#f2f2f2;
+}
+    .footer-links{
+margin-top:6px;
+font-size:13px;
+}
+
+.footer-links a{
+color:#1b167f;
+text-decoration:none;
+margin:0 4px;
+}
+
+.footer-links a:hover{
+text-decoration:underline;
+}
   </style>
 </head>
 
@@ -307,9 +360,22 @@
     </div>
   </div>
 
-  <footer class="footer-ayuda">
-    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
-  </footer>
+  
+<footer class="footer-ayuda">
+
+<p>© 2026 TuAloja. Todos los derechos reservados.</p>
+
+<div class="footer-links">
+<a href="politica-de-privacidad.html">Política de privacidad</a>
+|
+<a href="terminos-y-condiciones.html">Términos y condiciones</a>
+|
+<a href="politica-de-cancelacion.html">Política de cancelación</a>
+|
+<a href="politica-anti-estafas.html">Política anti-estafas</a>
+</div>
+
+</footer>
 
   <script type="module">
     import { logout, getUser } from "./public/js/auth.js";
@@ -696,5 +762,13 @@
 
     showTab("listings");
   </script>
+  <script>
+const btn = document.getElementById("hamburgerBtn");
+const nav = document.getElementById("mainNav");
+
+btn.addEventListener("click", () => {
+  nav.classList.toggle("nav-open");
+});
+</script>
 </body>
 </html>
