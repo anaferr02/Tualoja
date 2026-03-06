@@ -24,6 +24,42 @@
     .btn{ cursor:pointer; }
     .btn-row{ display:flex; gap:10px; flex-wrap:wrap; }
 
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+      padding-bottom:10px;
+      border-bottom:1px solid rgba(0,0,0,.08);
+    }
+    .tab-btn{
+      border:0;
+      cursor:pointer;
+      padding:12px 16px;
+      border-radius:14px;
+      background: rgba(0,0,0,.08);
+      color:#222;
+      font-weight:700;
+      transition: .18s ease;
+    }
+    .tab-btn:hover{
+      transform: translateY(-1px);
+      background: rgba(0,0,0,.12);
+    }
+    .tab-btn.active{
+      background:#1b167f;
+      color:#fff;
+      box-shadow: 0 10px 22px rgba(27,22,127,.22);
+    }
+
+    .panel-note{
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+
     .list{ margin-top: 12px; display:grid; gap: 12px; }
     .item{
       background: rgba(255,255,255,.7);
@@ -96,11 +132,18 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      font-weight: 600;
+    }
+    .mini-btn:hover{
+      background: rgba(0,0,0,.12);
     }
     .mini-btn.danger{
       background: rgba(176,0,32,.12);
       color:#b00020;
       font-weight: 700;
+    }
+    .mini-btn.danger:hover{
+      background: rgba(176,0,32,.18);
     }
 
     /* Modal simple */
@@ -190,10 +233,10 @@
         </div>
       </div>
 
-      <div class="btn-row" style="margin-bottom:10px;">
-        <button class="btn btn-outline" id="tabListings" type="button">Mis alojamientos</button>
-        <button class="btn btn-outline" id="tabBookings" type="button">Reservas recibidas</button>
-        <button class="btn btn-outline" id="tabCalendar" type="button">Calendario</button>
+      <div class="tabs">
+        <button class="tab-btn active" id="tabListings" type="button">Mis alojamientos</button>
+        <button class="tab-btn" id="tabBookings" type="button">Reservas recibidas</button>
+        <button class="tab-btn" id="tabCalendar" type="button">Calendario</button>
       </div>
 
       <section id="secListings">
@@ -205,7 +248,7 @@
       </section>
 
       <section id="secBookings" style="display:none;">
-        <div class="muted" style="margin-bottom:10px;">
+        <div class="panel-note muted">
           Acá vas a ver las reservas que te hacen tus huéspedes.
         </div>
 
@@ -214,68 +257,10 @@
         <p id="bookEmpty" class="muted" style="display:none; margin-top:12px;">
           Todavía no recibiste reservas.
         </p>
-
-        <hr style="height:1px;background:rgba(0,0,0,.08);border:0;margin:12px 0;" />
-
-        <div style="background: rgba(255,255,255,.6); border: 1px solid rgba(0,0,0,.06); border-radius: 18px; padding: 14px;">
-          <h3 style="margin:0 0 6px;">Crear reserva recibida (demo)</h3>
-          <p class="muted" style="margin:0 0 12px;">
-            Esto es para probar el panel. Más adelante lo conectamos con el botón “Reservar”.
-          </p>
-
-          <form id="demoHostBooking">
-            <div class="grid-2">
-              <div>
-                <label>Alojamiento (título)</label>
-                <input name="title" required placeholder="Ej: Cabaña en el río" />
-              </div>
-              <div>
-                <label>Huésped (nombre)</label>
-                <input name="guestName" required placeholder="Ej: Juan Pérez" />
-              </div>
-            </div>
-
-            <div class="grid-2">
-              <div>
-                <label>Email huésped</label>
-                <input name="guestEmail" required placeholder="juan@email.com" />
-              </div>
-              <div>
-                <label>Teléfono huésped</label>
-                <input name="guestPhone" placeholder="+54..." />
-              </div>
-            </div>
-
-            <div class="grid-2">
-              <div>
-                <label>Check-in</label>
-                <input name="checkin" required placeholder="2026-03-10" />
-              </div>
-              <div>
-                <label>Check-out</label>
-                <input name="checkout" required placeholder="2026-03-12" />
-              </div>
-            </div>
-
-            <div class="grid-2">
-              <div>
-                <label>Huéspedes</label>
-                <input name="guests" type="number" min="1" required placeholder="2" />
-              </div>
-              <div>
-                <label>Total (ARS)</label>
-                <input name="total" type="number" min="0" required placeholder="70000" />
-              </div>
-            </div>
-
-            <button class="primary" type="submit">+ Agregar reserva recibida</button>
-            <p class="muted" id="demoHostMsg" style="margin-top:10px;"></p>
-          </form>
-        </div>
       </section>
 
       <section id="secCalendar" style="display:none;">
-        <div class="muted" style="margin-bottom:10px;">
+        <div class="panel-note muted">
           Fechas reservadas de tus alojamientos.
         </div>
 
@@ -527,7 +512,7 @@
 
         const btnContact = document.createElement("a");
         btnContact.className = "mini-btn";
-        btnContact.href = `mailto:${encodeURIComponent(b.guestEmail || "")}?subject=${encodeURIComponent("Tu reserva en TuAloja")}&body=${encodeURIComponent("Hola! Te contacto por tu reserva " + (b.code || ""))}`;
+        btnContact.href = `mailto:${b.guestEmail || ""}?subject=${encodeURIComponent("Tu reserva en TuAloja")}&body=${encodeURIComponent("Hola! Te contacto por tu reserva " + (b.code || ""))}`;
         btnContact.textContent = "Contactar";
         actions.appendChild(btnContact);
 
@@ -644,50 +629,37 @@
     const secBookings = document.getElementById("secBookings");
     const secCalendar = document.getElementById("secCalendar");
 
+    const tabListings = document.getElementById("tabListings");
+    const tabBookings = document.getElementById("tabBookings");
+    const tabCalendar = document.getElementById("tabCalendar");
+
+    function setActiveTab(activeBtn) {
+      [tabListings, tabBookings, tabCalendar].forEach(btn => btn.classList.remove("active"));
+      activeBtn.classList.add("active");
+    }
+
     function showTab(which) {
       secListings.style.display = which === "listings" ? "block" : "none";
       secBookings.style.display = which === "bookings" ? "block" : "none";
       secCalendar.style.display = which === "calendar" ? "block" : "none";
 
-      if (which === "listings") render();
-      if (which === "bookings") renderHostBookings();
-      if (which === "calendar") renderCalendar();
+      if (which === "listings") {
+        setActiveTab(tabListings);
+        render();
+      }
+      if (which === "bookings") {
+        setActiveTab(tabBookings);
+        renderHostBookings();
+      }
+      if (which === "calendar") {
+        setActiveTab(tabCalendar);
+        renderCalendar();
+      }
     }
 
-    document.getElementById("tabListings").addEventListener("click", () => showTab("listings"));
-    document.getElementById("tabBookings").addEventListener("click", () => showTab("bookings"));
-    document.getElementById("tabCalendar").addEventListener("click", () => showTab("calendar"));
-
-    document.getElementById("demoHostBooking").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const f = e.currentTarget;
-      const demoHostMsg = document.getElementById("demoHostMsg");
-
-      const booking = {
-        id: "hbook_" + Date.now(),
-        code: "TA-" + Math.random().toString(16).slice(2, 8).toUpperCase(),
-        hostEmail: myEmail,
-        title: f.title.value.trim(),
-        guestName: f.guestName.value.trim(),
-        guestEmail: f.guestEmail.value.trim().toLowerCase(),
-        guestPhone: f.guestPhone.value.trim(),
-        checkin: f.checkin.value.trim(),
-        checkout: f.checkout.value.trim(),
-        guests: Number(f.guests.value),
-        total: Number(f.total.value),
-        status: "pendiente"
-      };
-
-      const all = loadBookings();
-      all.unshift(booking);
-      saveBookings(all);
-
-      demoHostMsg.textContent = "✅ Reserva recibida creada.";
-      f.reset();
-
-      renderHostBookings();
-      renderCalendar();
-    });
+    tabListings.addEventListener("click", () => showTab("listings"));
+    tabBookings.addEventListener("click", () => showTab("bookings"));
+    tabCalendar.addEventListener("click", () => showTab("calendar"));
 
     let toastTimer = null;
     function toast(msg) {
