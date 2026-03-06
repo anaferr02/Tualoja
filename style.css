@@ -244,3 +244,21 @@ margin:0 6px;
 .footer-links a:hover{
 text-decoration:underline;
 }
+.publish-actions .btn,
+.publish-top .btn{
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 14px;
+  border: 1px solid rgba(27,22,127,.14);
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height: 46px;
+}
+.publish-actions a.btn-outline{
+  padding: 8px 14px;
+  min-height: 36px;
+  font-size: 13px;
+}
