@@ -25,6 +25,13 @@
       flex-wrap:wrap;
     }
 
+    .avatar-wrap{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+    }
+
     .avatar{
       width:84px;
       height:84px;
@@ -37,6 +44,30 @@
       color:#1b167f;
       font-weight:800;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+      overflow:hidden;
+      flex-shrink:0;
+    }
+
+    .avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .avatar-btn{
+      border:0;
+      cursor:pointer;
+      padding:8px 10px;
+      border-radius:12px;
+      background:#eef1ff;
+      color:#1b167f;
+      font-weight:700;
+      font-size:12px;
+    }
+
+    .avatar-btn:hover{
+      background:#e2e8ff;
     }
 
     .hero-text h1{
@@ -228,6 +259,14 @@
       color:#555;
     }
 
+    .password-fields{
+      display:none;
+    }
+
+    .password-fields.open{
+      display:block;
+    }
+
     .footer-ayuda{
       text-align:center;
       margin-top:40px;
@@ -281,7 +320,11 @@
     <div class="card">
       <div class="top">
         <div class="hero">
-          <div class="avatar" id="avatar">U</div>
+          <div class="avatar-wrap">
+            <div class="avatar" id="avatar">U</div>
+            <label class="avatar-btn" for="profilePhoto">Subir foto</label>
+            <input id="profilePhoto" type="file" accept="image/*" style="display:none;" />
+          </div>
 
           <div class="hero-text">
             <h1 id="welcomeTitle">Hola 👋</h1>
@@ -292,7 +335,6 @@
         <button class="mini-btn danger" id="btnLogout" type="button">Cerrar sesión</button>
       </div>
 
-      <!-- DATOS -->
       <section class="box">
         <h3>Datos personales</h3>
 
@@ -315,7 +357,6 @@
         <div id="msg" class="msg"></div>
       </section>
 
-      <!-- ACCESOS -->
       <section class="box">
         <h3>Accesos rápidos</h3>
 
@@ -341,23 +382,28 @@
         </p>
       </section>
 
-      <!-- CAMBIAR CONTRASEÑA -->
       <section class="box">
         <h3>Cambiar contraseña</h3>
 
-        <div class="grid-2">
-          <div>
-            <label>Nueva contraseña</label>
-            <input id="pass1" type="password" placeholder="Nueva contraseña" />
-          </div>
-          <div>
-            <label>Repetir contraseña</label>
-            <input id="pass2" type="password" placeholder="Repetir contraseña" />
-          </div>
+        <div class="row">
+          <button class="mini-btn soft" id="btnTogglePass" type="button">Modificar contraseña</button>
         </div>
 
-        <div class="row">
-          <button class="mini-btn primary" id="btnPass" type="button">Actualizar contraseña</button>
+        <div id="passwordFields" class="password-fields">
+          <div class="grid-2">
+            <div>
+              <label>Nueva contraseña</label>
+              <input id="pass1" type="password" placeholder="Nueva contraseña" />
+            </div>
+            <div>
+              <label>Repetir contraseña</label>
+              <input id="pass2" type="password" placeholder="Repetir contraseña" />
+            </div>
+          </div>
+
+          <div class="row">
+            <button class="mini-btn primary" id="btnPass" type="button">Guardar nueva contraseña</button>
+          </div>
         </div>
 
         <div id="err" class="err"></div>
@@ -395,8 +441,12 @@
     const welcomeTitle = document.getElementById("welcomeTitle");
     const avatar = document.getElementById("avatar");
     const btnEdit = document.getElementById("btnEdit");
+    const btnTogglePass = document.getElementById("btnTogglePass");
+    const passwordFields = document.getElementById("passwordFields");
+    const profilePhotoInput = document.getElementById("profilePhoto");
 
     let editMode = false;
+    let passOpen = false;
 
     function loadUsers() {
       try { return JSON.parse(localStorage.getItem(usersKey) || "[]"); }
@@ -419,11 +469,50 @@
       }
     }
 
+    function setPassMode(state) {
+      passOpen = state;
+      passwordFields.classList.toggle("open", state);
+      btnTogglePass.textContent = state ? "Cancelar cambio" : "Modificar contraseña";
+
+      if (!state) {
+        document.getElementById("pass1").value = "";
+        document.getElementById("pass2").value = "";
+        err.style.display = "none";
+        ok.style.display = "none";
+      }
+    }
+
     function updateGreeting(name) {
       const cleanName = (name || "").trim();
       const first = cleanName ? cleanName.split(" ")[0] : "Usuario";
       welcomeTitle.textContent = `Hola, ${first} 👋`;
-      avatar.textContent = first.charAt(0).toUpperCase();
+
+      if (!avatar.querySelector("img")) {
+        avatar.textContent = first.charAt(0).toUpperCase();
+      }
+    }
+
+    function getPhotoKey() {
+      return "tualoja_profile_photo_" + myEmail;
+    }
+
+    function renderPhoto() {
+      const saved = localStorage.getItem(getPhotoKey());
+      if (saved) {
+        avatar.innerHTML = `<img src="${saved}" alt="Foto de perfil">`;
+      } else {
+        const currentName = nameEl.value.trim() || "U";
+        avatar.innerHTML = currentName.charAt(0).toUpperCase();
+      }
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
     }
 
     (function init(){
@@ -435,7 +524,9 @@
 
       nameEl.value = currentName;
       updateGreeting(currentName);
+      renderPhoto();
       setEditMode(false);
+      setPassMode(false);
     })();
 
     btnEdit.addEventListener("click", () => {
@@ -448,6 +539,10 @@
       }
 
       setEditMode(false);
+    });
+
+    btnTogglePass.addEventListener("click", () => {
+      setPassMode(!passOpen);
     });
 
     document.getElementById("btnSave").addEventListener("click", () => {
@@ -477,6 +572,7 @@
       } catch {}
 
       updateGreeting(name);
+      renderPhoto();
       setEditMode(false);
 
       msg.textContent = "✅ Datos guardados.";
@@ -512,8 +608,25 @@
       ok.textContent = "✅ Contraseña actualizada.";
       ok.style.display = "block";
 
-      document.getElementById("pass1").value = "";
-      document.getElementById("pass2").value = "";
+      setPassMode(false);
+    });
+
+    profilePhotoInput.addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      try {
+        const b64 = await fileToBase64(file);
+        localStorage.setItem(getPhotoKey(), b64);
+        renderPhoto();
+        msg.textContent = "✅ Foto de perfil actualizada.";
+        msg.style.display = "block";
+      } catch {
+        msg.textContent = "No se pudo subir la foto.";
+        msg.style.display = "block";
+      }
+
+      profilePhotoInput.value = "";
     });
 
     document.getElementById("btnLogout").addEventListener("click", () => {
