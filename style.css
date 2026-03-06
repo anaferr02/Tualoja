@@ -262,3 +262,26 @@ text-decoration:underline;
   min-height: 36px;
   font-size: 13px;
 }
+.publish-steps{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:18px;
+}
+
+.step{
+padding:8px 14px;
+border-radius:999px;
+font-size:13px;
+font-weight:600;
+background:#eef1ff;
+color:#1b167f;
+border:1px solid rgba(27,22,127,.15);
+}
+
+.step.active{
+background:#1b167f;
+color:#fff;
+border-color:#1b167f;
+box-shadow:0 6px 14px rgba(27,22,127,.25);
+}
