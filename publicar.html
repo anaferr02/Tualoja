@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* ✅ Estilo local SOLO para esta página (no rompe el resto) */
     .publish-wrap{ max-width: 980px; margin: 24px auto 40px; padding: 0 16px; }
     .publish-card{
       background: rgba(255,255,255,.85);
@@ -33,9 +32,11 @@
     .publish-section h3{ margin: 0 0 10px; }
 
     .grid-2{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-    @media (max-width: 720px){ .grid-2{ grid-template-columns: 1fr; } }
+    .grid-3{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+    @media (max-width: 720px){
+      .grid-2, .grid-3{ grid-template-columns: 1fr; }
+    }
 
-    /* inputs */
     .publish-card label{ display:block; font-weight: 600; margin-top: 10px; }
     .publish-card input, .publish-card select, .publish-card textarea{
       width:100%; box-sizing:border-box;
@@ -68,7 +69,6 @@
       border: 1px solid rgba(0,0,0,.06);
     }
 
-    /* Fotos */
     .preview-grid{
       display:grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -105,42 +105,37 @@
 
     .publish-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
     .btn{ cursor:pointer; }
+
+    .section-note{
+      margin-top:-4px;
+      margin-bottom:8px;
+      font-size:13px;
+      opacity:.85;
+    }
   </style>
 </head>
 
 <body>
-  <!-- 🔒 Protección: solo logueado -->
   <script>
     if (localStorage.getItem("tualoja_logged") !== "1") {
-      localStorage.setItem("redirect_after_login", "publicar.html");
-      location.href = "login.html";
+      location.href = "login.html?next=" + encodeURIComponent("publicar.html");
     }
   </script>
 
-  <!-- Header igual que tu sitio -->
   <header class="header">
+    <a class="logo" href="index.html">TuAloja.com</a>
 
-<a class="logo" href="index.html">TuAloja.com</a>
+    <nav id="mainNav" class="nav">
+      <a href="publicar.html">Publicar alojamiento</a>
+      <a href="mis-reservas.html">Mis reservas</a>
+      <a href="panel-anfitrion.html">Panel anfitrión</a>
+      <a href="mi-cuenta.html">Mi cuenta</a>
+      <a href="ayuda.html">Ayuda</a>
+      <a href="#" id="logoutLink">Cerrar sesión</a>
+    </nav>
 
-<nav id="mainNav" class="nav">
-
-<a href="publicar.html">Publicar alojamiento</a>
-
-<a href="mis-reservas.html">Mis reservas</a>
-
-<a href="panel-anfitrion.html">Panel anfitrión</a>
-
-<a href="mi-cuenta.html">Mi cuenta</a>
-
-<a href="ayuda.html">Ayuda</a>
-
-<a href="#" id="logoutLink">Cerrar sesión</a>
-
-</nav>
-
-<button id="hamburgerBtn" class="hamburger">☰</button>
-
-</header>
+    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
+  </header>
 
   <main class="publish-wrap">
     <div class="publish-card">
@@ -148,7 +143,7 @@
         <div>
           <h1>Publicar alojamiento</h1>
           <p class="muted" style="margin:6px 0 0;">
-            Subí fotos, completá datos y publicá.
+            Completá la información como en una ficha profesional de hospedaje.
           </p>
         </div>
         <button class="btn btn-outline" type="button" id="btnLogout">Cerrar sesión</button>
@@ -158,9 +153,10 @@
         <!-- INFO BÁSICA -->
         <section class="publish-section">
           <h3>Información básica</h3>
+          <p class="section-note">Contá qué tipo de lugar ofrecés y para cuántas personas.</p>
 
           <label>Nombre del alojamiento *</label>
-          <input name="titulo" required placeholder="Ej: Cabaña en el río" />
+          <input name="titulo" required placeholder="Ej: Departamento céntrico con balcón" />
 
           <div class="grid-2">
             <div>
@@ -173,6 +169,8 @@
                 <option>Habitación</option>
                 <option>Hotel</option>
                 <option>Hostel</option>
+                <option>Apart hotel</option>
+                <option>Complejo turístico</option>
                 <option>Otro</option>
               </select>
             </div>
@@ -182,13 +180,29 @@
             </div>
           </div>
 
+          <div class="grid-3">
+            <div>
+              <label>Habitaciones *</label>
+              <input name="habitaciones" type="number" min="0" required placeholder="Ej: 2" />
+            </div>
+            <div>
+              <label>Camas *</label>
+              <input name="camas" type="number" min="1" required placeholder="Ej: 3" />
+            </div>
+            <div>
+              <label>Baños *</label>
+              <input name="banos" type="number" min="1" required placeholder="Ej: 1" />
+            </div>
+          </div>
+
           <label>Descripción *</label>
-          <textarea name="descripcion" rows="4" required placeholder="Contá lo mejor del alojamiento..."></textarea>
+          <textarea name="descripcion" rows="4" required placeholder="Contá lo mejor del alojamiento, ubicación, comodidad, vista, cercanía a puntos de interés..."></textarea>
         </section>
 
         <!-- UBICACIÓN -->
         <section class="publish-section">
           <h3>Ubicación</h3>
+          <p class="section-note">Esto ayuda a generar confianza y evitar publicaciones falsas.</p>
 
           <div class="grid-2">
             <div>
@@ -201,59 +215,117 @@
             </div>
           </div>
 
-          <!-- ✅ Dirección obligatoria (como querías) -->
           <label>Dirección (obligatoria) *</label>
-          <input name="direccion" required minlength="5" placeholder="Ej: Calle y número (no se publica)" />
-          <small class="help">La dirección no será pública. Se usa para verificación y evitar estafas.</small>
+          <input name="direccion" required minlength="5" placeholder="Ej: Calle y número (no se publica completa)" />
+          <small class="help">La dirección exacta no será visible públicamente. Se usa para validación interna.</small>
 
-          <label>Código postal (opcional)</label>
-          <input name="cp" placeholder="Ej: 3265" />
+          <div class="grid-2">
+            <div>
+              <label>Código postal (opcional)</label>
+              <input name="cp" placeholder="Ej: 3265" />
+            </div>
+            <div>
+              <label>Referencia de ubicación (opcional)</label>
+              <input name="referencia" placeholder="Ej: A 2 cuadras de la plaza principal" />
+            </div>
+          </div>
         </section>
 
-        <!-- SERVICIOS -->
+        <!-- SERVICIOS PRINCIPALES -->
         <section class="publish-section">
-          <h3>Servicios</h3>
+          <h3>Servicios más populares</h3>
           <div class="checks">
             <label><input type="checkbox" name="servicios" value="Wifi" /> Wifi</label>
+            <label><input type="checkbox" name="servicios" value="Desayuno" /> Desayuno</label>
             <label><input type="checkbox" name="servicios" value="Aire acondicionado" /> Aire acondicionado</label>
             <label><input type="checkbox" name="servicios" value="Calefacción" /> Calefacción</label>
             <label><input type="checkbox" name="servicios" value="Cocina" /> Cocina</label>
             <label><input type="checkbox" name="servicios" value="Estacionamiento" /> Estacionamiento</label>
             <label><input type="checkbox" name="servicios" value="Pileta" /> Pileta</label>
             <label><input type="checkbox" name="servicios" value="Parrilla" /> Parrilla</label>
+            <label><input type="checkbox" name="servicios" value="Restaurante" /> Restaurante</label>
+            <label><input type="checkbox" name="servicios" value="Bar" /> Bar</label>
+            <label><input type="checkbox" name="servicios" value="Gimnasio" /> Gimnasio</label>
             <label><input type="checkbox" name="servicios" value="Mascotas" /> Mascotas</label>
+            <label><input type="checkbox" name="servicios" value="Habitaciones familiares" /> Habitaciones familiares</label>
+            <label><input type="checkbox" name="servicios" value="Habitaciones sin humo" /> Habitaciones sin humo</label>
+            <label><input type="checkbox" name="servicios" value="Traslado aeropuerto" /> Traslado aeropuerto</label>
+            <label><input type="checkbox" name="servicios" value="TV" /> TV</label>
+            <label><input type="checkbox" name="servicios" value="Lavarropas" /> Lavarropas</label>
+            <label><input type="checkbox" name="servicios" value="Balcón" /> Balcón</label>
+            <label><input type="checkbox" name="servicios" value="Vista" /> Vista</label>
           </div>
+        </section>
+
+        <!-- HORARIOS -->
+        <section class="publish-section">
+          <h3>Horarios</h3>
+
+          <div class="grid-2">
+            <div>
+              <label>Check-in desde *</label>
+              <input name="checkinDesde" type="time" required />
+            </div>
+            <div>
+              <label>Check-out hasta *</label>
+              <input name="checkoutHasta" type="time" required />
+            </div>
+          </div>
+        </section>
+
+        <!-- REGLAS -->
+        <section class="publish-section">
+          <h3>Reglas de la casa</h3>
+
+          <div class="checks">
+            <label><input type="checkbox" name="reglas" value="Se aceptan niños" /> Se aceptan niños</label>
+            <label><input type="checkbox" name="reglas" value="Se aceptan mascotas" /> Se aceptan mascotas</label>
+            <label><input type="checkbox" name="reglas" value="No se permite fumar" /> No se permite fumar</label>
+            <label><input type="checkbox" name="reglas" value="No se permiten fiestas" /> No se permiten fiestas</label>
+          </div>
+
+          <label>Reglas adicionales (opcional)</label>
+          <textarea name="reglasExtra" rows="3" placeholder="Ej: No hacer ruidos molestos después de las 23 hs."></textarea>
+        </section>
+
+        <!-- POLÍTICA -->
+        <section class="publish-section">
+          <h3>Política de cancelación</h3>
+
+          <select name="cancelacion" required>
+            <option value="">Elegí una política</option>
+            <option value="Flexible">Flexible</option>
+            <option value="Moderada">Moderada</option>
+            <option value="No reembolsable">No reembolsable</option>
+          </select>
         </section>
 
         <!-- FOTOS -->
         <section class="publish-section">
           <h3>Fotos</h3>
           <p class="muted" style="margin-top:-6px;">
-            Subí varias. Podés <strong>borrar</strong> y elegir <strong>portada</strong>.
+            Subí varias. Podés borrar y elegir portada.
           </p>
 
           <input id="fotos" type="file" accept="image/*" multiple />
           <div id="preview" class="preview-grid"></div>
-          <small class="help">Si no elegís portada, se usa automáticamente la primera. Si borrás la portada, se reasigna.</small>
+          <small class="help">La primera foto destacada será la portada del alojamiento.</small>
         </section>
 
         <!-- PRECIO -->
         <section class="publish-section">
-          <h3>Precio</h3>
+          <h3>Precio y estadía</h3>
 
           <div class="grid-2">
             <div>
-              <!-- ✅ Moneda ARS + aclaración de pago -->
               <label>Precio por noche (Pesos Argentinos) *</label>
               <input name="precio" type="number" min="0" required placeholder="Ej: 35000" />
-              <small class="help">
-                Precio orientativo en pesos argentinos. El pago se coordina directamente con el anfitrión.
-              </small>
+              <small class="help">El pago se coordina directamente con el anfitrión.</small>
             </div>
             <div>
               <label>Máximo de noches (opcional)</label>
               <input name="maxNoches" type="number" min="1" max="365" placeholder="Ej: 14" />
-              <small class="help">Si lo dejás vacío, se toma 30 (recomendado).</small>
+              <small class="help">Si lo dejás vacío, se toma 30.</small>
             </div>
           </div>
         </section>
@@ -285,13 +357,11 @@
         <p class="muted" id="msg" style="margin-top:12px;"></p>
       </form>
 
-      <!-- ✅ FORM OCULTO PARA ENVIAR EMAIL (a TuAloja + autorespuesta al anfitrión) -->
       <form id="mailForm" action="https://formsubmit.co/alojamientos@tualoja.com" method="POST" style="display:none;">
         <input type="hidden" name="_subject" value="TuAloja - Nueva publicación" />
         <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_template" value="table" />
 
-        <!-- Para autorespuesta: FormSubmit usa el campo "email" como destino -->
         <input type="hidden" name="email" id="mf_email_to" value="" />
         <input type="hidden" name="_replyto" id="mf_replyto" value="" />
         <input type="hidden" name="_autoresponse" id="mf_autoresponse" value="" />
@@ -300,16 +370,23 @@
         <input type="hidden" name="Título" id="mf_titulo" value="" />
         <input type="hidden" name="Tipo" id="mf_tipo" value="" />
         <input type="hidden" name="Capacidad" id="mf_capacidad" value="" />
+        <input type="hidden" name="Habitaciones" id="mf_habitaciones" value="" />
+        <input type="hidden" name="Camas" id="mf_camas" value="" />
+        <input type="hidden" name="Baños" id="mf_banos" value="" />
         <input type="hidden" name="Provincia" id="mf_provincia" value="" />
         <input type="hidden" name="Ciudad" id="mf_ciudad" value="" />
         <input type="hidden" name="Dirección" id="mf_direccion" value="" />
         <input type="hidden" name="Precio" id="mf_precio" value="" />
         <input type="hidden" name="Moneda" id="mf_moneda" value="ARS" />
         <input type="hidden" name="Máximo noches" id="mf_maxnoches" value="" />
+        <input type="hidden" name="Check-in desde" id="mf_checkin" value="" />
+        <input type="hidden" name="Check-out hasta" id="mf_checkout" value="" />
+        <input type="hidden" name="Cancelación" id="mf_cancelacion" value="" />
         <input type="hidden" name="Anfitrión" id="mf_anfitrion" value="" />
         <input type="hidden" name="Teléfono" id="mf_telefono" value="" />
         <input type="hidden" name="Email anfitrión" id="mf_email" value="" />
         <input type="hidden" name="Servicios" id="mf_servicios" value="" />
+        <input type="hidden" name="Reglas" id="mf_reglas" value="" />
       </form>
     </div>
   </main>
@@ -329,21 +406,18 @@
 
   <script src="script.js"></script>
   <script>
-    // Logout
     document.getElementById("btnLogout").addEventListener("click", () => {
       localStorage.setItem("tualoja_logged", "0");
       localStorage.removeItem("tualoja_user");
       location.href = "index.html";
     });
 
-    // Fotos: preview + borrar + portada (manteniendo tu estilo)
     const fotosInput = document.getElementById("fotos");
     const preview = document.getElementById("preview");
-    let fotos = []; // [{b64,isCover}]
+    let fotos = [];
 
     function asegurarPortada() {
       if (!fotos.length) return;
-      // ✅ Si nadie es portada, la primera lo es
       if (!fotos.some(x => x.isCover)) fotos[0].isCover = true;
     }
 
@@ -356,9 +430,7 @@
         fotos.push({ b64, isCover: false });
       }
 
-      // ✅ portada automática si no eligió
       asegurarPortada();
-
       fotosInput.value = "";
       renderFotos();
     });
@@ -398,7 +470,6 @@
           const wasCover = fotos[idx]?.isCover;
           fotos.splice(idx, 1);
 
-          // ✅ si borró la portada, reasignar automáticamente
           if (wasCover && fotos.length) {
             fotos = fotos.map((x, i) => ({ ...x, isCover: i === 0 }));
           }
@@ -430,33 +501,32 @@
       });
     }
 
-    // Publicar (localStorage) + ir a gracias.html + enviar mails
     document.getElementById("publishForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const f = e.currentTarget;
 
-      // ✅ Dirección obligatoria (por si el navegador no valida)
       if (!f.direccion.value.trim()) {
         alert("La dirección es obligatoria.");
         f.direccion.focus();
         return;
       }
 
-      // ✅ Máximo noches: default 30 + límites (para que no quede mal)
       let maxNoches = parseInt(f.maxNoches.value || "30", 10);
       if (Number.isNaN(maxNoches)) maxNoches = 30;
       if (maxNoches < 1) maxNoches = 1;
       if (maxNoches > 365) maxNoches = 365;
       f.maxNoches.value = String(maxNoches);
 
-      // ✅ Fotos: asegurar portada antes de ordenar
       asegurarPortada();
 
       const servicios = Array.from(
         f.querySelectorAll('input[name="servicios"]:checked')
       ).map(i => i.value);
 
-      // portada primero
+      const reglas = Array.from(
+        f.querySelectorAll('input[name="reglas"]:checked')
+      ).map(i => i.value);
+
       const fotosOrdenadas = [...fotos].sort((a, b) => (b.isCover ? 1 : 0) - (a.isCover ? 1 : 0));
       const fotosBase64 = fotosOrdenadas.map(x => x.b64);
 
@@ -465,15 +535,24 @@
         titulo: f.titulo.value.trim(),
         tipo: f.tipo.value,
         capacidad: Number(f.capacidad.value),
+        habitaciones: Number(f.habitaciones.value),
+        camas: Number(f.camas.value),
+        banos: Number(f.banos.value),
         descripcion: f.descripcion.value.trim(),
         direccion: f.direccion.value.trim(),
         ciudad: f.ciudad.value.trim(),
         provincia: f.provincia.value.trim(),
         cp: f.cp.value.trim(),
+        referencia: f.referencia.value.trim(),
         servicios,
+        reglas,
+        reglasExtra: f.reglasExtra.value.trim(),
+        cancelacion: f.cancelacion.value,
+        checkinDesde: f.checkinDesde.value,
+        checkoutHasta: f.checkoutHasta.value,
         fotos: fotosBase64,
         precio: Number(f.precio.value),
-        moneda: "ARS", // ✅ moneda definida
+        moneda: "ARS",
         maxNoches,
         anfitrion: f.anfitrion.value.trim(),
         telefono: f.telefono.value.trim(),
@@ -486,24 +565,28 @@
 
       document.getElementById("msg").textContent = "✅ Publicado. Enviando confirmación…";
 
-      // ✅ Envío de email confiable (sin fetch / sin CORS)
       try {
-        // datos para TuAloja (tu casilla)
         document.getElementById("mf_id").value = data.id;
         document.getElementById("mf_titulo").value = data.titulo;
         document.getElementById("mf_tipo").value = data.tipo;
         document.getElementById("mf_capacidad").value = String(data.capacidad);
+        document.getElementById("mf_habitaciones").value = String(data.habitaciones);
+        document.getElementById("mf_camas").value = String(data.camas);
+        document.getElementById("mf_banos").value = String(data.banos);
         document.getElementById("mf_provincia").value = data.provincia;
         document.getElementById("mf_ciudad").value = data.ciudad;
         document.getElementById("mf_direccion").value = data.direccion;
         document.getElementById("mf_precio").value = `$${data.precio} ARS`;
         document.getElementById("mf_maxnoches").value = String(data.maxNoches);
+        document.getElementById("mf_checkin").value = data.checkinDesde;
+        document.getElementById("mf_checkout").value = data.checkoutHasta;
+        document.getElementById("mf_cancelacion").value = data.cancelacion;
         document.getElementById("mf_anfitrion").value = data.anfitrion;
         document.getElementById("mf_telefono").value = data.telefono || "-";
         document.getElementById("mf_email").value = data.email;
         document.getElementById("mf_servicios").value = servicios.length ? servicios.join(", ") : "-";
+        document.getElementById("mf_reglas").value = reglas.length ? reglas.join(", ") : "-";
 
-        // reply-to / y autorespuesta al anfitrión
         document.getElementById("mf_replyto").value = data.email;
         document.getElementById("mf_email_to").value = data.email;
 
@@ -515,12 +598,13 @@ Recibimos correctamente tu publicación en TuAloja.
 📍 Alojamiento: ${data.titulo}
 📌 Ubicación: ${data.ciudad}, ${data.provincia}
 💰 Precio por noche: $${data.precio} ARS
-🛏️ Máx. de noches: ${data.maxNoches}
+🛏️ Capacidad: ${data.capacidad} huéspedes
+🕒 Check-in desde: ${data.checkinDesde}
+🕚 Check-out hasta: ${data.checkoutHasta}
+📄 Política de cancelación: ${data.cancelacion}
 
 Tu anuncio quedó en estado:
 ⏳ Pendiente de revisión de seguridad.
-
-Si necesitamos algún dato adicional, te contactamos por este correo.
 
 Gracias por confiar en TuAloja 💙
 — Equipo TuAloja`;
@@ -531,14 +615,11 @@ Gracias por confiar en TuAloja 💙
         if (navigator.sendBeacon) {
           navigator.sendBeacon(mailForm.action, fd);
         } else {
-          // fallback: si no existe sendBeacon
           mailForm.target = "_self";
           mailForm.submit();
-          return; // corta acá porque submit navega
+          return;
         }
-      } catch {
-        // si falla, igual seguimos al gracias
-      }
+      } catch {}
 
       document.getElementById("msg").textContent = "✅ Publicado. Redirigiendo…";
       setTimeout(() => { location.href = "gracias.html"; }, 600);
