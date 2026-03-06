@@ -223,3 +223,24 @@ display:block;
 }
 
 }
+.footer-ayuda{
+text-align:center;
+margin-top:40px;
+padding:20px;
+font-size:14px;
+color:#333;
+}
+
+.footer-links{
+margin-top:8px;
+}
+
+.footer-links a{
+color:#1b167f;
+text-decoration:none;
+margin:0 6px;
+}
+
+.footer-links a:hover{
+text-decoration:underline;
+}
