@@ -1,5 +1,4 @@
 // publicar.js
-import { addAlojamiento, uid } from "./storage.js";
 
 function readFilesAsDataURL(files) {
   const tasks = Array.from(files || []).map(
@@ -26,10 +25,16 @@ function readFilesAsDataURL(files) {
   if (inputFotos) {
     inputFotos.addEventListener("change", async () => {
       fotosData = await readFilesAsDataURL(inputFotos.files);
-      if (hint) hint.textContent = fotosData.length ? `Cargaste ${fotosData.length} foto(s).` : "Todavía no cargaste fotos.";
+
+      if (hint) {
+        hint.textContent = fotosData.length
+          ? `Cargaste ${fotosData.length} foto(s).`
+          : "Todavía no cargaste fotos.";
+      }
+
       if (preview) {
         preview.innerHTML = fotosData
-          .map((src) => `<img class="preview-img" src="${src}" alt="Foto">`)
+          .map((src) => `<img class="preview-img" src="${src}">`)
           .join("");
       }
     });
@@ -37,7 +42,7 @@ function readFilesAsDataURL(files) {
 
   if (!form) return;
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     if (fotosData.length < 3) {
@@ -45,30 +50,44 @@ function readFilesAsDataURL(files) {
       return;
     }
 
-    const servicios = Array.from(document.querySelectorAll(".serv:checked")).map((x) => x.value);
+    const servicios = Array.from(
+      document.querySelectorAll(".serv:checked")
+    ).map((x) => x.value);
 
-    const aloj = {
-      id: uid(),
-      titulo: document.getElementById("titulo")?.value?.trim(),
-      tipo: document.getElementById("tipo")?.value?.trim(),
-      capacidad: Number(document.getElementById("capacidad")?.value || 0),
-      descripcion: document.getElementById("descripcion")?.value?.trim(),
-      provincia: document.getElementById("provincia")?.value?.trim(),
-      ciudad: document.getElementById("ciudad")?.value?.trim(),
-      zona: document.getElementById("zona")?.value?.trim(),
+    const alojamiento = {
+      titulo: document.getElementById("titulo").value,
+      tipo: document.getElementById("tipo").value,
+      capacidad: Number(document.getElementById("capacidad").value),
+      descripcion: document.getElementById("descripcion").value,
+      provincia: document.getElementById("provincia").value,
+      ciudad: document.getElementById("ciudad").value,
+      zona: document.getElementById("zona").value,
       servicios,
       fotos: fotosData,
-      precio: Number(document.getElementById("precio")?.value || 0),
-      minimoNoches: Number(document.getElementById("minNoches")?.value || 1),
-      anfitrionNombre: document.getElementById("anfitrionNombre")?.value?.trim(),
-      anfitrionWhatsapp: document.getElementById("anfitrionWhatsapp")?.value?.trim(),
-      anfitrionEmail: document.getElementById("anfitrionEmail")?.value?.trim(),
-      createdAt: new Date().toISOString()
+      precio: Number(document.getElementById("precio").value),
+      minimoNoches: Number(document.getElementById("minNoches").value)
     };
 
-    addAlojamiento(aloj);
+    try {
+      const res = await fetch("/api/listings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(alojamiento)
+      });
 
-    if (msg) msg.textContent = "✅ Publicado. Te llevo a Resultados…";
-    setTimeout(() => (window.location.href = "resultados.html"), 600);
+      if (!res.ok) throw new Error("Error al publicar");
+
+      if (msg) msg.textContent = "✅ Publicado correctamente";
+
+      setTimeout(() => {
+        window.location.href = "resultados.html";
+      }, 800);
+
+    } catch (err) {
+      console.error(err);
+      if (msg) msg.textContent = "❌ Error al publicar el alojamiento";
+    }
   });
 })();
