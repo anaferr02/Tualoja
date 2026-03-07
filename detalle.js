@@ -86,10 +86,11 @@ function normalizarWhatsapp(telefono) {
     `;
   }
 
-  const botonReservar = reservarLink
-    ? `<a class="detalle-btn-reservar" href="${reservarLink}" target="_blank" rel="noopener">Reservar</a>`
-    : `<span class="detalle-btn-reservar disabled">Reservar</span>`;
-
+  const botonReservar = `
+<button class="detalle-btn-reservar" id="btnReservar">
+Reservar
+</button>
+`;
   wrap.innerHTML = `
     <section class="detalle-layout">
       <h1>${esc(a.titulo)}</h1>
@@ -99,6 +100,50 @@ function normalizarWhatsapp(telefono) {
       ${!a.fotos || !a.fotos.length ? `<p class="detalle-subtexto">Este alojamiento no cargó fotos todavía.</p>` : ""}
 
       <p class="detalle-descripcion-top">${descripcion}</p>
+      const btn = document.getElementById("btnReservar");
+
+if(btn){
+
+btn.addEventListener("click", () => {
+
+if(localStorage.getItem("tualoja_logged") !== "1"){
+alert("Tenés que iniciar sesión para reservar.");
+location.href="login.html";
+return;
+}
+
+const user = JSON.parse(localStorage.getItem("tualoja_user") || "{}");
+
+const reservas = JSON.parse(localStorage.getItem("tualoja_bookings") || "[]");
+
+const nuevaReserva = {
+id: Date.now().toString(),
+listingId: a.id,
+title: a.titulo,
+location: a.ciudad + ", " + a.provincia,
+cover: a.fotos?.[0] || "",
+userEmail: user.email,
+guestName: user.name || "Huésped",
+hostEmail: a.email || "",
+checkin: "pendiente",
+checkout: "pendiente",
+guests: a.capacidad || 1,
+total: a.precio,
+status: "pendiente",
+code: "R" + Math.floor(Math.random()*1000000)
+};
+
+reservas.push(nuevaReserva);
+
+localStorage.setItem("tualoja_bookings", JSON.stringify(reservas));
+
+alert("Reserva enviada al anfitrión.");
+
+location.href="mis-reservas.html";
+
+});
+
+}
 
       <div class="detalle-card">
         ${galeriaHTML}
