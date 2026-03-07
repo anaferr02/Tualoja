@@ -28,8 +28,8 @@ function esc(s) {
   }[c]));
 }
 
-function normalizarWhatsapp(telefono) {
-  return String(telefono || "").replace(/\D/g, "");
+function crearCodigoReserva() {
+  return "R" + Math.floor(100000 + Math.random() * 900000);
 }
 
 (function init() {
@@ -47,36 +47,24 @@ function normalizarWhatsapp(telefono) {
     return;
   }
 
-  const servicios = (a.servicios && a.servicios.length)
+  const servicios = Array.isArray(a.servicios) && a.servicios.length
     ? a.servicios.join(" · ")
     : "No especificados";
 
   const ubicacion = `${esc(a.ciudad || "")}${a.provincia ? `, <strong>${esc(a.provincia)}</strong>` : ""}${a.zona ? ` • ${esc(a.zona)}` : ""}`;
-
   const descripcion = esc(a.descripcion || "Este alojamiento no tiene descripción todavía.");
   const tipo = esc(a.tipo || "Alojamiento");
   const capacidad = esc(a.capacidad || "-");
   const minimoNoches = esc(a.minimoNoches || 1);
+  const portada = Array.isArray(a.fotos) && a.fotos.length ? String(a.fotos[0]) : "";
 
-  const wa = normalizarWhatsapp(a.anfitrionWhatsapp);
-  const mail = String(a.anfitrionEmail || "").trim();
-
-  let reservarLink = "";
-  if (wa) {
-    reservarLink = `https://wa.me/${wa}?text=${encodeURIComponent(`Hola! Quiero reservar "${a.titulo}" que vi en TuAloja. ¿Está disponible?`)}`;
-  } else if (mail) {
-    reservarLink = `mailto:${encodeURIComponent(mail)}?subject=${encodeURIComponent(`Reserva en TuAloja: ${a.titulo}`)}&body=${encodeURIComponent(`Hola! Quiero reservar "${a.titulo}". ¿Está disponible?`)}`;
-  }
-
-  let galeriaHTML = "";
-  if (a.fotos && a.fotos.length) {
-    galeriaHTML = `
+  const galeriaHTML = portada
+    ? `
       <div class="detalle-galeria">
-        <img src="${esc(a.fotos[0])}" alt="Foto de ${esc(a.titulo)}">
+        <img src="${esc(portada)}" alt="Foto de ${esc(a.titulo)}">
       </div>
-    `;
-  } else {
-    galeriaHTML = `
+    `
+    : `
       <div class="detalle-galeria">
         <div class="detalle-galeria-empty">
           <div class="icono">📷</div>
@@ -84,66 +72,16 @@ function normalizarWhatsapp(telefono) {
         </div>
       </div>
     `;
-  }
 
-  const botonReservar = `
-<button class="detalle-btn-reservar" id="btnReservar">
-Reservar
-</button>
-`;
   wrap.innerHTML = `
     <section class="detalle-layout">
       <h1>${esc(a.titulo)}</h1>
 
       <p class="detalle-ubicacion-top">📍 ${ubicacion}</p>
 
-      ${!a.fotos || !a.fotos.length ? `<p class="detalle-subtexto">Este alojamiento no cargó fotos todavía.</p>` : ""}
+      ${!portada ? `<p class="detalle-subtexto">Este alojamiento no cargó fotos todavía.</p>` : ""}
 
       <p class="detalle-descripcion-top">${descripcion}</p>
-      const btn = document.getElementById("btnReservar");
-
-if(btn){
-
-btn.addEventListener("click", () => {
-
-if(localStorage.getItem("tualoja_logged") !== "1"){
-alert("Tenés que iniciar sesión para reservar.");
-location.href="login.html";
-return;
-}
-
-const user = JSON.parse(localStorage.getItem("tualoja_user") || "{}");
-
-const reservas = JSON.parse(localStorage.getItem("tualoja_bookings") || "[]");
-
-const nuevaReserva = {
-id: Date.now().toString(),
-listingId: a.id,
-title: a.titulo,
-location: a.ciudad + ", " + a.provincia,
-cover: a.fotos?.[0] || "",
-userEmail: user.email,
-guestName: user.name || "Huésped",
-hostEmail: a.email || "",
-checkin: "pendiente",
-checkout: "pendiente",
-guests: a.capacidad || 1,
-total: a.precio,
-status: "pendiente",
-code: "R" + Math.floor(Math.random()*1000000)
-};
-
-reservas.push(nuevaReserva);
-
-localStorage.setItem("tualoja_bookings", JSON.stringify(reservas));
-
-alert("Reserva enviada al anfitrión.");
-
-location.href="mis-reservas.html";
-
-});
-
-}
 
       <div class="detalle-card">
         ${galeriaHTML}
@@ -163,14 +101,55 @@ location.href="mis-reservas.html";
 
             <p class="detalle-minimo">📅 Mínimo de noches: ${minimoNoches}</p>
 
-            ${botonReservar}
+            <button class="detalle-btn-reservar" id="btnReservar" type="button">
+              Reservar
+            </button>
 
             <div class="detalle-ayuda">
-              ${reservarLink ? "Te contactamos con el anfitrión para completar la reserva." : "Este alojamiento todavía no tiene un medio de contacto disponible."}
+              Te contactamos con el anfitrión para completar la reserva.
             </div>
           </div>
         </div>
       </div>
     </section>
   `;
+
+  const btnReservar = document.getElementById("btnReservar");
+
+  if (!btnReservar) return;
+
+  btnReservar.addEventListener("click", () => {
+    if (localStorage.getItem("tualoja_logged") !== "1") {
+      alert("Tenés que iniciar sesión para reservar.");
+      location.href = "login.html?next=" + encodeURIComponent(window.location.pathname + window.location.search);
+      return;
+    }
+
+    const user = JSON.parse(localStorage.getItem("tualoja_user") || "{}");
+    const reservas = JSON.parse(localStorage.getItem("tualoja_bookings") || "[]");
+
+    const nuevaReserva = {
+      id: String(Date.now()),
+      listingId: a.id,
+      title: a.titulo || "Alojamiento",
+      location: `${a.ciudad || ""}${a.provincia ? ", " + a.provincia : ""}`,
+      cover: portada || "",
+      userEmail: user.email || "",
+      guestEmail: user.email || "",
+      guestName: user.name || "Huésped",
+      hostEmail: a.email || "",
+      checkin: "pendiente",
+      checkout: "pendiente",
+      guests: a.capacidad || 1,
+      total: Number(a.precio) || 0,
+      status: "pendiente",
+      code: crearCodigoReserva()
+    };
+
+    reservas.push(nuevaReserva);
+    localStorage.setItem("tualoja_bookings", JSON.stringify(reservas));
+
+    alert("Reserva enviada al anfitrión.");
+    location.href = "mis-reservas.html";
+  });
 })();
