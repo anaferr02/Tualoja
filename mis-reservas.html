@@ -332,6 +332,22 @@
       catch { return String(num); }
     }
 
+    function formatDate(fecha) {
+      if (!fecha || fecha === "pendiente") return "-";
+      const d = new Date(fecha + "T00:00:00");
+      if (Number.isNaN(d.getTime())) return fecha;
+      return d.toLocaleDateString("es-AR");
+    }
+
+    function calcularNoches(checkin, checkout) {
+      if (!checkin || !checkout || checkin === "pendiente" || checkout === "pendiente") return null;
+      const d1 = new Date(checkin + "T00:00:00");
+      const d2 = new Date(checkout + "T00:00:00");
+      const diff = d2 - d1;
+      const noches = diff / (1000 * 60 * 60 * 24);
+      return noches > 0 ? noches : null;
+    }
+
     function statusChip(status) {
       if (status === "confirmada" || status === "aceptada") {
         return `<span class="chip chip-ok">✅ Confirmada</span>`;
@@ -347,20 +363,21 @@
       const emptyBox = document.getElementById("emptyBox");
       const summary = document.getElementById("summary");
 
-      const all = loadAll();
-      const mine = all.filter(x => (x.userEmail || x.guestEmail || "").toLowerCase() === myEmail);
+      const all = loadAll()
+        .filter(x => (x.userEmail || x.guestEmail || "").toLowerCase() === myEmail)
+        .sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
 
-      summary.textContent = `Reservas: ${mine.length}`;
+      summary.textContent = `Reservas: ${all.length}`;
       list.innerHTML = "";
 
-      if (!mine.length) {
+      if (!all.length) {
         emptyBox.style.display = "block";
         return;
       }
 
       emptyBox.style.display = "none";
 
-      mine.forEach((x) => {
+      all.forEach((x) => {
         const item = document.createElement("div");
         item.className = "item";
 
@@ -374,6 +391,8 @@
           thumb.appendChild(img);
         }
 
+        const noches = calcularNoches(x.checkin, x.checkout);
+
         const meta = document.createElement("div");
         meta.className = "meta";
 
@@ -382,8 +401,9 @@
           <p><b>${escapeHTML(x.location || "-")}</b></p>
           <div class="chips">
             ${statusChip(x.status)}
-            <span class="chip">Check-in: ${escapeHTML(x.checkin || "-")}</span>
-            <span class="chip">Check-out: ${escapeHTML(x.checkout || "-")}</span>
+            <span class="chip">Check-in: ${escapeHTML(formatDate(x.checkin))}</span>
+            <span class="chip">Check-out: ${escapeHTML(formatDate(x.checkout))}</span>
+            ${noches ? `<span class="chip">Noches: ${escapeHTML(String(noches))}</span>` : ""}
             <span class="chip">Huéspedes: ${escapeHTML(String(x.guests ?? "-"))}</span>
             <span class="chip">Total: ARS $${formatARS(x.total)}</span>
             <span class="chip">Código: ${escapeHTML(x.code || "")}</span>
