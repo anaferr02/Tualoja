@@ -630,7 +630,23 @@ footer {
 
 <script>
   function buscar(){
-    window.location.href="resultados.html";
+    const destino = document.getElementById("destino")?.value?.trim() || "";
+    const entrada = document.getElementById("entrada")?.value || "";
+    const salida = document.getElementById("salida")?.value || "";
+    const adultos = document.getElementById("adultos")?.value || "1";
+    const ninos = document.getElementById("ninos")?.value || "0";
+    const habitaciones = document.getElementById("habitaciones")?.value || "1";
+
+    const params = new URLSearchParams();
+
+    if (destino) params.set("destino", destino);
+    if (entrada) params.set("entrada", entrada);
+    if (salida) params.set("salida", salida);
+    if (adultos) params.set("adultos", adultos);
+    if (ninos) params.set("ninos", ninos);
+    if (habitaciones) params.set("habitaciones", habitaciones);
+
+    window.location.href = `resultados.html?${params.toString()}`;
   }
 
   (function(){
