@@ -1,311 +1,293 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Detalle - TuAloja</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Detalle - TuAloja</title>
 
-  <style>
-    .detalle-page{
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 28px 20px 60px;
-    }
+<link rel="stylesheet" href="style.css" />
 
-    .detalle-back{
-      display: inline-block;
-      margin-bottom: 22px;
-      color: #4f3dbb;
-      font-size: 18px;
-      text-decoration: underline;
-    }
+<style>
 
-    .detalle-layout h1{
-      margin: 0 0 14px;
-      font-size: 58px;
-      line-height: 1.03;
-      color: #181818;
-      font-family: Georgia, "Times New Roman", serif;
-    }
-
-    .detalle-ubicacion-top{
-      margin: 0 0 24px;
-      color: #2a2a2a;
-      font-size: 20px;
-    }
-
-    .detalle-ubicacion-top strong{
-      color: #202020;
-    }
-
-    .detalle-subtexto{
-      margin: 0 0 18px;
-      font-size: 18px;
-      color: #333;
-    }
-
-    .detalle-descripcion-top{
-      margin: 0 0 28px;
-      font-size: 18px;
-      color: #333;
-    }
-
-    .detalle-card{
-      background: #fff;
-      border: 1px solid #e6e6ef;
-      border-radius: 22px;
-      overflow: hidden;
-      box-shadow: 0 8px 28px rgba(0,0,0,.06);
-    }
-
-    .detalle-galeria{
-      background: #f3f3f9;
-      min-height: 300px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .detalle-galeria img{
-      width: 100%;
-      height: 100%;
-      min-height: 300px;
-      max-height: 480px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .detalle-galeria-empty{
-      width: 100%;
-      min-height: 300px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #4a4f73;
-      text-align: center;
-      padding: 30px 20px;
-      background: #f3f3f9;
-    }
-
-    .detalle-galeria-empty .icono{
-      font-size: 56px;
-      margin-bottom: 16px;
-      opacity: .7;
-    }
-
-    .detalle-galeria-empty .texto{
-      font-size: 20px;
-      font-weight: 500;
-    }
-
-    .detalle-info-grid{
-      display: grid;
-      grid-template-columns: 1.2fr .8fr;
-      border-top: 1px solid #e6e6ef;
-    }
-
-    .detalle-info-left{
-      padding: 30px 28px;
-      border-right: 1px solid #e6e6ef;
-    }
-
-    .detalle-info-right{
-      padding: 28px 28px 32px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .detalle-item{
-      font-size: 19px;
-      color: #262626;
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-
-    .detalle-item:last-child{
-      margin-bottom: 0;
-    }
-
-    .detalle-item strong{
-      color: #171717;
-    }
-
-    .detalle-precio-box{
-      margin-bottom: 14px;
-      color: #181818;
-      line-height: 1.1;
-    }
-
-    .detalle-precio-numero{
-      font-size: 34px;
-      font-weight: 800;
-      color: #151515;
-    }
-
-    .detalle-precio-texto{
-      font-size: 26px;
-      color: #222;
-      margin-left: 4px;
-    }
-
-    .detalle-minimo{
-      margin: 0 0 28px;
-      font-size: 18px;
-      color: #454b6b;
-    }
-
-   .detalle-btn-reservar{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:100%;
-  box-sizing:border-box;
-  min-height:64px;
-  padding:16px 20px;
-  border:none;
-  border-radius:18px;
-  background:linear-gradient(180deg, #6657d8, #4b3db7);
-  color:#fff;
-  text-decoration:none;
-  font-size:22px;
-  font-weight:800;
-  box-shadow:0 10px 24px rgba(79, 61, 187, .28);
-  transition:transform .15s ease, filter .15s ease, box-shadow .15s ease;
-  cursor:pointer;
+.detalle-page{
+max-width:1120px;
+margin:0 auto;
+padding:28px 20px 60px;
 }
 
-    .detalle-btn-reservar:hover{
-      transform: translateY(-1px);
-      filter: brightness(1.03);
-      box-shadow: 0 14px 28px rgba(79, 61, 187, .34);
-    }
+.detalle-back{
+display:inline-block;
+margin-bottom:22px;
+color:#4f3dbb;
+font-size:18px;
+text-decoration:underline;
+}
 
-    .detalle-btn-reservar.disabled{
-      background: #b9b7d9;
-      box-shadow: none;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
+.detalle-layout h1{
+margin:0 0 14px;
+font-size:58px;
+line-height:1.03;
+color:#181818;
+font-family:Georgia,"Times New Roman",serif;
+}
 
-    .detalle-ayuda{
-      margin-top: 14px;
-      font-size: 14px;
-      color: #6b6b78;
-      text-align: center;
-    }
+.detalle-ubicacion-top{
+margin:0 0 24px;
+color:#2a2a2a;
+font-size:20px;
+}
 
-    @media (max-width: 900px){
-      .detalle-layout h1{
-        font-size: 42px;
-      }
+.detalle-ubicacion-top strong{
+color:#202020;
+}
 
-      .detalle-info-grid{
-        grid-template-columns: 1fr;
-      }
+.detalle-subtexto{
+margin:0 0 18px;
+font-size:18px;
+color:#333;
+}
 
-      .detalle-info-left{
-        border-right: none;
-        border-bottom: 1px solid #e6e6ef;
-      }
+.detalle-descripcion-top{
+margin:0 0 28px;
+font-size:18px;
+color:#333;
+}
 
-      .detalle-precio-numero{
-        font-size: 30px;
-      }
+.detalle-card{
+background:#fff;
+border:1px solid #e6e6ef;
+border-radius:22px;
+overflow:hidden;
+box-shadow:0 8px 28px rgba(0,0,0,.06);
+}
 
-      .detalle-precio-texto{
-        font-size: 22px;
-      }
-    }
+.detalle-galeria{
+background:#f3f3f9;
+min-height:300px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
 
-    @media (max-width: 640px){
-      .detalle-page{
-        padding: 22px 16px 42px;
-      }
+.detalle-galeria img{
+width:100%;
+height:100%;
+min-height:300px;
+max-height:480px;
+object-fit:cover;
+display:block;
+}
 
-      .detalle-layout h1{
-        font-size: 34px;
-      }
+.detalle-galeria-empty{
+width:100%;
+min-height:300px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+color:#4a4f73;
+text-align:center;
+padding:30px 20px;
+background:#f3f3f9;
+}
 
-      .detalle-ubicacion-top,
-      .detalle-subtexto,
-      .detalle-descripcion-top,
-      .detalle-item{
-        font-size: 17px;
-      }
+.detalle-galeria-empty .icono{
+font-size:56px;
+margin-bottom:16px;
+opacity:.7;
+}
 
-      .detalle-info-left,
-      .detalle-info-right{
-        padding: 22px 18px;
-      }
+.detalle-galeria-empty .texto{
+font-size:20px;
+font-weight:500;
+}
 
-      .detalle-btn-reservar{
-        font-size: 20px;
-        min-height: 58px;
-      }
-      .detalle-reserva-form{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+.detalle-info-grid{
+display:grid;
+grid-template-columns:1.2fr .8fr;
+border-top:1px solid #e6e6ef;
+}
+
+.detalle-info-left{
+padding:30px 28px;
+border-right:1px solid #e6e6ef;
+}
+
+.detalle-info-right{
+padding:28px 28px 32px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+}
+
+.detalle-item{
+font-size:19px;
+color:#262626;
+margin-bottom:20px;
+line-height:1.5;
+}
+
+.detalle-item strong{
+color:#171717;
+}
+
+.detalle-precio-box{
+margin-bottom:14px;
+color:#181818;
+line-height:1.1;
+}
+
+.detalle-precio-numero{
+font-size:34px;
+font-weight:800;
+color:#151515;
+}
+
+.detalle-precio-texto{
+font-size:26px;
+color:#222;
+margin-left:4px;
+}
+
+.detalle-minimo{
+margin:0 0 20px;
+font-size:18px;
+color:#454b6b;
+}
+
+/* NUEVO: FORMULARIO RESERVA */
+
+.detalle-reserva-form{
+display:flex;
+flex-direction:column;
+gap:10px;
+margin-bottom:10px;
 }
 
 .detalle-label{
-  font-size:15px;
-  font-weight:700;
-  color:#2b2b2b;
+font-size:15px;
+font-weight:700;
+color:#2b2b2b;
 }
 
 .detalle-input{
-  width:100%;
-  height:50px;
-  border:1px solid #ddddea;
-  border-radius:14px;
-  padding:0 14px;
-  font-size:16px;
-  box-sizing:border-box;
-  background:#fff;
-  outline:none;
+width:100%;
+height:50px;
+border:1px solid #ddddea;
+border-radius:14px;
+padding:0 14px;
+font-size:16px;
+box-sizing:border-box;
+background:#fff;
+outline:none;
 }
 
 .detalle-input:focus{
-  border-color:#6657d8;
-  box-shadow:0 0 0 3px rgba(102, 87, 216, .10);
+border-color:#6657d8;
+box-shadow:0 0 0 3px rgba(102,87,216,.10);
 }
 
 .detalle-total-box{
-  margin-top:6px;
-  margin-bottom:6px;
-  padding:14px 16px;
-  border-radius:14px;
-  background:#f5f4ff;
-  color:#2f2b8f;
-  font-size:16px;
-  border:1px solid #ddd9ff;
+margin-top:6px;
+margin-bottom:6px;
+padding:14px 16px;
+border-radius:14px;
+background:#f5f4ff;
+color:#2f2b8f;
+font-size:16px;
+border:1px solid #ddd9ff;
 }
-    }
-    
-  </style>
+
+/* BOTON */
+
+.detalle-btn-reservar{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+width:100%;
+box-sizing:border-box;
+min-height:64px;
+padding:16px 20px;
+border:none;
+border-radius:18px;
+background:linear-gradient(180deg,#6657d8,#4b3db7);
+color:#fff;
+font-size:22px;
+font-weight:800;
+box-shadow:0 10px 24px rgba(79,61,187,.28);
+cursor:pointer;
+transition:transform .15s ease,filter .15s ease;
+}
+
+.detalle-btn-reservar:hover{
+transform:translateY(-1px);
+filter:brightness(1.03);
+}
+
+.detalle-btn-reservar.disabled{
+background:#b9b7d9;
+box-shadow:none;
+cursor:not-allowed;
+pointer-events:none;
+}
+
+.detalle-ayuda{
+margin-top:14px;
+font-size:14px;
+color:#6b6b78;
+text-align:center;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+.detalle-layout h1{
+font-size:42px;
+}
+
+.detalle-info-grid{
+grid-template-columns:1fr;
+}
+
+.detalle-info-left{
+border-right:none;
+border-bottom:1px solid #e6e6ef;
+}
+
+}
+
+</style>
 </head>
+
 <body>
-  <header class="header">
-    <a class="logo" href="index.html">TuAloja.com</a>
-    <nav id="mainNav" class="nav">
-      <a href="alojamiento.html">Registra tu alojamiento</a>
-      <a href="ayuda.html">Ayuda</a>
-      <span id="navAuth"></span>
-    </nav>
-    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
-  </header>
 
-  <main class="detalle-page">
-    <a class="detalle-back" href="resultados.html">← Volver a resultados</a>
-    <div id="detalleWrap"></div>
-    <p id="noExiste" class="muted" style="display:none; margin-top:16px;">Este alojamiento no existe (o fue eliminado).</p>
-  </main>
+<header class="header">
+<a class="logo" href="index.html">TuAloja.com</a>
 
-  <script src="script.js"></script>
-  <script type="module" src="detalle.js"></script>
+<nav id="mainNav" class="nav">
+<a href="alojamiento.html">Registra tu alojamiento</a>
+<a href="ayuda.html">Ayuda</a>
+<span id="navAuth"></span>
+</nav>
+
+<button id="hamburgerBtn" class="hamburger" type="button">☰</button>
+</header>
+
+<main class="detalle-page">
+
+<a class="detalle-back" href="resultados.html">← Volver a resultados</a>
+
+<div id="detalleWrap"></div>
+
+<p id="noExiste" class="muted" style="display:none;margin-top:16px;">
+Este alojamiento no existe (o fue eliminado).
+</p>
+
+</main>
+
+<script src="script.js"></script>
+<script type="module" src="detalle.js"></script>
+
 </body>
 </html>
