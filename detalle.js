@@ -8,14 +8,28 @@ function getId() {
 
 function moneyARS(n) {
   try {
-    return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(Number(n) || 0);
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      maximumFractionDigits: 0
+    }).format(Number(n) || 0);
   } catch {
     return `$${Number(n) || 0}`;
   }
 }
 
 function esc(s) {
-  return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  return String(s ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[c]));
+}
+
+function normalizarWhatsapp(telefono) {
+  return String(telefono || "").replace(/\D/g, "");
 }
 
 (function init() {
@@ -33,33 +47,83 @@ function esc(s) {
     return;
   }
 
-  const galeria = (a.fotos && a.fotos.length)
-    ? `<div class="galeria">${a.fotos.map((src) => `<img class="galeria-img" src="${src}" alt="Foto">`).join("")}</div>`
-    : `<div class="galeria"><div class="galeria-empty">Este alojamiento no cargó fotos todavía.</div></div>`;
+  const servicios = (a.servicios && a.servicios.length)
+    ? a.servicios.join(" · ")
+    : "No especificados";
 
-  const servicios = (a.servicios && a.servicios.length) ? a.servicios.join(" · ") : "No especificados";
+  const ubicacion = `${esc(a.ciudad || "")}${a.provincia ? `, <strong>${esc(a.provincia)}</strong>` : ""}${a.zona ? ` • ${esc(a.zona)}` : ""}`;
 
-  const wa = (a.anfitrionWhatsapp || "").replace(/\D/g, "");
-  const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent(`Hola! Me interesa tu alojamiento "${a.titulo}" en TuAloja. ¿Está disponible?`)}` : "";
-  const mail = a.anfitrionEmail ? `mailto:${encodeURIComponent(a.anfitrionEmail)}?subject=${encodeURIComponent("Consulta desde TuAloja")}&body=${encodeURIComponent(`Hola! Me interesa "${a.titulo}".`)}` : "";
+  const descripcion = esc(a.descripcion || "Este alojamiento no tiene descripción todavía.");
+  const tipo = esc(a.tipo || "Alojamiento");
+  const capacidad = esc(a.capacidad || "-");
+  const minimoNoches = esc(a.minimoNoches || 1);
+
+  const wa = normalizarWhatsapp(a.anfitrionWhatsapp);
+  const mail = String(a.anfitrionEmail || "").trim();
+
+  let reservarLink = "";
+  if (wa) {
+    reservarLink = `https://wa.me/${wa}?text=${encodeURIComponent(`Hola! Quiero reservar "${a.titulo}" que vi en TuAloja. ¿Está disponible?`)}`;
+  } else if (mail) {
+    reservarLink = `mailto:${encodeURIComponent(mail)}?subject=${encodeURIComponent(`Reserva en TuAloja: ${a.titulo}`)}&body=${encodeURIComponent(`Hola! Quiero reservar "${a.titulo}". ¿Está disponible?`)}`;
+  }
+
+  let galeriaHTML = "";
+  if (a.fotos && a.fotos.length) {
+    galeriaHTML = `
+      <div class="detalle-galeria">
+        <img src="${esc(a.fotos[0])}" alt="Foto de ${esc(a.titulo)}">
+      </div>
+    `;
+  } else {
+    galeriaHTML = `
+      <div class="detalle-galeria">
+        <div class="detalle-galeria-empty">
+          <div class="icono">📷</div>
+          <div class="texto">Este alojamiento no cargó fotos todavía.</div>
+        </div>
+      </div>
+    `;
+  }
+
+  const botonReservar = reservarLink
+    ? `<a class="detalle-btn-reservar" href="${reservarLink}" target="_blank" rel="noopener">Reservar</a>`
+    : `<span class="detalle-btn-reservar disabled">Reservar</span>`;
 
   wrap.innerHTML = `
-    <section class="detalle">
+    <section class="detalle-layout">
       <h1>${esc(a.titulo)}</h1>
-      <p class="muted">${esc(a.ciudad)}${a.provincia ? `, ${esc(a.provincia)}` : ""}${a.zona ? ` · ${esc(a.zona)}` : ""}</p>
 
-      ${galeria}
+      <p class="detalle-ubicacion-top">📍 ${ubicacion}</p>
 
-      <div class="detalle-box">
-        <p>${esc(a.descripcion)}</p>
-        <p><strong>Tipo:</strong> ${esc(a.tipo || "-")} · <strong>Capacidad:</strong> ${esc(a.capacidad || "-")} personas</p>
-        <p><strong>Servicios:</strong> ${esc(servicios)}</p>
-        <p class="detalle-precio"><strong>${moneyARS(a.precio)}</strong> <span class="muted">por noche</span></p>
-        <p class="muted">Mínimo de noches: ${esc(a.minimoNoches || 1)}</p>
+      ${!a.fotos || !a.fotos.length ? `<p class="detalle-subtexto">Este alojamiento no cargó fotos todavía.</p>` : ""}
 
-        <div class="detalle-cta">
-          ${waLink ? `<a class="btn" href="${waLink}" target="_blank" rel="noopener">Contactar por WhatsApp</a>` : ""}
-          ${mail ? `<a class="btn btn-sec" href="${mail}">Contactar por Email</a>` : ""}
+      <p class="detalle-descripcion-top">${descripcion}</p>
+
+      <div class="detalle-card">
+        ${galeriaHTML}
+
+        <div class="detalle-info-grid">
+          <div class="detalle-info-left">
+            <div class="detalle-item">🏠 <strong>Tipo:</strong> ${tipo}</div>
+            <div class="detalle-item">👥 <strong>Capacidad:</strong> ${capacidad} personas</div>
+            <div class="detalle-item">✅ <strong>Servicios:</strong> ${esc(servicios)}</div>
+          </div>
+
+          <div class="detalle-info-right">
+            <div class="detalle-precio-box">
+              <span class="detalle-precio-numero">${moneyARS(a.precio)}</span>
+              <span class="detalle-precio-texto">por noche</span>
+            </div>
+
+            <p class="detalle-minimo">📅 Mínimo de noches: ${minimoNoches}</p>
+
+            ${botonReservar}
+
+            <div class="detalle-ayuda">
+              ${reservarLink ? "Te contactamos con el anfitrión para completar la reserva." : "Este alojamiento todavía no tiene un medio de contacto disponible."}
+            </div>
+          </div>
         </div>
       </div>
     </section>
