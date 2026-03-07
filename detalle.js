@@ -32,6 +32,14 @@ function crearCodigoReserva() {
   return "R" + Math.floor(100000 + Math.random() * 900000);
 }
 
+function getReservas() {
+  try {
+    return JSON.parse(localStorage.getItem("tualoja_bookings") || "[]");
+  } catch {
+    return [];
+  }
+}
+
 (function init() {
   const id = getId();
   const a = getAlojamientoById(id);
@@ -46,6 +54,18 @@ function crearCodigoReserva() {
     wrap.innerHTML = "";
     return;
   }
+
+  const user = JSON.parse(localStorage.getItem("tualoja_user") || "{}");
+  const myEmail = String(user.email || "").toLowerCase();
+
+  const reservas = getReservas();
+
+  const miReservaActiva = reservas.find((r) => {
+    const reservaEmail = String(r.userEmail || r.guestEmail || "").toLowerCase();
+    const mismoAlojamiento = String(r.listingId) === String(a.id);
+    const activa = r.status !== "cancelada" && r.status !== "rechazada";
+    return reservaEmail === myEmail && mismoAlojamiento && activa;
+  });
 
   const servicios = Array.isArray(a.servicios) && a.servicios.length
     ? a.servicios.join(" · ")
@@ -72,6 +92,22 @@ function crearCodigoReserva() {
         </div>
       </div>
     `;
+
+  const botonHTML = miReservaActiva
+    ? `
+      <button class="detalle-btn-reservar disabled" type="button" disabled>
+        Ya reservado
+      </button>
+    `
+    : `
+      <button class="detalle-btn-reservar" id="btnReservar" type="button">
+        Reservar
+      </button>
+    `;
+
+  const ayudaHTML = miReservaActiva
+    ? `Ya tenés una reserva para este alojamiento.`
+    : `Te contactamos con el anfitrión para completar la reserva.`;
 
   wrap.innerHTML = `
     <section class="detalle-layout">
@@ -101,12 +137,10 @@ function crearCodigoReserva() {
 
             <p class="detalle-minimo">📅 Mínimo de noches: ${minimoNoches}</p>
 
-            <button class="detalle-btn-reservar" id="btnReservar" type="button">
-              Reservar
-            </button>
+            ${botonHTML}
 
             <div class="detalle-ayuda">
-              Te contactamos con el anfitrión para completar la reserva.
+              ${ayudaHTML}
             </div>
           </div>
         </div>
@@ -125,8 +159,21 @@ function crearCodigoReserva() {
       return;
     }
 
-    const user = JSON.parse(localStorage.getItem("tualoja_user") || "{}");
-    const reservas = JSON.parse(localStorage.getItem("tualoja_bookings") || "[]");
+    const userActual = JSON.parse(localStorage.getItem("tualoja_user") || "{}");
+    const reservasActuales = getReservas();
+
+    const yaExiste = reservasActuales.find((r) => {
+      const reservaEmail = String(r.userEmail || r.guestEmail || "").toLowerCase();
+      const mismoAlojamiento = String(r.listingId) === String(a.id);
+      const activa = r.status !== "cancelada" && r.status !== "rechazada";
+      return reservaEmail === String(userActual.email || "").toLowerCase() && mismoAlojamiento && activa;
+    });
+
+    if (yaExiste) {
+      alert("Ya tenés una reserva para este alojamiento.");
+      location.reload();
+      return;
+    }
 
     const nuevaReserva = {
       id: String(Date.now()),
@@ -134,9 +181,9 @@ function crearCodigoReserva() {
       title: a.titulo || "Alojamiento",
       location: `${a.ciudad || ""}${a.provincia ? ", " + a.provincia : ""}`,
       cover: portada || "",
-      userEmail: user.email || "",
-      guestEmail: user.email || "",
-      guestName: user.name || "Huésped",
+      userEmail: userActual.email || "",
+      guestEmail: userActual.email || "",
+      guestName: userActual.name || "Huésped",
       hostEmail: a.email || "",
       checkin: "pendiente",
       checkout: "pendiente",
@@ -146,8 +193,8 @@ function crearCodigoReserva() {
       code: crearCodigoReserva()
     };
 
-    reservas.push(nuevaReserva);
-    localStorage.setItem("tualoja_bookings", JSON.stringify(reservas));
+    reservasActuales.push(nuevaReserva);
+    localStorage.setItem("tualoja_bookings", JSON.stringify(reservasActuales));
 
     alert("Reserva enviada al anfitrión.");
     location.href = "mis-reservas.html";
