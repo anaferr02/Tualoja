@@ -5,35 +5,421 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Resultados - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    :root{
+      --violeta:#4f3dbb;
+      --violeta-oscuro:#3f2fa5;
+      --texto:#1f1f1f;
+      --muted:#6f6f6f;
+      --borde:#e7e7ef;
+      --fondo:#fafafa;
+      --card:#ffffff;
+      --shadow:0 10px 30px rgba(0,0,0,.06);
+      --radius:18px;
+      --radius-sm:12px;
+      --container:1100px;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      color:var(--texto);
+      background:var(--fondo);
+    }
+
+    .header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:#fff;
+      border-bottom:1px solid #eee;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:20px 32px;
+    }
+
+    .logo{
+      text-decoration:none;
+      font-size:28px;
+      font-weight:700;
+      color:#2f2b8f;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .nav a{
+      text-decoration:none;
+      color:#2f2b8f;
+      border:1px solid #d9d9ea;
+      padding:14px 22px;
+      border-radius:16px;
+      font-weight:600;
+      background:#fff;
+      transition:.2s ease;
+    }
+
+    .nav a:hover{
+      background:#f7f6ff;
+    }
+
+    .hamburger{
+      display:none;
+      border:none;
+      background:none;
+      font-size:26px;
+      cursor:pointer;
+    }
+
+    .contenedor{
+      max-width:var(--container);
+      margin:0 auto;
+      padding:34px 20px 60px;
+    }
+
+    .buscador-box{
+      background:#fff;
+      border:1px solid var(--borde);
+      border-radius:20px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      margin-bottom:28px;
+    }
+
+    .buscador-form{
+      display:grid;
+      grid-template-columns: 1fr 160px;
+      gap:14px;
+      align-items:center;
+    }
+
+    .campo-busqueda{
+      position:relative;
+    }
+
+    .campo-busqueda input{
+      width:100%;
+      height:62px;
+      border:1px solid #dcdceb;
+      border-radius:18px;
+      padding:0 18px 0 56px;
+      font-size:20px;
+      outline:none;
+      background:#fff;
+    }
+
+    .campo-busqueda .icono{
+      position:absolute;
+      left:18px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:24px;
+      color:#444;
+    }
+
+    .btn-buscar{
+      height:62px;
+      border:none;
+      border-radius:18px;
+      background:var(--violeta);
+      color:#fff;
+      font-size:20px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+
+    .btn-buscar:hover{
+      background:var(--violeta-oscuro);
+    }
+
+    .alerta-busqueda{
+      margin:0 0 30px;
+      background:#f4f4f8;
+      border:1px solid #e5e5ef;
+      border-radius:16px;
+      padding:22px 24px;
+      color:#333;
+      font-size:17px;
+      line-height:1.5;
+    }
+
+    .alerta-busqueda strong{
+      color:#222;
+    }
+
+    .alerta-busqueda a{
+      display:inline-block;
+      margin-top:8px;
+      color:var(--violeta);
+      font-weight:600;
+      text-decoration:underline;
+    }
+
+    .encabezado-resultados{
+      margin-bottom:22px;
+    }
+
+    .encabezado-resultados h1{
+      margin:0 0 12px;
+      font-size:56px;
+      line-height:1;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight:700;
+    }
+
+    .resumen-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      padding-bottom:22px;
+      border-bottom:1px solid #ececf1;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:18px;
+      margin:0;
+    }
+
+    .link-cambiar{
+      color:var(--violeta);
+      font-size:18px;
+      font-weight:600;
+      text-decoration:none;
+    }
+
+    .link-cambiar:hover{
+      text-decoration:underline;
+    }
+
+    .titulo-seccion{
+      margin:26px 0 20px;
+      font-size:28px;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .grid-resultados{
+      display:grid;
+      gap:24px;
+    }
+
+    .resultado-card{
+      display:grid;
+      grid-template-columns: 46% 54%;
+      background:var(--card);
+      border:1px solid var(--borde);
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+
+    .resultado-img{
+      width:100%;
+      height:100%;
+      min-height:320px;
+      object-fit:cover;
+      display:block;
+      background:#ececf4;
+    }
+
+    .resultado-info{
+      padding:28px 34px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .resultado-titulo{
+      margin:0 0 16px;
+      font-size:28px;
+      line-height:1.2;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .resultado-ubicacion{
+      font-size:18px;
+      color:var(--violeta);
+      font-weight:600;
+      margin-bottom:16px;
+    }
+
+    .resultado-meta{
+      font-size:18px;
+      color:#333;
+      margin-bottom:20px;
+    }
+
+    .resultado-precio{
+      font-size:24px;
+      font-weight:700;
+      margin-bottom:22px;
+    }
+
+    .resultado-precio span{
+      font-weight:400;
+      color:#444;
+    }
+
+    .resultado-acciones a{
+      display:inline-block;
+      background:var(--violeta);
+      color:#fff;
+      text-decoration:none;
+      padding:14px 28px;
+      border-radius:12px;
+      font-weight:700;
+      font-size:18px;
+    }
+
+    .resultado-acciones a:hover{
+      background:var(--violeta-oscuro);
+    }
+
+    .empty-estado{
+      text-align:center;
+      color:#666;
+      font-size:22px;
+      margin:28px 0 0;
+    }
+
+    @media (max-width: 900px){
+      .resultado-card{
+        grid-template-columns:1fr;
+      }
+
+      .resultado-img{
+        min-height:240px;
+      }
+
+      .encabezado-resultados h1{
+        font-size:42px;
+      }
+    }
+
+    @media (max-width: 768px){
+      .nav{
+        display:none;
+      }
+
+      .hamburger{
+        display:block;
+      }
+
+      .buscador-form{
+        grid-template-columns:1fr;
+      }
+
+      .resumen-row{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .resultado-info{
+        padding:22px;
+      }
+
+      .resultado-titulo{
+        font-size:24px;
+      }
+
+      .header{
+        padding:18px 16px;
+      }
+
+      .contenedor{
+        padding:24px 16px 50px;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="header">
     <a class="logo" href="index.html">TuAloja.com</a>
+
     <nav id="mainNav" class="nav">
       <a href="alojamiento.html">Registra tu alojamiento</a>
       <a href="ayuda.html">Ayuda</a>
       <span id="navAuth"></span>
     </nav>
+
     <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
   </header>
 
   <main class="contenedor">
-    <h1>Resultados</h1>
-    <p id="resumenBusqueda" class="muted"></p>
 
-    <div style="margin: 12px 0;">
-      <a class="btn" href="index.html">Cambiar búsqueda</a>
-    </div>
+    <section class="buscador-box">
+      <form class="buscador-form" action="resultado.html" method="GET">
+        <div class="campo-busqueda">
+          <span class="icono">⌕</span>
+          <input
+            type="text"
+            name="destino"
+            id="inputDestino"
+            placeholder="¿A dónde querés ir?"
+          />
+        </div>
+        <button type="submit" class="btn-buscar">Buscar</button>
+      </form>
+    </section>
+
+    <div id="alertaBusqueda" class="alerta-busqueda" style="display:none;"></div>
+
+    <section class="encabezado-resultados">
+      <h1>Resultados</h1>
+
+      <div class="resumen-row">
+        <p id="resumenBusqueda" class="muted">Mostrando alojamientos disponibles.</p>
+        <a class="link-cambiar" href="index.html">Cambiar búsqueda</a>
+      </div>
+    </section>
 
     <section>
-      <h2>Alojamientos</h2>
+      <h2 class="titulo-seccion">Alojamientos</h2>
+
       <div id="gridResultados" class="grid-resultados"></div>
-      <p id="emptyResultados" class="muted" style="display:none;">No hay alojamientos todavía. Publicá el primero 🙌</p>
+
+      <p id="emptyResultados" class="empty-estado" style="display:none;">
+        No hay alojamientos disponibles para esta búsqueda.
+      </p>
     </section>
   </main>
 
   <script src="script.js"></script>
   <script type="module" src="seed.js"></script>
   <script type="module" src="resultados.js"></script>
+
+  <script>
+    // Completa el input con lo que venga en la URL, por ejemplo ?destino=Mendoza
+    const params = new URLSearchParams(window.location.search);
+    const destino = params.get("destino") || params.get("ubicacion") || params.get("q") || "";
+    const inputDestino = document.getElementById("inputDestino");
+    const alertaBusqueda = document.getElementById("alertaBusqueda");
+    const resumenBusqueda = document.getElementById("resumenBusqueda");
+
+    if (inputDestino && destino) {
+      inputDestino.value = destino;
+    }
+
+    // Mensaje visual tipo la imagen
+    if (destino) {
+      resumenBusqueda.textContent = `Buscando alojamientos para "${destino}".`;
+    }
+
+    // Este cartel se puede actualizar luego desde resultados.js
+    // si no encuentra resultados exactos o si muestra sugerencias.
+  </script>
 </body>
 </html>
