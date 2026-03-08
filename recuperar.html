@@ -1,209 +1,98 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Recuperar contraseña - TuAloja</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recuperar contraseña - TuAloja</title>
 
-  <style>
-    body{
-      font-family: Arial, sans-serif;
-      margin:0;
-      min-height:100vh;
-      background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
-    }
+<style>
+body{
+font-family:Arial;
+margin:0;
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background:linear-gradient(to bottom,#5fd0ff,#7fdcff);
+}
 
-    .auth-page{
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-    }
-    .auth-main{
-      flex:1;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:40px 16px;
-    }
+.card{
+background:white;
+padding:30px;
+border-radius:18px;
+width:420px;
+box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
 
-    .card{
-      background:#fff;
-      width:min(520px, 95vw);
-      border-radius:18px;
-      padding:26px;
-      box-shadow:0 10px 30px rgba(0,0,0,.12);
-    }
+h1{
+margin-top:0;
+color:#1b167f;
+}
 
-    h1{margin:0 0 8px; color:#1b167f; font-size:34px;}
-    p{margin:0 0 16px; color:#444;}
+input{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:1px solid #ccc;
+margin-top:10px;
+}
 
-    label{display:block; font-size:14px; margin:12px 0 6px; color:#222;}
-    input{
-      width:100%;
-      padding:12px;
-      border:1px solid #d6d6d6;
-      border-radius:12px;
-      outline:none;
-      font-size:14px;
-    }
+button{
+width:100%;
+margin-top:16px;
+padding:12px;
+border:none;
+border-radius:10px;
+background:#1b167f;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+</style>
 
-    .btn{
-      width:100%;
-      border:none;
-      border-radius:14px;
-      padding:14px;
-      background:#1b167f;
-      color:#fff;
-      font-weight:bold;
-      cursor:pointer;
-      margin-top:16px;
-      font-size:14px;
-      box-shadow:0 8px 20px rgba(27,22,127,.35);
-    }
-
-    .btn:hover{
-      transform: translateY(-2px);
-    }
-
-    .link{
-      display:block;
-      margin-top:14px;
-      text-align:center;
-      color:#1b167f;
-      text-decoration: underline;
-      font-size:14px;
-    }
-
-    .err{
-      display:none;
-      margin-top:12px;
-      color:#b00020;
-      font-weight:700;
-      font-size:13px;
-    }
-
-    .ok{
-      display:none;
-      margin-top:12px;
-      color:#1b167f;
-      font-weight:700;
-      font-size:13px;
-    }
-
-    .step{ display:none; }
-    .step.active{ display:block; }
-
-    footer{
-      text-align:center;
-      padding:18px 12px;
-      font-size:12px;
-      color:#1b167f;
-    }
-  </style>
 </head>
 
-<body class="auth-page">
-  <main class="auth-main">
-    <div class="card">
+<body>
 
-      <h1>Recuperar contraseña</h1>
-      <p>Ingresá tu email para cambiar la contraseña.</p>
+<div class="card">
 
-      <!-- PASO 1: EMAIL -->
-      <div id="stepEmail" class="step active">
-        <label>Email</label>
-        <input id="email" type="email" placeholder="tuemail@ejemplo.com" />
+<h1>Recuperar contraseña</h1>
 
-        <button class="btn" id="btnCheck">Continuar</button>
-      </div>
+<input id="email" type="email" placeholder="Tu email">
 
-      <!-- PASO 2: NUEVA CONTRASEÑA -->
-      <div id="stepPassword" class="step">
-        <label>Nueva contraseña</label>
-        <input id="pass1" type="password" placeholder="Nueva contraseña" />
+<input id="newpass" type="password" placeholder="Nueva contraseña">
 
-        <label>Repetir contraseña</label>
-        <input id="pass2" type="password" placeholder="Repetir contraseña" />
+<button onclick="reset()">Cambiar contraseña</button>
 
-        <button class="btn" id="btnSave">Guardar contraseña</button>
-      </div>
+</div>
 
-      <div id="err" class="err"></div>
-      <div id="ok" class="ok"></div>
+<script>
 
-      <a class="link" href="login.html">Volver a iniciar sesión</a>
+function reset(){
 
-    </div>
-  </main>
+const email = document.getElementById("email").value.trim().toLowerCase()
+const pass = document.getElementById("newpass").value
 
-  <footer>
-    <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
-  </footer>
+let users = JSON.parse(localStorage.getItem("tualoja_users") || "[]")
 
-  <script>
-    const usersKey = "tualoja_users";
+const index = users.findIndex(u => u.email === email)
 
-    const stepEmail = document.getElementById("stepEmail");
-    const stepPassword = document.getElementById("stepPassword");
+if(index === -1){
+alert("Ese email no está registrado")
+return
+}
 
-    const emailInput = document.getElementById("email");
-    const pass1 = document.getElementById("pass1");
-    const pass2 = document.getElementById("pass2");
+users[index].password = pass
 
-    const err = document.getElementById("err");
-    const ok = document.getElementById("ok");
+localStorage.setItem("tualoja_users", JSON.stringify(users))
 
-    let currentUserIndex = null;
+alert("Contraseña cambiada correctamente")
 
-    document.getElementById("btnCheck").addEventListener("click", () => {
-      err.style.display = "none";
+window.location.href="login.html"
 
-      const email = emailInput.value.trim().toLowerCase();
-      if (!email) {
-        showError("Ingresá un email.");
-        return;
-      }
+}
 
-      const users = JSON.parse(localStorage.getItem(usersKey) || "[]");
-      const idx = users.findIndex(u => u.email === email);
+</script>
 
-      if (idx === -1) {
-        showError("No existe una cuenta con ese email.");
-        return;
-      }
-
-      currentUserIndex = idx;
-      stepEmail.classList.remove("active");
-      stepPassword.classList.add("active");
-    });
-
-    document.getElementById("btnSave").addEventListener("click", () => {
-      err.style.display = "none";
-
-      if (pass1.value.length < 4) {
-        showError("La contraseña debe tener al menos 4 caracteres.");
-        return;
-      }
-
-      if (pass1.value !== pass2.value) {
-        showError("Las contraseñas no coinciden.");
-        return;
-      }
-
-      const users = JSON.parse(localStorage.getItem(usersKey) || "[]");
-      users[currentUserIndex].password = pass1.value;
-      localStorage.setItem(usersKey, JSON.stringify(users));
-
-      ok.textContent = "✅ Contraseña actualizada correctamente. Ya podés iniciar sesión.";
-      ok.style.display = "block";
-
-      stepPassword.style.display = "none";
-    });
-
-    function showError(msg){
-      err.textContent = msg;
-      err.style.display = "block";
-    }
-  </script>
 </body>
 </html>
