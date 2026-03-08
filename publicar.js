@@ -13,7 +13,9 @@ titulo: document.getElementById("titulo").value,
 ciudad: document.getElementById("ciudad").value,
 provincia: document.getElementById("provincia").value,
 precio: document.getElementById("precio").value,
-foto: document.getElementById("foto").value
+foto: document.getElementById("foto").value,
+lat: document.getElementById("lat").value,
+lng: document.getElementById("lng").value
 
 };
 
