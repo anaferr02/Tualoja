@@ -285,3 +285,10 @@ color:#fff;
 border-color:#1b167f;
 box-shadow:0 6px 14px rgba(27,22,127,.25);
 }
+
+#mapa{
+height:500px;
+width:100%;
+margin-top:20px;
+border-radius:12px;
+}
