@@ -1,32 +1,224 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Recuperar contraseña</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recuperar contraseña - TuAloja</title>
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      margin:0;
+      min-height:100vh;
+      background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
+      display:flex;
+      flex-direction:column;
+    }
+
+    .auth-main{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px 16px;
+    }
+
+    .card{
+      background:#fff;
+      width:min(520px, 95vw);
+      border-radius:18px;
+      padding:26px;
+      box-shadow:0 10px 30px rgba(0,0,0,.12);
+    }
+
+    h1{
+      margin:0 0 8px;
+      color:#1b167f;
+      font-size:34px;
+    }
+
+    p{
+      margin:0 0 18px;
+      color:#444;
+    }
+
+    label{
+      display:block;
+      font-size:14px;
+      margin:12px 0 6px;
+      color:#222;
+      font-weight:700;
+    }
+
+    input{
+      width:100%;
+      padding:12px;
+      border:1px solid #d6d6d6;
+      border-radius:12px;
+      outline:none;
+      font-size:14px;
+    }
+
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:14px;
+      background:#1b167f;
+      color:#fff;
+      font-weight:bold;
+      cursor:pointer;
+      margin-top:16px;
+      font-size:14px;
+      box-shadow: 0 8px 20px rgba(27,22,127,.35);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .btn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(27,22,127,.45);
+    }
+
+    .link{
+      display:block;
+      margin-top:14px;
+      text-align:center;
+      color:#1b167f;
+      font-size:14px;
+      text-decoration: underline;
+    }
+
+    .msg{
+      display:none;
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      line-height:1.4;
+    }
+
+    .msg.ok{
+      display:block;
+      background:#eaf8ee;
+      color:#157347;
+      border:1px solid #b7e4c7;
+    }
+
+    .msg.err{
+      display:block;
+      background:#fdecec;
+      color:#b00020;
+      border:1px solid #f5b5b5;
+    }
+
+    .success-box{
+      display:none;
+      text-align:center;
+    }
+
+    .success-icon{
+      font-size:54px;
+      margin-bottom:10px;
+    }
+
+    .success-title{
+      color:#1b167f;
+      font-size:28px;
+      margin:0 0 10px;
+      font-weight:900;
+    }
+
+    .success-text{
+      color:#444;
+      margin:0 0 18px;
+      line-height:1.5;
+    }
+
+    footer{
+      text-align:center;
+      padding:18px 12px;
+      font-size:12px;
+      color:#1b167f;
+    }
+
+    .footer-legal a{
+      color:#1b167f;
+      text-decoration: underline;
+      margin:0 4px;
+      font-size:12px;
+    }
+  </style>
 </head>
 
 <body>
+  <main class="auth-main">
+    <div class="card">
+      <div id="formBox">
+        <h1>Recuperar contraseña</h1>
+        <p>Ingresá tu email y te enviaremos un enlace para restablecer tu contraseña.</p>
 
-<h2>Recuperar contraseña</h2>
+        <form id="resetForm">
+          <label for="email">Email</label>
+          <input id="email" type="email" required placeholder="tuemail@ejemplo.com" />
 
-<input id="email" placeholder="Tu email">
-<button onclick="reset()">Enviar email</button>
+          <button class="btn" type="submit">Enviar correo de recuperación</button>
 
-<script type="module">
+          <a class="link" href="login.html">Volver a iniciar sesión</a>
 
-import { sendReset } from "./public/js/auth.js";
+          <div id="msg" class="msg"></div>
+        </form>
+      </div>
 
-window.reset = async function(){
+      <div id="successBox" class="success-box">
+        <div class="success-icon">📩</div>
+        <h2 class="success-title">Te enviamos un correo</h2>
+        <p class="success-text">
+          Revisá tu bandeja de entrada y seguí el enlace para cambiar tu contraseña.
+          Si no lo encontrás, revisá también la carpeta de spam o correo no deseado.
+        </p>
 
-const email = document.getElementById("email").value;
+        <a class="btn" href="login.html" style="text-decoration:none;">Volver al login</a>
+      </div>
+    </div>
+  </main>
 
-await sendReset(email);
+  <footer>
+    <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-legal">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a> |
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    </div>
+  </footer>
 
-alert("Te enviamos un email para cambiar tu contraseña");
+  <script type="module">
+    import { sendReset } from "./public/js/auth.js";
 
-}
+    const form = document.getElementById("resetForm");
+    const msg = document.getElementById("msg");
+    const formBox = document.getElementById("formBox");
+    const successBox = document.getElementById("successBox");
 
-</script>
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
+      msg.className = "msg";
+      msg.style.display = "none";
+      msg.textContent = "";
+
+      const email = document.getElementById("email").value.trim().toLowerCase();
+
+      try {
+        await sendReset(email);
+        formBox.style.display = "none";
+        successBox.style.display = "block";
+      } catch (error) {
+        msg.textContent = "No pudimos enviar el correo. Verificá el email e intentá nuevamente.";
+        msg.classList.add("err");
+        msg.style.display = "block";
+      }
+    });
+  </script>
 </body>
 </html>
