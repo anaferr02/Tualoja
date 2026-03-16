@@ -2,93 +2,27 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Recuperar contraseña - TuAloja</title>
-
-<style>
-body{
-font-family:Arial;
-margin:0;
-min-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-background:linear-gradient(to bottom,#5fd0ff,#7fdcff);
-}
-
-.card{
-background:white;
-padding:30px;
-border-radius:18px;
-width:420px;
-box-shadow:0 10px 30px rgba(0,0,0,.15);
-}
-
-h1{
-margin-top:0;
-color:#1b167f;
-}
-
-input{
-width:100%;
-padding:12px;
-border-radius:10px;
-border:1px solid #ccc;
-margin-top:10px;
-}
-
-button{
-width:100%;
-margin-top:16px;
-padding:12px;
-border:none;
-border-radius:10px;
-background:#1b167f;
-color:white;
-font-weight:bold;
-cursor:pointer;
-}
-</style>
-
+<title>Recuperar contraseña</title>
 </head>
 
 <body>
 
-<div class="card">
+<h2>Recuperar contraseña</h2>
 
-<h1>Recuperar contraseña</h1>
+<input id="email" placeholder="Tu email">
+<button onclick="reset()">Enviar email</button>
 
-<input id="email" type="email" placeholder="Tu email">
+<script type="module">
 
-<input id="newpass" type="password" placeholder="Nueva contraseña">
+import { sendReset } from "./public/js/auth.js";
 
-<button onclick="reset()">Cambiar contraseña</button>
+window.reset = async function(){
 
-</div>
+const email = document.getElementById("email").value;
 
-<script>
+await sendReset(email);
 
-function reset(){
-
-const email = document.getElementById("email").value.trim().toLowerCase()
-const pass = document.getElementById("newpass").value
-
-let users = JSON.parse(localStorage.getItem("tualoja_users") || "[]")
-
-const index = users.findIndex(u => u.email === email)
-
-if(index === -1){
-alert("Ese email no está registrado")
-return
-}
-
-users[index].password = pass
-
-localStorage.setItem("tualoja_users", JSON.stringify(users))
-
-alert("Contraseña cambiada correctamente")
-
-window.location.href="login.html"
+alert("Te enviamos un email para cambiar tu contraseña");
 
 }
 
