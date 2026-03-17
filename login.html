@@ -147,6 +147,13 @@
     const err = document.getElementById("err");
 
     const params = new URLSearchParams(location.search);
+    const resetOk = params.get("reset");
+
+if (resetOk === "ok") {
+  err.textContent = "Tu contraseña fue restablecida. Ahora iniciá sesión con la nueva contraseña.";
+  err.style.display = "block";
+  err.style.color = "#157347";
+}
     const next = params.get("next") || "mi-cuenta.html";
         const resetOk = params.get("reset");
 
