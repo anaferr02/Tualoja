@@ -257,9 +257,13 @@ header{
   </div>
 </footer>
 
-<script>
-  document.getElementById("btnComenzar").onclick = () => {
-    if (localStorage.getItem("tualoja_logged") !== "1") {
+<script type="module">
+  import { refreshMe } from "./public/js/auth.js";
+
+  document.getElementById("btnComenzar").onclick = async () => {
+    const user = await refreshMe();
+
+    if (!user) {
       localStorage.setItem("redirect_after_login", "publicar.html");
       location.href = "login.html";
     } else {
