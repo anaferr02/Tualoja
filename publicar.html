@@ -283,12 +283,6 @@
 </head>
 
 <body>
-  <script>
-    if (localStorage.getItem("tualoja_logged") !== "1") {
-      location.href = "login.html?next=" + encodeURIComponent("publicar.html");
-    }
-  </script>
-
   <header class="header">
     <a class="logo" href="index.html">TuAloja.com</a>
 
@@ -313,26 +307,18 @@
             Completá la información como en una ficha profesional de hospedaje.
           </p>
         </div>
-       
       </div>
+
       <div class="publish-steps">
-
-<div class="step active">1 Información</div>
-
-<div class="step">2 Ubicación</div>
-
-<div class="step">3 Servicios</div>
-
-<div class="step">4 Fotos</div>
-
-<div class="step">5 Precio</div>
-
-<div class="step">6 Publicar</div>
-
-</div>
+        <div class="step active">1 Información</div>
+        <div class="step">2 Ubicación</div>
+        <div class="step">3 Servicios</div>
+        <div class="step">4 Fotos</div>
+        <div class="step">5 Precio</div>
+        <div class="step">6 Publicar</div>
+      </div>
 
       <form id="publishForm">
-        <!-- INFO BÁSICA -->
         <section class="publish-section">
           <h3>Información básica</h3>
           <p class="section-note">Contá qué tipo de lugar ofrecés y para cuántas personas.</p>
@@ -381,7 +367,6 @@
           <textarea name="descripcion" rows="4" required placeholder="Contá lo mejor del alojamiento, ubicación, comodidad, vista, cercanía a puntos de interés..."></textarea>
         </section>
 
-        <!-- UBICACIÓN -->
         <section class="publish-section">
           <h3>Ubicación</h3>
           <p class="section-note">Esto ayuda a generar confianza y evitar publicaciones falsas.</p>
@@ -413,7 +398,6 @@
           </div>
         </section>
 
-        <!-- SERVICIOS PRINCIPALES -->
         <section class="publish-section">
           <h3>Servicios más populares</h3>
           <div class="checks">
@@ -439,7 +423,6 @@
           </div>
         </section>
 
-        <!-- HORARIOS -->
         <section class="publish-section">
           <h3>Horarios</h3>
 
@@ -455,7 +438,6 @@
           </div>
         </section>
 
-        <!-- REGLAS -->
         <section class="publish-section">
           <h3>Reglas de la casa</h3>
 
@@ -470,7 +452,6 @@
           <textarea name="reglasExtra" rows="3" placeholder="Ej: No hacer ruidos molestos después de las 23 hs."></textarea>
         </section>
 
-        <!-- POLÍTICA -->
         <section class="publish-section">
           <h3>Política de cancelación</h3>
 
@@ -482,7 +463,6 @@
           </select>
         </section>
 
-        <!-- FOTOS -->
         <section class="publish-section">
           <h3>Fotos</h3>
           <p class="muted" style="margin-top:-6px;">
@@ -494,7 +474,6 @@
           <small class="help">La primera foto destacada será la portada del alojamiento.</small>
         </section>
 
-        <!-- PRECIO -->
         <section class="publish-section">
           <h3>Precio y estadía</h3>
 
@@ -512,7 +491,6 @@
           </div>
         </section>
 
-        <!-- ANFITRIÓN -->
         <section class="publish-section">
           <h3>Datos del anfitrión</h3>
 
@@ -589,15 +567,32 @@
   </footer>
 
   <script src="script.js"></script>
-  <script>
-    document.getElementById("btnLogout").addEventListener("click", () => {
-      localStorage.setItem("tualoja_logged", "0");
-      localStorage.removeItem("tualoja_user");
-      location.href = "index.html";
-    });
+
+  <script type="module">
+    import { refreshMe, logout, getUser } from "./public/js/auth.js";
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+    const user = await refreshMe();
+    if (!user) {
+      location.href = "login.html?next=" + encodeURIComponent("publicar.html");
+    }
+
+    const logoutLink = document.getElementById("logoutLink");
+    if (logoutLink) {
+      logoutLink.addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+      });
+    }
 
     const fotosInput = document.getElementById("fotos");
     const preview = document.getElementById("preview");
+    const msg = document.getElementById("msg");
     let fotos = [];
 
     function asegurarPortada() {
@@ -714,6 +709,8 @@
       const fotosOrdenadas = [...fotos].sort((a, b) => (b.isCover ? 1 : 0) - (a.isCover ? 1 : 0));
       const fotosBase64 = fotosOrdenadas.map(x => x.b64);
 
+      const currentUser = getUser();
+
       const data = {
         id: "alo_" + Date.now(),
         titulo: f.titulo.value.trim(),
@@ -740,16 +737,22 @@
         maxNoches,
         anfitrion: f.anfitrion.value.trim(),
         telefono: f.telefono.value.trim(),
-        email: f.email.value.trim()
+        email: f.email.value.trim(),
+        ownerUid: currentUser?.id || "",
+        ownerEmail: currentUser?.email || "",
+        status: "activo",
+        createdAt: serverTimestamp()
       };
 
-      const arr = JSON.parse(localStorage.getItem("tualoja_listings") || "[]");
-      arr.unshift(data);
-      localStorage.setItem("tualoja_listings", JSON.stringify(arr));
-
-      document.getElementById("msg").textContent = "✅ Publicado. Enviando confirmación…";
+      msg.textContent = "✅ Publicando...";
 
       try {
+        await addDoc(collection(db, "alojamientos"), data);
+
+        const arr = JSON.parse(localStorage.getItem("tualoja_listings") || "[]");
+        arr.unshift({ ...data, createdAt: new Date().toISOString() });
+        localStorage.setItem("tualoja_listings", JSON.stringify(arr));
+
         document.getElementById("mf_id").value = data.id;
         document.getElementById("mf_titulo").value = data.titulo;
         document.getElementById("mf_tipo").value = data.tipo;
@@ -770,7 +773,6 @@
         document.getElementById("mf_email").value = data.email;
         document.getElementById("mf_servicios").value = servicios.length ? servicios.join(", ") : "-";
         document.getElementById("mf_reglas").value = reglas.length ? reglas.join(", ") : "-";
-
         document.getElementById("mf_replyto").value = data.email;
         document.getElementById("mf_email_to").value = data.email;
 
@@ -798,17 +800,15 @@ Gracias por confiar en TuAloja 💙
 
         if (navigator.sendBeacon) {
           navigator.sendBeacon(mailForm.action, fd);
-        } else {
-          mailForm.target = "_self";
-          mailForm.submit();
-          return;
         }
-      } catch {}
 
-      document.getElementById("msg").textContent = "✅ Publicado. Redirigiendo…";
-      setTimeout(() => { location.href = "gracias.html"; }, 600);
+        msg.textContent = "✅ Publicado correctamente. Redirigiendo...";
+        setTimeout(() => { location.href = "gracias.html"; }, 700);
+      } catch (error) {
+        console.error(error);
+        msg.textContent = "❌ No se pudo publicar. Intentá nuevamente.";
+      }
     });
   </script>
-  <script type="module" src="publicar.js"></script>
 </body>
 </html>
