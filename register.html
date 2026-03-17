@@ -12,7 +12,6 @@
       background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
     }
 
-    /* Layout para que el footer NO se cruce */
     .auth-page{
       min-height:100vh;
       display:flex;
@@ -110,7 +109,6 @@
     </div>
   </main>
 
-  <!-- FOOTER -->
   <footer>
     <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
     <div class="footer-legal">
@@ -121,8 +119,11 @@
     </div>
   </footer>
 
-  <script>
-    document.getElementById("registerForm").addEventListener("submit", (e) => {
+  <!-- 🔥 NUEVO SCRIPT (FIREBASE) -->
+  <script type="module">
+    import { register } from "./public/js/auth.js";
+
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const form = e.currentTarget;
@@ -135,20 +136,15 @@
         return;
       }
 
-      const users = JSON.parse(localStorage.getItem("tualoja_users") || "[]");
-      if (users.some(u => u.email === email)) {
-        alert("Ese email ya está registrado. Iniciá sesión.");
-        window.location.href = "login.html";
-        return;
+      try {
+        await register("Usuario", email, password);
+        window.location.href = "publicar.html";
+      } catch (error) {
+        alert(error?.message || "No se pudo crear la cuenta.");
+        console.error(error);
       }
-
-      users.push({ email, password });
-      localStorage.setItem("tualoja_users", JSON.stringify(users));
-      localStorage.setItem("tualoja_logged", "1");
-      localStorage.setItem("tualoja_user", email);
-
-      window.location.href = "publicar.html";
     });
   </script>
+
 </body>
 </html>
