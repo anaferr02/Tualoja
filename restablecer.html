@@ -194,76 +194,84 @@
     </div>
   </footer>
 
-  <script type="module">
-    import { auth } from "./firebase-config.js";
-    import {
-      verifyPasswordResetCode,
-      confirmPasswordReset
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+ <script type="module">
+  import { auth } from "./firebase-config.js";
+  import {
+    verifyPasswordResetCode,
+    confirmPasswordReset
+  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-    const params = new URLSearchParams(window.location.search);
-    const mode = params.get("mode");
-    const oobCode = params.get("oobCode");
+  const params = new URLSearchParams(window.location.search);
+  const mode = params.get("mode");
+  const oobCode = params.get("oobCode");
 
-    const emailInput = document.getElementById("email");
-    const form = document.getElementById("resetPasswordForm");
-    const msg = document.getElementById("msg");
-    const formBox = document.getElementById("formBox");
-    const successBox = document.getElementById("successBox");
+  const emailInput = document.getElementById("email");
+  const form = document.getElementById("resetPasswordForm");
+  const msg = document.getElementById("msg");
+  const formBox = document.getElementById("formBox");
+  const successBox = document.getElementById("successBox");
+  const subtitle = document.getElementById("subtitle");
 
-    function showError(text) {
-      msg.textContent = text;
-      msg.className = "msg err";
-      msg.style.display = "block";
+  function showError(text) {
+    msg.textContent = text;
+    msg.className = "msg err";
+    msg.style.display = "block";
+  }
+
+  async function init() {
+    if (!mode || !oobCode) {
+      subtitle.textContent = "El enlace no es válido o está incompleto.";
+      showError("Pedí un nuevo correo de restablecimiento e intentá de nuevo.");
+      return;
     }
 
-    async function init() {
-      if (mode !== "resetPassword" || !oobCode) {
-        showError("El enlace no es válido o está incompleto.");
-        form.style.display = "none";
-        return;
-      }
-
-      try {
-        const email = await verifyPasswordResetCode(auth, oobCode);
-        emailInput.value = email;
-      } catch (error) {
-        console.error(error);
-        showError("Este enlace venció o ya no es válido. Pedí uno nuevo.");
-        form.style.display = "none";
-      }
+    if (mode !== "resetPassword") {
+      subtitle.textContent = "Este enlace no corresponde a un cambio de contraseña.";
+      showError("Pedí un nuevo correo de restablecimiento.");
+      return;
     }
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      msg.className = "msg";
-      msg.style.display = "none";
-      msg.textContent = "";
+    try {
+      const email = await verifyPasswordResetCode(auth, oobCode);
+      emailInput.value = email;
+    } catch (error) {
+      console.error(error);
+      subtitle.textContent = "Este enlace venció o ya no es válido.";
+      showError("Pedí un nuevo correo de restablecimiento.");
+    }
+  }
 
-      const password = document.getElementById("password").value;
-      const password2 = document.getElementById("password2").value;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msg.className = "msg";
+    msg.style.display = "none";
+    msg.textContent = "";
 
-      if (password !== password2) {
-        showError("Las contraseñas no coinciden.");
-        return;
-      }
+    const password = document.getElementById("password").value;
+    const password2 = document.getElementById("password2").value;
 
-      if (password.length < 6) {
-        showError("La contraseña debe tener al menos 6 caracteres.");
-        return;
-      }
+    if (password !== password2) {
+      showError("Las contraseñas no coinciden.");
+      return;
+    }
 
-      try {
-        await confirmPasswordReset(auth, oobCode, password);
-        formBox.style.display = "none";
-        successBox.style.display = "block";
-      } catch (error) {
-        console.error(error);
-        showError("No pudimos cambiar la contraseña. Pedí un nuevo enlace.");
-      }
-    });
+    if (password.length < 6) {
+      showError("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
 
-    init();
-  </script>
+    try {
+      await confirmPasswordReset(auth, oobCode, password);
+      form.style.display = "none";
+      subtitle.style.display = "none";
+      successBox.style.display = "block";
+    } catch (error) {
+      console.error(error);
+      showError("No pudimos cambiar la contraseña. Pedí un nuevo enlace.");
+    }
+  });
+
+  init();
+</script>
 </body>
 </html>
