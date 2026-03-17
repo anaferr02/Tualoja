@@ -51,11 +51,12 @@ export async function login(email,password){
 }
 
 export async function sendReset(email){
-
   const cleanEmail = email.trim().toLowerCase();
 
-  await sendPasswordResetEmail(auth,cleanEmail);
-
+  await sendPasswordResetEmail(auth, cleanEmail, {
+    url: "https://tualoja.com/login.html?reset=ok",
+    handleCodeInApp: false
+  });
 }
 
 export async function logout(){
