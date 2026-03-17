@@ -18,7 +18,7 @@ async function cargarDetalle() {
 
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      if (data.id === id) {
+      if (String(data.id) === String(id)) {
         alojamiento = data;
       }
     });
