@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restablecer contraseña - TuAloja</title>
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      margin:0;
+      min-height:100vh;
+      background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
+      display:flex;
+      flex-direction:column;
+    }
+
+    .auth-main{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px 16px;
+    }
+
+    .card{
+      background:#fff;
+      width:min(520px, 95vw);
+      border-radius:18px;
+      padding:26px;
+      box-shadow:0 10px 30px rgba(0,0,0,.12);
+    }
+
+    h1{
+      margin:0 0 8px;
+      color:#1b167f;
+      font-size:34px;
+    }
+
+    p{
+      margin:0 0 18px;
+      color:#444;
+    }
+
+    label{
+      display:block;
+      font-size:14px;
+      margin:12px 0 6px;
+      color:#222;
+      font-weight:700;
+    }
+
+    input{
+      width:100%;
+      padding:12px;
+      border:1px solid #d6d6d6;
+      border-radius:12px;
+      outline:none;
+      font-size:14px;
+    }
+
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:14px;
+      background:#1b167f;
+      color:#fff;
+      font-weight:bold;
+      cursor:pointer;
+      margin-top:16px;
+      font-size:14px;
+      box-shadow:0 8px 20px rgba(27,22,127,.35);
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 12px 28px rgba(27,22,127,.45);
+    }
+
+    .msg{
+      display:none;
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      line-height:1.4;
+    }
+
+    .msg.ok{
+      display:block;
+      background:#eaf8ee;
+      color:#157347;
+      border:1px solid #b7e4c7;
+    }
+
+    .msg.err{
+      display:block;
+      background:#fdecec;
+      color:#b00020;
+      border:1px solid #f5b5b5;
+    }
+
+    .success-box{
+      display:none;
+      text-align:center;
+    }
+
+    .success-icon{
+      font-size:54px;
+      margin-bottom:10px;
+    }
+
+    .success-title{
+      color:#1b167f;
+      font-size:28px;
+      margin:0 0 10px;
+      font-weight:900;
+    }
+
+    .success-text{
+      color:#444;
+      margin:0 0 18px;
+      line-height:1.5;
+    }
+
+    .link{
+      display:block;
+      margin-top:14px;
+      text-align:center;
+      color:#1b167f;
+      font-size:14px;
+      text-decoration:underline;
+    }
+
+    footer{
+      text-align:center;
+      padding:18px 12px;
+      font-size:12px;
+      color:#1b167f;
+    }
+
+    .footer-legal a{
+      color:#1b167f;
+      text-decoration:underline;
+      margin:0 4px;
+      font-size:12px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="auth-main">
+    <div class="card">
+      <div id="formBox">
+        <h1>Restablecer contraseña</h1>
+        <p id="subtitle">Elegí una nueva contraseña para tu cuenta.</p>
+
+        <form id="resetPasswordForm">
+          <label for="email">Email</label>
+          <input id="email" type="email" readonly />
+
+          <label for="password">Nueva contraseña</label>
+          <input id="password" type="password" required minlength="6" placeholder="Mínimo 6 caracteres" />
+
+          <label for="password2">Confirmar nueva contraseña</label>
+          <input id="password2" type="password" required minlength="6" placeholder="Repetí la nueva contraseña" />
+
+          <button class="btn" type="submit">Guardar nueva contraseña</button>
+
+          <div id="msg" class="msg"></div>
+        </form>
+      </div>
+
+      <div id="successBox" class="success-box">
+        <div class="success-icon">✅</div>
+        <h2 class="success-title">Contraseña actualizada</h2>
+        <p class="success-text">
+          Tu contraseña fue cambiada correctamente. Ahora podés iniciar sesión con tu nueva contraseña.
+        </p>
+        <a class="btn" href="login.html?reset=ok" style="text-decoration:none;">Ir al login</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-legal">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a> |
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { auth } from "./firebase-config.js";
+    import {
+      verifyPasswordResetCode,
+      confirmPasswordReset
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get("mode");
+    const oobCode = params.get("oobCode");
+
+    const emailInput = document.getElementById("email");
+    const form = document.getElementById("resetPasswordForm");
+    const msg = document.getElementById("msg");
+    const formBox = document.getElementById("formBox");
+    const successBox = document.getElementById("successBox");
+
+    function showError(text) {
+      msg.textContent = text;
+      msg.className = "msg err";
+      msg.style.display = "block";
+    }
+
+    async function init() {
+      if (mode !== "resetPassword" || !oobCode) {
+        showError("El enlace no es válido o está incompleto.");
+        form.style.display = "none";
+        return;
+      }
+
+      try {
+        const email = await verifyPasswordResetCode(auth, oobCode);
+        emailInput.value = email;
+      } catch (error) {
+        console.error(error);
+        showError("Este enlace venció o ya no es válido. Pedí uno nuevo.");
+        form.style.display = "none";
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.className = "msg";
+      msg.style.display = "none";
+      msg.textContent = "";
+
+      const password = document.getElementById("password").value;
+      const password2 = document.getElementById("password2").value;
+
+      if (password !== password2) {
+        showError("Las contraseñas no coinciden.");
+        return;
+      }
+
+      if (password.length < 6) {
+        showError("La contraseña debe tener al menos 6 caracteres.");
+        return;
+      }
+
+      try {
+        await confirmPasswordReset(auth, oobCode, password);
+        formBox.style.display = "none";
+        successBox.style.display = "block";
+      } catch (error) {
+        console.error(error);
+        showError("No pudimos cambiar la contraseña. Pedí un nuevo enlace.");
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>
