@@ -4,49 +4,28 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-const grid = document.getElementById("gridResultados");
-const empty = document.getElementById("emptyResultados");
+const cont = document.getElementById("gridResultados");
 
-const params = new URLSearchParams(window.location.search);
-const destino = (params.get("destino") || "").toLowerCase();
+async function cargarResultados() {
 
-async function cargarAlojamientos() {
-  try {
-    const querySnapshot = await getDocs(collection(db, "alojamientos"));
+  const querySnapshot = await getDocs(collection(db, "alojamientos"));
 
-    let alojamientos = [];
+  let html = "";
 
-    querySnapshot.forEach((doc) => {
-      alojamientos.push(doc.data());
-    });
+  querySnapshot.forEach((doc) => {
 
-    // 🔎 FILTRO POR CIUDAD / PROVINCIA
-    if (destino) {
-      alojamientos = alojamientos.filter(a =>
-        (a.ciudad || "").toLowerCase().includes(destino) ||
-        (a.provincia || "").toLowerCase().includes(destino)
-      );
-    }
+    const a = doc.data();
 
-    if (!alojamientos.length) {
-      empty.style.display = "block";
-      return;
-    }
-
-    grid.innerHTML = alojamientos.map(a => `
+    html += `
       <div class="resultado-card">
 
-        <img class="resultado-img" src="${a.fotos?.[0] || 'https://via.placeholder.com/400'}">
+        <img class="resultado-img" src="${a.fotos?.[0] || ''}">
 
         <div class="resultado-info">
           <h3 class="resultado-titulo">${a.titulo}</h3>
 
           <div class="resultado-ubicacion">
-            📍 ${a.ciudad}, ${a.provincia}
-          </div>
-
-          <div class="resultado-meta">
-            👥 ${a.capacidad} huéspedes · 🛏️ ${a.camas} camas
+            ${a.ciudad} - ${a.provincia}
           </div>
 
           <div class="resultado-precio">
@@ -59,36 +38,10 @@ async function cargarAlojamientos() {
         </div>
 
       </div>
-    `).join("");
-
-    cargarMapa(alojamientos);
-
-  } catch (error) {
-    console.error(error);
-    empty.style.display = "block";
-  }
-}
-
-function cargarMapa(alojamientos) {
-  const mapaDiv = document.getElementById("mapa");
-
-  if (!mapaDiv) return;
-
-  mapaDiv.style.height = "400px";
-  mapaDiv.style.marginBottom = "20px";
-  mapaDiv.style.borderRadius = "16px";
-
-  const map = L.map("mapa").setView([-34.6, -58.4], 4);
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-  alojamientos.forEach(a => {
-    if (a.lat && a.lng) {
-      L.marker([a.lat, a.lng])
-        .addTo(map)
-        .bindPopup(`<b>${a.titulo}</b><br>${a.ciudad}`);
-    }
+    `;
   });
+
+  cont.innerHTML = html;
 }
 
-cargarAlojamientos();
+cargarResultados();
