@@ -52,6 +52,7 @@ export async function login(email,password){
 
 export async function sendReset(email){
   const cleanEmail = email.trim().toLowerCase();
+  auth.languageCode = "es";
 
   await sendPasswordResetEmail(auth, cleanEmail, {
     url: "https://tualoja.com/login.html?reset=ok",
