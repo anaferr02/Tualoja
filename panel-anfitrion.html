@@ -374,12 +374,11 @@ text-decoration:underline;
   import { db } from "./firebase-config.js";
   import { logout, getUser } from "./public/js/auth.js";
   import {
-    collection,
-    getDocs,
-    deleteDoc,
-    doc,
-    updateDoc
-  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
   const userObj = getUser();
   if (!userObj) location.href = "login.html?next=" + encodeURIComponent("panel-anfitrion.html");
