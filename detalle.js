@@ -1,6 +1,8 @@
-import { db } from "./firebase-config.js";
-import { getUser } from "./public/js/auth.js";
+import { db, auth } from "./firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 import {
+  doc,
+  getDoc,
   collection,
   getDocs,
   addDoc,
@@ -14,6 +16,12 @@ const id = params.get("id");
 
 const cont = document.getElementById("detalleWrap");
 const noExiste = document.getElementById("noExiste");
+
+let usuarioActual = null;
+
+onAuthStateChanged(auth, (user) => {
+  usuarioActual = user;
+});
 
 function escapeHTML(str) {
   return String(str || "")
@@ -67,23 +75,23 @@ async function cargarReservasAceptadas(listingId) {
 
 async function cargarDetalle() {
   try {
-    const querySnapshot = await getDocs(collection(db, "alojamientos"));
-
-    let alojamiento = null;
-
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      if (String(data.id) === String(id)) {
-        alojamiento = data;
-      }
-    });
-
-    if (!alojamiento) {
+    if (!id) {
       noExiste.style.display = "block";
       return;
     }
 
-    const reservasAceptadas = await cargarReservasAceptadas(alojamiento.id);
+    const docRef = doc(db, "alojamientos", id);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      noExiste.style.display = "block";
+      return;
+    }
+
+    const alojamiento = docSnap.data();
+    const alojamientoId = docSnap.id;
+
+    const reservasAceptadas = await cargarReservasAceptadas(alojamientoId);
 
     cont.innerHTML = `
       <div class="detalle-layout">
@@ -95,9 +103,9 @@ async function cargarDetalle() {
         </p>
 
         <p class="detalle-subtexto">
-          👥 ${escapeHTML(alojamiento.capacidad)} huéspedes ·
-          🛏️ ${escapeHTML(alojamiento.camas)} camas ·
-          🛁 ${escapeHTML(alojamiento.banos)} baños
+          👥 ${escapeHTML(alojamiento.capacidad || "-")} huéspedes ·
+          🛏️ ${escapeHTML(alojamiento.camas || "-")} camas ·
+          🛁 ${escapeHTML(alojamiento.banos || "-")} baños
         </p>
 
         <p class="detalle-descripcion-top">
@@ -122,18 +130,18 @@ async function cargarDetalle() {
           <div class="detalle-info-grid">
 
             <div class="detalle-info-left">
-              <div class="detalle-item"><strong>Tipo:</strong> ${escapeHTML(alojamiento.tipo)}</div>
+              <div class="detalle-item"><strong>Tipo:</strong> ${escapeHTML(alojamiento.tipo || "-")}</div>
               <div class="detalle-item"><strong>Servicios:</strong> ${escapeHTML((alojamiento.servicios || []).join(", ") || "-")}</div>
               <div class="detalle-item"><strong>Reglas:</strong> ${escapeHTML((alojamiento.reglas || []).join(", ") || "-")}</div>
-              <div class="detalle-item"><strong>Check-in:</strong> ${escapeHTML(alojamiento.checkinDesde)}</div>
-              <div class="detalle-item"><strong>Check-out:</strong> ${escapeHTML(alojamiento.checkoutHasta)}</div>
-              <div class="detalle-item"><strong>Cancelación:</strong> ${escapeHTML(alojamiento.cancelacion)}</div>
+              <div class="detalle-item"><strong>Check-in:</strong> ${escapeHTML(alojamiento.checkinDesde || "-")}</div>
+              <div class="detalle-item"><strong>Check-out:</strong> ${escapeHTML(alojamiento.checkoutHasta || "-")}</div>
+              <div class="detalle-item"><strong>Cancelación:</strong> ${escapeHTML(alojamiento.cancelacion || "-")}</div>
             </div>
 
             <div class="detalle-info-right">
 
               <div class="detalle-precio-box">
-                <span class="detalle-precio-numero">$${escapeHTML(alojamiento.precio)}</span>
+                <span class="detalle-precio-numero">$${escapeHTML(alojamiento.precio || 0)}</span>
                 <span class="detalle-precio-texto">/ noche</span>
               </div>
 
@@ -149,7 +157,7 @@ async function cargarDetalle() {
                 <input id="checkoutInput" type="date" class="detalle-input">
 
                 <label class="detalle-label">Huéspedes</label>
-                <input id="guestsInput" type="number" min="1" max="${escapeHTML(alojamiento.capacidad)}" value="1" class="detalle-input">
+                <input id="guestsInput" type="number" min="1" max="${escapeHTML(alojamiento.capacidad || 1)}" value="1" class="detalle-input">
               </div>
 
               <div id="ocupadasBox" class="detalle-total-box" style="background:#fff8e8;border-color:#f2ddb2;color:#7a5a00;">
@@ -223,9 +231,7 @@ async function cargarDetalle() {
     checkoutInput.addEventListener("change", actualizarTotal);
 
     btnReservar.addEventListener("click", async () => {
-      const me = getUser();
-
-      if (!me) {
+      if (!usuarioActual) {
         location.href = "login.html?next=" + encodeURIComponent(location.pathname + location.search);
         return;
       }
@@ -259,11 +265,13 @@ async function cargarDetalle() {
       try {
         await addDoc(collection(db, "reservas"), {
           code: generarCodigoReserva(),
-          listingId: alojamiento.id,
-          title: alojamiento.titulo,
-          hostEmail: alojamiento.ownerEmail || alojamiento.email || "",
-          guestEmail: me.email || "",
-          guestName: me.name || "Huésped",
+          listingId: alojamientoId,
+          title: alojamiento.titulo || "",
+          hostEmail: alojamiento.anfitrionEmail || "",
+          hostId: alojamiento.anfitrionId || "",
+          guestEmail: usuarioActual.email || "",
+          guestName: usuarioActual.displayName || "Huésped",
+          guestId: usuarioActual.uid,
           checkin,
           checkout,
           guests,
