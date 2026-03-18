@@ -1,26 +1,40 @@
-const tipoSelect = document.getElementById("tipo");
-const datosPropietario = document.getElementById("datosPropietario");
+import { auth } from "./firebase-config.js";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
 const form = document.getElementById("registroForm");
 
-tipoSelect.addEventListener("change", () => {
-  if (tipoSelect.value === "propietario") {
-    datosPropietario.style.display = "block";
-  } else {
-    datosPropietario.style.display = "none";
-  }
-});
-
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const formData = new FormData(form);
   const datos = Object.fromEntries(formData.entries());
 
-  console.log("Datos de registro:", datos);
+  const nombre = datos.nombre || "";
+  const email = datos.email || "";
+  const password = datos.password || "";
 
-  alert("Registro enviado (simulado). Mirá la consola 👀");
+  if (!email || !password) {
+    alert("Completá email y contraseña.");
+    return;
+  }
 
-  // Más adelante:
-  // fetch(...)
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+    if (nombre) {
+      await updateProfile(cred.user, {
+        displayName: nombre
+      });
+    }
+
+    alert("Cuenta creada con éxito 🚀");
+    location.href = "panel-anfitrion.html";
+
+  } catch (error) {
+    console.error(error);
+    alert("Error al registrarse.");
+  }
 });
-
