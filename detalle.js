@@ -1,7 +1,10 @@
 import { db } from "./firebase-config.js";
+import { getUser } from "./public/js/auth.js";
 import {
   collection,
-  getDocs
+  getDocs,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const params = new URLSearchParams(window.location.search);
@@ -9,6 +12,28 @@ const id = params.get("id");
 
 const cont = document.getElementById("detalleWrap");
 const noExiste = document.getElementById("noExiste");
+
+function escapeHTML(str) {
+  return String(str || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function nochesEntre(checkin, checkout) {
+  if (!checkin || !checkout) return 0;
+  const d1 = new Date(checkin + "T00:00:00");
+  const d2 = new Date(checkout + "T00:00:00");
+  const diff = d2 - d1;
+  const noches = diff / (1000 * 60 * 60 * 24);
+  return noches > 0 ? noches : 0;
+}
+
+function generarCodigoReserva() {
+  return "RES-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+}
 
 async function cargarDetalle() {
   try {
@@ -31,18 +56,20 @@ async function cargarDetalle() {
     cont.innerHTML = `
       <div class="detalle-layout">
 
-        <h1>${alojamiento.titulo}</h1>
+        <h1>${escapeHTML(alojamiento.titulo)}</h1>
 
         <p class="detalle-ubicacion-top">
-          📍 <strong>${alojamiento.ciudad}, ${alojamiento.provincia}</strong>
+          📍 <strong>${escapeHTML(alojamiento.ciudad)}, ${escapeHTML(alojamiento.provincia)}</strong>
         </p>
 
         <p class="detalle-subtexto">
-          👥 ${alojamiento.capacidad} huéspedes · 🛏️ ${alojamiento.camas} camas · 🛁 ${alojamiento.banos} baños
+          👥 ${escapeHTML(alojamiento.capacidad)} huéspedes ·
+          🛏️ ${escapeHTML(alojamiento.camas)} camas ·
+          🛁 ${escapeHTML(alojamiento.banos)} baños
         </p>
 
         <p class="detalle-descripcion-top">
-          ${alojamiento.descripcion || ""}
+          ${escapeHTML(alojamiento.descripcion || "")}
         </p>
 
         <div class="detalle-card">
@@ -50,7 +77,7 @@ async function cargarDetalle() {
           <div class="detalle-galeria">
             ${
               alojamiento.fotos?.length
-                ? `<img src="${alojamiento.fotos[0]}">`
+                ? `<img src="${alojamiento.fotos[0]}" alt="${escapeHTML(alojamiento.titulo)}">`
                 : `
                   <div class="detalle-galeria-empty">
                     <div class="icono">🏡</div>
@@ -63,42 +90,45 @@ async function cargarDetalle() {
           <div class="detalle-info-grid">
 
             <div class="detalle-info-left">
-              <div class="detalle-item"><strong>Tipo:</strong> ${alojamiento.tipo}</div>
-              <div class="detalle-item"><strong>Servicios:</strong> ${(alojamiento.servicios || []).join(", ") || "-"}</div>
-              <div class="detalle-item"><strong>Reglas:</strong> ${(alojamiento.reglas || []).join(", ") || "-"}</div>
-              <div class="detalle-item"><strong>Check-in:</strong> ${alojamiento.checkinDesde}</div>
-              <div class="detalle-item"><strong>Check-out:</strong> ${alojamiento.checkoutHasta}</div>
-              <div class="detalle-item"><strong>Cancelación:</strong> ${alojamiento.cancelacion}</div>
+              <div class="detalle-item"><strong>Tipo:</strong> ${escapeHTML(alojamiento.tipo)}</div>
+              <div class="detalle-item"><strong>Servicios:</strong> ${escapeHTML((alojamiento.servicios || []).join(", ") || "-")}</div>
+              <div class="detalle-item"><strong>Reglas:</strong> ${escapeHTML((alojamiento.reglas || []).join(", ") || "-")}</div>
+              <div class="detalle-item"><strong>Check-in:</strong> ${escapeHTML(alojamiento.checkinDesde)}</div>
+              <div class="detalle-item"><strong>Check-out:</strong> ${escapeHTML(alojamiento.checkoutHasta)}</div>
+              <div class="detalle-item"><strong>Cancelación:</strong> ${escapeHTML(alojamiento.cancelacion)}</div>
             </div>
 
             <div class="detalle-info-right">
 
               <div class="detalle-precio-box">
-                <span class="detalle-precio-numero">$${alojamiento.precio}</span>
+                <span class="detalle-precio-numero">$${escapeHTML(alojamiento.precio)}</span>
                 <span class="detalle-precio-texto">/ noche</span>
               </div>
 
               <p class="detalle-minimo">
-                Máx. ${alojamiento.maxNoches || 30} noches
+                Máx. ${escapeHTML(alojamiento.maxNoches || 30)} noches
               </p>
 
               <div class="detalle-reserva-form">
                 <label class="detalle-label">Check-in</label>
-                <input type="date" class="detalle-input">
+                <input id="checkinInput" type="date" class="detalle-input">
 
                 <label class="detalle-label">Check-out</label>
-                <input type="date" class="detalle-input">
+                <input id="checkoutInput" type="date" class="detalle-input">
+
+                <label class="detalle-label">Huéspedes</label>
+                <input id="guestsInput" type="number" min="1" max="${escapeHTML(alojamiento.capacidad)}" value="1" class="detalle-input">
               </div>
 
-              <div class="detalle-total-box">
-                Total estimado: $${alojamiento.precio} ARS
+              <div id="totalBox" class="detalle-total-box">
+                Elegí fechas para ver el total.
               </div>
 
-              <button class="detalle-btn-reservar">
+              <button id="btnReservar" class="detalle-btn-reservar">
                 Reservar
               </button>
 
-              <p class="detalle-ayuda">
+              <p id="msgReserva" class="detalle-ayuda">
                 No se cobra nada ahora
               </p>
 
@@ -108,6 +138,85 @@ async function cargarDetalle() {
         </div>
       </div>
     `;
+
+    const checkinInput = document.getElementById("checkinInput");
+    const checkoutInput = document.getElementById("checkoutInput");
+    const guestsInput = document.getElementById("guestsInput");
+    const totalBox = document.getElementById("totalBox");
+    const btnReservar = document.getElementById("btnReservar");
+    const msgReserva = document.getElementById("msgReserva");
+
+    function actualizarTotal() {
+      const checkin = checkinInput.value;
+      const checkout = checkoutInput.value;
+      const noches = nochesEntre(checkin, checkout);
+
+      if (!checkin || !checkout || noches <= 0) {
+        totalBox.textContent = "Elegí fechas válidas para ver el total.";
+        return 0;
+      }
+
+      const total = Number(alojamiento.precio || 0) * noches;
+      totalBox.textContent = `${noches} noche${noches > 1 ? "s" : ""} · Total estimado: $${total} ARS`;
+      return total;
+    }
+
+    checkinInput.addEventListener("change", actualizarTotal);
+    checkoutInput.addEventListener("change", actualizarTotal);
+
+    btnReservar.addEventListener("click", async () => {
+      const me = getUser();
+
+      if (!me) {
+        location.href = "login.html?next=" + encodeURIComponent(location.pathname + location.search);
+        return;
+      }
+
+      const checkin = checkinInput.value;
+      const checkout = checkoutInput.value;
+      const guests = Number(guestsInput.value || 1);
+      const noches = nochesEntre(checkin, checkout);
+
+      if (!checkin || !checkout || noches <= 0) {
+        msgReserva.textContent = "Elegí fechas válidas.";
+        return;
+      }
+
+      if (guests < 1 || guests > Number(alojamiento.capacidad || 1)) {
+        msgReserva.textContent = "La cantidad de huéspedes no es válida.";
+        return;
+      }
+
+      const total = Number(alojamiento.precio || 0) * noches;
+
+      btnReservar.disabled = true;
+      btnReservar.classList.add("disabled");
+      msgReserva.textContent = "Guardando reserva...";
+
+      try {
+        await addDoc(collection(db, "reservas"), {
+          code: generarCodigoReserva(),
+          listingId: alojamiento.id,
+          title: alojamiento.titulo,
+          hostEmail: alojamiento.ownerEmail || alojamiento.email || "",
+          guestEmail: me.email || "",
+          guestName: me.name || "Huésped",
+          checkin,
+          checkout,
+          guests,
+          total,
+          status: "pendiente",
+          createdAt: serverTimestamp()
+        });
+
+        msgReserva.textContent = "✅ Reserva enviada correctamente. El anfitrión la verá en su panel.";
+      } catch (error) {
+        console.error(error);
+        msgReserva.textContent = "❌ No se pudo guardar la reserva.";
+        btnReservar.disabled = false;
+        btnReservar.classList.remove("disabled");
+      }
+    });
 
   } catch (error) {
     console.error(error);
