@@ -140,7 +140,7 @@
   </footer>
 
   <!-- ✅ LOGIN conectado a public/js/auth.js -->
-  <script type="module">
+ <script type="module">
 import { auth } from "./firebase-config.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
@@ -156,14 +156,12 @@ form.addEventListener("submit", async (e) => {
   err.style.display = "none";
   err.textContent = "";
 
-  const email = document.getElementById("email").value.trim();
+  const email = document.getElementById("email").value.trim().toLowerCase();
   const password = document.getElementById("password").value;
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
-
     window.location.href = next;
-
   } catch (error) {
     console.error(error);
     err.textContent = "Email o contraseña incorrectos.";
