@@ -4,7 +4,9 @@ import {
   collection,
   getDocs,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const params = new URLSearchParams(window.location.search);
@@ -35,6 +37,34 @@ function generarCodigoReserva() {
   return "RES-" + Math.random().toString(36).slice(2, 8).toUpperCase();
 }
 
+function formatDate(fecha) {
+  if (!fecha) return "-";
+  const d = new Date(fecha + "T00:00:00");
+  if (Number.isNaN(d.getTime())) return fecha;
+  return d.toLocaleDateString("es-AR");
+}
+
+function rangosSePisan(aInicio, aFin, bInicio, bFin) {
+  return aInicio < bFin && aFin > bInicio;
+}
+
+async function cargarReservasAceptadas(listingId) {
+  const q = query(
+    collection(db, "reservas"),
+    where("listingId", "==", listingId),
+    where("status", "==", "aceptada")
+  );
+
+  const snap = await getDocs(q);
+  const reservas = [];
+
+  snap.forEach((d) => {
+    reservas.push(d.data());
+  });
+
+  return reservas;
+}
+
 async function cargarDetalle() {
   try {
     const querySnapshot = await getDocs(collection(db, "alojamientos"));
@@ -52,6 +82,8 @@ async function cargarDetalle() {
       noExiste.style.display = "block";
       return;
     }
+
+    const reservasAceptadas = await cargarReservasAceptadas(alojamiento.id);
 
     cont.innerHTML = `
       <div class="detalle-layout">
@@ -120,6 +152,14 @@ async function cargarDetalle() {
                 <input id="guestsInput" type="number" min="1" max="${escapeHTML(alojamiento.capacidad)}" value="1" class="detalle-input">
               </div>
 
+              <div id="ocupadasBox" class="detalle-total-box" style="background:#fff8e8;border-color:#f2ddb2;color:#7a5a00;">
+                ${
+                  reservasAceptadas.length
+                    ? `Fechas ocupadas: ${reservasAceptadas.map(r => `${formatDate(r.checkin)} al ${formatDate(r.checkout)}`).join(" · ")}`
+                    : "No hay fechas ocupadas actualmente."
+                }
+              </div>
+
               <div id="totalBox" class="detalle-total-box">
                 Elegí fechas para ver el total.
               </div>
@@ -146,6 +186,19 @@ async function cargarDetalle() {
     const btnReservar = document.getElementById("btnReservar");
     const msgReserva = document.getElementById("msgReserva");
 
+    function fechasDisponibles(checkin, checkout) {
+      if (!checkin || !checkout) return true;
+
+      const inicio = new Date(checkin + "T00:00:00");
+      const fin = new Date(checkout + "T00:00:00");
+
+      return !reservasAceptadas.some((r) => {
+        const rInicio = new Date(r.checkin + "T00:00:00");
+        const rFin = new Date(r.checkout + "T00:00:00");
+        return rangosSePisan(inicio, fin, rInicio, rFin);
+      });
+    }
+
     function actualizarTotal() {
       const checkin = checkinInput.value;
       const checkout = checkoutInput.value;
@@ -153,6 +206,11 @@ async function cargarDetalle() {
 
       if (!checkin || !checkout || noches <= 0) {
         totalBox.textContent = "Elegí fechas válidas para ver el total.";
+        return 0;
+      }
+
+      if (!fechasDisponibles(checkin, checkout)) {
+        totalBox.textContent = "Esas fechas se cruzan con una reserva ya aceptada.";
         return 0;
       }
 
@@ -179,6 +237,11 @@ async function cargarDetalle() {
 
       if (!checkin || !checkout || noches <= 0) {
         msgReserva.textContent = "Elegí fechas válidas.";
+        return;
+      }
+
+      if (!fechasDisponibles(checkin, checkout)) {
+        msgReserva.textContent = "❌ Esas fechas ya están ocupadas.";
         return;
       }
 
