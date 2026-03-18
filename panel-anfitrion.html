@@ -416,6 +416,10 @@ text-decoration:underline;
     return noches > 0 ? noches : null;
   }
 
+  function rangosSePisan(aInicio, aFin, bInicio, bFin) {
+    return aInicio < bFin && aFin > bInicio;
+  }
+
   async function loadListings() {
     const snap = await getDocs(collection(db, "alojamientos"));
     const arr = [];
@@ -587,7 +591,7 @@ text-decoration:underline;
         btnAccept.type = "button";
         btnAccept.className = "mini-btn";
         btnAccept.textContent = "Aceptar";
-        btnAccept.onclick = async () => updateBookingStatus(b._docId, "aceptada");
+        btnAccept.onclick = async () => updateBookingStatus(b, "aceptada");
         actions.appendChild(btnAccept);
       }
 
@@ -596,7 +600,7 @@ text-decoration:underline;
         btnReject.type = "button";
         btnReject.className = "mini-btn danger";
         btnReject.textContent = "Rechazar";
-        btnReject.onclick = async () => updateBookingStatus(b._docId, "rechazada");
+        btnReject.onclick = async () => updateBookingStatus(b, "rechazada");
         actions.appendChild(btnReject);
       }
 
@@ -652,8 +656,39 @@ text-decoration:underline;
     });
   }
 
-  async function updateBookingStatus(docId, status) {
-    await updateDoc(doc(db, "reservas", docId), { status });
+  async function hayCruceConAceptadas(reservaActual) {
+    const all = await loadBookings();
+
+    const aceptadasMismoAlojamiento = all.filter((r) =>
+      r.listingId === reservaActual.listingId &&
+      r.status === "aceptada" &&
+      r._docId !== reservaActual._docId
+    );
+
+    const inicioActual = new Date(reservaActual.checkin + "T00:00:00");
+    const finActual = new Date(reservaActual.checkout + "T00:00:00");
+
+    return aceptadasMismoAlojamiento.some((r) => {
+      const inicio = new Date(r.checkin + "T00:00:00");
+      const fin = new Date(r.checkout + "T00:00:00");
+      return rangosSePisan(inicioActual, finActual, inicio, fin);
+    });
+  }
+
+  function rangosSePisan(aInicio, aFin, bInicio, bFin) {
+    return aInicio < bFin && aFin > bInicio;
+  }
+
+  async function updateBookingStatus(reserva, status) {
+    if (status === "aceptada") {
+      const seCruza = await hayCruceConAceptadas(reserva);
+      if (seCruza) {
+        toast("❌ No podés aceptar: esas fechas ya están ocupadas.");
+        return;
+      }
+    }
+
+    await updateDoc(doc(db, "reservas", reserva._docId), { status });
     await renderHostBookings();
     await renderCalendar();
     toast(status === "aceptada" ? "✅ Reserva aceptada" : "✅ Reserva rechazada");
@@ -763,7 +798,7 @@ text-decoration:underline;
     }
     el.textContent = msg;
     el.style.display = "block";
-    toastTimer = setTimeout(() => { el.style.display = "none"; }, 1600);
+    toastTimer = setTimeout(() => { el.style.display = "none"; }, 1800);
   }
 
   function escapeHTML(str) {
