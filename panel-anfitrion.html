@@ -1,107 +1,798 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel anfitrión - TuAloja</title>
+  <link rel="stylesheet" href="style.css" />
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 30px;
+    .page-wrap{ max-width: 1040px; margin: 24px auto 40px; padding: 0 16px; }
+    .card{
+      background: rgba(255,255,255,.85);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 22px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.12);
+      padding: 18px;
+    }
+    .top{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+      margin-bottom: 12px;
+    }
+    .top h1{ margin:0; }
+    .muted{ opacity:.85; }
+    .btn{ cursor:pointer; }
+    .btn-row{ display:flex; gap:10px; flex-wrap:wrap; }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+      padding-bottom:10px;
+      border-bottom:1px solid rgba(0,0,0,.08);
+    }
+    .tab-btn{
+      border:0;
+      cursor:pointer;
+      padding:12px 16px;
+      border-radius:14px;
+      background: rgba(0,0,0,.08);
+      color:#222;
+      font-weight:700;
+      transition: .18s ease;
+    }
+    .tab-btn.active{
+      background:#1b167f;
+      color:#fff;
     }
 
-    .panel {
-      max-width: 1100px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    .panel-note{
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
     }
 
-    h1 {
-      margin-top: 0;
-    }
-
-    .acciones {
-      display: flex;
+    .list{ margin-top: 12px; display:grid; gap: 12px; }
+    .item{
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 18px;
+      padding: 14px;
+      display:grid;
+      grid-template-columns: 150px 1fr;
       gap: 12px;
-      margin-bottom: 25px;
-      flex-wrap: wrap;
+      align-items: start;
+    }
+    @media (max-width: 720px){
+      .item{ grid-template-columns: 1fr; }
     }
 
-    .btn {
-      padding: 12px 18px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .btn-primary {
-      background: #2d2aa7;
-      color: white;
-    }
-
-    .btn-light {
-      background: #ececec;
-      color: #222;
-    }
-
-    .card-alojamiento {
-      border: 1px solid #ddd;
-      border-radius: 14px;
-      overflow: hidden;
-      margin-bottom: 18px;
-      background: white;
-    }
-
-    .card-alojamiento img {
+    .thumb{
       width: 100%;
-      max-height: 240px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .card-info {
-      padding: 16px;
-    }
-
-    .card-info h3 {
-      margin: 0 0 8px 0;
-    }
-
-    .vacio {
-      padding: 20px;
-      background: #fafafa;
-      border: 1px dashed #ccc;
+      height: 120px;
       border-radius: 14px;
+      overflow:hidden;
+      background: rgba(0,0,0,.06);
+      border: 1px solid rgba(0,0,0,.08);
+    }
+    .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .chip{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.08);
+      border: 1px solid rgba(0,0,0,.06);
+      white-space: nowrap;
+    }
+    .chip-strong{
+      background: rgba(27,22,127,.12);
+      border-color: rgba(27,22,127,.22);
+      color:#1b167f;
+      font-weight: 700;
+    }
+    .chip-ok{
+      background: rgba(0,128,0,.10);
+      border-color: rgba(0,128,0,.20);
+      color: rgba(0,128,0,.95);
+      font-weight: 800;
+    }
+    .chip-bad{
+      background: rgba(176,0,32,.10);
+      border-color: rgba(176,0,32,.20);
+      color:#b00020;
+      font-weight: 800;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .mini-btn{
+      border:0; cursor:pointer;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.08);
+      text-decoration: none;
+      color: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+    .mini-btn.danger{
+      background: rgba(176,0,32,.12);
+      color:#b00020;
+      font-weight: 700;
+    }
+
+    .modal-backdrop{
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 50;
+    }
+    .modal{
+      width: min(720px, 96vw);
+      background:#fff;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.20);
+    }
+    .modal-top{
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+      margin-bottom: 10px;
+    }
+    .close-x{
+      border:0; cursor:pointer;
+      background: rgba(0,0,0,.08);
+      border-radius: 12px;
+      padding: 8px 10px;
+    }
+    .grid-2{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    @media (max-width: 720px){ .grid-2{ grid-template-columns: 1fr; } }
+
+    label{ display:block; font-weight: 600; margin-top: 10px; }
+    input, textarea{
+      width:100%;
+      box-sizing:border-box;
+      margin-top: 6px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: #fff;
+      outline: none;
+    }
+
+    .modal-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
+    .primary{
+      border:0; cursor:pointer;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background:#1b167f;
+      color:#fff;
+      font-weight: 800;
+    }
+
+    .hamburger{
+      font-size:20px;
+      background:none;
+      border:none;
+      cursor:pointer;
+    }
+
+    @media (max-width:800px){
+      .nav{
+        display:none;
+        position:absolute;
+        right:20px;
+        top:70px;
+        background:white;
+        padding:15px;
+        border-radius:12px;
+        box-shadow:0 10px 30px rgba(0,0,0,.15);
+        flex-direction:column;
+        gap:10px;
+      }
+      .nav.nav-open{ display:flex; }
+    }
+
+    .btn-outline{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.15);
+      background:white;
+      font-weight:600;
+      cursor:pointer;
     }
   </style>
 </head>
+
 <body>
+  <header class="header">
+    <a class="logo" href="index.html">TuAloja.com</a>
+    <nav id="mainNav" class="nav">
+      <a href="publicar.html">Publicar alojamiento</a>
+      <a href="ayuda.html">Ayuda</a>
+    </nav>
+    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
+  </header>
 
-  <div class="panel">
-    <h1>Panel anfitrión</h1>
-    <p>Administrá tus alojamientos.</p>
+  <main class="page-wrap">
+    <div class="card">
+      <div class="top">
+        <div>
+          <h1>Panel anfitrión</h1>
+          <p class="muted" style="margin:6px 0 0;">
+            Administrá tus alojamientos, reservas y fechas ocupadas.
+          </p>
+        </div>
 
-    <div class="acciones">
-      <button class="btn btn-primary" onclick="window.location.href='publicar.html'">
-        + Publicar alojamiento
-      </button>
+        <div class="btn-row">
+          <a class="btn btn-outline" href="publicar.html">+ Publicar</a>
+          <button class="btn btn-outline" id="btnLogout" type="button">Cerrar sesión</button>
+        </div>
+      </div>
 
-      <button class="btn btn-light" data-cerrar-sesion>
-        Cerrar sesión
-      </button>
+      <div class="tabs">
+        <button class="tab-btn active" id="tabListings" type="button">Mis alojamientos</button>
+        <button class="tab-btn" id="tabBookings" type="button">Reservas recibidas</button>
+        <button class="tab-btn" id="tabCalendar" type="button">Calendario</button>
+      </div>
+
+      <section id="secListings">
+        <div id="summary" class="muted"></div>
+        <div id="list" class="list"></div>
+        <p id="empty" class="muted" style="display:none; margin-top:12px;">
+          Todavía no tenés publicaciones. Tocá “+ Publicar”.
+        </p>
+      </section>
+
+      <section id="secBookings" style="display:none;">
+        <div class="panel-note muted">
+          Acá vas a ver las reservas que te hacen tus huéspedes.
+        </div>
+
+        <div id="bookSummary" class="muted"></div>
+        <div id="bookList" class="list"></div>
+        <p id="bookEmpty" class="muted" style="display:none; margin-top:12px;">
+          Todavía no recibiste reservas.
+        </p>
+      </section>
+
+      <section id="secCalendar" style="display:none;">
+        <div class="panel-note muted">
+          Fechas reservadas de tus alojamientos.
+        </div>
+
+        <div id="calList" class="list"></div>
+        <p id="calEmpty" class="muted" style="display:none; margin-top:12px;">
+          Aún no hay reservas para mostrar en el calendario.
+        </p>
+      </section>
     </div>
+  </main>
 
-    <h2>Mis alojamientos</h2>
+  <div id="backdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-top">
+        <h2>Editar publicación</h2>
+        <button class="close-x" id="closeModal" type="button">✕</button>
+      </div>
 
-    <div data-mis-alojamientos></div>
+      <form id="editForm">
+        <input type="hidden" name="id" />
+        <label>Título</label>
+        <input name="titulo" required />
+
+        <div class="grid-2">
+          <div>
+            <label>Precio por noche (ARS)</label>
+            <input name="precio" type="number" min="0" required />
+          </div>
+          <div>
+            <label>Máximo de noches</label>
+            <input name="maxNoches" type="number" min="1" max="365" />
+          </div>
+        </div>
+
+        <label>Descripción</label>
+        <textarea name="descripcion" rows="4" required></textarea>
+
+        <div class="modal-actions">
+          <button class="primary" type="submit">Guardar cambios</button>
+          <button class="btn btn-outline" id="cancelModal" type="button">Cancelar</button>
+        </div>
+      </form>
+    </div>
   </div>
 
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import { logout, getUser, refreshMe } from "./public/js/auth.js";
+    import {
+      collection,
+      getDocs,
+      doc,
+      deleteDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+    await refreshMe();
+    const userObj = getUser();
+
+    if (!userObj?.email) {
+      location.href = "login.html?next=" + encodeURIComponent("panel-anfitrion.html");
+      throw new Error("Usuario no autenticado");
+    }
+
+    const myEmail = String(userObj.email || "").toLowerCase().trim();
+    const myUid = String(userObj.uid || "").trim();
+
+    console.log("PANEL USER:", { myEmail, myUid });
+
+    document.getElementById("btnLogout")?.addEventListener("click", async () => {
+      await logout();
+    });
+
+    function coverFromFotos(listing) {
+      return listing?.fotos?.[0] || "";
+    }
+
+    function formatARS(n) {
+      const num = Number(n || 0);
+      try { return num.toLocaleString("es-AR"); } catch { return String(num); }
+    }
+
+    function formatDate(fecha) {
+      if (!fecha) return "-";
+      const d = new Date(fecha + "T00:00:00");
+      if (Number.isNaN(d.getTime())) return fecha;
+      return d.toLocaleDateString("es-AR");
+    }
+
+    function calcularNoches(checkin, checkout) {
+      if (!checkin || !checkout) return null;
+      const d1 = new Date(checkin + "T00:00:00");
+      const d2 = new Date(checkout + "T00:00:00");
+      const diff = d2 - d1;
+      const noches = diff / (1000 * 60 * 60 * 24);
+      return noches > 0 ? noches : null;
+    }
+
+    function rangosSePisan(aInicio, aFin, bInicio, bFin) {
+      return aInicio < bFin && aFin > bInicio;
+    }
+
+    function escapeHTML(str) {
+      return String(str || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    let toastTimer = null;
+    function toast(msg) {
+      clearTimeout(toastTimer);
+      let el = document.getElementById("toast");
+      if (!el) {
+        el = document.createElement("div");
+        el.id = "toast";
+        el.style.position = "fixed";
+        el.style.left = "50%";
+        el.style.bottom = "18px";
+        el.style.transform = "translateX(-50%)";
+        el.style.background = "rgba(0,0,0,.75)";
+        el.style.color = "#fff";
+        el.style.padding = "10px 14px";
+        el.style.borderRadius = "999px";
+        el.style.fontSize = "13px";
+        el.style.zIndex = "999";
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      el.style.display = "block";
+      toastTimer = setTimeout(() => { el.style.display = "none"; }, 1800);
+    }
+
+    async function loadListings() {
+      const snap = await getDocs(collection(db, "alojamientos"));
+      const arr = [];
+      snap.forEach((d) => arr.push({ ...d.data(), _docId: d.id }));
+      console.log("TODOS LOS ALOJAMIENTOS:", arr);
+      return arr;
+    }
+
+    async function loadBookings() {
+      const snap = await getDocs(collection(db, "reservas"));
+      const arr = [];
+      snap.forEach((d) => arr.push({ ...d.data(), _docId: d.id }));
+      console.log("TODAS LAS RESERVAS:", arr);
+      return arr;
+    }
+
+    function esMioAlojamiento(x) {
+      const ownerEmail = String(x.ownerEmail || "").toLowerCase().trim();
+      const anfitrionEmail = String(x.anfitrionEmail || "").toLowerCase().trim();
+      const email = String(x.email || "").toLowerCase().trim();
+      const anfitrionId = String(x.anfitrionId || "").trim();
+
+      return (
+        ownerEmail === myEmail ||
+        anfitrionEmail === myEmail ||
+        email === myEmail ||
+        (myUid && anfitrionId === myUid)
+      );
+    }
+
+    function esMiReserva(b) {
+      const hostEmail = String(b.hostEmail || "").toLowerCase().trim();
+      const anfitrionEmail = String(b.anfitrionEmail || "").toLowerCase().trim();
+      const hostId = String(b.hostId || "").trim();
+      const anfitrionId = String(b.anfitrionId || "").trim();
+
+      return (
+        hostEmail === myEmail ||
+        anfitrionEmail === myEmail ||
+        (myUid && hostId === myUid) ||
+        (myUid && anfitrionId === myUid)
+      );
+    }
+
+    async function render() {
+      const list = document.getElementById("list");
+      const empty = document.getElementById("empty");
+      const summary = document.getElementById("summary");
+
+      const all = await loadListings();
+      const mine = all.filter(esMioAlojamiento);
+
+      console.log("ALOJAMIENTOS MIOS:", mine);
+
+      summary.textContent = `Publicaciones: ${mine.length}`;
+      list.innerHTML = "";
+
+      if (!mine.length) {
+        empty.style.display = "block";
+        return;
+      }
+
+      empty.style.display = "none";
+
+      mine.forEach((x) => {
+        const item = document.createElement("div");
+        item.className = "item";
+
+        const imgWrap = document.createElement("div");
+        imgWrap.className = "thumb";
+        const cover = coverFromFotos(x);
+
+        if (cover) {
+          const img = document.createElement("img");
+          img.src = cover;
+          img.alt = x.titulo || "Alojamiento";
+          imgWrap.appendChild(img);
+        }
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.innerHTML = `
+          <h3>${escapeHTML(x.titulo || "Sin título")}</h3>
+          <p><b>${escapeHTML(x.ciudad || "-")}</b>, ${escapeHTML(x.provincia || "-")}</p>
+          <div class="chips">
+            <span class="chip chip-strong">${escapeHTML(x.status || "activo")}</span>
+            <span class="chip">ARS $${formatARS(x.precio)}</span>
+            <span class="chip">Máx. noches: ${x.maxNoches ?? 30}</span>
+            <span class="chip">ID: ${escapeHTML(x.id || x._docId || "")}</span>
+          </div>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const btnEdit = document.createElement("button");
+        btnEdit.type = "button";
+        btnEdit.className = "mini-btn";
+        btnEdit.textContent = "Editar";
+        btnEdit.onclick = () => openEdit(x);
+
+        const btnCopy = document.createElement("button");
+        btnCopy.type = "button";
+        btnCopy.className = "mini-btn";
+        btnCopy.textContent = "Copiar ID";
+        btnCopy.onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(x.id || x._docId || "");
+            toast("✅ ID copiado");
+          } catch {
+            toast("No pude copiar. Copialo manualmente.");
+          }
+        };
+
+        const btnDel = document.createElement("button");
+        btnDel.type = "button";
+        btnDel.className = "mini-btn danger";
+        btnDel.textContent = "Eliminar";
+        btnDel.onclick = async () => {
+          const ok = confirm("¿Eliminar esta publicación?");
+          if (!ok) return;
+          await deleteDoc(doc(db, "alojamientos", x._docId));
+          await render();
+          toast("✅ Eliminado");
+        };
+
+        actions.appendChild(btnEdit);
+        actions.appendChild(btnCopy);
+        actions.appendChild(btnDel);
+
+        meta.appendChild(actions);
+        item.appendChild(imgWrap);
+        item.appendChild(meta);
+        list.appendChild(item);
+      });
+    }
+
+    async function renderHostBookings() {
+      const bookSummary = document.getElementById("bookSummary");
+      const bookList = document.getElementById("bookList");
+      const bookEmpty = document.getElementById("bookEmpty");
+
+      const all = await loadBookings();
+      const mine = all.filter(esMiReserva);
+
+      console.log("RESERVAS MIAS:", mine);
+
+      bookSummary.textContent = `Reservas recibidas: ${mine.length}`;
+      bookList.innerHTML = "";
+
+      if (!mine.length) {
+        bookEmpty.style.display = "block";
+        return;
+      }
+
+      bookEmpty.style.display = "none";
+
+      mine.forEach((b) => {
+        const item = document.createElement("div");
+        item.className = "item";
+
+        const left = document.createElement("div");
+        left.className = "thumb";
+        left.innerHTML = `
+          <div style="padding:10px; font-size:12px; color:#333;">
+            <b>${escapeHTML(b.title || b.titulo || "Reserva")}</b><br/>
+            Código: ${escapeHTML(b.code || b._docId || "")}
+          </div>
+        `;
+
+        const stateClass =
+          b.status === "aceptada" ? "chip-ok" :
+          b.status === "rechazada" ? "chip-bad" :
+          "chip-strong";
+
+        const noches = calcularNoches(b.checkin, b.checkout);
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.innerHTML = `
+          <h3>${escapeHTML(b.guestName || "Huésped")}</h3>
+          <p><b>${escapeHTML(b.guestEmail || "-")}</b></p>
+          <div class="chips">
+            <span class="chip ${stateClass}">Estado: ${escapeHTML(b.status || "pendiente")}</span>
+            <span class="chip">Check-in: ${escapeHTML(formatDate(b.checkin))}</span>
+            <span class="chip">Check-out: ${escapeHTML(formatDate(b.checkout))}</span>
+            ${noches ? `<span class="chip">Noches: ${escapeHTML(String(noches))}</span>` : ""}
+            <span class="chip">Huéspedes: ${escapeHTML(String(b.guests ?? "-"))}</span>
+            <span class="chip">Total: ARS $${formatARS(b.total)}</span>
+          </div>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        if (b.status !== "aceptada") {
+          const btnAccept = document.createElement("button");
+          btnAccept.type = "button";
+          btnAccept.className = "mini-btn";
+          btnAccept.textContent = "Aceptar";
+          btnAccept.onclick = async () => updateBookingStatus(b, "aceptada");
+          actions.appendChild(btnAccept);
+        }
+
+        if (b.status !== "rechazada") {
+          const btnReject = document.createElement("button");
+          btnReject.type = "button";
+          btnReject.className = "mini-btn danger";
+          btnReject.textContent = "Rechazar";
+          btnReject.onclick = async () => updateBookingStatus(b, "rechazada");
+          actions.appendChild(btnReject);
+        }
+
+        meta.appendChild(actions);
+        item.appendChild(left);
+        item.appendChild(meta);
+        bookList.appendChild(item);
+      });
+    }
+
+    async function renderCalendar() {
+      const calList = document.getElementById("calList");
+      const calEmpty = document.getElementById("calEmpty");
+
+      const all = await loadBookings();
+      const mine = all.filter((b) => esMiReserva(b) && b.status !== "rechazada");
+
+      calList.innerHTML = "";
+
+      if (!mine.length) {
+        calEmpty.style.display = "block";
+        return;
+      }
+
+      calEmpty.style.display = "none";
+
+      mine.forEach((b) => {
+        const noches = calcularNoches(b.checkin, b.checkout);
+
+        const item = document.createElement("div");
+        item.className = "item";
+        item.style.gridTemplateColumns = "1fr";
+
+        item.innerHTML = `
+          <div class="meta">
+            <h3>${escapeHTML(b.title || b.titulo || "Alojamiento")}</h3>
+            <div class="chips">
+              <span class="chip chip-strong">${escapeHTML(b.status || "pendiente")}</span>
+              <span class="chip">Check-in: ${escapeHTML(formatDate(b.checkin))}</span>
+              <span class="chip">Check-out: ${escapeHTML(formatDate(b.checkout))}</span>
+              ${noches ? `<span class="chip">Noches: ${escapeHTML(String(noches))}</span>` : ""}
+              <span class="chip">Código: ${escapeHTML(b.code || b._docId || "")}</span>
+              <span class="chip">Huésped: ${escapeHTML(b.guestName || "-")}</span>
+            </div>
+          </div>
+        `;
+        calList.appendChild(item);
+      });
+    }
+
+    async function hayCruceConAceptadas(reservaActual) {
+      const all = await loadBookings();
+
+      const aceptadasMismoAlojamiento = all.filter((r) =>
+        r.listingId === reservaActual.listingId &&
+        r.status === "aceptada" &&
+        r._docId !== reservaActual._docId
+      );
+
+      const inicioActual = new Date(reservaActual.checkin + "T00:00:00");
+      const finActual = new Date(reservaActual.checkout + "T00:00:00");
+
+      return aceptadasMismoAlojamiento.some((r) => {
+        const inicio = new Date(r.checkin + "T00:00:00");
+        const fin = new Date(r.checkout + "T00:00:00");
+        return rangosSePisan(inicioActual, finActual, inicio, fin);
+      });
+    }
+
+    async function updateBookingStatus(reserva, status) {
+      if (status === "aceptada") {
+        const seCruza = await hayCruceConAceptadas(reserva);
+        if (seCruza) {
+          toast("❌ No podés aceptar: esas fechas ya están ocupadas.");
+          return;
+        }
+      }
+
+      await updateDoc(doc(db, "reservas", reserva._docId), { status });
+      await renderHostBookings();
+      await renderCalendar();
+      toast(status === "aceptada" ? "✅ Reserva aceptada" : "✅ Reserva rechazada");
+    }
+
+    const backdrop = document.getElementById("backdrop");
+    const editForm = document.getElementById("editForm");
+    let currentEditDocId = null;
+
+    function openEdit(item) {
+      currentEditDocId = item._docId;
+      editForm.id.value = item.id || "";
+      editForm.titulo.value = item.titulo || "";
+      editForm.precio.value = Number(item.precio || 0);
+      editForm.maxNoches.value = item.maxNoches ?? 30;
+      editForm.descripcion.value = item.descripcion || "";
+      backdrop.style.display = "flex";
+    }
+
+    function closeEdit() {
+      backdrop.style.display = "none";
+      currentEditDocId = null;
+    }
+
+    document.getElementById("closeModal").addEventListener("click", closeEdit);
+    document.getElementById("cancelModal").addEventListener("click", closeEdit);
+    backdrop.addEventListener("click", (e) => {
+      if (e.target === backdrop) closeEdit();
+    });
+
+    editForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentEditDocId) return;
+
+      let maxNoches = parseInt(editForm.maxNoches.value || "30", 10);
+      if (Number.isNaN(maxNoches)) maxNoches = 30;
+      if (maxNoches < 1) maxNoches = 1;
+      if (maxNoches > 365) maxNoches = 365;
+
+      await updateDoc(doc(db, "alojamientos", currentEditDocId), {
+        titulo: editForm.titulo.value.trim(),
+        precio: Number(editForm.precio.value || 0),
+        maxNoches,
+        descripcion: editForm.descripcion.value.trim(),
+        moneda: "ARS"
+      });
+
+      closeEdit();
+      await render();
+      toast("✅ Guardado");
+    });
+
+    const secListings = document.getElementById("secListings");
+    const secBookings = document.getElementById("secBookings");
+    const secCalendar = document.getElementById("secCalendar");
+
+    const tabListings = document.getElementById("tabListings");
+    const tabBookings = document.getElementById("tabBookings");
+    const tabCalendar = document.getElementById("tabCalendar");
+
+    function setActiveTab(activeBtn) {
+      [tabListings, tabBookings, tabCalendar].forEach((btn) => btn.classList.remove("active"));
+      activeBtn.classList.add("active");
+    }
+
+    async function showTab(which) {
+      secListings.style.display = which === "listings" ? "block" : "none";
+      secBookings.style.display = which === "bookings" ? "block" : "none";
+      secCalendar.style.display = which === "calendar" ? "block" : "none";
+
+      if (which === "listings") {
+        setActiveTab(tabListings);
+        await render();
+      }
+      if (which === "bookings") {
+        setActiveTab(tabBookings);
+        await renderHostBookings();
+      }
+      if (which === "calendar") {
+        setActiveTab(tabCalendar);
+        await renderCalendar();
+      }
+    }
+
+    tabListings.addEventListener("click", () => showTab("listings"));
+    tabBookings.addEventListener("click", () => showTab("bookings"));
+    tabCalendar.addEventListener("click", () => showTab("calendar"));
+
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const mainNav = document.getElementById("mainNav");
+    if (hamburgerBtn && mainNav) {
+      hamburgerBtn.addEventListener("click", () => {
+        mainNav.classList.toggle("nav-open");
+      });
+    }
+
+    showTab("listings");
+  </script>
   <script type="module" src="./panel-anfitrion.js"></script>
 </body>
 </html>
