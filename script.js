@@ -17,35 +17,30 @@ function setupHamburgerMenu() {
     toggleNav();
   });
 
-  // Evita que clicks dentro del nav cierren por el listener global
   nav.addEventListener("click", (e) => {
     e.stopPropagation();
 
-    // Cerrar al clickear un link dentro del nav
-    if (e.target && e.target.tagName === "A") closeNav();
+    if (e.target && e.target.tagName === "A") {
+      closeNav();
+    }
   });
 
-  // Cerrar si se hace click fuera
   document.addEventListener("click", (e) => {
     const clickedInside = nav.contains(e.target) || btn.contains(e.target);
     if (!clickedInside) closeNav();
   });
 
-  // Cerrar con ESC
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeNav();
   });
 
-  // Reset si se agranda la pantalla
   window.addEventListener("resize", () => {
     if (window.innerWidth > 768) closeNav();
   });
 }
 
 /* =========================
-   AUTH UI (soporta 2 variantes)
-   - Variante A: #userMenu + #userDropdown
-   - Variante B: #authArea (como tu index)
+   AUTH UI
 ========================= */
 function renderAuthArea(user) {
   const authArea = document.getElementById("authArea");
@@ -59,9 +54,9 @@ function renderAuthArea(user) {
 
     const btn = document.getElementById("logoutBtnAuthArea");
     if (btn) {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", async (e) => {
         e.preventDefault();
-        logout();
+        await logout();
       });
     }
   } else {
@@ -89,9 +84,9 @@ function renderUserMenu(user) {
 
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) {
-      logoutBtn.addEventListener("click", (e) => {
+      logoutBtn.addEventListener("click", async (e) => {
         e.preventDefault();
-        logout();
+        await logout();
       });
     }
   } else {
@@ -111,7 +106,6 @@ async function setupAuthUI() {
   await refreshMe();
   const user = getUser();
 
-  // Actualiza la UI según lo que exista en esa página
   renderAuthArea(user);
   renderUserMenu(user);
 }
