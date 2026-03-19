@@ -753,16 +753,6 @@ footer {
 </script>
 
 <script type="module" src="script.js"></script>
-<script>
-  const authArea = document.getElementById("authArea");
-  const logged = localStorage.getItem("tualoja_logged");
-  const user = JSON.parse(localStorage.getItem("tualoja_user") || "{}");
 
-  if (logged === "1" && user?.email) {
-    authArea.innerHTML = `
-      <a class="btn btn-primary" href="mi-cuenta.html">Cuenta</a>
-    `;
-  }
-</script>
 </body>
 </html>
