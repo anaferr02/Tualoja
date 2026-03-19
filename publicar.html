@@ -601,7 +601,7 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script type="module">
@@ -856,6 +856,7 @@
       const fotosBase64 = fotosOrdenadas.map(x => x.b64);
 
       const data = {
+        id: crypto.randomUUID(),
         titulo: form.titulo.value.trim(),
         tipo: form.tipo.value,
         capacidad: Number(form.capacidad.value),
@@ -885,7 +886,8 @@
         lat: Number(latInput.value),
         lng: Number(lngInput.value),
         anfitrionId: currentUser.uid,
-        anfitrionEmail: currentUser.email || "",
+        anfitrionEmail: (currentUser.email || "").toLowerCase(),
+        ownerEmail: (currentUser.email || "").toLowerCase(),
         status: "activo",
         createdAt: serverTimestamp()
       };
