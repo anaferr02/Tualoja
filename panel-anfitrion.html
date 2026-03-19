@@ -372,22 +372,31 @@ text-decoration:underline;
 
 <script type="module">
   import { db } from "./firebase-config.js";
-  import { logout, getUser } from "./public/js/auth.js";
+  import { logout, getUser, refreshMe } from "./public/js/auth.js";
   import {
-  collection,
-  query,
-  where,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+    collection,
+    getDocs,
+    doc,
+    deleteDoc,
+    updateDoc
+  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
+  await refreshMe();
   const userObj = getUser();
-  if (!userObj) location.href = "login.html?next=" + encodeURIComponent("panel-anfitrion.html");
 
-  const myEmail = (userObj?.email || "").toLowerCase();
+  if (!userObj?.email) {
+    location.href = "login.html?next=" + encodeURIComponent("panel-anfitrion.html");
+    throw new Error("Usuario no autenticado");
+  }
 
-  document.getElementById("btnLogout").addEventListener("click", () => {
-    logout();
-  });
+  const myEmail = userObj.email.toLowerCase();
+
+  const btnLogout = document.getElementById("btnLogout");
+  if (btnLogout) {
+    btnLogout.addEventListener("click", async () => {
+      await logout();
+    });
+  }
 
   function coverFromFotos(listing) {
     if (!listing?.fotos?.length) return "";
@@ -396,7 +405,11 @@ text-decoration:underline;
 
   function formatARS(n) {
     const num = Number(n || 0);
-    try { return num.toLocaleString("es-AR"); } catch { return String(num); }
+    try {
+      return num.toLocaleString("es-AR");
+    } catch {
+      return String(num);
+    }
   }
 
   function formatDate(fecha) {
@@ -419,23 +432,64 @@ text-decoration:underline;
     return aInicio < bFin && aFin > bInicio;
   }
 
+  function escapeHTML(str) {
+    return String(str || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  let toastTimer = null;
+  function toast(msg) {
+    clearTimeout(toastTimer);
+    let el = document.getElementById("toast");
+
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "toast";
+      el.style.position = "fixed";
+      el.style.left = "50%";
+      el.style.bottom = "18px";
+      el.style.transform = "translateX(-50%)";
+      el.style.background = "rgba(0,0,0,.75)";
+      el.style.color = "#fff";
+      el.style.padding = "10px 14px";
+      el.style.borderRadius = "999px";
+      el.style.fontSize = "13px";
+      el.style.zIndex = "999";
+      document.body.appendChild(el);
+    }
+
+    el.textContent = msg;
+    el.style.display = "block";
+    toastTimer = setTimeout(() => {
+      el.style.display = "none";
+    }, 1800);
+  }
+
   async function loadListings() {
     const snap = await getDocs(collection(db, "alojamientos"));
     const arr = [];
+
     snap.forEach((d) => {
       const x = d.data();
       arr.push({ ...x, _docId: d.id });
     });
+
     return arr;
   }
 
   async function loadBookings() {
     const snap = await getDocs(collection(db, "reservas"));
     const arr = [];
+
     snap.forEach((d) => {
       const x = d.data();
       arr.push({ ...x, _docId: d.id });
     });
+
     return arr;
   }
 
@@ -445,7 +499,7 @@ text-decoration:underline;
     const summary = document.getElementById("summary");
 
     const all = await loadListings();
-    const mine = all.filter(x => (x.ownerEmail || "").toLowerCase() === myEmail);
+    const mine = all.filter((x) => (x.ownerEmail || "").toLowerCase() === myEmail);
 
     summary.textContent = `Publicaciones: ${mine.length}`;
     list.innerHTML = "";
@@ -463,6 +517,7 @@ text-decoration:underline;
 
       const imgWrap = document.createElement("div");
       imgWrap.className = "thumb";
+
       const cover = coverFromFotos(x);
       if (cover) {
         const img = document.createElement("img");
@@ -513,6 +568,7 @@ text-decoration:underline;
       btnDel.onclick = async () => {
         const ok = confirm("¿Eliminar esta publicación?");
         if (!ok) return;
+
         await deleteDoc(doc(db, "alojamientos", x._docId));
         await render();
         toast("✅ Eliminado");
@@ -523,7 +579,6 @@ text-decoration:underline;
       actions.appendChild(btnDel);
 
       meta.appendChild(actions);
-
       item.appendChild(imgWrap);
       item.appendChild(meta);
       list.appendChild(item);
@@ -536,7 +591,7 @@ text-decoration:underline;
     const bookEmpty = document.getElementById("bookEmpty");
 
     const all = await loadBookings();
-    const mine = all.filter(b => (b.hostEmail || "").toLowerCase() === myEmail);
+    const mine = all.filter((b) => (b.hostEmail || "").toLowerCase() === myEmail);
 
     bookSummary.textContent = `Reservas recibidas: ${mine.length}`;
     bookList.innerHTML = "";
@@ -545,6 +600,7 @@ text-decoration:underline;
       bookEmpty.style.display = "block";
       return;
     }
+
     bookEmpty.style.display = "none";
 
     mine.forEach((b) => {
@@ -561,9 +617,11 @@ text-decoration:underline;
       `;
 
       const stateClass =
-        b.status === "aceptada" ? "chip-ok" :
-        b.status === "rechazada" ? "chip-bad" :
-        "chip-strong";
+        b.status === "aceptada"
+          ? "chip-ok"
+          : b.status === "rechazada"
+          ? "chip-bad"
+          : "chip-strong";
 
       const noches = calcularNoches(b.checkin, b.checkout);
 
@@ -621,7 +679,9 @@ text-decoration:underline;
     const calEmpty = document.getElementById("calEmpty");
 
     const all = await loadBookings();
-    const mine = all.filter(b => (b.hostEmail || "").toLowerCase() === myEmail && b.status !== "rechazada");
+    const mine = all.filter(
+      (b) => (b.hostEmail || "").toLowerCase() === myEmail && b.status !== "rechazada"
+    );
 
     calList.innerHTML = "";
 
@@ -629,6 +689,7 @@ text-decoration:underline;
       calEmpty.style.display = "block";
       return;
     }
+
     calEmpty.style.display = "none";
 
     mine.forEach((b) => {
@@ -651,6 +712,7 @@ text-decoration:underline;
           </div>
         </div>
       `;
+
       calList.appendChild(item);
     });
   }
@@ -658,10 +720,11 @@ text-decoration:underline;
   async function hayCruceConAceptadas(reservaActual) {
     const all = await loadBookings();
 
-    const aceptadasMismoAlojamiento = all.filter((r) =>
-      r.listingId === reservaActual.listingId &&
-      r.status === "aceptada" &&
-      r._docId !== reservaActual._docId
+    const aceptadasMismoAlojamiento = all.filter(
+      (r) =>
+        r.listingId === reservaActual.listingId &&
+        r.status === "aceptada" &&
+        r._docId !== reservaActual._docId
     );
 
     const inicioActual = new Date(reservaActual.checkin + "T00:00:00");
@@ -672,10 +735,6 @@ text-decoration:underline;
       const fin = new Date(r.checkout + "T00:00:00");
       return rangosSePisan(inicioActual, finActual, inicio, fin);
     });
-  }
-
-  function rangosSePisan(aInicio, aFin, bInicio, bFin) {
-    return aInicio < bFin && aFin > bInicio;
   }
 
   async function updateBookingStatus(reserva, status) {
@@ -714,6 +773,7 @@ text-decoration:underline;
 
   document.getElementById("closeModal").addEventListener("click", closeEdit);
   document.getElementById("cancelModal").addEventListener("click", closeEdit);
+
   backdrop.addEventListener("click", (e) => {
     if (e.target === backdrop) closeEdit();
   });
@@ -749,7 +809,7 @@ text-decoration:underline;
   const tabCalendar = document.getElementById("tabCalendar");
 
   function setActiveTab(activeBtn) {
-    [tabListings, tabBookings, tabCalendar].forEach(btn => btn.classList.remove("active"));
+    [tabListings, tabBookings, tabCalendar].forEach((btn) => btn.classList.remove("active"));
     activeBtn.classList.add("active");
   }
 
@@ -762,10 +822,12 @@ text-decoration:underline;
       setActiveTab(tabListings);
       await render();
     }
+
     if (which === "bookings") {
       setActiveTab(tabBookings);
       await renderHostBookings();
     }
+
     if (which === "calendar") {
       setActiveTab(tabCalendar);
       await renderCalendar();
@@ -776,37 +838,14 @@ text-decoration:underline;
   tabBookings.addEventListener("click", () => showTab("bookings"));
   tabCalendar.addEventListener("click", () => showTab("calendar"));
 
-  let toastTimer = null;
-  function toast(msg) {
-    clearTimeout(toastTimer);
-    let el = document.getElementById("toast");
-    if (!el) {
-      el = document.createElement("div");
-      el.id = "toast";
-      el.style.position = "fixed";
-      el.style.left = "50%";
-      el.style.bottom = "18px";
-      el.style.transform = "translateX(-50%)";
-      el.style.background = "rgba(0,0,0,.75)";
-      el.style.color = "#fff";
-      el.style.padding = "10px 14px";
-      el.style.borderRadius = "999px";
-      el.style.fontSize = "13px";
-      el.style.zIndex = "999";
-      document.body.appendChild(el);
-    }
-    el.textContent = msg;
-    el.style.display = "block";
-    toastTimer = setTimeout(() => { el.style.display = "none"; }, 1800);
-  }
+  // menú hamburguesa simple
+  const hamburgerBtn = document.getElementById("hamburgerBtn");
+  const mainNav = document.getElementById("mainNav");
 
-  function escapeHTML(str) {
-    return String(str || "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+  if (hamburgerBtn && mainNav) {
+    hamburgerBtn.addEventListener("click", () => {
+      mainNav.classList.toggle("nav-open");
+    });
   }
 
   showTab("listings");
