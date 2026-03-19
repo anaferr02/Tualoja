@@ -5,281 +5,290 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Publicar alojamiento - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
   <style>
-  .publish-wrap{
-    max-width: 1100px;
-    margin: 30px auto 50px;
-    padding: 0 18px;
-  }
-
-  .publish-card{
-    background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.90));
-    border: 1px solid rgba(27,22,127,.10);
-    border-radius: 26px;
-    box-shadow: 0 20px 50px rgba(27,22,127,.10);
-    padding: 24px;
-  }
-
-  .publish-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:16px;
-    flex-wrap:wrap;
-    margin-bottom: 14px;
-  }
-
-  .publish-top h1{
-    margin:0;
-    font-size: 38px;
-    line-height: 1.05;
-    color:#1b167f;
-  }
-
-  .muted{
-    opacity:.82;
-    color:#4b5563;
-  }
-
-  .publish-section{
-    background: #fff;
-    border: 1px solid rgba(27,22,127,.08);
-    border-radius: 22px;
-    padding: 18px;
-    margin-top: 16px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.04);
-  }
-
-  .publish-section h3{
-    margin: 0 0 10px;
-    font-size: 18px;
-    color:#1b167f;
-  }
-
-  .section-note{
-    margin-top:-2px;
-    margin-bottom:10px;
-    font-size:13px;
-    color:#5b6472;
-  }
-
-  .grid-2,
-  .grid-3{
-    display:grid;
-    gap:14px;
-  }
-
-  .grid-2{
-    grid-template-columns: repeat(2, minmax(0,1fr));
-  }
-
-  .grid-3{
-    grid-template-columns: repeat(3, minmax(0,1fr));
-  }
-
-  @media (max-width: 760px){
-    .grid-2,
-    .grid-3{
-      grid-template-columns: 1fr;
+    .publish-wrap{
+      max-width: 1100px;
+      margin: 30px auto 50px;
+      padding: 0 18px;
     }
 
     .publish-card{
-      padding: 16px;
-      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.90));
+      border: 1px solid rgba(27,22,127,.10);
+      border-radius: 26px;
+      box-shadow: 0 20px 50px rgba(27,22,127,.10);
+      padding: 24px;
     }
 
-    .publish-section{
-      padding: 14px;
-      border-radius: 18px;
+    .publish-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom: 14px;
     }
 
     .publish-top h1{
-      font-size: 30px;
+      margin:0;
+      font-size: 38px;
+      line-height: 1.05;
+      color:#1b167f;
     }
-  }
 
-  .publish-card label{
-    display:block;
-    font-weight: 700;
-    margin-top: 10px;
-    color:#222;
-    font-size: 14px;
-  }
+    .muted{
+      opacity:.82;
+      color:#4b5563;
+    }
 
-  .publish-card input,
-  .publish-card select,
-  .publish-card textarea{
-    width:100%;
-    box-sizing:border-box;
-    margin-top: 6px;
-    padding: 13px 14px;
-    border-radius: 14px;
-    border: 1px solid rgba(27,22,127,.14);
-    background: #fdfdff;
-    outline: none;
-    font-size: 14px;
-    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
-  }
+    .publish-section{
+      background: #fff;
+      border: 1px solid rgba(27,22,127,.08);
+      border-radius: 22px;
+      padding: 18px;
+      margin-top: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.04);
+    }
 
-  .publish-card input:focus,
-  .publish-card select:focus,
-  .publish-card textarea:focus{
-    border-color:#4f46e5;
-    box-shadow: 0 0 0 4px rgba(79,70,229,.10);
-    background:#fff;
-  }
+    .publish-section h3{
+      margin: 0 0 10px;
+      font-size: 18px;
+      color:#1b167f;
+    }
 
-  .publish-card textarea{
-    resize: vertical;
-    min-height: 110px;
-  }
+    .section-note{
+      margin-top:-2px;
+      margin-bottom:10px;
+      font-size:13px;
+      color:#5b6472;
+    }
 
-  .help{
-    display:block;
-    font-size: 12px;
-    color:#667085;
-    margin-top: 6px;
-    line-height: 1.35;
-  }
+    .grid-2,
+    .grid-3{
+      display:grid;
+      gap:14px;
+    }
 
-  .checks{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-  }
+    .grid-2{
+      grid-template-columns: repeat(2, minmax(0,1fr));
+    }
 
-  .checks label{
-    margin:0;
-    font-weight: 600;
-    display:inline-flex;
-    gap:8px;
-    align-items:center;
-    padding: 10px 14px;
-    border-radius: 999px;
-    background: #f5f7ff;
-    border: 1px solid rgba(27,22,127,.10);
-    color:#24304a;
-    font-size: 13px;
-    transition: .18s ease;
-    cursor:pointer;
-  }
+    .grid-3{
+      grid-template-columns: repeat(3, minmax(0,1fr));
+    }
 
-  .checks label:hover{
-    background:#eef2ff;
-    border-color: rgba(79,70,229,.20);
-  }
+    @media (max-width: 760px){
+      .grid-2,
+      .grid-3{
+        grid-template-columns: 1fr;
+      }
 
-  .checks input{
-    width:auto;
-    margin:0;
-    transform: scale(.95);
-  }
+      .publish-card{
+        padding: 16px;
+        border-radius: 20px;
+      }
 
-  .preview-grid{
-    display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 14px;
-    margin-top: 14px;
-  }
+      .publish-section{
+        padding: 14px;
+        border-radius: 18px;
+      }
 
-  .preview-item{
-    border-radius: 18px;
-    overflow: hidden;
-    background: #fff;
-    border: 1px solid rgba(27,22,127,.10);
-    box-shadow: 0 8px 20px rgba(0,0,0,.05);
-  }
+      .publish-top h1{
+        font-size: 30px;
+      }
+    }
 
-  .preview-item img{
-    width:100%;
-    height:130px;
-    object-fit:cover;
-    display:block;
-  }
+    .publish-card label{
+      display:block;
+      font-weight: 700;
+      margin-top: 10px;
+      color:#222;
+      font-size: 14px;
+    }
 
-  .preview-actions{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:8px;
-    padding: 10px;
-    font-size: 12px;
-  }
+    .publish-card input,
+    .publish-card select,
+    .publish-card textarea{
+      width:100%;
+      box-sizing:border-box;
+      margin-top: 6px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(27,22,127,.14);
+      background: #fdfdff;
+      outline: none;
+      font-size: 14px;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
 
-  .mini-btn{
-    border:0;
-    cursor:pointer;
-    padding: 8px 11px;
-    border-radius: 12px;
-    background: #eef1f8;
-    color:#223;
-    font-weight:600;
-    transition:.18s ease;
-  }
+    .publish-card input:focus,
+    .publish-card select:focus,
+    .publish-card textarea:focus{
+      border-color:#4f46e5;
+      box-shadow: 0 0 0 4px rgba(79,70,229,.10);
+      background:#fff;
+    }
 
-  .mini-btn:hover{
-    background:#dfe7ff;
-  }
+    .publish-card textarea{
+      resize: vertical;
+      min-height: 110px;
+    }
 
-  .mini-badge{
-    font-size: 11px;
-    padding: 5px 10px;
-    border-radius: 999px;
-    background:#1b167f;
-    color:#fff;
-    white-space:nowrap;
-    font-weight:700;
-  }
+    .help{
+      display:block;
+      font-size: 12px;
+      color:#667085;
+      margin-top: 6px;
+      line-height: 1.35;
+    }
 
-  .publish-actions{
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-top: 18px;
-    align-items:center;
-  }
+    .checks{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
 
-  .publish-actions .btn,
-  .publish-top .btn{
-    padding: 12px 18px;
-    border-radius: 14px;
-    font-weight: 700;
-    font-size: 14px;
-    border: 1px solid rgba(27,22,127,.14);
-    text-decoration:none;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    min-height: 46px;
-  }
+    .checks label{
+      margin:0;
+      font-weight: 600;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #f5f7ff;
+      border: 1px solid rgba(27,22,127,.10);
+      color:#24304a;
+      font-size: 13px;
+      transition: .18s ease;
+      cursor:pointer;
+    }
 
-  .publish-actions button.btn[type="submit"]{
-    background:#1b167f;
-    color:#fff;
-    border-color:#1b167f;
-    box-shadow: 0 10px 24px rgba(27,22,127,.22);
-  }
+    .checks label:hover{
+      background:#eef2ff;
+      border-color: rgba(79,70,229,.20);
+    }
 
-  .publish-actions button.btn[type="submit"]:hover{
-    background:#241da1;
-  }
+    .checks input{
+      width:auto;
+      margin:0;
+      transform: scale(.95);
+    }
 
-  .btn-outline{
-    background:#fff;
-    color:#1b167f;
-  }
+    .preview-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
 
-  .btn-outline:hover{
-    background:#f5f7ff;
-  }
+    .preview-item{
+      border-radius: 18px;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid rgba(27,22,127,.10);
+      box-shadow: 0 8px 20px rgba(0,0,0,.05);
+    }
 
-  #msg{
-    margin-top:14px;
-    font-weight:700;
-    color:#1b167f;
-  }
-</style>
+    .preview-item img{
+      width:100%;
+      height:130px;
+      object-fit:cover;
+      display:block;
+    }
+
+    .preview-actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      padding: 10px;
+      font-size: 12px;
+    }
+
+    .mini-btn{
+      border:0;
+      cursor:pointer;
+      padding: 8px 11px;
+      border-radius: 12px;
+      background: #eef1f8;
+      color:#223;
+      font-weight:600;
+      transition:.18s ease;
+    }
+
+    .mini-btn:hover{
+      background:#dfe7ff;
+    }
+
+    .mini-badge{
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background:#1b167f;
+      color:#fff;
+      white-space:nowrap;
+      font-weight:700;
+    }
+
+    .publish-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top: 18px;
+      align-items:center;
+    }
+
+    .publish-actions .btn,
+    .publish-top .btn{
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 14px;
+      border: 1px solid rgba(27,22,127,.14);
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 46px;
+    }
+
+    .publish-actions button.btn[type="submit"]{
+      background:#1b167f;
+      color:#fff;
+      border-color:#1b167f;
+      box-shadow: 0 10px 24px rgba(27,22,127,.22);
+    }
+
+    .publish-actions button.btn[type="submit"]:hover{
+      background:#241da1;
+    }
+
+    .btn-outline{
+      background:#fff;
+      color:#1b167f;
+    }
+
+    .btn-outline:hover{
+      background:#f5f7ff;
+    }
+
+    #msg{
+      margin-top:14px;
+      font-weight:700;
+      color:#1b167f;
+    }
+
+    #mapa{
+      height:320px;
+      margin-top:12px;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid rgba(27,22,127,.12);
+    }
+  </style>
 </head>
 
 <body>
@@ -371,10 +380,21 @@
           <h3>Ubicación</h3>
           <p class="section-note">Esto ayuda a generar confianza y evitar publicaciones falsas.</p>
 
-          <div class="grid-2">
+          <div class="grid-3">
             <div>
-              <label>Provincia *</label>
-              <input name="provincia" required placeholder="Ej: Entre Ríos" />
+              <label>País *</label>
+              <select name="pais" id="pais" required>
+                <option value="">Elegí un país</option>
+                <option value="Argentina">Argentina</option>
+                <option value="Uruguay">Uruguay</option>
+                <option value="Chile">Chile</option>
+              </select>
+            </div>
+            <div>
+              <label>Provincia / Estado *</label>
+              <select name="provincia" id="provincia" required>
+                <option value="">Primero elegí un país</option>
+              </select>
             </div>
             <div>
               <label>Ciudad *</label>
@@ -394,6 +414,23 @@
             <div>
               <label>Referencia de ubicación (opcional)</label>
               <input name="referencia" placeholder="Ej: A 2 cuadras de la plaza principal" />
+            </div>
+          </div>
+
+          <div style="margin-top:16px;">
+            <label>Ubicación en el mapa *</label>
+            <div id="mapa"></div>
+            <small class="help">Hacé clic en el mapa para marcar tu alojamiento.</small>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label>Latitud</label>
+              <input id="lat" name="lat" readonly placeholder="Se completa desde el mapa" />
+            </div>
+            <div>
+              <label>Longitud</label>
+              <input id="lng" name="lng" readonly placeholder="Se completa desde el mapa" />
             </div>
           </div>
         </section>
@@ -547,8 +584,6 @@
         <input type="hidden" name="Email anfitrión" id="mf_email" value="" />
         <input type="hidden" name="Servicios" id="mf_servicios" value="" />
         <input type="hidden" name="Reglas" id="mf_reglas" value="" />
-        <input id="lat" placeholder="Latitud">
-        <input id="lng" placeholder="Longitud">
       </form>
     </div>
   </main>
@@ -567,40 +602,140 @@
   </footer>
 
   <script src="script.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script type="module">
-    import { refreshMe, logout, getUser } from "./public/js/auth.js";
-    import { db } from "./firebase-config.js";
+    import { auth, db } from "./firebase-config.js";
+    import {
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
     import {
       collection,
       addDoc,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-    const user = await refreshMe();
-    if (!user) {
-      location.href = "login.html?next=" + encodeURIComponent("publicar.html");
-    }
+    let currentUser = null;
 
+    const provinciasPorPais = {
+      Argentina: [
+        "Buenos Aires", "CABA", "Catamarca", "Chaco", "Chubut", "Córdoba",
+        "Corrientes", "Entre Ríos", "Formosa", "Jujuy", "La Pampa",
+        "La Rioja", "Mendoza", "Misiones", "Neuquén", "Río Negro",
+        "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe",
+        "Santiago del Estero", "Tierra del Fuego", "Tucumán"
+      ],
+      Uruguay: [
+        "Artigas", "Canelones", "Cerro Largo", "Colonia", "Durazno",
+        "Flores", "Florida", "Lavalleja", "Maldonado", "Montevideo",
+        "Paysandú", "Río Negro", "Rivera", "Rocha", "Salto",
+        "San José", "Soriano", "Tacuarembó", "Treinta y Tres"
+      ],
+      Chile: [
+        "Arica y Parinacota", "Tarapacá", "Antofagasta", "Atacama", "Coquimbo",
+        "Valparaíso", "Metropolitana", "O’Higgins", "Maule", "Ñuble",
+        "Biobío", "La Araucanía", "Los Ríos", "Los Lagos", "Aysén",
+        "Magallanes"
+      ]
+    };
+
+    const paisSelect = document.getElementById("pais");
+    const provinciaSelect = document.getElementById("provincia");
     const logoutLink = document.getElementById("logoutLink");
-    if (logoutLink) {
-      logoutLink.addEventListener("click", async (e) => {
-        e.preventDefault();
-        await logout();
-      });
-    }
-
     const fotosInput = document.getElementById("fotos");
     const preview = document.getElementById("preview");
     const msg = document.getElementById("msg");
+    const form = document.getElementById("publishForm");
+    const mailForm = document.getElementById("mailForm");
+    const latInput = document.getElementById("lat");
+    const lngInput = document.getElementById("lng");
+
     let fotos = [];
+    let mapa = null;
+    let marcador = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        location.href = "login.html?next=" + encodeURIComponent("publicar.html");
+        return;
+      }
+      currentUser = user;
+    });
+
+    if (logoutLink) {
+      logoutLink.addEventListener("click", async (e) => {
+        e.preventDefault();
+        await signOut(auth);
+        location.href = "login.html";
+      });
+    }
+
+    function cargarProvincias() {
+      const pais = paisSelect.value;
+      const provincias = provinciasPorPais[pais] || [];
+
+      provinciaSelect.innerHTML = "";
+
+      if (!pais) {
+        provinciaSelect.innerHTML = `<option value="">Primero elegí un país</option>`;
+        return;
+      }
+
+      provinciaSelect.innerHTML = `<option value="">Elegí una provincia</option>`;
+      provincias.forEach((prov) => {
+        const option = document.createElement("option");
+        option.value = prov;
+        option.textContent = prov;
+        provinciaSelect.appendChild(option);
+      });
+    }
+
+    paisSelect?.addEventListener("change", cargarProvincias);
+
+    function initMapa() {
+      const mapaEl = document.getElementById("mapa");
+      if (!mapaEl || typeof L === "undefined") return;
+
+      mapa = L.map("mapa").setView([-31.4201, -64.1888], 5);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap"
+      }).addTo(mapa);
+
+      mapa.on("click", (e) => {
+        const { lat, lng } = e.latlng;
+
+        latInput.value = lat.toFixed(6);
+        lngInput.value = lng.toFixed(6);
+
+        if (marcador) {
+          marcador.setLatLng([lat, lng]);
+        } else {
+          marcador = L.marker([lat, lng]).addTo(mapa);
+        }
+      });
+
+      setTimeout(() => mapa.invalidateSize(), 300);
+    }
+
+    initMapa();
 
     function asegurarPortada() {
       if (!fotos.length) return;
-      if (!fotos.some(x => x.isCover)) fotos[0].isCover = true;
+      if (!fotos.some((x) => x.isCover)) fotos[0].isCover = true;
     }
 
-    fotosInput.addEventListener("change", async () => {
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result));
+        r.onerror = reject;
+        r.readAsDataURL(file);
+      });
+    }
+
+    fotosInput?.addEventListener("change", async () => {
       const files = Array.from(fotosInput.files || []);
       if (!files.length) return;
 
@@ -671,75 +806,86 @@
       });
     }
 
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const r = new FileReader();
-        r.onload = () => resolve(String(r.result));
-        r.onerror = reject;
-        r.readAsDataURL(file);
-      });
-    }
-
-    document.getElementById("publishForm").addEventListener("submit", async (e) => {
+    form?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const f = e.currentTarget;
 
-      if (!f.direccion.value.trim()) {
-        alert("La dirección es obligatoria.");
-        f.direccion.focus();
+      if (!currentUser) {
+        location.href = "login.html?next=" + encodeURIComponent("publicar.html");
         return;
       }
 
-      let maxNoches = parseInt(f.maxNoches.value || "30", 10);
+      if (!form.direccion.value.trim()) {
+        alert("La dirección es obligatoria.");
+        form.direccion.focus();
+        return;
+      }
+
+      if (!paisSelect.value) {
+        alert("Elegí un país.");
+        paisSelect.focus();
+        return;
+      }
+
+      if (!provinciaSelect.value) {
+        alert("Elegí una provincia.");
+        provinciaSelect.focus();
+        return;
+      }
+
+      if (!latInput.value || !lngInput.value) {
+        alert("Marcá la ubicación en el mapa.");
+        return;
+      }
+
+      let maxNoches = parseInt(form.maxNoches.value || "30", 10);
       if (Number.isNaN(maxNoches)) maxNoches = 30;
       if (maxNoches < 1) maxNoches = 1;
       if (maxNoches > 365) maxNoches = 365;
-      f.maxNoches.value = String(maxNoches);
 
       asegurarPortada();
 
       const servicios = Array.from(
-        f.querySelectorAll('input[name="servicios"]:checked')
+        form.querySelectorAll('input[name="servicios"]:checked')
       ).map(i => i.value);
 
       const reglas = Array.from(
-        f.querySelectorAll('input[name="reglas"]:checked')
+        form.querySelectorAll('input[name="reglas"]:checked')
       ).map(i => i.value);
 
       const fotosOrdenadas = [...fotos].sort((a, b) => (b.isCover ? 1 : 0) - (a.isCover ? 1 : 0));
       const fotosBase64 = fotosOrdenadas.map(x => x.b64);
 
-      const currentUser = getUser();
-
       const data = {
-        id: "alo_" + Date.now(),
-        titulo: f.titulo.value.trim(),
-        tipo: f.tipo.value,
-        capacidad: Number(f.capacidad.value),
-        habitaciones: Number(f.habitaciones.value),
-        camas: Number(f.camas.value),
-        banos: Number(f.banos.value),
-        descripcion: f.descripcion.value.trim(),
-        direccion: f.direccion.value.trim(),
-        ciudad: f.ciudad.value.trim(),
-        provincia: f.provincia.value.trim(),
-        cp: f.cp.value.trim(),
-        referencia: f.referencia.value.trim(),
+        titulo: form.titulo.value.trim(),
+        tipo: form.tipo.value,
+        capacidad: Number(form.capacidad.value),
+        habitaciones: Number(form.habitaciones.value),
+        camas: Number(form.camas.value),
+        banos: Number(form.banos.value),
+        descripcion: form.descripcion.value.trim(),
+        pais: paisSelect.value,
+        provincia: provinciaSelect.value,
+        ciudad: form.ciudad.value.trim(),
+        direccion: form.direccion.value.trim(),
+        cp: form.cp.value.trim(),
+        referencia: form.referencia.value.trim(),
         servicios,
         reglas,
-        reglasExtra: f.reglasExtra.value.trim(),
-        cancelacion: f.cancelacion.value,
-        checkinDesde: f.checkinDesde.value,
-        checkoutHasta: f.checkoutHasta.value,
+        reglasExtra: form.reglasExtra.value.trim(),
+        cancelacion: form.cancelacion.value,
+        checkinDesde: form.checkinDesde.value,
+        checkoutHasta: form.checkoutHasta.value,
         fotos: fotosBase64,
-        precio: Number(f.precio.value),
+        precio: Number(form.precio.value),
         moneda: "ARS",
         maxNoches,
-        anfitrion: f.anfitrion.value.trim(),
-        telefono: f.telefono.value.trim(),
-        email: f.email.value.trim(),
-        ownerUid: currentUser?.id || "",
-        ownerEmail: currentUser?.email || "",
+        anfitrion: form.anfitrion.value.trim(),
+        telefono: form.telefono.value.trim(),
+        email: form.email.value.trim(),
+        lat: Number(latInput.value),
+        lng: Number(lngInput.value),
+        anfitrionId: currentUser.uid,
+        anfitrionEmail: currentUser.email || "",
         status: "activo",
         createdAt: serverTimestamp()
       };
@@ -747,20 +893,16 @@
       msg.textContent = "✅ Publicando...";
 
       try {
-        await addDoc(collection(db, "alojamientos"), data);
+        const docRef = await addDoc(collection(db, "alojamientos"), data);
 
-        const arr = JSON.parse(localStorage.getItem("tualoja_listings") || "[]");
-        arr.unshift({ ...data, createdAt: new Date().toISOString() });
-        localStorage.setItem("tualoja_listings", JSON.stringify(arr));
-
-        document.getElementById("mf_id").value = data.id;
+        document.getElementById("mf_id").value = docRef.id;
         document.getElementById("mf_titulo").value = data.titulo;
         document.getElementById("mf_tipo").value = data.tipo;
         document.getElementById("mf_capacidad").value = String(data.capacidad);
         document.getElementById("mf_habitaciones").value = String(data.habitaciones);
         document.getElementById("mf_camas").value = String(data.camas);
         document.getElementById("mf_banos").value = String(data.banos);
-        document.getElementById("mf_provincia").value = data.provincia;
+        document.getElementById("mf_provincia").value = `${data.pais} - ${data.provincia}`;
         document.getElementById("mf_ciudad").value = data.ciudad;
         document.getElementById("mf_direccion").value = data.direccion;
         document.getElementById("mf_precio").value = `$${data.precio} ARS`;
@@ -782,28 +924,25 @@
 Recibimos correctamente tu publicación en TuAloja.
 
 📍 Alojamiento: ${data.titulo}
-📌 Ubicación: ${data.ciudad}, ${data.provincia}
+📌 Ubicación: ${data.ciudad}, ${data.provincia}, ${data.pais}
 💰 Precio por noche: $${data.precio} ARS
 🛏️ Capacidad: ${data.capacidad} huéspedes
 🕒 Check-in desde: ${data.checkinDesde}
 🕚 Check-out hasta: ${data.checkoutHasta}
 📄 Política de cancelación: ${data.cancelacion}
 
-Tu anuncio quedó en estado:
-⏳ Pendiente de revisión de seguridad.
-
 Gracias por confiar en TuAloja 💙
 — Equipo TuAloja`;
 
-        const mailForm = document.getElementById("mailForm");
-        const fd = new FormData(mailForm);
-
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon(mailForm.action, fd);
-        }
-
         msg.textContent = "✅ Publicado correctamente. Redirigiendo...";
-        setTimeout(() => { location.href = "gracias.html"; }, 700);
+
+        setTimeout(() => {
+          mailForm.submit();
+        }, 300);
+
+        setTimeout(() => {
+          location.href = "gracias.html";
+        }, 900);
       } catch (error) {
         console.error(error);
         msg.textContent = "❌ No se pudo publicar. Intentá nuevamente.";
