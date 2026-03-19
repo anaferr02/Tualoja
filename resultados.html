@@ -22,9 +22,7 @@
       --container:1100px;
     }
 
-    *{
-      box-sizing:border-box;
-    }
+    *{ box-sizing:border-box; }
 
     body{
       margin:0;
@@ -156,18 +154,6 @@
       line-height:1.5;
     }
 
-    .alerta-busqueda strong{
-      color:#222;
-    }
-
-    .alerta-busqueda a{
-      display:inline-block;
-      margin-top:8px;
-      color:var(--violeta);
-      font-weight:600;
-      text-decoration:underline;
-    }
-
     .encabezado-resultados{
       margin-bottom:22px;
     }
@@ -257,12 +243,6 @@
       margin-bottom:16px;
     }
 
-    .resultado-meta{
-      font-size:18px;
-      color:#333;
-      margin-bottom:20px;
-    }
-
     .resultado-precio{
       font-size:24px;
       font-weight:700;
@@ -296,53 +276,34 @@
       margin:28px 0 0;
     }
 
+    #mapa{
+      width:100%;
+      height:320px;
+      margin-top:18px;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid #e5e5ef;
+      background:#eee;
+    }
+
     @media (max-width: 900px){
-      .resultado-card{
-        grid-template-columns:1fr;
-      }
-
-      .resultado-img{
-        min-height:240px;
-      }
-
-      .encabezado-resultados h1{
-        font-size:42px;
-      }
+      .resultado-card{ grid-template-columns:1fr; }
+      .resultado-img{ min-height:240px; }
+      .encabezado-resultados h1{ font-size:42px; }
     }
 
     @media (max-width: 768px){
-      .nav{
-        display:none;
-      }
-
-      .hamburger{
-        display:block;
-      }
-
-      .buscador-form{
-        grid-template-columns:1fr;
-      }
-
+      .nav{ display:none; }
+      .hamburger{ display:block; }
+      .buscador-form{ grid-template-columns:1fr; }
       .resumen-row{
         flex-direction:column;
         align-items:flex-start;
       }
-
-      .resultado-info{
-        padding:22px;
-      }
-
-      .resultado-titulo{
-        font-size:24px;
-      }
-
-      .header{
-        padding:18px 16px;
-      }
-
-      .contenedor{
-        padding:24px 16px 50px;
-      }
+      .resultado-info{ padding:22px; }
+      .resultado-titulo{ font-size:24px; }
+      .header{ padding:18px 16px; }
+      .contenedor{ padding:24px 16px 50px; }
     }
   </style>
 </head>
@@ -351,18 +312,16 @@
     <a class="logo" href="index.html">TuAloja.com</a>
 
     <nav id="mainNav" class="nav">
-      <a href="alojamiento.html">Registra tu alojamiento</a>
+      <a href="publicar.html">Registra tu alojamiento</a>
       <a href="ayuda.html">Ayuda</a>
-      <span id="navAuth"></span>
     </nav>
 
     <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
   </header>
 
   <main class="contenedor">
-
     <section class="buscador-box">
-     <form class="buscador-form" action="resultados.html" method="GET">
+      <form class="buscador-form" action="resultados.html" method="GET">
         <div class="campo-busqueda">
           <span class="icono">⌕</span>
           <input
@@ -385,6 +344,7 @@
         <p id="resumenBusqueda" class="muted">Mostrando alojamientos disponibles.</p>
         <a class="link-cambiar" href="index.html">Cambiar búsqueda</a>
       </div>
+
       <div id="mapa"></div>
     </section>
 
@@ -399,29 +359,42 @@
     </section>
   </main>
 
-  <script src="script.js"></script>
-  
   <script type="module" src="resultados.js"></script>
 
   <script>
-    // Completa el input con lo que venga en la URL, por ejemplo ?destino=Mendoza
     const params = new URLSearchParams(window.location.search);
     const destino = params.get("destino") || params.get("ubicacion") || params.get("q") || "";
     const inputDestino = document.getElementById("inputDestino");
-    const alertaBusqueda = document.getElementById("alertaBusqueda");
     const resumenBusqueda = document.getElementById("resumenBusqueda");
 
     if (inputDestino && destino) {
       inputDestino.value = destino;
     }
 
-    // Mensaje visual tipo la imagen
     if (destino) {
       resumenBusqueda.textContent = `Buscando alojamientos para "${destino}".`;
     }
 
-    // Este cartel se puede actualizar luego desde resultados.js
-    // si no encuentra resultados exactos o si muestra sugerencias.
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const mainNav = document.getElementById("mainNav");
+
+    if (hamburgerBtn && mainNav) {
+      hamburgerBtn.addEventListener("click", () => {
+        if (mainNav.style.display === "flex") {
+          mainNav.style.display = "none";
+        } else {
+          mainNav.style.display = "flex";
+          mainNav.style.flexDirection = "column";
+          mainNav.style.position = "absolute";
+          mainNav.style.top = "70px";
+          mainNav.style.right = "16px";
+          mainNav.style.background = "#fff";
+          mainNav.style.padding = "12px";
+          mainNav.style.border = "1px solid #ddd";
+          mainNav.style.borderRadius = "12px";
+        }
+      });
+    }
   </script>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
