@@ -1,3 +1,4 @@
+console.log("panel-anfitrion.js cargó");
 import { auth, db } from "./firebase-config.js";
 import {
   onAuthStateChanged,
@@ -12,6 +13,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOM listo");
   const contenedor = document.querySelector("[data-mis-alojamientos]");
   const btnLogout = document.querySelector("[data-cerrar-sesion]");
 
@@ -28,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   onAuthStateChanged(auth, async (user) => {
+    console.log("Usuario actual:", user);
     if (!user) {
       alert("Iniciá sesión");
       window.location.href = "login.html";
@@ -35,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     await cargarAlojamientos(user.uid);
+    console.log("Buscando alojamientos del uid:", uid);
   });
 
   async function cargarAlojamientos(uid) {
