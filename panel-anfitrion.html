@@ -316,145 +316,170 @@
     </div>
   </div>
 
-  <script type="module">
-    import { db } from "./firebase-config.js";
-    import { logout, getUser, refreshMe } from "./public/js/auth.js";
-    import {
-      collection,
-      getDocs,
-      doc,
-      deleteDoc,
-      updateDoc
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+<script type="module">
+  import { db } from "./firebase-config.js";
+  import { logout, getUser, refreshMe } from "./public/js/auth.js";
+  import {
+    collection,
+    getDocs,
+    doc,
+    deleteDoc,
+    updateDoc
+  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-    await refreshMe();
-    const userObj = getUser();
+  const secListings = document.getElementById("secListings");
+  const secBookings = document.getElementById("secBookings");
+  const secCalendar = document.getElementById("secCalendar");
 
-    if (!userObj?.email) {
-      location.href = "login.html?next=" + encodeURIComponent("panel-anfitrion.html");
-      throw new Error("Usuario no autenticado");
+  const tabListings = document.getElementById("tabListings");
+  const tabBookings = document.getElementById("tabBookings");
+  const tabCalendar = document.getElementById("tabCalendar");
+
+  const btnLogout = document.getElementById("btnLogout");
+  const hamburgerBtn = document.getElementById("hamburgerBtn");
+  const mainNav = document.getElementById("mainNav");
+
+  const backdrop = document.getElementById("backdrop");
+  const editForm = document.getElementById("editForm");
+
+  let toastTimer = null;
+  let currentEditDocId = null;
+  let myEmail = "";
+  let myUid = "";
+
+  function toast(msg) {
+    clearTimeout(toastTimer);
+    let el = document.getElementById("toast");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "toast";
+      el.style.position = "fixed";
+      el.style.left = "50%";
+      el.style.bottom = "18px";
+      el.style.transform = "translateX(-50%)";
+      el.style.background = "rgba(0,0,0,.75)";
+      el.style.color = "#fff";
+      el.style.padding = "10px 14px";
+      el.style.borderRadius = "999px";
+      el.style.fontSize = "13px";
+      el.style.zIndex = "999";
+      document.body.appendChild(el);
     }
+    el.textContent = msg;
+    el.style.display = "block";
+    toastTimer = setTimeout(() => { el.style.display = "none"; }, 1800);
+  }
 
-    const myEmail = String(userObj.email || "").toLowerCase().trim();
-    const myUid = String(userObj.uid || "").trim();
+  function coverFromFotos(listing) {
+    return listing?.fotos?.[0] || "";
+  }
 
-    console.log("PANEL USER:", { myEmail, myUid });
+  function formatARS(n) {
+    const num = Number(n || 0);
+    try { return num.toLocaleString("es-AR"); } catch { return String(num); }
+  }
 
-    document.getElementById("btnLogout")?.addEventListener("click", async () => {
-      await logout();
-    });
+  function formatDate(fecha) {
+    if (!fecha) return "-";
+    const d = new Date(fecha + "T00:00:00");
+    if (Number.isNaN(d.getTime())) return fecha;
+    return d.toLocaleDateString("es-AR");
+  }
 
-    function coverFromFotos(listing) {
-      return listing?.fotos?.[0] || "";
-    }
+  function calcularNoches(checkin, checkout) {
+    if (!checkin || !checkout) return null;
+    const d1 = new Date(checkin + "T00:00:00");
+    const d2 = new Date(checkout + "T00:00:00");
+    const diff = d2 - d1;
+    const noches = diff / (1000 * 60 * 60 * 24);
+    return noches > 0 ? noches : null;
+  }
 
-    function formatARS(n) {
-      const num = Number(n || 0);
-      try { return num.toLocaleString("es-AR"); } catch { return String(num); }
-    }
+  function rangosSePisan(aInicio, aFin, bInicio, bFin) {
+    return aInicio < bFin && aFin > bInicio;
+  }
 
-    function formatDate(fecha) {
-      if (!fecha) return "-";
-      const d = new Date(fecha + "T00:00:00");
-      if (Number.isNaN(d.getTime())) return fecha;
-      return d.toLocaleDateString("es-AR");
-    }
+  function escapeHTML(str) {
+    return String(str || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 
-    function calcularNoches(checkin, checkout) {
-      if (!checkin || !checkout) return null;
-      const d1 = new Date(checkin + "T00:00:00");
-      const d2 = new Date(checkout + "T00:00:00");
-      const diff = d2 - d1;
-      const noches = diff / (1000 * 60 * 60 * 24);
-      return noches > 0 ? noches : null;
-    }
+  function setActiveTab(activeBtn) {
+    [tabListings, tabBookings, tabCalendar].forEach((btn) => btn?.classList.remove("active"));
+    activeBtn?.classList.add("active");
+  }
 
-    function rangosSePisan(aInicio, aFin, bInicio, bFin) {
-      return aInicio < bFin && aFin > bInicio;
-    }
+  async function loadListings() {
+    const snap = await getDocs(collection(db, "alojamientos"));
+    const arr = [];
+    snap.forEach((d) => arr.push({ ...d.data(), _docId: d.id }));
+    console.log("TODOS LOS ALOJAMIENTOS:", arr);
+    return arr;
+  }
 
-    function escapeHTML(str) {
-      return String(str || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
+  async function loadBookings() {
+    const snap = await getDocs(collection(db, "reservas"));
+    const arr = [];
+    snap.forEach((d) => arr.push({ ...d.data(), _docId: d.id }));
+    console.log("TODAS LAS RESERVAS:", arr);
+    return arr;
+  }
 
-    let toastTimer = null;
-    function toast(msg) {
-      clearTimeout(toastTimer);
-      let el = document.getElementById("toast");
-      if (!el) {
-        el = document.createElement("div");
-        el.id = "toast";
-        el.style.position = "fixed";
-        el.style.left = "50%";
-        el.style.bottom = "18px";
-        el.style.transform = "translateX(-50%)";
-        el.style.background = "rgba(0,0,0,.75)";
-        el.style.color = "#fff";
-        el.style.padding = "10px 14px";
-        el.style.borderRadius = "999px";
-        el.style.fontSize = "13px";
-        el.style.zIndex = "999";
-        document.body.appendChild(el);
-      }
-      el.textContent = msg;
-      el.style.display = "block";
-      toastTimer = setTimeout(() => { el.style.display = "none"; }, 1800);
-    }
+  function esMioAlojamiento(x) {
+    const emails = [
+      x.ownerEmail,
+      x.anfitrionEmail,
+      x.email,
+      x.userEmail,
+      x.hostEmail,
+      x.correo
+    ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
 
-    async function loadListings() {
-      const snap = await getDocs(collection(db, "alojamientos"));
-      const arr = [];
-      snap.forEach((d) => arr.push({ ...d.data(), _docId: d.id }));
-      console.log("TODOS LOS ALOJAMIENTOS:", arr);
-      return arr;
-    }
+    const uids = [
+      x.anfitrionId,
+      x.ownerUid,
+      x.ownerId,
+      x.hostUid,
+      x.hostId,
+      x.uid,
+      x.userUid,
+      x.userId,
+      x.propietarioId
+    ].map(v => String(v || "").trim()).filter(Boolean);
 
-    async function loadBookings() {
-      const snap = await getDocs(collection(db, "reservas"));
-      const arr = [];
-      snap.forEach((d) => arr.push({ ...d.data(), _docId: d.id }));
-      console.log("TODAS LAS RESERVAS:", arr);
-      return arr;
-    }
+    return emails.includes(myEmail) || (myUid && uids.includes(myUid));
+  }
 
-    function esMioAlojamiento(x) {
-      const ownerEmail = String(x.ownerEmail || "").toLowerCase().trim();
-      const anfitrionEmail = String(x.anfitrionEmail || "").toLowerCase().trim();
-      const email = String(x.email || "").toLowerCase().trim();
-      const anfitrionId = String(x.anfitrionId || "").trim();
+  function esMiReserva(b) {
+    const emails = [
+      b.hostEmail,
+      b.anfitrionEmail,
+      b.ownerEmail,
+      b.email
+    ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
 
-      return (
-        ownerEmail === myEmail ||
-        anfitrionEmail === myEmail ||
-        email === myEmail ||
-        (myUid && anfitrionId === myUid)
-      );
-    }
+    const uids = [
+      b.hostId,
+      b.hostUid,
+      b.anfitrionId,
+      b.ownerId,
+      b.ownerUid,
+      b.uid
+    ].map(v => String(v || "").trim()).filter(Boolean);
 
-    function esMiReserva(b) {
-      const hostEmail = String(b.hostEmail || "").toLowerCase().trim();
-      const anfitrionEmail = String(b.anfitrionEmail || "").toLowerCase().trim();
-      const hostId = String(b.hostId || "").trim();
-      const anfitrionId = String(b.anfitrionId || "").trim();
+    return emails.includes(myEmail) || (myUid && uids.includes(myUid));
+  }
 
-      return (
-        hostEmail === myEmail ||
-        anfitrionEmail === myEmail ||
-        (myUid && hostId === myUid) ||
-        (myUid && anfitrionId === myUid)
-      );
-    }
+  async function render() {
+    const list = document.getElementById("list");
+    const empty = document.getElementById("empty");
+    const summary = document.getElementById("summary");
 
-    async function render() {
-      const list = document.getElementById("list");
-      const empty = document.getElementById("empty");
-      const summary = document.getElementById("summary");
-
+    try {
       const all = await loadListings();
       const mine = all.filter(esMioAlojamiento);
 
@@ -541,13 +566,20 @@
         item.appendChild(meta);
         list.appendChild(item);
       });
+    } catch (error) {
+      console.error("Error render alojamientos:", error);
+      document.getElementById("list").innerHTML = "";
+      document.getElementById("empty").style.display = "block";
+      toast("Error al cargar alojamientos");
     }
+  }
 
-    async function renderHostBookings() {
-      const bookSummary = document.getElementById("bookSummary");
-      const bookList = document.getElementById("bookList");
-      const bookEmpty = document.getElementById("bookEmpty");
+  async function renderHostBookings() {
+    const bookSummary = document.getElementById("bookSummary");
+    const bookList = document.getElementById("bookList");
+    const bookEmpty = document.getElementById("bookEmpty");
 
+    try {
       const all = await loadBookings();
       const mine = all.filter(esMiReserva);
 
@@ -624,12 +656,17 @@
         item.appendChild(meta);
         bookList.appendChild(item);
       });
+    } catch (error) {
+      console.error("Error render reservas:", error);
+      toast("Error al cargar reservas");
     }
+  }
 
-    async function renderCalendar() {
-      const calList = document.getElementById("calList");
-      const calEmpty = document.getElementById("calEmpty");
+  async function renderCalendar() {
+    const calList = document.getElementById("calList");
+    const calEmpty = document.getElementById("calEmpty");
 
+    try {
       const all = await loadBookings();
       const mine = all.filter((b) => esMiReserva(b) && b.status !== "rechazada");
 
@@ -664,134 +701,143 @@
         `;
         calList.appendChild(item);
       });
+    } catch (error) {
+      console.error("Error render calendario:", error);
+      toast("Error al cargar calendario");
     }
+  }
 
-    async function hayCruceConAceptadas(reservaActual) {
-      const all = await loadBookings();
+  async function hayCruceConAceptadas(reservaActual) {
+    const all = await loadBookings();
 
-      const aceptadasMismoAlojamiento = all.filter((r) =>
-        r.listingId === reservaActual.listingId &&
-        r.status === "aceptada" &&
-        r._docId !== reservaActual._docId
-      );
+    const aceptadasMismoAlojamiento = all.filter((r) =>
+      r.listingId === reservaActual.listingId &&
+      r.status === "aceptada" &&
+      r._docId !== reservaActual._docId
+    );
 
-      const inicioActual = new Date(reservaActual.checkin + "T00:00:00");
-      const finActual = new Date(reservaActual.checkout + "T00:00:00");
+    const inicioActual = new Date(reservaActual.checkin + "T00:00:00");
+    const finActual = new Date(reservaActual.checkout + "T00:00:00");
 
-      return aceptadasMismoAlojamiento.some((r) => {
-        const inicio = new Date(r.checkin + "T00:00:00");
-        const fin = new Date(r.checkout + "T00:00:00");
-        return rangosSePisan(inicioActual, finActual, inicio, fin);
-      });
-    }
-
-    async function updateBookingStatus(reserva, status) {
-      if (status === "aceptada") {
-        const seCruza = await hayCruceConAceptadas(reserva);
-        if (seCruza) {
-          toast("❌ No podés aceptar: esas fechas ya están ocupadas.");
-          return;
-        }
-      }
-
-      await updateDoc(doc(db, "reservas", reserva._docId), { status });
-      await renderHostBookings();
-      await renderCalendar();
-      toast(status === "aceptada" ? "✅ Reserva aceptada" : "✅ Reserva rechazada");
-    }
-
-    const backdrop = document.getElementById("backdrop");
-    const editForm = document.getElementById("editForm");
-    let currentEditDocId = null;
-
-    function openEdit(item) {
-      currentEditDocId = item._docId;
-      editForm.id.value = item.id || "";
-      editForm.titulo.value = item.titulo || "";
-      editForm.precio.value = Number(item.precio || 0);
-      editForm.maxNoches.value = item.maxNoches ?? 30;
-      editForm.descripcion.value = item.descripcion || "";
-      backdrop.style.display = "flex";
-    }
-
-    function closeEdit() {
-      backdrop.style.display = "none";
-      currentEditDocId = null;
-    }
-
-    document.getElementById("closeModal").addEventListener("click", closeEdit);
-    document.getElementById("cancelModal").addEventListener("click", closeEdit);
-    backdrop.addEventListener("click", (e) => {
-      if (e.target === backdrop) closeEdit();
+    return aceptadasMismoAlojamiento.some((r) => {
+      const inicio = new Date(r.checkin + "T00:00:00");
+      const fin = new Date(r.checkout + "T00:00:00");
+      return rangosSePisan(inicioActual, finActual, inicio, fin);
     });
+  }
 
-    editForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentEditDocId) return;
+  async function updateBookingStatus(reserva, status) {
+    if (status === "aceptada") {
+      const seCruza = await hayCruceConAceptadas(reserva);
+      if (seCruza) {
+        toast("❌ No podés aceptar: esas fechas ya están ocupadas.");
+        return;
+      }
+    }
 
-      let maxNoches = parseInt(editForm.maxNoches.value || "30", 10);
-      if (Number.isNaN(maxNoches)) maxNoches = 30;
-      if (maxNoches < 1) maxNoches = 1;
-      if (maxNoches > 365) maxNoches = 365;
+    await updateDoc(doc(db, "reservas", reserva._docId), { status });
+    await renderHostBookings();
+    await renderCalendar();
+    toast(status === "aceptada" ? "✅ Reserva aceptada" : "✅ Reserva rechazada");
+  }
 
-      await updateDoc(doc(db, "alojamientos", currentEditDocId), {
-        titulo: editForm.titulo.value.trim(),
-        precio: Number(editForm.precio.value || 0),
-        maxNoches,
-        descripcion: editForm.descripcion.value.trim(),
-        moneda: "ARS"
-      });
+  function openEdit(item) {
+    currentEditDocId = item._docId;
+    editForm.id.value = item.id || "";
+    editForm.titulo.value = item.titulo || "";
+    editForm.precio.value = Number(item.precio || 0);
+    editForm.maxNoches.value = item.maxNoches ?? 30;
+    editForm.descripcion.value = item.descripcion || "";
+    backdrop.style.display = "flex";
+  }
 
-      closeEdit();
+  function closeEdit() {
+    backdrop.style.display = "none";
+    currentEditDocId = null;
+  }
+
+  async function showTab(which) {
+    secListings.style.display = which === "listings" ? "block" : "none";
+    secBookings.style.display = which === "bookings" ? "block" : "none";
+    secCalendar.style.display = which === "calendar" ? "block" : "none";
+
+    if (which === "listings") {
+      setActiveTab(tabListings);
       await render();
-      toast("✅ Guardado");
+    }
+    if (which === "bookings") {
+      setActiveTab(tabBookings);
+      await renderHostBookings();
+    }
+    if (which === "calendar") {
+      setActiveTab(tabCalendar);
+      await renderCalendar();
+    }
+  }
+
+  tabListings?.addEventListener("click", () => showTab("listings"));
+  tabBookings?.addEventListener("click", () => showTab("bookings"));
+  tabCalendar?.addEventListener("click", () => showTab("calendar"));
+
+  btnLogout?.addEventListener("click", async () => {
+    await logout();
+  });
+
+  hamburgerBtn?.addEventListener("click", () => {
+    mainNav?.classList.toggle("nav-open");
+  });
+
+  document.getElementById("closeModal")?.addEventListener("click", closeEdit);
+  document.getElementById("cancelModal")?.addEventListener("click", closeEdit);
+  backdrop?.addEventListener("click", (e) => {
+    if (e.target === backdrop) closeEdit();
+  });
+
+  editForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!currentEditDocId) return;
+
+    let maxNoches = parseInt(editForm.maxNoches.value || "30", 10);
+    if (Number.isNaN(maxNoches)) maxNoches = 30;
+    if (maxNoches < 1) maxNoches = 1;
+    if (maxNoches > 365) maxNoches = 365;
+
+    await updateDoc(doc(db, "alojamientos", currentEditDocId), {
+      titulo: editForm.titulo.value.trim(),
+      precio: Number(editForm.precio.value || 0),
+      maxNoches,
+      descripcion: editForm.descripcion.value.trim(),
+      moneda: "ARS"
     });
 
-    const secListings = document.getElementById("secListings");
-    const secBookings = document.getElementById("secBookings");
-    const secCalendar = document.getElementById("secCalendar");
+    closeEdit();
+    await render();
+    toast("✅ Guardado");
+  });
 
-    const tabListings = document.getElementById("tabListings");
-    const tabBookings = document.getElementById("tabBookings");
-    const tabCalendar = document.getElementById("tabCalendar");
+  async function initPanel() {
+    try {
+      await refreshMe();
+      const userObj = getUser();
 
-    function setActiveTab(activeBtn) {
-      [tabListings, tabBookings, tabCalendar].forEach((btn) => btn.classList.remove("active"));
-      activeBtn.classList.add("active");
-    }
-
-    async function showTab(which) {
-      secListings.style.display = which === "listings" ? "block" : "none";
-      secBookings.style.display = which === "bookings" ? "block" : "none";
-      secCalendar.style.display = which === "calendar" ? "block" : "none";
-
-      if (which === "listings") {
-        setActiveTab(tabListings);
-        await render();
+      if (!userObj?.email) {
+        location.href = "login.html?next=" + encodeURIComponent("panel-anfitrion.html");
+        return;
       }
-      if (which === "bookings") {
-        setActiveTab(tabBookings);
-        await renderHostBookings();
-      }
-      if (which === "calendar") {
-        setActiveTab(tabCalendar);
-        await renderCalendar();
-      }
+
+      myEmail = String(userObj.email || "").toLowerCase().trim();
+      myUid = String(userObj.uid || "").trim();
+
+      console.log("PANEL USER:", { myEmail, myUid });
+
+      await showTab("listings");
+    } catch (error) {
+      console.error("Error inicializando panel:", error);
+      toast("Error al abrir el panel");
     }
+  }
 
-    tabListings.addEventListener("click", () => showTab("listings"));
-    tabBookings.addEventListener("click", () => showTab("bookings"));
-    tabCalendar.addEventListener("click", () => showTab("calendar"));
-
-    const hamburgerBtn = document.getElementById("hamburgerBtn");
-    const mainNav = document.getElementById("mainNav");
-    if (hamburgerBtn && mainNav) {
-      hamburgerBtn.addEventListener("click", () => {
-        mainNav.classList.toggle("nav-open");
-      });
-    }
-
-    showTab("listings");
-  </script>
+  initPanel();
+</script>
 </body>
 </html>
