@@ -7,9 +7,9 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    .page-wrap{ max-width: 1040px; margin: 24px auto 40px; padding: 0 16px; }
+    .page-wrap{ max-width:1040px; margin:24px auto 40px; padding:0 16px; }
     .card{
-      background: rgba(255,255,255,.85);
+      background: rgba(255,255,255,.92);
       border: 1px solid rgba(0,0,0,.08);
       border-radius: 22px;
       box-shadow: 0 18px 40px rgba(0,0,0,.12);
@@ -17,11 +17,10 @@
     }
     .top{
       display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
-      margin-bottom: 12px;
+      margin-bottom:12px;
     }
     .top h1{ margin:0; }
     .muted{ opacity:.85; }
-    .btn{ cursor:pointer; }
     .btn-row{ display:flex; gap:10px; flex-wrap:wrap; }
 
     .tabs{
@@ -40,7 +39,6 @@
       background: rgba(0,0,0,.08);
       color:#222;
       font-weight:700;
-      transition: .18s ease;
     }
     .tab-btn.active{
       background:#1b167f;
@@ -55,7 +53,7 @@
       margin-bottom: 12px;
     }
 
-    .list{ margin-top: 12px; display:grid; gap: 12px; }
+    .list{ margin-top:12px; display:grid; gap:12px; }
     .item{
       background: rgba(255,255,255,.7);
       border: 1px solid rgba(0,0,0,.06);
@@ -66,121 +64,76 @@
       gap: 12px;
       align-items: start;
     }
-    @media (max-width: 720px){
-      .item{ grid-template-columns: 1fr; }
+    @media (max-width:720px){
+      .item{ grid-template-columns:1fr; }
     }
 
     .thumb{
-      width: 100%;
-      height: 120px;
-      border-radius: 14px;
+      width:100%;
+      height:120px;
+      border-radius:14px;
       overflow:hidden;
       background: rgba(0,0,0,.06);
-      border: 1px solid rgba(0,0,0,.08);
+      border:1px solid rgba(0,0,0,.08);
     }
-    .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
 
     .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
     .chip{
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
       background: rgba(0,0,0,.08);
-      border: 1px solid rgba(0,0,0,.06);
-      white-space: nowrap;
+      border:1px solid rgba(0,0,0,.06);
+      white-space:nowrap;
     }
     .chip-strong{
       background: rgba(27,22,127,.12);
       border-color: rgba(27,22,127,.22);
       color:#1b167f;
-      font-weight: 700;
+      font-weight:700;
     }
     .chip-ok{
       background: rgba(0,128,0,.10);
       border-color: rgba(0,128,0,.20);
       color: rgba(0,128,0,.95);
-      font-weight: 800;
+      font-weight:800;
     }
     .chip-bad{
       background: rgba(176,0,32,.10);
       border-color: rgba(176,0,32,.20);
       color:#b00020;
-      font-weight: 800;
+      font-weight:800;
     }
 
     .actions{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-      margin-top: 12px;
+      margin-top:12px;
     }
     .mini-btn{
-      border:0; cursor:pointer;
-      padding: 10px 12px;
-      border-radius: 14px;
+      border:0;
+      cursor:pointer;
+      padding:10px 12px;
+      border-radius:14px;
       background: rgba(0,0,0,.08);
-      text-decoration: none;
-      color: inherit;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
+      text-decoration:none;
+      color:inherit;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:600;
     }
     .mini-btn.danger{
       background: rgba(176,0,32,.12);
       color:#b00020;
-      font-weight: 700;
-    }
-
-    .modal-backdrop{
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.45);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding: 18px;
-      z-index: 50;
-    }
-    .modal{
-      width: min(720px, 96vw);
-      background:#fff;
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 18px 40px rgba(0,0,0,.20);
-    }
-    .modal-top{
-      display:flex; justify-content:space-between; align-items:center; gap:12px;
-      margin-bottom: 10px;
-    }
-    .close-x{
-      border:0; cursor:pointer;
-      background: rgba(0,0,0,.08);
-      border-radius: 12px;
-      padding: 8px 10px;
-    }
-    .grid-2{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-    @media (max-width: 720px){ .grid-2{ grid-template-columns: 1fr; } }
-
-    label{ display:block; font-weight: 600; margin-top: 10px; }
-    input, textarea{
-      width:100%;
-      box-sizing:border-box;
-      margin-top: 6px;
-      padding: 12px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(0,0,0,.12);
-      background: #fff;
-      outline: none;
-    }
-
-    .modal-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
-    .primary{
-      border:0; cursor:pointer;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background:#1b167f;
-      color:#fff;
-      font-weight: 800;
+      font-weight:700;
     }
 
     .hamburger{
@@ -238,8 +191,8 @@
         </div>
 
         <div class="btn-row">
-          <a class="btn btn-outline" href="publicar.html">+ Publicar</a>
-          <button class="btn btn-outline" id="btnLogout" type="button">Cerrar sesión</button>
+          <a class="btn-outline" href="publicar.html">+ Publicar</a>
+          <button class="btn-outline" id="btnLogout" type="button">Cerrar sesión</button>
         </div>
       </div>
 
@@ -261,7 +214,6 @@
         <div class="panel-note muted">
           Acá vas a ver las reservas que te hacen tus huéspedes.
         </div>
-
         <div id="bookSummary" class="muted"></div>
         <div id="bookList" class="list"></div>
         <p id="bookEmpty" class="muted" style="display:none; margin-top:12px;">
@@ -273,7 +225,6 @@
         <div class="panel-note muted">
           Fechas reservadas de tus alojamientos.
         </div>
-
         <div id="calList" class="list"></div>
         <p id="calEmpty" class="muted" style="display:none; margin-top:12px;">
           Aún no hay reservas para mostrar en el calendario.
@@ -282,236 +233,154 @@
     </div>
   </main>
 
-  <div id="backdrop" class="modal-backdrop">
-    <div class="modal">
-      <div class="modal-top">
-        <h2>Editar publicación</h2>
-        <button class="close-x" id="closeModal" type="button">✕</button>
-      </div>
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import {
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+    import {
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-      <form id="editForm">
-        <input type="hidden" name="id" />
-        <label>Título</label>
-        <input name="titulo" required />
+    const secListings = document.getElementById("secListings");
+    const secBookings = document.getElementById("secBookings");
+    const secCalendar = document.getElementById("secCalendar");
 
-        <div class="grid-2">
-          <div>
-            <label>Precio por noche (ARS)</label>
-            <input name="precio" type="number" min="0" required />
-          </div>
-          <div>
-            <label>Máximo de noches</label>
-            <input name="maxNoches" type="number" min="1" max="365" />
-          </div>
-        </div>
+    const tabListings = document.getElementById("tabListings");
+    const tabBookings = document.getElementById("tabBookings");
+    const tabCalendar = document.getElementById("tabCalendar");
 
-        <label>Descripción</label>
-        <textarea name="descripcion" rows="4" required></textarea>
-
-        <div class="modal-actions">
-          <button class="primary" type="submit">Guardar cambios</button>
-          <button class="btn btn-outline" id="cancelModal" type="button">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-<script type="module">
-  import { db } from "./firebase-config.js";
-  import { logout, getUser, refreshMe } from "./public/js/auth.js";
-  import {
-    collection,
-    getDocs,
-    doc,
-    deleteDoc,
-    updateDoc
-  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-
-  const secListings = document.getElementById("secListings");
-  const secBookings = document.getElementById("secBookings");
-  const secCalendar = document.getElementById("secCalendar");
-
-  const tabListings = document.getElementById("tabListings");
-  const tabBookings = document.getElementById("tabBookings");
-  const tabCalendar = document.getElementById("tabCalendar");
-
-  const btnLogout = document.getElementById("btnLogout");
-  const hamburgerBtn = document.getElementById("hamburgerBtn");
-  const mainNav = document.getElementById("mainNav");
-
-  const backdrop = document.getElementById("backdrop");
-  const editForm = document.getElementById("editForm");
-
-  let toastTimer = null;
-  let currentEditDocId = null;
-  let myEmail = "";
-  let myUid = "";
-
-  function toast(msg) {
-    clearTimeout(toastTimer);
-    let el = document.getElementById("toast");
-    if (!el) {
-      el = document.createElement("div");
-      el.id = "toast";
-      el.style.position = "fixed";
-      el.style.left = "50%";
-      el.style.bottom = "18px";
-      el.style.transform = "translateX(-50%)";
-      el.style.background = "rgba(0,0,0,.75)";
-      el.style.color = "#fff";
-      el.style.padding = "10px 14px";
-      el.style.borderRadius = "999px";
-      el.style.fontSize = "13px";
-      el.style.zIndex = "999";
-      document.body.appendChild(el);
-    }
-    el.textContent = msg;
-    el.style.display = "block";
-    toastTimer = setTimeout(() => { el.style.display = "none"; }, 1800);
-  }
-
-  function coverFromFotos(listing) {
-    return listing?.fotos?.[0] || "";
-  }
-
-  function formatARS(n) {
-    const num = Number(n || 0);
-    try { return num.toLocaleString("es-AR"); } catch { return String(num); }
-  }
-
-  function formatDate(fecha) {
-    if (!fecha) return "-";
-    const d = new Date(fecha + "T00:00:00");
-    if (Number.isNaN(d.getTime())) return fecha;
-    return d.toLocaleDateString("es-AR");
-  }
-
-  function calcularNoches(checkin, checkout) {
-    if (!checkin || !checkout) return null;
-    const d1 = new Date(checkin + "T00:00:00");
-    const d2 = new Date(checkout + "T00:00:00");
-    const diff = d2 - d1;
-    const noches = diff / (1000 * 60 * 60 * 24);
-    return noches > 0 ? noches : null;
-  }
-
-  function rangosSePisan(aInicio, aFin, bInicio, bFin) {
-    return aInicio < bFin && aFin > bInicio;
-  }
-
-  function escapeHTML(str) {
-    return String(str || "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  function setActiveTab(activeBtn) {
-    [tabListings, tabBookings, tabCalendar].forEach((btn) => btn?.classList.remove("active"));
-    activeBtn?.classList.add("active");
-  }
-
-  async function loadListings() {
-    const snap = await getDocs(collection(db, "alojamientos"));
-    const arr = [];
-    snap.forEach((d) => arr.push({ ...d.data(), _docId: d.id }));
-    console.log("TODOS LOS ALOJAMIENTOS:", arr);
-    return arr;
-  }
-
-  async function loadBookings() {
-    const snap = await getDocs(collection(db, "reservas"));
-    const arr = [];
-    snap.forEach((d) => arr.push({ ...d.data(), _docId: d.id }));
-    console.log("TODAS LAS RESERVAS:", arr);
-    return arr;
-  }
-
-  function esMioAlojamiento(x) {
-    const emails = [
-      x.ownerEmail,
-      x.anfitrionEmail,
-      x.email,
-      x.userEmail,
-      x.hostEmail,
-      x.correo
-    ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
-
-    const uids = [
-      x.anfitrionId,
-      x.ownerUid,
-      x.ownerId,
-      x.hostUid,
-      x.hostId,
-      x.uid,
-      x.userUid,
-      x.userId,
-      x.propietarioId
-    ].map(v => String(v || "").trim()).filter(Boolean);
-
-    return emails.includes(myEmail) || (myUid && uids.includes(myUid));
-  }
-
-  function esMiReserva(b) {
-    const emails = [
-      b.hostEmail,
-      b.anfitrionEmail,
-      b.ownerEmail,
-      b.email
-    ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
-
-    const uids = [
-      b.hostId,
-      b.hostUid,
-      b.anfitrionId,
-      b.ownerId,
-      b.ownerUid,
-      b.uid
-    ].map(v => String(v || "").trim()).filter(Boolean);
-
-    return emails.includes(myEmail) || (myUid && uids.includes(myUid));
-  }
-
-  async function render() {
     const list = document.getElementById("list");
     const empty = document.getElementById("empty");
     const summary = document.getElementById("summary");
 
-    try {
-      const all = await loadListings();
-      const mine = all.filter(esMioAlojamiento);
+    const bookSummary = document.getElementById("bookSummary");
+    const bookList = document.getElementById("bookList");
+    const bookEmpty = document.getElementById("bookEmpty");
 
+    const calList = document.getElementById("calList");
+    const calEmpty = document.getElementById("calEmpty");
+
+    const btnLogout = document.getElementById("btnLogout");
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const mainNav = document.getElementById("mainNav");
+
+    let currentUser = null;
+
+    function setActiveTab(activeBtn) {
+      [tabListings, tabBookings, tabCalendar].forEach(btn => btn.classList.remove("active"));
+      activeBtn.classList.add("active");
+    }
+
+    function showTab(which) {
+      secListings.style.display = which === "listings" ? "block" : "none";
+      secBookings.style.display = which === "bookings" ? "block" : "none";
+      secCalendar.style.display = which === "calendar" ? "block" : "none";
+
+      if (which === "listings") setActiveTab(tabListings);
+      if (which === "bookings") setActiveTab(tabBookings);
+      if (which === "calendar") setActiveTab(tabCalendar);
+    }
+
+    function escapeHTML(str) {
+      return String(str || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatARS(n) {
+      const num = Number(n || 0);
+      try { return num.toLocaleString("es-AR"); } catch { return String(num); }
+    }
+
+    function formatDate(fecha) {
+      if (!fecha) return "-";
+      const d = new Date(fecha + "T00:00:00");
+      if (Number.isNaN(d.getTime())) return fecha;
+      return d.toLocaleDateString("es-AR");
+    }
+
+    function calcularNoches(checkin, checkout) {
+      if (!checkin || !checkout) return null;
+      const d1 = new Date(checkin + "T00:00:00");
+      const d2 = new Date(checkout + "T00:00:00");
+      const diff = d2 - d1;
+      const noches = diff / (1000 * 60 * 60 * 24);
+      return noches > 0 ? noches : null;
+    }
+
+    function coverFromFotos(item) {
+      return item?.fotos?.[0] || "";
+    }
+
+    function esMioAlojamiento(x, user) {
+      const myEmail = String(user?.email || "").toLowerCase().trim();
+      const myUid = String(user?.uid || "").trim();
+
+      const emails = [
+        x.ownerEmail, x.anfitrionEmail, x.email, x.userEmail, x.hostEmail, x.correo
+      ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
+
+      const uids = [
+        x.anfitrionId, x.ownerUid, x.ownerId, x.hostUid, x.hostId,
+        x.uid, x.userUid, x.userId, x.propietarioId
+      ].map(v => String(v || "").trim()).filter(Boolean);
+
+      return emails.includes(myEmail) || (myUid && uids.includes(myUid));
+    }
+
+    function esMiReserva(x, user) {
+      const myEmail = String(user?.email || "").toLowerCase().trim();
+      const myUid = String(user?.uid || "").trim();
+
+      const emails = [
+        x.hostEmail, x.anfitrionEmail, x.ownerEmail, x.email
+      ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
+
+      const uids = [
+        x.hostId, x.hostUid, x.anfitrionId, x.ownerId, x.ownerUid, x.uid
+      ].map(v => String(v || "").trim()).filter(Boolean);
+
+      return emails.includes(myEmail) || (myUid && uids.includes(myUid));
+    }
+
+    async function renderListings() {
+      list.innerHTML = "";
+      empty.style.display = "none";
+
+      const snap = await getDocs(collection(db, "alojamientos"));
+      const all = [];
+      snap.forEach(d => all.push({ ...d.data(), _docId: d.id }));
+
+      console.log("TODOS LOS ALOJAMIENTOS:", all);
+
+      const mine = all.filter(x => esMioAlojamiento(x, currentUser));
       console.log("ALOJAMIENTOS MIOS:", mine);
 
       summary.textContent = `Publicaciones: ${mine.length}`;
-      list.innerHTML = "";
 
       if (!mine.length) {
         empty.style.display = "block";
         return;
       }
 
-      empty.style.display = "none";
-
-      mine.forEach((x) => {
+      mine.forEach(x => {
         const item = document.createElement("div");
         item.className = "item";
 
         const imgWrap = document.createElement("div");
         imgWrap.className = "thumb";
         const cover = coverFromFotos(x);
-
         if (cover) {
-          const img = document.createElement("img");
-          img.src = cover;
-          img.alt = x.titulo || "Alojamiento";
-          imgWrap.appendChild(img);
+          imgWrap.innerHTML = `<img src="${cover}" alt="${escapeHTML(x.titulo || "Alojamiento")}">`;
         }
 
         const meta = document.createElement("div");
-        meta.className = "meta";
         meta.innerHTML = `
           <h3>${escapeHTML(x.titulo || "Sin título")}</h3>
           <p><b>${escapeHTML(x.ciudad || "-")}</b>, ${escapeHTML(x.provincia || "-")}</p>
@@ -523,171 +392,86 @@
           </div>
         `;
 
-        const actions = document.createElement("div");
-        actions.className = "actions";
-
-        const btnEdit = document.createElement("button");
-        btnEdit.type = "button";
-        btnEdit.className = "mini-btn";
-        btnEdit.textContent = "Editar";
-        btnEdit.onclick = () => openEdit(x);
-
-        const btnCopy = document.createElement("button");
-        btnCopy.type = "button";
-        btnCopy.className = "mini-btn";
-        btnCopy.textContent = "Copiar ID";
-        btnCopy.onclick = async () => {
-          try {
-            await navigator.clipboard.writeText(x.id || x._docId || "");
-            toast("✅ ID copiado");
-          } catch {
-            toast("No pude copiar. Copialo manualmente.");
-          }
-        };
-
-        const btnDel = document.createElement("button");
-        btnDel.type = "button";
-        btnDel.className = "mini-btn danger";
-        btnDel.textContent = "Eliminar";
-        btnDel.onclick = async () => {
-          const ok = confirm("¿Eliminar esta publicación?");
-          if (!ok) return;
-          await deleteDoc(doc(db, "alojamientos", x._docId));
-          await render();
-          toast("✅ Eliminado");
-        };
-
-        actions.appendChild(btnEdit);
-        actions.appendChild(btnCopy);
-        actions.appendChild(btnDel);
-
-        meta.appendChild(actions);
         item.appendChild(imgWrap);
         item.appendChild(meta);
         list.appendChild(item);
       });
-    } catch (error) {
-      console.error("Error render alojamientos:", error);
-      document.getElementById("list").innerHTML = "";
-      document.getElementById("empty").style.display = "block";
-      toast("Error al cargar alojamientos");
     }
-  }
 
-  async function renderHostBookings() {
-    const bookSummary = document.getElementById("bookSummary");
-    const bookList = document.getElementById("bookList");
-    const bookEmpty = document.getElementById("bookEmpty");
+    async function renderBookings() {
+      bookList.innerHTML = "";
+      bookEmpty.style.display = "none";
 
-    try {
-      const all = await loadBookings();
-      const mine = all.filter(esMiReserva);
+      const snap = await getDocs(collection(db, "reservas"));
+      const all = [];
+      snap.forEach(d => all.push({ ...d.data(), _docId: d.id }));
 
+      console.log("TODAS LAS RESERVAS:", all);
+
+      const mine = all.filter(x => esMiReserva(x, currentUser));
       console.log("RESERVAS MIAS:", mine);
 
       bookSummary.textContent = `Reservas recibidas: ${mine.length}`;
-      bookList.innerHTML = "";
 
       if (!mine.length) {
         bookEmpty.style.display = "block";
         return;
       }
 
-      bookEmpty.style.display = "none";
-
-      mine.forEach((b) => {
-        const item = document.createElement("div");
-        item.className = "item";
-
-        const left = document.createElement("div");
-        left.className = "thumb";
-        left.innerHTML = `
-          <div style="padding:10px; font-size:12px; color:#333;">
-            <b>${escapeHTML(b.title || b.titulo || "Reserva")}</b><br/>
-            Código: ${escapeHTML(b.code || b._docId || "")}
-          </div>
-        `;
-
+      mine.forEach(b => {
+        const noches = calcularNoches(b.checkin, b.checkout);
         const stateClass =
           b.status === "aceptada" ? "chip-ok" :
-          b.status === "rechazada" ? "chip-bad" :
-          "chip-strong";
+          b.status === "rechazada" ? "chip-bad" : "chip-strong";
 
-        const noches = calcularNoches(b.checkin, b.checkout);
-
-        const meta = document.createElement("div");
-        meta.className = "meta";
-        meta.innerHTML = `
-          <h3>${escapeHTML(b.guestName || "Huésped")}</h3>
-          <p><b>${escapeHTML(b.guestEmail || "-")}</b></p>
-          <div class="chips">
-            <span class="chip ${stateClass}">Estado: ${escapeHTML(b.status || "pendiente")}</span>
-            <span class="chip">Check-in: ${escapeHTML(formatDate(b.checkin))}</span>
-            <span class="chip">Check-out: ${escapeHTML(formatDate(b.checkout))}</span>
-            ${noches ? `<span class="chip">Noches: ${escapeHTML(String(noches))}</span>` : ""}
-            <span class="chip">Huéspedes: ${escapeHTML(String(b.guests ?? "-"))}</span>
-            <span class="chip">Total: ARS $${formatARS(b.total)}</span>
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <div class="thumb">
+            <div style="padding:10px; font-size:12px; color:#333;">
+              <b>${escapeHTML(b.title || b.titulo || "Reserva")}</b><br>
+              Código: ${escapeHTML(b.code || b._docId || "")}
+            </div>
+          </div>
+          <div>
+            <h3>${escapeHTML(b.guestName || "Huésped")}</h3>
+            <p><b>${escapeHTML(b.guestEmail || "-")}</b></p>
+            <div class="chips">
+              <span class="chip ${stateClass}">Estado: ${escapeHTML(b.status || "pendiente")}</span>
+              <span class="chip">Check-in: ${escapeHTML(formatDate(b.checkin))}</span>
+              <span class="chip">Check-out: ${escapeHTML(formatDate(b.checkout))}</span>
+              ${noches ? `<span class="chip">Noches: ${escapeHTML(String(noches))}</span>` : ""}
+              <span class="chip">Huéspedes: ${escapeHTML(String(b.guests ?? "-"))}</span>
+              <span class="chip">Total: ARS $${formatARS(b.total)}</span>
+            </div>
           </div>
         `;
-
-        const actions = document.createElement("div");
-        actions.className = "actions";
-
-        if (b.status !== "aceptada") {
-          const btnAccept = document.createElement("button");
-          btnAccept.type = "button";
-          btnAccept.className = "mini-btn";
-          btnAccept.textContent = "Aceptar";
-          btnAccept.onclick = async () => updateBookingStatus(b, "aceptada");
-          actions.appendChild(btnAccept);
-        }
-
-        if (b.status !== "rechazada") {
-          const btnReject = document.createElement("button");
-          btnReject.type = "button";
-          btnReject.className = "mini-btn danger";
-          btnReject.textContent = "Rechazar";
-          btnReject.onclick = async () => updateBookingStatus(b, "rechazada");
-          actions.appendChild(btnReject);
-        }
-
-        meta.appendChild(actions);
-        item.appendChild(left);
-        item.appendChild(meta);
         bookList.appendChild(item);
       });
-    } catch (error) {
-      console.error("Error render reservas:", error);
-      toast("Error al cargar reservas");
     }
-  }
 
-  async function renderCalendar() {
-    const calList = document.getElementById("calList");
-    const calEmpty = document.getElementById("calEmpty");
-
-    try {
-      const all = await loadBookings();
-      const mine = all.filter((b) => esMiReserva(b) && b.status !== "rechazada");
-
+    async function renderCalendar() {
       calList.innerHTML = "";
+      calEmpty.style.display = "none";
+
+      const snap = await getDocs(collection(db, "reservas"));
+      const all = [];
+      snap.forEach(d => all.push({ ...d.data(), _docId: d.id }));
+
+      const mine = all.filter(x => esMiReserva(x, currentUser) && x.status !== "rechazada");
 
       if (!mine.length) {
         calEmpty.style.display = "block";
         return;
       }
 
-      calEmpty.style.display = "none";
-
-      mine.forEach((b) => {
+      mine.forEach(b => {
         const noches = calcularNoches(b.checkin, b.checkout);
-
         const item = document.createElement("div");
         item.className = "item";
         item.style.gridTemplateColumns = "1fr";
-
         item.innerHTML = `
-          <div class="meta">
+          <div>
             <h3>${escapeHTML(b.title || b.titulo || "Alojamiento")}</h3>
             <div class="chips">
               <span class="chip chip-strong">${escapeHTML(b.status || "pendiente")}</span>
@@ -701,143 +485,43 @@
         `;
         calList.appendChild(item);
       });
-    } catch (error) {
-      console.error("Error render calendario:", error);
-      toast("Error al cargar calendario");
     }
-  }
 
-  async function hayCruceConAceptadas(reservaActual) {
-    const all = await loadBookings();
-
-    const aceptadasMismoAlojamiento = all.filter((r) =>
-      r.listingId === reservaActual.listingId &&
-      r.status === "aceptada" &&
-      r._docId !== reservaActual._docId
-    );
-
-    const inicioActual = new Date(reservaActual.checkin + "T00:00:00");
-    const finActual = new Date(reservaActual.checkout + "T00:00:00");
-
-    return aceptadasMismoAlojamiento.some((r) => {
-      const inicio = new Date(r.checkin + "T00:00:00");
-      const fin = new Date(r.checkout + "T00:00:00");
-      return rangosSePisan(inicioActual, finActual, inicio, fin);
+    tabListings.addEventListener("click", async () => {
+      showTab("listings");
+      await renderListings();
     });
-  }
 
-  async function updateBookingStatus(reserva, status) {
-    if (status === "aceptada") {
-      const seCruza = await hayCruceConAceptadas(reserva);
-      if (seCruza) {
-        toast("❌ No podés aceptar: esas fechas ya están ocupadas.");
-        return;
-      }
-    }
+    tabBookings.addEventListener("click", async () => {
+      showTab("bookings");
+      await renderBookings();
+    });
 
-    await updateDoc(doc(db, "reservas", reserva._docId), { status });
-    await renderHostBookings();
-    await renderCalendar();
-    toast(status === "aceptada" ? "✅ Reserva aceptada" : "✅ Reserva rechazada");
-  }
-
-  function openEdit(item) {
-    currentEditDocId = item._docId;
-    editForm.id.value = item.id || "";
-    editForm.titulo.value = item.titulo || "";
-    editForm.precio.value = Number(item.precio || 0);
-    editForm.maxNoches.value = item.maxNoches ?? 30;
-    editForm.descripcion.value = item.descripcion || "";
-    backdrop.style.display = "flex";
-  }
-
-  function closeEdit() {
-    backdrop.style.display = "none";
-    currentEditDocId = null;
-  }
-
-  async function showTab(which) {
-    secListings.style.display = which === "listings" ? "block" : "none";
-    secBookings.style.display = which === "bookings" ? "block" : "none";
-    secCalendar.style.display = which === "calendar" ? "block" : "none";
-
-    if (which === "listings") {
-      setActiveTab(tabListings);
-      await render();
-    }
-    if (which === "bookings") {
-      setActiveTab(tabBookings);
-      await renderHostBookings();
-    }
-    if (which === "calendar") {
-      setActiveTab(tabCalendar);
+    tabCalendar.addEventListener("click", async () => {
+      showTab("calendar");
       await renderCalendar();
-    }
-  }
-
-  tabListings?.addEventListener("click", () => showTab("listings"));
-  tabBookings?.addEventListener("click", () => showTab("bookings"));
-  tabCalendar?.addEventListener("click", () => showTab("calendar"));
-
-  btnLogout?.addEventListener("click", async () => {
-    await logout();
-  });
-
-  hamburgerBtn?.addEventListener("click", () => {
-    mainNav?.classList.toggle("nav-open");
-  });
-
-  document.getElementById("closeModal")?.addEventListener("click", closeEdit);
-  document.getElementById("cancelModal")?.addEventListener("click", closeEdit);
-  backdrop?.addEventListener("click", (e) => {
-    if (e.target === backdrop) closeEdit();
-  });
-
-  editForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!currentEditDocId) return;
-
-    let maxNoches = parseInt(editForm.maxNoches.value || "30", 10);
-    if (Number.isNaN(maxNoches)) maxNoches = 30;
-    if (maxNoches < 1) maxNoches = 1;
-    if (maxNoches > 365) maxNoches = 365;
-
-    await updateDoc(doc(db, "alojamientos", currentEditDocId), {
-      titulo: editForm.titulo.value.trim(),
-      precio: Number(editForm.precio.value || 0),
-      maxNoches,
-      descripcion: editForm.descripcion.value.trim(),
-      moneda: "ARS"
     });
 
-    closeEdit();
-    await render();
-    toast("✅ Guardado");
-  });
+    btnLogout.addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "login.html";
+    });
 
-  async function initPanel() {
-    try {
-      await refreshMe();
-      const userObj = getUser();
+    hamburgerBtn?.addEventListener("click", () => {
+      mainNav?.classList.toggle("nav-open");
+    });
 
-      if (!userObj?.email) {
-        location.href = "login.html?next=" + encodeURIComponent("panel-anfitrion.html");
+    onAuthStateChanged(auth, async (user) => {
+      console.log("USUARIO PANEL:", user);
+      if (!user) {
+        window.location.href = "login.html";
         return;
       }
 
-      myEmail = String(userObj.email || "").toLowerCase().trim();
-      myUid = String(userObj.uid || "").trim();
-
-      console.log("PANEL USER:", { myEmail, myUid });
-
-      await showTab("listings");
-    } catch (error) {
-      console.error("Error inicializando panel:", error);
-      toast("Error al abrir el panel");
-    }
-  }
-
-  initPanel();
-</script>
+      currentUser = user;
+      showTab("listings");
+      await renderListings();
+    });
+  </script>
 </body>
 </html>
