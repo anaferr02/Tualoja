@@ -147,8 +147,6 @@ import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/1
 const form = document.getElementById("loginForm");
 const err = document.getElementById("err");
 
-const redirect = localStorage.getItem("redirectAfterLogin");
-
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -160,13 +158,15 @@ form.addEventListener("submit", async (e) => {
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
+
+    const redirect = localStorage.getItem("redirectAfterLogin");
+
     if (redirect) {
-  localStorage.removeItem("redirectAfterLogin");
-  window.location.href = redirect;
-} else {
-  window.location.href = "panel-anfitrion.html";
-}
-    window.location.href = next;
+      localStorage.removeItem("redirectAfterLogin");
+      window.location.href = redirect;
+    } else {
+      window.location.href = "panel-anfitrion.html";
+    }
   } catch (error) {
     console.error(error);
     err.textContent = "Email o contraseña incorrectos.";
