@@ -135,6 +135,42 @@
       color:#b00020;
       font-weight:700;
     }
+    .mini-btn.success{
+      background: rgba(0,128,0,.12);
+      color: rgba(0,128,0,.95);
+      font-weight:700;
+    }
+
+    .calendar-grid{
+      display:grid;
+      gap:12px;
+    }
+
+    .calendar-row{
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .calendar-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+
+    .calendar-range{
+      font-weight:800;
+      color:#1b167f;
+      background: rgba(27,22,127,.10);
+      border: 1px solid rgba(27,22,127,.18);
+      padding:8px 12px;
+      border-radius:999px;
+      display:inline-block;
+    }
 
     .hamburger{
       font-size:20px;
@@ -166,6 +202,86 @@
       background:white;
       font-weight:600;
       cursor:pointer;
+    }
+
+    .modal-backdrop{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.42);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 999;
+    }
+
+    .modal{
+      width: min(620px, 96vw);
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.20);
+      padding: 16px;
+    }
+
+    .modal-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .close-x{
+      border:0;
+      cursor:pointer;
+      background: rgba(0,0,0,.08);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-weight:700;
+    }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+
+    @media (max-width:720px){
+      .grid-2{ grid-template-columns:1fr; }
+    }
+
+    label{
+      display:block;
+      font-weight:600;
+      margin-top:10px;
+    }
+
+    input, textarea{
+      width:100%;
+      box-sizing:border-box;
+      margin-top:6px;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+      outline:none;
+    }
+
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .primary{
+      border:0;
+      cursor:pointer;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#1b167f;
+      color:#fff;
+      font-weight:800;
     }
   </style>
 </head>
@@ -225,13 +341,46 @@
         <div class="panel-note muted">
           Fechas reservadas de tus alojamientos.
         </div>
-        <div id="calList" class="list"></div>
+        <div id="calList" class="calendar-grid"></div>
         <p id="calEmpty" class="muted" style="display:none; margin-top:12px;">
           Aún no hay reservas para mostrar en el calendario.
         </p>
       </section>
     </div>
   </main>
+
+  <div id="editBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-top">
+        <h2 style="margin:0;">Editar publicación</h2>
+        <button id="closeEditModal" class="close-x" type="button">✕</button>
+      </div>
+
+      <form id="editForm">
+        <label for="editTitulo">Título</label>
+        <input id="editTitulo" name="titulo" required />
+
+        <div class="grid-2">
+          <div>
+            <label for="editPrecio">Precio por noche</label>
+            <input id="editPrecio" name="precio" type="number" min="0" required />
+          </div>
+          <div>
+            <label for="editMaxNoches">Máx. noches</label>
+            <input id="editMaxNoches" name="maxNoches" type="number" min="1" max="365" />
+          </div>
+        </div>
+
+        <label for="editDescripcion">Descripción</label>
+        <textarea id="editDescripcion" name="descripcion" rows="4"></textarea>
+
+        <div class="modal-actions">
+          <button class="primary" type="submit">Guardar cambios</button>
+          <button class="btn-outline" id="cancelEditModal" type="button">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
@@ -241,7 +390,10 @@
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
     import {
       collection,
-      getDocs
+      getDocs,
+      doc,
+      deleteDoc,
+      updateDoc
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
     const secListings = document.getElementById("secListings");
@@ -267,7 +419,13 @@
     const hamburgerBtn = document.getElementById("hamburgerBtn");
     const mainNav = document.getElementById("mainNav");
 
+    const editBackdrop = document.getElementById("editBackdrop");
+    const editForm = document.getElementById("editForm");
+    const closeEditModal = document.getElementById("closeEditModal");
+    const cancelEditModal = document.getElementById("cancelEditModal");
+
     let currentUser = null;
+    let currentEditDocId = null;
 
     function setActiveTab(activeBtn) {
       [tabListings, tabBookings, tabCalendar].forEach(btn => btn.classList.remove("active"));
@@ -349,6 +507,21 @@
       return emails.includes(myEmail) || (myUid && uids.includes(myUid));
     }
 
+    function abrirEdicion(x) {
+      currentEditDocId = x._docId;
+      editForm.titulo.value = x.titulo || "";
+      editForm.precio.value = Number(x.precio || 0);
+      editForm.maxNoches.value = Number(x.maxNoches || 30);
+      editForm.descripcion.value = x.descripcion || "";
+      editBackdrop.style.display = "flex";
+    }
+
+    function cerrarEdicion() {
+      editBackdrop.style.display = "none";
+      currentEditDocId = null;
+      editForm.reset();
+    }
+
     async function renderListings() {
       list.innerHTML = "";
       empty.style.display = "none";
@@ -357,11 +530,7 @@
       const all = [];
       snap.forEach(d => all.push({ ...d.data(), _docId: d.id }));
 
-      console.log("TODOS LOS ALOJAMIENTOS:", all);
-
       const mine = all.filter(x => esMioAlojamiento(x, currentUser));
-      console.log("ALOJAMIENTOS MIOS:", mine);
-
       summary.textContent = `Publicaciones: ${mine.length}`;
 
       if (!mine.length) {
@@ -392,6 +561,30 @@
           </div>
         `;
 
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const btnEdit = document.createElement("button");
+        btnEdit.type = "button";
+        btnEdit.className = "mini-btn";
+        btnEdit.textContent = "Editar";
+        btnEdit.onclick = () => abrirEdicion(x);
+
+        const btnDelete = document.createElement("button");
+        btnDelete.type = "button";
+        btnDelete.className = "mini-btn danger";
+        btnDelete.textContent = "Eliminar";
+        btnDelete.onclick = async () => {
+          const ok = confirm("¿Eliminar este alojamiento?");
+          if (!ok) return;
+          await deleteDoc(doc(db, "alojamientos", x._docId));
+          await renderListings();
+        };
+
+        actions.appendChild(btnEdit);
+        actions.appendChild(btnDelete);
+
+        meta.appendChild(actions);
         item.appendChild(imgWrap);
         item.appendChild(meta);
         list.appendChild(item);
@@ -406,11 +599,7 @@
       const all = [];
       snap.forEach(d => all.push({ ...d.data(), _docId: d.id }));
 
-      console.log("TODAS LAS RESERVAS:", all);
-
       const mine = all.filter(x => esMiReserva(x, currentUser));
-      console.log("RESERVAS MIAS:", mine);
-
       bookSummary.textContent = `Reservas recibidas: ${mine.length}`;
 
       if (!mine.length) {
@@ -426,6 +615,7 @@
 
         const item = document.createElement("div");
         item.className = "item";
+
         item.innerHTML = `
           <div class="thumb">
             <div style="padding:10px; font-size:12px; color:#333;">
@@ -446,6 +636,39 @@
             </div>
           </div>
         `;
+
+        const right = item.children[1];
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        if (b.status !== "aceptada") {
+          const btnAccept = document.createElement("button");
+          btnAccept.type = "button";
+          btnAccept.className = "mini-btn success";
+          btnAccept.textContent = "Aceptar";
+          btnAccept.onclick = async () => {
+            await updateDoc(doc(db, "reservas", b._docId), { status: "aceptada" });
+            await renderBookings();
+            await renderCalendar();
+          };
+          actions.appendChild(btnAccept);
+        }
+
+        if (b.status !== "rechazada") {
+          const btnReject = document.createElement("button");
+          btnReject.type = "button";
+          btnReject.className = "mini-btn danger";
+          btnReject.textContent = "Rechazar";
+          btnReject.onclick = async () => {
+            await updateDoc(doc(db, "reservas", b._docId), { status: "rechazada" });
+            await renderBookings();
+            await renderCalendar();
+          };
+          actions.appendChild(btnReject);
+        }
+
+        right.appendChild(actions);
         bookList.appendChild(item);
       });
     }
@@ -458,7 +681,9 @@
       const all = [];
       snap.forEach(d => all.push({ ...d.data(), _docId: d.id }));
 
-      const mine = all.filter(x => esMiReserva(x, currentUser) && x.status !== "rechazada");
+      const mine = all
+        .filter(x => esMiReserva(x, currentUser) && x.status !== "rechazada")
+        .sort((a, b) => String(a.checkin || "").localeCompare(String(b.checkin || "")));
 
       if (!mine.length) {
         calEmpty.style.display = "block";
@@ -467,23 +692,34 @@
 
       mine.forEach(b => {
         const noches = calcularNoches(b.checkin, b.checkout);
-        const item = document.createElement("div");
-        item.className = "item";
-        item.style.gridTemplateColumns = "1fr";
-        item.innerHTML = `
-          <div>
-            <h3>${escapeHTML(b.title || b.titulo || "Alojamiento")}</h3>
+
+        const row = document.createElement("div");
+        row.className = "calendar-row";
+        row.innerHTML = `
+          <div class="calendar-head">
+            <div>
+              <div class="calendar-range">
+                ${escapeHTML(formatDate(b.checkin))} → ${escapeHTML(formatDate(b.checkout))}
+              </div>
+            </div>
             <div class="chips">
               <span class="chip chip-strong">${escapeHTML(b.status || "pendiente")}</span>
-              <span class="chip">Check-in: ${escapeHTML(formatDate(b.checkin))}</span>
-              <span class="chip">Check-out: ${escapeHTML(formatDate(b.checkout))}</span>
-              ${noches ? `<span class="chip">Noches: ${escapeHTML(String(noches))}</span>` : ""}
-              <span class="chip">Código: ${escapeHTML(b.code || b._docId || "")}</span>
-              <span class="chip">Huésped: ${escapeHTML(b.guestName || "-")}</span>
+              ${noches ? `<span class="chip">${escapeHTML(String(noches))} noches</span>` : ""}
             </div>
           </div>
+
+          <h3 style="margin:6px 0 6px;">${escapeHTML(b.title || b.titulo || "Alojamiento")}</h3>
+
+          <div class="chips">
+            <span class="chip">Código: ${escapeHTML(b.code || b._docId || "")}</span>
+            <span class="chip">Huésped: ${escapeHTML(b.guestName || "-")}</span>
+            <span class="chip">Email: ${escapeHTML(b.guestEmail || "-")}</span>
+            <span class="chip">Huéspedes: ${escapeHTML(String(b.guests ?? "-"))}</span>
+            <span class="chip">Total: ARS $${formatARS(b.total)}</span>
+          </div>
         `;
-        calList.appendChild(item);
+
+        calList.appendChild(row);
       });
     }
 
@@ -511,8 +747,33 @@
       mainNav?.classList.toggle("nav-open");
     });
 
+    closeEditModal.addEventListener("click", cerrarEdicion);
+    cancelEditModal.addEventListener("click", cerrarEdicion);
+    editBackdrop.addEventListener("click", (e) => {
+      if (e.target === editBackdrop) cerrarEdicion();
+    });
+
+    editForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentEditDocId) return;
+
+      let maxNoches = parseInt(editForm.maxNoches.value || "30", 10);
+      if (Number.isNaN(maxNoches)) maxNoches = 30;
+      if (maxNoches < 1) maxNoches = 1;
+      if (maxNoches > 365) maxNoches = 365;
+
+      await updateDoc(doc(db, "alojamientos", currentEditDocId), {
+        titulo: editForm.titulo.value.trim(),
+        precio: Number(editForm.precio.value || 0),
+        maxNoches,
+        descripcion: editForm.descripcion.value.trim()
+      });
+
+      cerrarEdicion();
+      await renderListings();
+    });
+
     onAuthStateChanged(auth, async (user) => {
-      console.log("USUARIO PANEL:", user);
       if (!user) {
         window.location.href = "login.html";
         return;
