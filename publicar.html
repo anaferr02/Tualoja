@@ -856,41 +856,56 @@
       const fotosBase64 = fotosOrdenadas.map(x => x.b64);
 
       const data = {
-        id: crypto.randomUUID(),
-        titulo: form.titulo.value.trim(),
-        tipo: form.tipo.value,
-        capacidad: Number(form.capacidad.value),
-        habitaciones: Number(form.habitaciones.value),
-        camas: Number(form.camas.value),
-        banos: Number(form.banos.value),
-        descripcion: form.descripcion.value.trim(),
-        pais: paisSelect.value,
-        provincia: provinciaSelect.value,
-        ciudad: form.ciudad.value.trim(),
-        direccion: form.direccion.value.trim(),
-        cp: form.cp.value.trim(),
-        referencia: form.referencia.value.trim(),
-        servicios,
-        reglas,
-        reglasExtra: form.reglasExtra.value.trim(),
-        cancelacion: form.cancelacion.value,
-        checkinDesde: form.checkinDesde.value,
-        checkoutHasta: form.checkoutHasta.value,
-        fotos: fotosBase64,
-        precio: Number(form.precio.value),
-        moneda: "ARS",
-        maxNoches,
-        anfitrion: form.anfitrion.value.trim(),
-        telefono: form.telefono.value.trim(),
-        email: form.email.value.trim(),
-        lat: Number(latInput.value),
-        lng: Number(lngInput.value),
-        anfitrionId: currentUser.uid,
-        anfitrionEmail: (currentUser.email || "").toLowerCase(),
-        ownerEmail: (currentUser.email || "").toLowerCase(),
-        status: "activo",
-        createdAt: serverTimestamp()
-      };
+  id: crypto.randomUUID(),
+
+  titulo: form.titulo.value.trim(),
+  tipo: form.tipo.value,
+  capacidad: Number(form.capacidad.value),
+  habitaciones: Number(form.habitaciones.value),
+  camas: Number(form.camas.value),
+  banos: Number(form.banos.value),
+  descripcion: form.descripcion.value.trim(),
+
+  pais: paisSelect.value,
+  provincia: provinciaSelect.value,
+  ciudad: form.ciudad.value.trim(),
+  direccion: form.direccion.value.trim(),
+  cp: form.cp.value.trim(),
+  referencia: form.referencia.value.trim(),
+
+  servicios,
+  reglas,
+  reglasExtra: form.reglasExtra.value.trim(),
+
+  cancelacion: form.cancelacion.value,
+  checkinDesde: form.checkinDesde.value,
+  checkoutHasta: form.checkoutHasta.value,
+
+  fotos: fotosBase64,
+
+  precio: Number(form.precio.value),
+  moneda: "ARS",
+  maxNoches,
+
+  anfitrion: form.anfitrion.value.trim(),
+  telefono: form.telefono.value.trim(),
+  email: form.email.value.trim(),
+
+  lat: Number(latInput.value),
+  lng: Number(lngInput.value),
+
+  // 🔥 ESTO ES CLAVE (YA LO TENÍAS)
+  anfitrionId: currentUser.uid,
+  anfitrionEmail: (currentUser.email || "").toLowerCase(),
+  ownerEmail: (currentUser.email || "").toLowerCase(),
+
+  // 🔥 NUEVO (IMPORTANTE)
+  createdBy: currentUser.uid,
+  createdEmail: currentUser.email,
+
+  status: "activo",
+  createdAt: serverTimestamp()
+};
 
       msg.textContent = "✅ Publicando...";
 
