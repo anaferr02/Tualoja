@@ -147,8 +147,7 @@ import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/1
 const form = document.getElementById("loginForm");
 const err = document.getElementById("err");
 
-const params = new URLSearchParams(location.search);
-const next = params.get("next") || "panel-anfitrion.html";
+const redirect = localStorage.getItem("redirectAfterLogin");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -161,6 +160,12 @@ form.addEventListener("submit", async (e) => {
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
+    if (redirect) {
+  localStorage.removeItem("redirectAfterLogin");
+  window.location.href = redirect;
+} else {
+  window.location.href = "panel-anfitrion.html";
+}
     window.location.href = next;
   } catch (error) {
     console.error(error);
