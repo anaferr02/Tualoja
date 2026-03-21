@@ -1,5 +1,4 @@
 import { db, auth } from "./firebase-config.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 import {
   doc,
   getDoc,
@@ -16,12 +15,6 @@ const id = params.get("id");
 
 const cont = document.getElementById("detalleWrap");
 const noExiste = document.getElementById("noExiste");
-
-let usuarioActual = null;
-
-onAuthStateChanged(auth, (user) => {
-  usuarioActual = user;
-});
 
 function escapeHTML(str) {
   return String(str || "")
@@ -191,7 +184,7 @@ async function cargarDetalle() {
                 Elegí fechas para ver el total.
               </div>
 
-              <button id="btnReservar" class="detalle-btn-reservar">
+              <button id="btnReservar" type="button" class="detalle-btn-reservar">
                 Reservar
               </button>
 
@@ -266,7 +259,15 @@ async function cargarDetalle() {
       }
 
       if (checkinInput.value) {
-        checkoutInput.min = checkinInput.value;
+        const minCheckout = new Date(checkinInput.value + "T00:00:00");
+        minCheckout.setDate(minCheckout.getDate() + 1);
+        checkoutInput.min = fechaToInputFormat(minCheckout);
+      } else {
+        checkoutInput.min = hoy;
+      }
+
+      if (checkoutInput.value && checkoutInput.value <= checkinInput.value) {
+        checkoutInput.value = "";
       }
 
       actualizarTotal();
@@ -282,11 +283,17 @@ async function cargarDetalle() {
     });
 
     btnReservar.addEventListener("click", async () => {
-     if (!usuarioActual) {
-  localStorage.setItem("redirectAfterLogin", location.pathname + location.search);
-  location.href = "login.html";
-  return;
-}
+      const usuario = auth.currentUser;
+
+      if (!usuario) {
+        localStorage.setItem("redirectAfterLogin", location.pathname + location.search);
+        localStorage.setItem("pendingReservaCheckin", checkinInput.value || "");
+        localStorage.setItem("pendingReservaCheckout", checkoutInput.value || "");
+        localStorage.setItem("pendingReservaGuests", guestsInput.value || "1");
+        location.href = "login.html";
+        return;
+      }
+
       const checkin = checkinInput.value;
       const checkout = checkoutInput.value;
       const guests = Number(guestsInput.value || 1);
@@ -337,9 +344,9 @@ async function cargarDetalle() {
           anfitrionEmail: (alojamiento.anfitrionEmail || alojamiento.ownerEmail || "").toLowerCase(),
           anfitrionId: alojamiento.anfitrionId || alojamiento.createdBy || "",
 
-          guestEmail: (usuarioActual.email || "").toLowerCase(),
-          guestName: usuarioActual.displayName || "Huésped",
-          guestId: usuarioActual.uid,
+          guestEmail: (usuario.email || "").toLowerCase(),
+          guestName: usuario.displayName || "Huésped",
+          guestId: usuario.uid,
 
           checkin,
           checkout,
@@ -347,7 +354,7 @@ async function cargarDetalle() {
           total,
           status: "pendiente",
           createdAt: serverTimestamp(),
-          createdBy: usuarioActual.uid
+          createdBy: usuario.uid
         });
 
         msgReserva.textContent = "✅ Reserva enviada correctamente. El anfitrión la verá en su panel.";
@@ -358,6 +365,26 @@ async function cargarDetalle() {
         btnReservar.classList.remove("disabled");
       }
     });
+
+    const pendingCheckin = localStorage.getItem("pendingReservaCheckin");
+    const pendingCheckout = localStorage.getItem("pendingReservaCheckout");
+    const pendingGuests = localStorage.getItem("pendingReservaGuests");
+
+    if (pendingCheckin) checkinInput.value = pendingCheckin;
+    if (pendingCheckout) checkoutInput.value = pendingCheckout;
+    if (pendingGuests) guestsInput.value = pendingGuests;
+
+    localStorage.removeItem("pendingReservaCheckin");
+    localStorage.removeItem("pendingReservaCheckout");
+    localStorage.removeItem("pendingReservaGuests");
+
+    if (checkinInput.value) {
+      const minCheckout = new Date(checkinInput.value + "T00:00:00");
+      minCheckout.setDate(minCheckout.getDate() + 1);
+      checkoutInput.min = fechaToInputFormat(minCheckout);
+    }
+
+    actualizarTotal();
 
   } catch (error) {
     console.error(error);
