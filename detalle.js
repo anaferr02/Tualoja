@@ -282,11 +282,11 @@ async function cargarDetalle() {
     });
 
     btnReservar.addEventListener("click", async () => {
-      if (!usuarioActual) {
-        location.href = "login.html?next=" + encodeURIComponent(location.pathname + location.search);
-        return;
-      }
-
+     if (!usuarioActual) {
+  localStorage.setItem("redirectAfterLogin", location.pathname + location.search);
+  location.href = "login.html";
+  return;
+}
       const checkin = checkinInput.value;
       const checkout = checkoutInput.value;
       const guests = Number(guestsInput.value || 1);
