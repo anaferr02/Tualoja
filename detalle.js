@@ -32,6 +32,15 @@ function escapeHTML(str) {
     .replaceAll("'", "&#039;");
 }
 
+function fechaToInputFormat(fecha) {
+  const d = new Date(fecha);
+  return d.toISOString().split("T")[0];
+}
+
+function fechaBloqueada(fecha) {
+  return fechasOcupadas.includes(fecha);
+}
+
 function nochesEntre(checkin, checkout) {
   if (!checkin || !checkout) return 0;
   const d1 = new Date(checkin + "T00:00:00");
@@ -74,6 +83,16 @@ async function cargarDetalle() {
     const alojamientoId = docSnap.id;
 
     const reservasAceptadas = await cargarReservasAceptadas(alojamientoId);
+    const fechasOcupadas = [];
+
+reservasAceptadas.forEach(r => {
+  const inicio = new Date(r.checkin);
+  const fin = new Date(r.checkout);
+
+  for (let d = new Date(inicio); d < fin; d.setDate(d.getDate() + 1)) {
+    fechasOcupadas.push(fechaToInputFormat(d));
+  }
+});
 
     cont.innerHTML = `
       <h1>${escapeHTML(alojamiento.titulo)}</h1>
@@ -87,6 +106,22 @@ async function cargarDetalle() {
 
     const checkinInput = document.getElementById("checkinInput");
     const checkoutInput = document.getElementById("checkoutInput");
+    // 🔥 BLOQUEAR FECHAS PASADAS
+    const hoy = new Date().toISOString().split("T")[0];
+    checkinInput.min = hoy;
+    checkoutInput.min = hoy;
+    checkinInput.addEventListener("change", () => {
+  if (fechaBloqueada(checkinInput.value)) {
+    alert("❌ Esa fecha está ocupada");
+    checkinInput.value = "";
+  }
+});
+    checkoutInput.addEventListener("change", () => {
+  if (fechaBloqueada(checkoutInput.value)) {
+    alert("❌ Esa fecha está ocupada");
+    checkoutInput.value = "";
+  }
+});
     const btnReservar = document.getElementById("btnReservar");
     const msgReserva = document.getElementById("msgReserva");
 
