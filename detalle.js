@@ -37,19 +37,11 @@ function nochesEntre(checkin, checkout) {
   const d1 = new Date(checkin + "T00:00:00");
   const d2 = new Date(checkout + "T00:00:00");
   const diff = d2 - d1;
-  const noches = diff / (1000 * 60 * 60 * 24);
-  return noches > 0 ? noches : 0;
+  return diff / (1000 * 60 * 60 * 24);
 }
 
 function generarCodigoReserva() {
   return "RES-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-}
-
-function formatDate(fecha) {
-  if (!fecha) return "-";
-  const d = new Date(fecha + "T00:00:00");
-  if (Number.isNaN(d.getTime())) return fecha;
-  return d.toLocaleDateString("es-AR");
 }
 
 function rangosSePisan(aInicio, aFin, bInicio, bFin) {
@@ -65,28 +57,18 @@ async function cargarReservasAceptadas(listingId) {
 
   const snap = await getDocs(q);
   const reservas = [];
-
-  snap.forEach((d) => {
-    reservas.push(d.data());
-  });
-
+  snap.forEach((d) => reservas.push(d.data()));
   return reservas;
 }
 
 async function cargarDetalle() {
   try {
-    if (!id) {
-      noExiste.style.display = "block";
-      return;
-    }
+    if (!id) return noExiste.style.display = "block";
 
     const docRef = doc(db, "alojamientos", id);
     const docSnap = await getDoc(docRef);
 
-    if (!docSnap.exists()) {
-      noExiste.style.display = "block";
-      return;
-    }
+    if (!docSnap.exists()) return noExiste.style.display = "block";
 
     const alojamiento = docSnap.data();
     const alojamientoId = docSnap.id;
@@ -94,198 +76,85 @@ async function cargarDetalle() {
     const reservasAceptadas = await cargarReservasAceptadas(alojamientoId);
 
     cont.innerHTML = `
-      <div class="detalle-layout">
+      <h1>${escapeHTML(alojamiento.titulo)}</h1>
+      <p>${escapeHTML(alojamiento.ciudad)} - ${escapeHTML(alojamiento.provincia)}</p>
 
-        <h1>${escapeHTML(alojamiento.titulo)}</h1>
-
-        <p class="detalle-ubicacion-top">
-          📍 <strong>${escapeHTML(alojamiento.ciudad)}, ${escapeHTML(alojamiento.provincia)}</strong>
-        </p>
-
-        <p class="detalle-subtexto">
-          👥 ${escapeHTML(alojamiento.capacidad || "-")} huéspedes ·
-          🛏️ ${escapeHTML(alojamiento.camas || "-")} camas ·
-          🛁 ${escapeHTML(alojamiento.banos || "-")} baños
-        </p>
-
-        <p class="detalle-descripcion-top">
-          ${escapeHTML(alojamiento.descripcion || "")}
-        </p>
-
-        <div class="detalle-card">
-
-          <div class="detalle-galeria">
-            ${
-              alojamiento.fotos?.length
-                ? `<img src="${alojamiento.fotos[0]}" alt="${escapeHTML(alojamiento.titulo)}">`
-                : `
-                  <div class="detalle-galeria-empty">
-                    <div class="icono">🏡</div>
-                    <div class="texto">Sin fotos disponibles</div>
-                  </div>
-                `
-            }
-          </div>
-
-          <div class="detalle-info-grid">
-
-            <div class="detalle-info-left">
-              <div class="detalle-item"><strong>Tipo:</strong> ${escapeHTML(alojamiento.tipo || "-")}</div>
-              <div class="detalle-item"><strong>Servicios:</strong> ${escapeHTML((alojamiento.servicios || []).join(", ") || "-")}</div>
-              <div class="detalle-item"><strong>Reglas:</strong> ${escapeHTML((alojamiento.reglas || []).join(", ") || "-")}</div>
-              <div class="detalle-item"><strong>Check-in:</strong> ${escapeHTML(alojamiento.checkinDesde || "-")}</div>
-              <div class="detalle-item"><strong>Check-out:</strong> ${escapeHTML(alojamiento.checkoutHasta || "-")}</div>
-              <div class="detalle-item"><strong>Cancelación:</strong> ${escapeHTML(alojamiento.cancelacion || "-")}</div>
-            </div>
-
-            <div class="detalle-info-right">
-
-              <div class="detalle-precio-box">
-                <span class="detalle-precio-numero">$${escapeHTML(alojamiento.precio || 0)}</span>
-                <span class="detalle-precio-texto">/ noche</span>
-              </div>
-
-              <p class="detalle-minimo">
-                Máx. ${escapeHTML(alojamiento.maxNoches || 30)} noches
-              </p>
-
-              <div class="detalle-reserva-form">
-                <label class="detalle-label">Check-in</label>
-                <input id="checkinInput" type="date" class="detalle-input">
-
-                <label class="detalle-label">Check-out</label>
-                <input id="checkoutInput" type="date" class="detalle-input">
-
-                <label class="detalle-label">Huéspedes</label>
-                <input id="guestsInput" type="number" min="1" max="${escapeHTML(alojamiento.capacidad || 1)}" value="1" class="detalle-input">
-              </div>
-
-              <div id="ocupadasBox" class="detalle-total-box" style="background:#fff8e8;border-color:#f2ddb2;color:#7a5a00;">
-                ${
-                  reservasAceptadas.length
-                    ? `Fechas ocupadas: ${reservasAceptadas.map(r => `${formatDate(r.checkin)} al ${formatDate(r.checkout)}`).join(" · ")}`
-                    : "No hay fechas ocupadas actualmente."
-                }
-              </div>
-
-              <div id="totalBox" class="detalle-total-box">
-                Elegí fechas para ver el total.
-              </div>
-
-              <button id="btnReservar" class="detalle-btn-reservar">
-                Reservar
-              </button>
-
-              <p id="msgReserva" class="detalle-ayuda">
-                No se cobra nada ahora
-              </p>
-
-            </div>
-
-          </div>
-        </div>
-      </div>
+      <input id="checkinInput" type="date">
+      <input id="checkoutInput" type="date">
+      <button id="btnReservar">Reservar</button>
+      <p id="msgReserva"></p>
     `;
 
     const checkinInput = document.getElementById("checkinInput");
     const checkoutInput = document.getElementById("checkoutInput");
-    const guestsInput = document.getElementById("guestsInput");
-    const totalBox = document.getElementById("totalBox");
     const btnReservar = document.getElementById("btnReservar");
     const msgReserva = document.getElementById("msgReserva");
 
     function fechasDisponibles(checkin, checkout) {
-      if (!checkin || !checkout) return true;
-
-      const inicio = new Date(checkin + "T00:00:00");
-      const fin = new Date(checkout + "T00:00:00");
+      const inicio = new Date(checkin);
+      const fin = new Date(checkout);
 
       return !reservasAceptadas.some((r) => {
-        const rInicio = new Date(r.checkin + "T00:00:00");
-        const rFin = new Date(r.checkout + "T00:00:00");
+        const rInicio = new Date(r.checkin);
+        const rFin = new Date(r.checkout);
         return rangosSePisan(inicio, fin, rInicio, rFin);
       });
     }
 
-    function actualizarTotal() {
-      const checkin = checkinInput.value;
-      const checkout = checkoutInput.value;
-      const noches = nochesEntre(checkin, checkout);
-
-      if (!checkin || !checkout || noches <= 0) {
-        totalBox.textContent = "Elegí fechas válidas para ver el total.";
-        return 0;
-      }
-
-      if (!fechasDisponibles(checkin, checkout)) {
-        totalBox.textContent = "Esas fechas se cruzan con una reserva ya aceptada.";
-        return 0;
-      }
-
-      const total = Number(alojamiento.precio || 0) * noches;
-      totalBox.textContent = `${noches} noche${noches > 1 ? "s" : ""} · Total estimado: $${total} ARS`;
-      return total;
-    }
-
-    checkinInput.addEventListener("change", actualizarTotal);
-    checkoutInput.addEventListener("change", actualizarTotal);
-
     btnReservar.addEventListener("click", async () => {
       if (!usuarioActual) {
-        location.href = "login.html?next=" + encodeURIComponent(location.pathname + location.search);
+        location.href = "login.html";
         return;
       }
 
       const checkin = checkinInput.value;
       const checkout = checkoutInput.value;
-      const guests = Number(guestsInput.value || 1);
       const noches = nochesEntre(checkin, checkout);
 
       if (!checkin || !checkout || noches <= 0) {
-        msgReserva.textContent = "Elegí fechas válidas.";
+        msgReserva.textContent = "Fechas inválidas";
         return;
       }
 
       if (!fechasDisponibles(checkin, checkout)) {
-        msgReserva.textContent = "❌ Esas fechas ya están ocupadas.";
+        msgReserva.textContent = "Fechas ocupadas";
         return;
       }
 
-      if (guests < 1 || guests > Number(alojamiento.capacidad || 1)) {
-        msgReserva.textContent = "La cantidad de huéspedes no es válida.";
-        return;
-      }
-
-      const total = Number(alojamiento.precio || 0) * noches;
-
-      btnReservar.disabled = true;
-      btnReservar.classList.add("disabled");
-      msgReserva.textContent = "Guardando reserva...";
+      const total = (alojamiento.precio || 0) * noches;
 
       try {
         await addDoc(collection(db, "reservas"), {
           code: generarCodigoReserva(),
+
+          // 🔥 CLAVE
           listingId: alojamientoId,
-          title: alojamiento.titulo || "",
-          hostEmail: alojamiento.anfitrionEmail || "",
+          title: alojamiento.titulo,
+
+          // 🔥 HOST (MUY IMPORTANTE)
           hostId: alojamiento.anfitrionId || "",
-          guestEmail: usuarioActual.email || "",
-          guestName: usuarioActual.displayName || "Huésped",
+          hostEmail: alojamiento.anfitrionEmail || "",
+
+          // 🔥 HUÉSPED
           guestId: usuarioActual.uid,
+          guestEmail: usuarioActual.email,
+          guestName: usuarioActual.displayName || "Huésped",
+
           checkin,
           checkout,
-          guests,
           total,
+
           status: "pendiente",
-          createdAt: serverTimestamp()
+
+          // 🔥 NUEVO (IMPORTANTE)
+          createdAt: serverTimestamp(),
+          createdBy: usuarioActual.uid
         });
 
-        msgReserva.textContent = "✅ Reserva enviada correctamente. El anfitrión la verá en su panel.";
-      } catch (error) {
-        console.error(error);
-        msgReserva.textContent = "❌ No se pudo guardar la reserva.";
-        btnReservar.disabled = false;
-        btnReservar.classList.remove("disabled");
+        msgReserva.textContent = "✅ Reserva enviada";
+      } catch (err) {
+        console.error(err);
+        msgReserva.textContent = "Error al reservar";
       }
     });
 
