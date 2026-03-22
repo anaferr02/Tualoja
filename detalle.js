@@ -13,6 +13,10 @@ import {
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
+const checkinParam = (params.get("checkin") || "").trim();
+const checkoutParam = (params.get("checkout") || "").trim();
+const guestsParam = (params.get("guests") || "1").trim();
+
 const cont = document.getElementById("detalleWrap");
 const noExiste = document.getElementById("noExiste");
 
@@ -181,7 +185,7 @@ async function cargarDetalle() {
               </div>
 
               <div id="totalBox" class="detalle-total-box">
-                Elegí fechas para ver el total.
+                Elegí fechas válidas para ver el total.
               </div>
 
               <button id="btnReservar" type="button" class="detalle-btn-reservar">
@@ -250,6 +254,24 @@ async function cargarDetalle() {
       const total = Number(alojamiento.precio || 0) * noches;
       totalBox.textContent = `${noches} noche${noches > 1 ? "s" : ""} · Total estimado: $${total} ARS`;
       return total;
+    }
+
+    if (checkinParam) {
+      checkinInput.value = checkinParam;
+    }
+
+    if (checkoutParam) {
+      checkoutInput.value = checkoutParam;
+    }
+
+    if (guestsParam) {
+      guestsInput.value = guestsParam;
+    }
+
+    if (checkinInput.value) {
+      const minCheckout = new Date(checkinInput.value + "T00:00:00");
+      minCheckout.setDate(minCheckout.getDate() + 1);
+      checkoutInput.min = fechaToInputFormat(minCheckout);
     }
 
     checkinInput.addEventListener("change", () => {
