@@ -10,10 +10,7 @@ const resumenBusqueda = document.getElementById("resumenBusqueda");
 
 const params = new URLSearchParams(window.location.search);
 
-const destinoBuscado = (params.get("destino") || params.get("ubicacion") || params.get("q") || "")
-  .trim()
-  .toLowerCase();
-
+const destinoBuscado = (params.get("destino") || params.get("ubicacion") || params.get("q") || "").trim();
 const checkinBuscado = (params.get("checkin") || "").trim();
 const checkoutBuscado = (params.get("checkout") || "").trim();
 const guestsBuscado = (params.get("guests") || params.get("huespedes") || "1").trim();
@@ -44,8 +41,13 @@ function normalizar(texto) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function sinEspacios(texto) {
+  return normalizar(texto).replace(/\s+/g, "");
 }
 
 function initMapa() {
@@ -95,7 +97,7 @@ function renderMapa(alojamientos) {
 function coincideDestino(a, destino) {
   if (!destino) return true;
 
-  const textoCompleto = normalizar([
+  const textoNormal = normalizar([
     a.titulo,
     a.ciudad,
     a.provincia,
@@ -104,11 +106,24 @@ function coincideDestino(a, destino) {
     a.referencia
   ].join(" "));
 
-  const palabrasBuscadas = normalizar(destino)
-    .split(" ")
-    .filter(Boolean);
+  const textoCompacto = sinEspacios([
+    a.titulo,
+    a.ciudad,
+    a.provincia,
+    a.pais,
+    a.direccion,
+    a.referencia
+  ].join(" "));
 
-  return palabrasBuscadas.every((palabra) => textoCompleto.includes(palabra));
+  const destinoNormal = normalizar(destino);
+  const destinoCompacto = sinEspacios(destino);
+
+  const palabras = destinoNormal.split(" ").filter(Boolean);
+
+  const coincidePorPalabras = palabras.every((p) => textoNormal.includes(p));
+  const coincideCompacto = destinoCompacto && textoCompacto.includes(destinoCompacto);
+
+  return coincidePorPalabras || coincideCompacto;
 }
 
 function armarLinkDetalle(idPublico) {
