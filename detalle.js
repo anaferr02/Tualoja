@@ -13,12 +13,14 @@ import {
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
+const destinoParam = (params.get("destino") || params.get("ubicacion") || params.get("q") || "").trim();
 const checkinParam = (params.get("checkin") || "").trim();
 const checkoutParam = (params.get("checkout") || "").trim();
-const guestsParam = (params.get("guests") || "1").trim();
+const guestsParam = (params.get("guests") || params.get("huespedes") || "1").trim();
 
 const cont = document.getElementById("detalleWrap");
 const noExiste = document.getElementById("noExiste");
+const volverResultados = document.getElementById("volverResultados");
 
 function escapeHTML(str) {
   return String(str || "")
@@ -49,6 +51,10 @@ function formatDate(fecha) {
   return d.toLocaleDateString("es-AR");
 }
 
+function formatPrecio(valor) {
+  return Number(valor || 0).toLocaleString("es-AR");
+}
+
 function rangosSePisan(aInicio, aFin, bInicio, bFin) {
   return aInicio < bFin && aFin > bInicio;
 }
@@ -59,6 +65,21 @@ function fechaToInputFormat(fecha) {
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+function actualizarLinkVolver() {
+  if (!volverResultados) return;
+
+  const qs = new URLSearchParams();
+
+  if (destinoParam) qs.set("destino", destinoParam);
+  if (checkinParam) qs.set("checkin", checkinParam);
+  if (checkoutParam) qs.set("checkout", checkoutParam);
+  if (guestsParam) qs.set("guests", guestsParam);
+
+  volverResultados.href = qs.toString()
+    ? `resultados.html?${qs.toString()}`
+    : "resultados.html";
 }
 
 async function cargarReservasAceptadas(listingId) {
@@ -80,6 +101,8 @@ async function cargarReservasAceptadas(listingId) {
 
 async function cargarDetalle() {
   try {
+    actualizarLinkVolver();
+
     if (!id) {
       noExiste.style.display = "block";
       return;
@@ -157,7 +180,7 @@ async function cargarDetalle() {
             <div class="detalle-info-right">
 
               <div class="detalle-precio-box">
-                <span class="detalle-precio-numero">$${escapeHTML(alojamiento.precio || 0)}</span>
+                <span class="detalle-precio-numero">$${formatPrecio(alojamiento.precio || 0)}</span>
                 <span class="detalle-precio-texto">/ noche</span>
               </div>
 
@@ -166,14 +189,21 @@ async function cargarDetalle() {
               </p>
 
               <div class="detalle-reserva-form">
-                <label class="detalle-label">Check-in</label>
+                <label class="detalle-label" for="checkinInput">Check-in</label>
                 <input id="checkinInput" type="date" class="detalle-input">
 
-                <label class="detalle-label">Check-out</label>
+                <label class="detalle-label" for="checkoutInput">Check-out</label>
                 <input id="checkoutInput" type="date" class="detalle-input">
 
-                <label class="detalle-label">Huéspedes</label>
-                <input id="guestsInput" type="number" min="1" max="${escapeHTML(alojamiento.capacidad || 1)}" value="1" class="detalle-input">
+                <label class="detalle-label" for="guestsInput">Huéspedes</label>
+                <input
+                  id="guestsInput"
+                  type="number"
+                  min="1"
+                  max="${escapeHTML(alojamiento.capacidad || 1)}"
+                  value="1"
+                  class="detalle-input"
+                >
               </div>
 
               <div id="ocupadasBox" class="detalle-total-box" style="background:#fff8e8;border-color:#f2ddb2;color:#7a5a00;">
@@ -234,6 +264,7 @@ async function cargarDetalle() {
     function actualizarTotal() {
       const checkin = checkinInput.value;
       const checkout = checkoutInput.value;
+      const guests = Number(guestsInput.value || 1);
       const noches = nochesEntre(checkin, checkout);
 
       if (!checkin || !checkout || noches <= 0) {
@@ -251,22 +282,27 @@ async function cargarDetalle() {
         return 0;
       }
 
+      if (guests < 1 || guests > Number(alojamiento.capacidad || 1)) {
+        totalBox.textContent = "La cantidad de huéspedes no es válida.";
+        return 0;
+      }
+
       const total = Number(alojamiento.precio || 0) * noches;
-      totalBox.textContent = `${noches} noche${noches > 1 ? "s" : ""} · Total estimado: $${total} ARS`;
+      totalBox.textContent = `${noches} noche${noches > 1 ? "s" : ""} · ${guests} huésped${guests > 1 ? "es" : ""} · Total estimado: ARS $${formatPrecio(total)}`;
       return total;
     }
 
-    if (checkinParam) {
-      checkinInput.value = checkinParam;
-    }
+    const pendingCheckin = localStorage.getItem("pendingReservaCheckin");
+    const pendingCheckout = localStorage.getItem("pendingReservaCheckout");
+    const pendingGuests = localStorage.getItem("pendingReservaGuests");
 
-    if (checkoutParam) {
-      checkoutInput.value = checkoutParam;
-    }
+    checkinInput.value = pendingCheckin || checkinParam || "";
+    checkoutInput.value = pendingCheckout || checkoutParam || "";
+    guestsInput.value = pendingGuests || guestsParam || "1";
 
-    if (guestsParam) {
-      guestsInput.value = guestsParam;
-    }
+    localStorage.removeItem("pendingReservaCheckin");
+    localStorage.removeItem("pendingReservaCheckout");
+    localStorage.removeItem("pendingReservaGuests");
 
     if (checkinInput.value) {
       const minCheckout = new Date(checkinInput.value + "T00:00:00");
@@ -303,6 +339,8 @@ async function cargarDetalle() {
 
       actualizarTotal();
     });
+
+    guestsInput.addEventListener("input", actualizarTotal);
 
     btnReservar.addEventListener("click", async () => {
       const usuario = auth.currentUser;
@@ -387,24 +425,6 @@ async function cargarDetalle() {
         btnReservar.classList.remove("disabled");
       }
     });
-
-    const pendingCheckin = localStorage.getItem("pendingReservaCheckin");
-    const pendingCheckout = localStorage.getItem("pendingReservaCheckout");
-    const pendingGuests = localStorage.getItem("pendingReservaGuests");
-
-    if (pendingCheckin) checkinInput.value = pendingCheckin;
-    if (pendingCheckout) checkoutInput.value = pendingCheckout;
-    if (pendingGuests) guestsInput.value = pendingGuests;
-
-    localStorage.removeItem("pendingReservaCheckin");
-    localStorage.removeItem("pendingReservaCheckout");
-    localStorage.removeItem("pendingReservaGuests");
-
-    if (checkinInput.value) {
-      const minCheckout = new Date(checkinInput.value + "T00:00:00");
-      minCheckout.setDate(minCheckout.getDate() + 1);
-      checkoutInput.min = fechaToInputFormat(minCheckout);
-    }
 
     actualizarTotal();
 
