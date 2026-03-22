@@ -1,3 +1,10 @@
+function normalizar(texto) {
+  return String(texto || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+}
 import { db } from "./firebase-config.js";
 import {
   collection,
@@ -86,6 +93,8 @@ function renderMapa(alojamientos) {
 function coincideDestino(a, destino) {
   if (!destino) return true;
 
+  const destinoNormalizado = normalizar(destino);
+
   const texto = [
     a.titulo,
     a.ciudad,
@@ -94,12 +103,11 @@ function coincideDestino(a, destino) {
     a.direccion,
     a.referencia
   ]
-    .join(" ")
-    .toLowerCase();
+    .map(normalizar)
+    .join(" ");
 
-  return texto.includes(destino);
+  return texto.includes(destinoNormalizado);
 }
-
 function armarLinkDetalle(idPublico) {
   const detalleParams = new URLSearchParams();
 
