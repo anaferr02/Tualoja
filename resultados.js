@@ -120,7 +120,10 @@ function coincideDestino(a, destino) {
 
   const palabras = destinoNormal.split(" ").filter(Boolean);
 
-  const coincidePorPalabras = palabras.every((p) => textoNormal.includes(p));
+  const coincidencias = palabras.filter((p) => textoNormal.includes(p)).length;
+  const minimoNecesario = palabras.length >= 3 ? 2 : 1;
+
+  const coincidePorPalabras = coincidencias >= minimoNecesario;
   const coincideCompacto = destinoCompacto && textoCompacto.includes(destinoCompacto);
 
   return coincidePorPalabras || coincideCompacto;
