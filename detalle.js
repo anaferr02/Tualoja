@@ -241,8 +241,28 @@ async function cargarDetalle() {
     const msgReserva = document.getElementById("msgReserva");
 
     const hoy = new Date().toISOString().split("T")[0];
-    checkinInput.min = hoy;
-    checkoutInput.min = hoy;
+
+checkinInput.min = hoy;
+
+if (checkinParam) {
+  checkinInput.value = checkinParam;
+}
+
+if (checkoutParam) {
+  checkoutInput.value = checkoutParam;
+}
+
+if (guestsParam) {
+  guestsInput.value = guestsParam;
+}
+
+if (checkinInput.value) {
+  const minCheckout = new Date(checkinInput.value + "T00:00:00");
+  minCheckout.setDate(minCheckout.getDate() + 1);
+  checkoutInput.min = fechaToInputFormat(minCheckout);
+} else {
+  checkoutInput.min = hoy;
+}
 
     function fechaBloqueada(fecha) {
       return fechasOcupadas.includes(fecha);
