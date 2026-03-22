@@ -1,10 +1,3 @@
-function normalizar(texto) {
-  return String(texto || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
-}
 import { db } from "./firebase-config.js";
 import {
   collection,
@@ -44,6 +37,15 @@ function formatPrecio(n) {
   } catch {
     return String(num);
   }
+}
+
+function normalizar(texto) {
+  return String(texto || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function initMapa() {
@@ -93,21 +95,22 @@ function renderMapa(alojamientos) {
 function coincideDestino(a, destino) {
   if (!destino) return true;
 
-  const destinoNormalizado = normalizar(destino);
-
-  const texto = [
+  const textoCompleto = normalizar([
     a.titulo,
     a.ciudad,
     a.provincia,
     a.pais,
     a.direccion,
     a.referencia
-  ]
-    .map(normalizar)
-    .join(" ");
+  ].join(" "));
 
-  return texto.includes(destinoNormalizado);
+  const palabrasBuscadas = normalizar(destino)
+    .split(" ")
+    .filter(Boolean);
+
+  return palabrasBuscadas.every((palabra) => textoCompleto.includes(palabra));
 }
+
 function armarLinkDetalle(idPublico) {
   const detalleParams = new URLSearchParams();
 
