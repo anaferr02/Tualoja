@@ -331,6 +331,11 @@
             placeholder="¿A dónde querés ir?"
           />
         </div>
+
+        <input type="hidden" name="checkin" id="hiddenCheckin" />
+        <input type="hidden" name="checkout" id="hiddenCheckout" />
+        <input type="hidden" name="guests" id="hiddenGuests" />
+
         <button type="submit" class="btn-buscar">Buscar</button>
       </form>
     </section>
@@ -363,12 +368,32 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
+
     const destino = params.get("destino") || params.get("ubicacion") || params.get("q") || "";
+    const checkin = params.get("checkin") || "";
+    const checkout = params.get("checkout") || "";
+    const guests = params.get("guests") || params.get("huespedes") || "1";
+
     const inputDestino = document.getElementById("inputDestino");
+    const hiddenCheckin = document.getElementById("hiddenCheckin");
+    const hiddenCheckout = document.getElementById("hiddenCheckout");
+    const hiddenGuests = document.getElementById("hiddenGuests");
     const resumenBusqueda = document.getElementById("resumenBusqueda");
 
     if (inputDestino && destino) {
       inputDestino.value = destino;
+    }
+
+    if (hiddenCheckin) {
+      hiddenCheckin.value = checkin;
+    }
+
+    if (hiddenCheckout) {
+      hiddenCheckout.value = checkout;
+    }
+
+    if (hiddenGuests) {
+      hiddenGuests.value = guests;
     }
 
     if (destino) {
