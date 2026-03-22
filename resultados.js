@@ -9,9 +9,14 @@ const empty = document.getElementById("emptyResultados");
 const resumenBusqueda = document.getElementById("resumenBusqueda");
 
 const params = new URLSearchParams(window.location.search);
+
 const destinoBuscado = (params.get("destino") || params.get("ubicacion") || params.get("q") || "")
   .trim()
   .toLowerCase();
+
+const checkinBuscado = (params.get("checkin") || "").trim();
+const checkoutBuscado = (params.get("checkout") || "").trim();
+const guestsBuscado = (params.get("guests") || params.get("huespedes") || "1").trim();
 
 let mapa;
 let markersLayer;
@@ -95,6 +100,18 @@ function coincideDestino(a, destino) {
   return texto.includes(destino);
 }
 
+function armarLinkDetalle(idPublico) {
+  const detalleParams = new URLSearchParams();
+
+  detalleParams.set("id", idPublico);
+
+  if (checkinBuscado) detalleParams.set("checkin", checkinBuscado);
+  if (checkoutBuscado) detalleParams.set("checkout", checkoutBuscado);
+  if (guestsBuscado) detalleParams.set("guests", guestsBuscado);
+
+  return `detalle.html?${detalleParams.toString()}`;
+}
+
 async function cargarResultados() {
   try {
     const querySnapshot = await getDocs(collection(db, "alojamientos"));
@@ -139,6 +156,7 @@ async function cargarResultados() {
 
     filtrados.forEach((a) => {
       const idPublico = a.id || a._docId;
+      const linkDetalle = armarLinkDetalle(idPublico);
 
       html += `
         <div class="resultado-card">
@@ -160,7 +178,7 @@ async function cargarResultados() {
             </div>
 
             <div class="resultado-acciones">
-              <a href="detalle.html?id=${encodeURIComponent(idPublico)}">Ver alojamiento</a>
+              <a href="${linkDetalle}">Ver alojamiento</a>
             </div>
           </div>
         </div>
