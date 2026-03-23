@@ -680,13 +680,57 @@
           if (Number(guests.value) < 1) guests.value = "1";
         });
 
-        btnReservar.addEventListener("click", () => {
-          const noches = calcularNoches(checkin.value, checkout.value);
+        import { getUser } from "./public/js/auth.js";
 
-          if (noches <= 0) {
-            alert("Seleccioná fechas válidas.");
-            return;
-          }
+btnReservar.addEventListener("click", () => {
+
+  const user = getUser();
+
+  // 🔐 SI NO ESTÁ LOGUEADO
+  if (!user) {
+
+    // Guardamos a dónde volver
+    localStorage.setItem("redirectAfterLogin", window.location.href);
+
+    alert("Tenés que iniciar sesión para reservar");
+
+    window.location.href = "login.html";
+    return;
+  }
+
+  // 🧮 VALIDACIONES NORMALES
+  const noches = calcularNoches(checkin.value, checkout.value);
+
+  if (noches <= 0) {
+    alert("Seleccioná fechas válidas.");
+    return;
+  }
+
+  if (hayCruceDeFechas(checkin.value, checkout.value)) {
+    alert("No disponible para esas fechas.");
+    return;
+  }
+
+  const cantidadHuespedes = Number(guests.value || 1);
+
+  if (cantidadHuespedes > huespedes) {
+    alert("Supera la capacidad.");
+    return;
+  }
+
+  // ✅ GUARDAR DATOS DE RESERVA (IMPORTANTE)
+  const reserva = {
+    alojamientoId: id,
+    checkin: checkin.value,
+    checkout: checkout.value,
+    guests: cantidadHuespedes
+  };
+
+  localStorage.setItem("reservaPendiente", JSON.stringify(reserva));
+
+  // 👉 ACA después vamos a mandar a pago o confirmación
+  alert("Reserva lista para continuar 🚀");
+});
 
           if (hayCruceDeFechas(checkin.value, checkout.value)) {
             alert("Este alojamiento no está disponible para esas fechas.");
@@ -704,6 +748,15 @@
         });
 
         actualizarTotal();
+      const reservaGuardada = JSON.parse(localStorage.getItem("reservaPendiente"));
+
+if (reservaGuardada && reservaGuardada.alojamientoId === id) {
+  checkin.value = reservaGuardada.checkin;
+  checkout.value = reservaGuardada.checkout;
+  guests.value = reservaGuardada.guests;
+
+  actualizarTotal();
+}
       } catch (error) {
         console.error("Error al cargar detalle:", error);
         noExiste.style.display = "block";
