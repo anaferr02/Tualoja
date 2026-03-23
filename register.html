@@ -121,8 +121,7 @@
 
   <!-- 🔥 NUEVO SCRIPT (FIREBASE) -->
   <script type="module">
-  import { auth } from "./firebase-config.js";
-  import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+  import { register } from "./public/js/auth.js";
 
   document.getElementById("registerForm").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -138,9 +137,16 @@
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      alert("Cuenta creada con éxito");
-      window.location.href = "publicar.html";
+      await register("", email, password);
+
+      const redirect = localStorage.getItem("redirectAfterLogin");
+
+      if (redirect) {
+        localStorage.removeItem("redirectAfterLogin");
+        window.location.href = redirect;
+      } else {
+        window.location.href = "publicar.html";
+      }
     } catch (error) {
       console.error(error);
       alert("No se pudo crear la cuenta.");
