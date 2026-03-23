@@ -40,12 +40,6 @@
       color:#202020;
     }
 
-    .detalle-subtexto{
-      margin:0 0 18px;
-      font-size:18px;
-      color:#333;
-    }
-
     .detalle-descripcion-top{
       margin:0 0 28px;
       font-size:18px;
@@ -88,15 +82,6 @@
       text-align:center;
       padding:30px 20px;
       background:#f3f3f9;
-    }
-
-    .detalle-galeria-empty .icono{
-      font-size:56px;
-      margin-bottom:16px;
-      opacity:.7;
-    }
-
-    .detalle-galeria-empty .texto{
       font-size:20px;
       font-weight:500;
     }
@@ -146,12 +131,6 @@
       font-size:26px;
       color:#222;
       margin-left:4px;
-    }
-
-    .detalle-minimo{
-      margin:0 0 20px;
-      font-size:18px;
-      color:#454b6b;
     }
 
     .detalle-reserva-form{
@@ -211,7 +190,7 @@
       font-weight:800;
       box-shadow:0 10px 24px rgba(79,61,187,.28);
       cursor:pointer;
-      transition:transform .15s ease,filter .15s ease;
+      transition:transform .15s ease,filter .15s ease,opacity .15s ease;
     }
 
     .detalle-btn-reservar:hover{
@@ -224,6 +203,7 @@
       box-shadow:none;
       cursor:not-allowed;
       pointer-events:none;
+      opacity:.8;
     }
 
     .detalle-ayuda{
@@ -231,6 +211,11 @@
       font-size:14px;
       color:#6b6b78;
       text-align:center;
+    }
+
+    .muted{
+      color:#666;
+      font-size:18px;
     }
 
     @media(max-width:900px){
@@ -267,152 +252,214 @@
   <main class="detalle-page">
     <a id="volverResultados" class="detalle-back" href="resultados.html">← Volver a resultados</a>
 
-    <!-- ESTE ID ES EL IMPORTANTE -->
     <div id="detalleAlojamiento"></div>
 
-    <p id="noExiste" class="muted" style="display:none;margin-top:16px;">
-      Este alojamiento no existe (o fue eliminado).
+    <p id="noExiste" class="muted" style="display:none; margin-top:16px;">
+      Este alojamiento no existe o fue eliminado.
     </p>
   </main>
 
   <script src="script.js"></script>
+
   <script type="module">
-import { db } from "./firebase-config.js";
-import {
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+    import { db } from "./firebase-config.js";
+    import {
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-const wrap = document.getElementById("detalleAlojamiento");
-const noExiste = document.getElementById("noExiste");
+    const wrap = document.getElementById("detalleAlojamiento");
+    const noExiste = document.getElementById("noExiste");
+    const volverResultados = document.getElementById("volverResultados");
 
-const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
 
-const id = params.get("id");
-const checkinParam = params.get("checkin") || "";
-const checkoutParam = params.get("checkout") || "";
-const guestsParam = params.get("guests") || "1";
+    const id = params.get("id");
+    const checkinParam = params.get("checkin") || "";
+    const checkoutParam = params.get("checkout") || "";
+    const guestsParam = params.get("guests") || "1";
 
-function calcularNoches(checkin, checkout) {
-  if (!checkin || !checkout) return 0;
-
-  const entrada = new Date(checkin);
-  const salida = new Date(checkout);
-
-  const diff = salida - entrada;
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
-
-function formatearPrecio(valor) {
-  return Number(valor || 0).toLocaleString("es-AR");
-}
-
-async function cargarDetalle() {
-
-  if (!id) {
-    noExiste.style.display = "block";
-    return;
-  }
-
-  const ref = doc(db, "alojamientos", id);
-  const snap = await getDoc(ref);
-
-  if (!snap.exists()) {
-    noExiste.style.display = "block";
-    return;
-  }
-
-  const a = snap.data();
-
-  const foto = a.fotos?.[0] || "";
-  const precio = Number(a.precio || 0);
-
-  wrap.innerHTML = `
-    <section class="detalle-layout">
-      <h1>${a.titulo}</h1>
-
-      <p class="detalle-ubicacion-top">
-        <strong>Ubicación:</strong> ${a.ciudad} - ${a.provincia}
-      </p>
-
-      <p class="detalle-descripcion-top">
-        ${a.descripcion || ""}
-      </p>
-
-      <div class="detalle-card">
-
-        <div class="detalle-galeria">
-          ${
-            foto
-              ? `<img src="${foto}">`
-              : `<div class="detalle-galeria-empty">Sin imagen</div>`
-          }
-        </div>
-
-        <div class="detalle-info-grid">
-
-          <div class="detalle-info-left">
-            <div class="detalle-item">
-              <strong>Capacidad:</strong> ${a.huespedes || "?"} huéspedes
-            </div>
-          </div>
-
-          <div class="detalle-info-right">
-
-            <div class="detalle-precio-box">
-              <span class="detalle-precio-numero">$${formatearPrecio(precio)}</span>
-              <span class="detalle-precio-texto">/ noche</span>
-            </div>
-
-            <div class="detalle-reserva-form">
-              <label class="detalle-label">Check-in</label>
-              <input class="detalle-input" type="date" id="checkin" value="${checkinParam}">
-
-              <label class="detalle-label">Check-out</label>
-              <input class="detalle-input" type="date" id="checkout" value="${checkoutParam}">
-
-              <label class="detalle-label">Huéspedes</label>
-              <input class="detalle-input" type="number" id="guests" value="${guestsParam}">
-            </div>
-
-            <div class="detalle-total-box" id="totalBox">
-              Seleccioná fechas para calcular el total
-            </div>
-
-            <button class="detalle-btn-reservar" id="btnReservar">
-              Reservar
-            </button>
-
-          </div>
-
-        </div>
-      </div>
-    </section>
-  `;
-
-  const checkin = document.getElementById("checkin");
-  const checkout = document.getElementById("checkout");
-  const totalBox = document.getElementById("totalBox");
-
-  function actualizarTotal() {
-    const noches = calcularNoches(checkin.value, checkout.value);
-
-    if (noches > 0) {
-      totalBox.innerHTML = `<strong>Total:</strong> $${formatearPrecio(noches * precio)} (${noches} noches)`;
-    } else {
-      totalBox.innerHTML = "Seleccioná fechas para calcular el total";
+    if (checkinParam || checkoutParam || guestsParam) {
+      volverResultados.href = `resultados.html?checkin=${encodeURIComponent(checkinParam)}&checkout=${encodeURIComponent(checkoutParam)}&guests=${encodeURIComponent(guestsParam)}`;
     }
-  }
 
-  checkin.addEventListener("change", actualizarTotal);
-  checkout.addEventListener("change", actualizarTotal);
+    function calcularNoches(checkin, checkout) {
+      if (!checkin || !checkout) return 0;
 
-  // 🔥 CALCULA AUTOMÁTICO AL ENTRAR
-  actualizarTotal();
-}
+      const entrada = new Date(checkin + "T00:00:00");
+      const salida = new Date(checkout + "T00:00:00");
 
-cargarDetalle();
-</script>
+      const diff = salida.getTime() - entrada.getTime();
 
+      if (isNaN(diff) || diff <= 0) return 0;
+
+      return Math.round(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function formatearPrecio(valor) {
+      return Number(valor || 0).toLocaleString("es-AR");
+    }
+
+    function obtenerHoy() {
+      const hoy = new Date();
+      const year = hoy.getFullYear();
+      const month = String(hoy.getMonth() + 1).padStart(2, "0");
+      const day = String(hoy.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    async function cargarDetalle() {
+      try {
+        if (!id) {
+          noExiste.style.display = "block";
+          return;
+        }
+
+        const ref = doc(db, "alojamientos", id);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          noExiste.style.display = "block";
+          return;
+        }
+
+        const a = snap.data();
+
+        const foto = a.fotos?.[0] || "";
+        const precio = Number(a.precio || 0);
+        const ciudad = a.ciudad || "Ubicación no informada";
+        const provincia = a.provincia || "";
+        const ubicacion = provincia ? `${ciudad} - ${provincia}` : ciudad;
+        const descripcion = a.descripcion || "Sin descripción disponible.";
+        const titulo = a.titulo || "Alojamiento sin título";
+        const huespedes = a.huespedes || "?";
+        const hoy = obtenerHoy();
+
+        wrap.innerHTML = `
+          <section class="detalle-layout">
+            <h1>${titulo}</h1>
+
+            <p class="detalle-ubicacion-top">
+              <strong>Ubicación:</strong> ${ubicacion}
+            </p>
+
+            <p class="detalle-descripcion-top">
+              ${descripcion}
+            </p>
+
+            <div class="detalle-card">
+              <div class="detalle-galeria">
+                ${
+                  foto
+                    ? `<img src="${foto}" alt="${titulo}">`
+                    : `<div class="detalle-galeria-empty">Sin imagen</div>`
+                }
+              </div>
+
+              <div class="detalle-info-grid">
+                <div class="detalle-info-left">
+                  <div class="detalle-item">
+                    <strong>Capacidad:</strong> ${huespedes} huéspedes
+                  </div>
+                </div>
+
+                <div class="detalle-info-right">
+                  <div class="detalle-precio-box">
+                    <span class="detalle-precio-numero">$${formatearPrecio(precio)}</span>
+                    <span class="detalle-precio-texto">/ noche</span>
+                  </div>
+
+                  <div class="detalle-reserva-form">
+                    <label class="detalle-label" for="checkin">Check-in</label>
+                    <input class="detalle-input" type="date" id="checkin" value="${checkinParam}" min="${hoy}">
+
+                    <label class="detalle-label" for="checkout">Check-out</label>
+                    <input class="detalle-input" type="date" id="checkout" value="${checkoutParam}" min="${hoy}">
+
+                    <label class="detalle-label" for="guests">Huéspedes</label>
+                    <input class="detalle-input" type="number" id="guests" value="${guestsParam}" min="1" max="${huespedes !== "?" ? huespedes : 50}">
+                  </div>
+
+                  <div class="detalle-total-box" id="totalBox">
+                    Seleccioná fechas para calcular el total
+                  </div>
+
+                  <button class="detalle-btn-reservar disabled" id="btnReservar" type="button">
+                    Reservar
+                  </button>
+
+                  <div class="detalle-ayuda">
+                    El total se calcula según la cantidad de noches elegidas.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        `;
+
+        const checkin = document.getElementById("checkin");
+        const checkout = document.getElementById("checkout");
+        const guests = document.getElementById("guests");
+        const totalBox = document.getElementById("totalBox");
+        const btnReservar = document.getElementById("btnReservar");
+
+        function actualizarTotal() {
+          if (checkin.value) {
+            checkout.min = checkin.value;
+          } else {
+            checkout.min = hoy;
+          }
+
+          const noches = calcularNoches(checkin.value, checkout.value);
+
+          if (noches > 0) {
+            const total = noches * precio;
+            totalBox.innerHTML = `<strong>Total:</strong> $${formatearPrecio(total)} (${noches} ${noches === 1 ? "noche" : "noches"})`;
+            btnReservar.classList.remove("disabled");
+          } else {
+            totalBox.innerHTML = "Seleccioná fechas válidas para calcular el total";
+            btnReservar.classList.add("disabled");
+          }
+        }
+
+        checkin.addEventListener("change", () => {
+          if (checkout.value && checkout.value <= checkin.value) {
+            checkout.value = "";
+          }
+          actualizarTotal();
+        });
+
+        checkout.addEventListener("change", actualizarTotal);
+        guests.addEventListener("input", () => {
+          if (Number(guests.value) < 1) guests.value = 1;
+        });
+
+        btnReservar.addEventListener("click", () => {
+          const noches = calcularNoches(checkin.value, checkout.value);
+
+          if (noches <= 0) {
+            alert("Seleccioná fechas válidas.");
+            return;
+          }
+
+          const cantidadHuespedes = Number(guests.value || 1);
+
+          if (a.huespedes && cantidadHuespedes > Number(a.huespedes)) {
+            alert("La cantidad de huéspedes supera la capacidad del alojamiento.");
+            return;
+          }
+
+          alert("Reserva lista para continuar. Después te ayudo a conectarla con Firebase.");
+        });
+
+        actualizarTotal();
+      } catch (error) {
+        console.error("Error al cargar detalle:", error);
+        noExiste.style.display = "block";
+      }
+    }
+
+    cargarDetalle();
+  </script>
 </body>
 </html>
