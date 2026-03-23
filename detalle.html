@@ -266,6 +266,13 @@
       font-weight:700;
     }
 
+    .detalle-alerta.no-disponible{
+      background:#f6f3ff;
+      border-color:#d6cffd;
+      color:#4a3ab8;
+      font-weight:700;
+    }
+
     .detalle-btn-reservar{
       display:inline-flex;
       align-items:center;
@@ -463,6 +470,25 @@
       return fallback;
     }
 
+    function hayCruceDeFechas(checkin, checkout) {
+      if (!checkin || !checkout) return false;
+
+      const reservasExistentes = [
+        { desde: "2026-03-20", hasta: "2026-03-22" },
+        { desde: "2026-04-10", hasta: "2026-04-15" }
+      ];
+
+      const entrada = new Date(checkin + "T00:00:00");
+      const salida = new Date(checkout + "T00:00:00");
+
+      return reservasExistentes.some((reserva) => {
+        const reservaDesde = new Date(reserva.desde + "T00:00:00");
+        const reservaHasta = new Date(reserva.hasta + "T00:00:00");
+
+        return entrada < reservaHasta && salida > reservaDesde;
+      });
+    }
+
     async function cargarDetalle() {
       try {
         if (!id) {
@@ -573,8 +599,8 @@
                       </select>
                     </div>
 
-                    <div class="detalle-alerta warning">
-                      Fechas ocupadas: 20/03/2026 al 22/03/2026
+                    <div class="detalle-alerta warning" id="alertaDisponibilidad" style="display:none;">
+                      Este alojamiento ya está reservado para esas fechas.
                     </div>
 
                     <div class="detalle-alerta info" id="totalBox">
@@ -604,6 +630,7 @@
         const guests = document.getElementById("guests");
         const totalBox = document.getElementById("totalBox");
         const btnReservar = document.getElementById("btnReservar");
+        const alertaDisponibilidad = document.getElementById("alertaDisponibilidad");
 
         function actualizarTotal() {
           if (checkin.value) {
@@ -614,14 +641,30 @@
 
           const noches = calcularNoches(checkin.value, checkout.value);
 
-          if (noches > 0) {
-            const total = noches * precio;
-            totalBox.innerHTML = `<strong>${noches} ${noches === 1 ? "noche" : "noches"}</strong> · Total estimado: <strong>$${formatearPrecio(total)}</strong>`;
-            btnReservar.classList.remove("disabled");
-          } else {
+          if (noches <= 0) {
+            alertaDisponibilidad.style.display = "none";
             totalBox.innerHTML = "Seleccioná fechas válidas para calcular el total";
+            totalBox.className = "detalle-alerta info";
             btnReservar.classList.add("disabled");
+            return;
           }
+
+          const reservado = hayCruceDeFechas(checkin.value, checkout.value);
+
+          if (reservado) {
+            alertaDisponibilidad.style.display = "block";
+            totalBox.innerHTML = "No disponible para las fechas seleccionadas";
+            totalBox.className = "detalle-alerta no-disponible";
+            btnReservar.classList.add("disabled");
+            return;
+          }
+
+          alertaDisponibilidad.style.display = "none";
+
+          const total = noches * precio;
+          totalBox.innerHTML = `<strong>${noches} ${noches === 1 ? "noche" : "noches"}</strong> · Total estimado: <strong>$${formatearPrecio(total)}</strong>`;
+          totalBox.className = "detalle-alerta info";
+          btnReservar.classList.remove("disabled");
         }
 
         checkin.addEventListener("change", () => {
@@ -642,6 +685,11 @@
 
           if (noches <= 0) {
             alert("Seleccioná fechas válidas.");
+            return;
+          }
+
+          if (hayCruceDeFechas(checkin.value, checkout.value)) {
+            alert("Este alojamiento no está disponible para esas fechas.");
             return;
           }
 
