@@ -26,7 +26,7 @@
     }
     .layout{
       display:grid;
-      grid-template-columns:1.2fr .8fr;
+      grid-template-columns:1.15fr .85fr;
       gap:24px;
     }
     .card{
@@ -46,6 +46,11 @@
       font-size:22px;
       color:#1b167f;
     }
+    h3{
+      margin:20px 0 12px;
+      font-size:18px;
+      color:#1b167f;
+    }
     p{
       margin:0 0 14px;
       color:#444;
@@ -58,19 +63,20 @@
       font-size:14px;
       color:#222;
     }
-    input, textarea{
+    input, textarea, select{
       width:100%;
       padding:13px 14px;
       border:1px solid #d9dced;
       border-radius:12px;
       font-size:14px;
       outline:none;
+      background:#fff;
     }
     textarea{
       min-height:110px;
       resize:vertical;
     }
-    input:focus, textarea:focus{
+    input:focus, textarea:focus, select:focus{
       border-color:#6b5be7;
       box-shadow:0 0 0 4px rgba(107,91,231,.10);
     }
@@ -125,6 +131,69 @@
       color:#2e6b1f;
       border:1px solid #b8e0ad;
     }
+    .pago-box{
+      margin-top:18px;
+      padding:18px;
+      border:1px solid #dddff5;
+      border-radius:18px;
+      background:#f8f7ff;
+    }
+    .importe-grande{
+      font-size:32px;
+      font-weight:800;
+      color:#1b167f;
+      margin:4px 0 10px;
+    }
+    .mini{
+      font-size:13px;
+      color:#666;
+      line-height:1.5;
+    }
+    .opcion-pago{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:12px;
+      border:1px solid #e4e6f2;
+      border-radius:14px;
+      background:#fff;
+      margin-bottom:10px;
+    }
+    .opcion-pago input{
+      width:auto;
+      margin-top:3px;
+    }
+    .opcion-pago strong{
+      display:block;
+      color:#1d1d26;
+      margin-bottom:4px;
+    }
+    .destacado{
+      margin-top:12px;
+      padding:14px;
+      border-radius:14px;
+      background:#fff;
+      border:1px solid #d8dbf3;
+      color:#3f3f58;
+      line-height:1.5;
+      font-size:14px;
+    }
+    .linea-total{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 0;
+      border-bottom:1px solid #eef0f6;
+      font-size:15px;
+    }
+    .linea-total:last-child{
+      border-bottom:none;
+    }
+    .linea-total.final{
+      font-size:17px;
+      font-weight:800;
+      color:#1b167f;
+    }
 
     @media(max-width:900px){
       .layout{
@@ -140,7 +209,7 @@
     <div class="layout">
       <section class="card">
         <h1>Completá tu reserva</h1>
-        <p>Ingresá tus datos para enviar la solicitud al anfitrión.</p>
+        <p>Ingresá tus datos y aboná la seña para enviar la solicitud al anfitrión.</p>
 
         <form id="formReserva">
           <label for="nombre">Nombre y apellido</label>
@@ -152,8 +221,33 @@
           <label for="mensaje">Mensaje para el anfitrión</label>
           <textarea id="mensaje" placeholder="Hola, quisiera reservar este alojamiento."></textarea>
 
+          <div class="pago-box">
+            <h3>Pago de seña</h3>
+            <p>Para confirmar la solicitud, se paga solo la seña de TuAloja. El resto se paga después según acuerdes con el anfitrión.</p>
+
+            <div class="importe-grande" id="montoSena">$0</div>
+
+            <div class="destacado" id="detalleSena">
+              Cargando importe de seña...
+            </div>
+
+            <label for="metodoPago">Método de pago de la seña</label>
+            <select id="metodoPago" required>
+              <option value="">Seleccioná una opción</option>
+              <option value="mercado_pago">Mercado Pago</option>
+              <option value="transferencia">Transferencia</option>
+            </select>
+
+            <div class="destacado" id="infoPago" style="display:none;"></div>
+
+            <label style="display:flex; gap:10px; align-items:flex-start; margin-top:14px; font-weight:400;">
+              <input type="checkbox" id="aceptaSena" style="width:auto; margin-top:3px;">
+              <span>Acepto pagar la seña para enviar esta solicitud de reserva.</span>
+            </label>
+          </div>
+
           <button type="submit" class="btn" id="btnConfirmar">
-            Confirmar solicitud de reserva
+            Continuar con la seña
           </button>
 
           <div id="errorBox" class="alert error"></div>
@@ -181,6 +275,8 @@
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
+    const SENA_PORCENTAJE = 15;
+
     const resumenReserva = document.getElementById("resumenReserva");
     const formReserva = document.getElementById("formReserva");
     const errorBox = document.getElementById("errorBox");
@@ -189,9 +285,21 @@
     const inputNombre = document.getElementById("nombre");
     const inputTelefono = document.getElementById("telefono");
     const inputMensaje = document.getElementById("mensaje");
+    const metodoPago = document.getElementById("metodoPago");
+    const aceptaSena = document.getElementById("aceptaSena");
+    const montoSena = document.getElementById("montoSena");
+    const detalleSena = document.getElementById("detalleSena");
+    const infoPago = document.getElementById("infoPago");
 
     let alojamientoActual = null;
     let reservaActual = null;
+    let totalesActuales = {
+      noches: 0,
+      precio: 0,
+      total: 0,
+      sena: 0,
+      restante: 0
+    };
 
     function mostrarError(msg){
       errorBox.textContent = msg;
@@ -226,6 +334,35 @@
       if (isNaN(diff) || diff <= 0) return 0;
 
       return Math.round(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function actualizarInfoPago() {
+      const metodo = metodoPago.value;
+
+      if (!metodo) {
+        infoPago.style.display = "none";
+        infoPago.innerHTML = "";
+        return;
+      }
+
+      if (metodo === "mercado_pago") {
+        infoPago.style.display = "block";
+        infoPago.innerHTML = `
+          <strong>Mercado Pago:</strong><br>
+          Después vamos a conectar acá el link de pago de la seña.
+        `;
+        return;
+      }
+
+      if (metodo === "transferencia") {
+        infoPago.style.display = "block";
+        infoPago.innerHTML = `
+          <strong>Transferencia:</strong><br>
+          Alias: tualoja.senas<br>
+          Titular: TuAloja<br>
+          Después podemos agregar comprobante de pago.
+        `;
+      }
     }
 
     async function cargarReserva() {
@@ -281,16 +418,34 @@
         }
 
         const total = noches * precio;
+        const sena = Math.round(total * (SENA_PORCENTAJE / 100));
+        const restante = total - sena;
+
+        totalesActuales = {
+          noches,
+          precio,
+          total,
+          sena,
+          restante
+        };
+
+        montoSena.textContent = `$${formatearPrecio(sena)}`;
+        detalleSena.innerHTML = `
+          <strong>Seña:</strong> ${SENA_PORCENTAJE}% del total de la estadía.<br>
+          <strong>Restante a pagar luego:</strong> $${formatearPrecio(restante)}.
+        `;
 
         resumenReserva.innerHTML = `
-          <div class="resumen-item"><strong>Alojamiento:</strong> ${titulo}</div>
-          <div class="resumen-item"><strong>Ubicación:</strong> ${ubicacion}</div>
-          <div class="resumen-item"><strong>Check-in:</strong> ${reservaPendiente.checkin}</div>
-          <div class="resumen-item"><strong>Check-out:</strong> ${reservaPendiente.checkout}</div>
-          <div class="resumen-item"><strong>Huéspedes:</strong> ${reservaPendiente.guests}</div>
-          <div class="resumen-item"><strong>Noches:</strong> ${noches}</div>
-          <div class="resumen-item"><strong>Precio por noche:</strong> $${formatearPrecio(precio)}</div>
-          <div class="resumen-item"><strong>Total estimado:</strong> $${formatearPrecio(total)}</div>
+          <div class="linea-total"><span>Alojamiento</span><strong>${titulo}</strong></div>
+          <div class="linea-total"><span>Ubicación</span><strong>${ubicacion}</strong></div>
+          <div class="linea-total"><span>Check-in</span><strong>${reservaPendiente.checkin}</strong></div>
+          <div class="linea-total"><span>Check-out</span><strong>${reservaPendiente.checkout}</strong></div>
+          <div class="linea-total"><span>Huéspedes</span><strong>${reservaPendiente.guests}</strong></div>
+          <div class="linea-total"><span>Noches</span><strong>${noches}</strong></div>
+          <div class="linea-total"><span>Precio por noche</span><strong>$${formatearPrecio(precio)}</strong></div>
+          <div class="linea-total"><span>Total estadía</span><strong>$${formatearPrecio(total)}</strong></div>
+          <div class="linea-total"><span>Seña (${SENA_PORCENTAJE}%)</span><strong>$${formatearPrecio(sena)}</strong></div>
+          <div class="linea-total final"><span>Saldo restante</span><strong>$${formatearPrecio(restante)}</strong></div>
         `;
       } catch (error) {
         console.error("Error al cargar la reserva:", error);
@@ -298,6 +453,8 @@
         formReserva.style.display = "none";
       }
     }
+
+    metodoPago.addEventListener("change", actualizarInfoPago);
 
     formReserva.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -324,9 +481,20 @@
       const nombre = inputNombre.value.trim();
       const telefono = inputTelefono.value.trim();
       const mensaje = inputMensaje.value.trim();
+      const metodo = metodoPago.value;
 
       if (!nombre || !telefono) {
         mostrarError("Completá nombre y teléfono.");
+        return;
+      }
+
+      if (!metodo) {
+        mostrarError("Seleccioná cómo vas a pagar la seña.");
+        return;
+      }
+
+      if (!aceptaSena.checked) {
+        mostrarError("Tenés que aceptar el pago de la seña para continuar.");
         return;
       }
 
@@ -336,9 +504,6 @@
         mostrarError("Las fechas de la reserva no son válidas.");
         return;
       }
-
-      const precio = Number(alojamientoActual.precio || 0);
-      const total = noches * precio;
 
       btnConfirmar.disabled = true;
 
@@ -357,25 +522,23 @@
           checkin: reservaActual.checkin,
           checkout: reservaActual.checkout,
           guests: Number(reservaActual.guests || 1),
-          noches: noches,
-          precioPorNoche: precio,
-          total: total,
-          estado: "pendiente",
+          noches: totalesActuales.noches,
+          precioPorNoche: totalesActuales.precio,
+          total: totalesActuales.total,
+          senaPorcentaje: SENA_PORCENTAJE,
+          senaMonto: totalesActuales.sena,
+          saldoRestante: totalesActuales.restante,
+          metodoPagoSena: metodo,
+          estado: "pendiente_pago_sena",
+          estadoPagoSena: "pendiente",
           creadaEn: serverTimestamp()
         });
 
         localStorage.removeItem("reservaPendiente");
 
-        mostrarOk("Solicitud enviada con éxito.");
+        mostrarOk("Reserva creada. Ahora falta cobrar o confirmar la seña.");
         formReserva.reset();
-
-        if (user.name) {
-          inputNombre.value = user.name;
-        }
-
-        setTimeout(() => {
-          window.location.href = "index.html";
-        }, 1600);
+        actualizaFormularioDespues();
 
       } catch (error) {
         console.error("Error al guardar la reserva:", error);
@@ -384,6 +547,16 @@
         btnConfirmar.disabled = false;
       }
     });
+
+    function actualizaFormularioDespues() {
+      infoPago.style.display = "none";
+      infoPago.innerHTML = "";
+      montoSena.textContent = "$0";
+      detalleSena.innerHTML = "Reserva enviada correctamente.";
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1800);
+    }
 
     cargarReserva();
   </script>
