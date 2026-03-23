@@ -86,14 +86,23 @@
       cursor:pointer;
       margin-top:18px;
       box-shadow:0 10px 24px rgba(79,61,187,.25);
+      transition:filter .15s ease, transform .15s ease;
     }
     .btn:hover{
       filter:brightness(1.03);
+      transform:translateY(-1px);
+    }
+    .btn:disabled{
+      opacity:.7;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:none;
     }
     .resumen-item{
       padding:10px 0;
       border-bottom:1px solid #eef0f6;
       font-size:15px;
+      line-height:1.5;
     }
     .resumen-item:last-child{
       border-bottom:none;
@@ -104,6 +113,7 @@
       border-radius:12px;
       font-size:14px;
       display:none;
+      line-height:1.5;
     }
     .alert.error{
       background:#ffeaea;
@@ -142,7 +152,9 @@
           <label for="mensaje">Mensaje para el anfitrión</label>
           <textarea id="mensaje" placeholder="Hola, quisiera reservar este alojamiento."></textarea>
 
-          <button type="submit" class="btn">Confirmar solicitud de reserva</button>
+          <button type="submit" class="btn" id="btnConfirmar">
+            Confirmar solicitud de reserva
+          </button>
 
           <div id="errorBox" class="alert error"></div>
           <div id="okBox" class="alert ok"></div>
@@ -170,9 +182,13 @@
     const formReserva = document.getElementById("formReserva");
     const errorBox = document.getElementById("errorBox");
     const okBox = document.getElementById("okBox");
+    const btnConfirmar = document.getElementById("btnConfirmar");
+    const inputNombre = document.getElementById("nombre");
+    const inputTelefono = document.getElementById("telefono");
+    const inputMensaje = document.getElementById("mensaje");
 
-    const user = getUser();
-    const reservaPendiente = JSON.parse(localStorage.getItem("reservaPendiente"));
+    let alojamientoActual = null;
+    let reservaActual = null;
 
     function mostrarError(msg){
       errorBox.textContent = msg;
@@ -186,6 +202,13 @@
       errorBox.style.display = "none";
     }
 
+    function ocultarMensajes(){
+      errorBox.style.display = "none";
+      okBox.style.display = "none";
+      errorBox.textContent = "";
+      okBox.textContent = "";
+    }
+
     function formatearPrecio(valor) {
       return Number(valor || 0).toLocaleString("es-AR");
     }
@@ -195,7 +218,6 @@
 
       const entrada = new Date(checkin + "T00:00:00");
       const salida = new Date(checkout + "T00:00:00");
-
       const diff = salida.getTime() - entrada.getTime();
 
       if (isNaN(diff) || diff <= 0) return 0;
@@ -204,17 +226,28 @@
     }
 
     async function cargarReserva() {
+      const user = getUser();
+
       if (!user) {
-        localStorage.setItem("redirectAfterLogin", "reservar.html");
+        localStorage.setItem("redirectAfterLogin", window.location.href);
         window.location.href = "login.html";
         return;
       }
+
+      // prefijar nombre si existe
+      if (user.name) {
+        inputNombre.value = user.name;
+      }
+
+      const reservaPendiente = JSON.parse(localStorage.getItem("reservaPendiente"));
 
       if (!reservaPendiente || !reservaPendiente.alojamientoId) {
         resumenReserva.innerHTML = "No hay una reserva pendiente.";
         formReserva.style.display = "none";
         return;
       }
+
+      reservaActual = reservaPendiente;
 
       try {
         const ref = doc(db, "alojamientos", reservaPendiente.alojamientoId);
@@ -227,23 +260,29 @@
         }
 
         const alojamiento = snap.data();
+        alojamientoActual = alojamiento;
 
         const titulo = alojamiento.titulo || "Alojamiento";
         const ciudad = alojamiento.ciudad || "";
         const provincia = alojamiento.provincia || "";
-        const ubicacion = provincia ? `${ciudad} - ${provincia}` : ciudad;
+        const ubicacion = provincia ? `${ciudad} - ${provincia}` : (ciudad || "No informada");
         const precio = Number(alojamiento.precio || 0);
-
         const noches = calcularNoches(
           reservaPendiente.checkin,
           reservaPendiente.checkout
         );
 
+        if (noches <= 0) {
+          resumenReserva.innerHTML = "Las fechas de la reserva no son válidas.";
+          formReserva.style.display = "none";
+          return;
+        }
+
         const total = noches * precio;
 
         resumenReserva.innerHTML = `
           <div class="resumen-item"><strong>Alojamiento:</strong> ${titulo}</div>
-          <div class="resumen-item"><strong>Ubicación:</strong> ${ubicacion || "No informada"}</div>
+          <div class="resumen-item"><strong>Ubicación:</strong> ${ubicacion}</div>
           <div class="resumen-item"><strong>Check-in:</strong> ${reservaPendiente.checkin}</div>
           <div class="resumen-item"><strong>Check-out:</strong> ${reservaPendiente.checkout}</div>
           <div class="resumen-item"><strong>Huéspedes:</strong> ${reservaPendiente.guests}</div>
@@ -252,7 +291,7 @@
           <div class="resumen-item"><strong>Total estimado:</strong> $${formatearPrecio(total)}</div>
         `;
       } catch (error) {
-        console.error(error);
+        console.error("Error al cargar la reserva:", error);
         resumenReserva.innerHTML = "No se pudo cargar la reserva.";
         formReserva.style.display = "none";
       }
@@ -260,32 +299,88 @@
 
     formReserva.addEventListener("submit", async (e) => {
       e.preventDefault();
+      ocultarMensajes();
 
-      errorBox.style.display = "none";
-      okBox.style.display = "none";
+      const user = getUser();
 
-      const nombre = document.getElementById("nombre").value.trim();
-      const telefono = document.getElementById("telefono").value.trim();
-      const mensaje = document.getElementById("mensaje").value.trim();
+      if (!user) {
+        localStorage.setItem("redirectAfterLogin", window.location.href);
+        window.location.href = "login.html";
+        return;
+      }
+
+      if (!reservaActual || !reservaActual.alojamientoId) {
+        mostrarError("No hay datos de reserva para continuar.");
+        return;
+      }
+
+      if (!alojamientoActual) {
+        mostrarError("No se pudo cargar el alojamiento.");
+        return;
+      }
+
+      const nombre = inputNombre.value.trim();
+      const telefono = inputTelefono.value.trim();
+      const mensaje = inputMensaje.value.trim();
 
       if (!nombre || !telefono) {
         mostrarError("Completá nombre y teléfono.");
         return;
       }
 
-      // Por ahora simulamos confirmación.
-      // Después acá lo conectamos con Firebase.
-      console.log("Reserva a guardar:", {
-        usuario: user,
-        reservaPendiente,
-        nombre,
-        telefono,
-        mensaje
-      });
+      const noches = calcularNoches(reservaActual.checkin, reservaActual.checkout);
 
-      mostrarOk("Solicitud enviada con éxito. Después conectamos esta parte con Firebase.");
-      localStorage.removeItem("reservaPendiente");
-      formReserva.reset();
+      if (noches <= 0) {
+        mostrarError("Las fechas de la reserva no son válidas.");
+        return;
+      }
+
+      btnConfirmar.disabled = true;
+
+      try {
+        // Por ahora solo simulamos guardado
+        const precio = Number(alojamientoActual.precio || 0);
+        const total = noches * precio;
+
+        const reservaFinal = {
+          alojamientoId: reservaActual.alojamientoId,
+          alojamientoTitulo: alojamientoActual.titulo || "Alojamiento",
+          usuarioId: user.id,
+          usuarioEmail: user.email || "",
+          nombreHuesped: nombre,
+          telefono,
+          mensaje,
+          checkin: reservaActual.checkin,
+          checkout: reservaActual.checkout,
+          guests: Number(reservaActual.guests || 1),
+          noches,
+          precioPorNoche: precio,
+          total,
+          estado: "pendiente",
+          creadaEn: new Date().toISOString()
+        };
+
+        console.log("Reserva a guardar:", reservaFinal);
+
+        localStorage.removeItem("reservaPendiente");
+
+        mostrarOk("Solicitud enviada con éxito. Ahora el siguiente paso es guardarla en Firebase.");
+        formReserva.reset();
+
+        if (user.name) {
+          inputNombre.value = user.name;
+        }
+
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1800);
+
+      } catch (error) {
+        console.error("Error al confirmar la reserva:", error);
+        mostrarError("No se pudo enviar la solicitud.");
+      } finally {
+        btnConfirmar.disabled = false;
+      }
     });
 
     cargarReserva();
