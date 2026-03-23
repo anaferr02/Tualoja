@@ -1,429 +1,54 @@
-import { db, auth } from "./firebase-config.js";
+import { db } from "./firebase-config.js";
 import {
   doc,
-  getDoc,
-  collection,
-  getDocs,
-  addDoc,
-  serverTimestamp,
-  query,
-  where
+  getDoc
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
+const cont = document.getElementById("detalleAlojamiento");
+
+// Obtener ID desde la URL
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-const destinoParam = (
-  params.get("destino") ||
-  params.get("ubicacion") ||
-  params.get("q") ||
-  localStorage.getItem("searchDestino") ||
-  ""
-).trim();
-
-const checkinParam = (
-  params.get("checkin") ||
-  localStorage.getItem("searchCheckin") ||
-  ""
-).trim();
-
-const checkoutParam = (
-  params.get("checkout") ||
-  localStorage.getItem("searchCheckout") ||
-  ""
-).trim();
-
-const guestsParam = (
-  params.get("guests") ||
-  params.get("huespedes") ||
-  localStorage.getItem("searchGuests") ||
-  "1"
-).trim();
-
-const cont = document.getElementById("detalleWrap");
-const noExiste = document.getElementById("noExiste");
-const volverResultados = document.getElementById("volverResultados");
-
-function escapeHTML(str) {
-  return String(str || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function nochesEntre(checkin, checkout) {
-  if (!checkin || !checkout) return 0;
-  const d1 = new Date(checkin + "T00:00:00");
-  const d2 = new Date(checkout + "T00:00:00");
-  const diff = d2 - d1;
-  const noches = diff / (1000 * 60 * 60 * 24);
-  return noches > 0 ? noches : 0;
-}
-
-function generarCodigoReserva() {
-  return "RES-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-}
-
-function formatDate(fecha) {
-  if (!fecha) return "-";
-  const d = new Date(fecha + "T00:00:00");
-  if (Number.isNaN(d.getTime())) return fecha;
-  return d.toLocaleDateString("es-AR");
-}
-
-function formatPrecio(valor) {
-  return Number(valor || 0).toLocaleString("es-AR");
-}
-
-function rangosSePisan(aInicio, aFin, bInicio, bFin) {
-  return aInicio < bFin && aFin > bInicio;
-}
-
-function fechaToInputFormat(fecha) {
-  const d = new Date(fecha);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function actualizarLinkVolver() {
-  if (!volverResultados) return;
-
-  const qs = new URLSearchParams();
-  if (destinoParam) qs.set("destino", destinoParam);
-  if (checkinParam) qs.set("checkin", checkinParam);
-  if (checkoutParam) qs.set("checkout", checkoutParam);
-  if (guestsParam) qs.set("guests", guestsParam);
-
-  volverResultados.href = qs.toString()
-    ? `resultados.html?${qs.toString()}`
-    : "resultados.html";
-}
-
-async function cargarReservasAceptadas(listingId) {
-  const q = query(
-    collection(db, "reservas"),
-    where("listingId", "==", listingId),
-    where("status", "==", "aceptada")
-  );
-
-  const snap = await getDocs(q);
-  const reservas = [];
-
-  snap.forEach((d) => {
-    reservas.push({ ...d.data(), _docId: d.id });
-  });
-
-  return reservas;
-}
-
 async function cargarDetalle() {
+
+  if (!id) {
+    cont.innerHTML = "<p>Alojamiento no encontrado</p>";
+    return;
+  }
+
   try {
-    actualizarLinkVolver();
+    const ref = doc(db, "alojamientos", id);
+    const snap = await getDoc(ref);
 
-    if (!id) {
-      noExiste.style.display = "block";
+    if (!snap.exists()) {
+      cont.innerHTML = "<p>No existe este alojamiento</p>";
       return;
     }
 
-    const docRef = doc(db, "alojamientos", id);
-    const docSnap = await getDoc(docRef);
-
-    if (!docSnap.exists()) {
-      noExiste.style.display = "block";
-      return;
-    }
-
-    const alojamiento = docSnap.data();
-    const alojamientoId = docSnap.id;
-
-    const reservasAceptadas = await cargarReservasAceptadas(alojamientoId);
-
-    const fechasOcupadas = [];
-
-    reservasAceptadas.forEach((r) => {
-      const inicio = new Date(r.checkin + "T00:00:00");
-      const fin = new Date(r.checkout + "T00:00:00");
-
-      for (let d = new Date(inicio); d < fin; d.setDate(d.getDate() + 1)) {
-        fechasOcupadas.push(fechaToInputFormat(d));
-      }
-    });
+    const a = snap.data();
 
     cont.innerHTML = `
-      <div class="detalle-layout">
-        <h1>${escapeHTML(alojamiento.titulo || "Alojamiento")}</h1>
+      <div class="detalle-card">
 
-        <p class="detalle-ubicacion-top">
-          📍 <strong>${escapeHTML(alojamiento.ciudad || "")}, ${escapeHTML(alojamiento.provincia || "")}</strong>
-        </p>
+        <img class="detalle-img" src="${a.fotos?.[0] || ''}">
 
-        <p class="detalle-subtexto">
-          👥 ${escapeHTML(alojamiento.capacidad || "-")} huéspedes ·
-          🛏️ ${escapeHTML(alojamiento.camas || "-")} camas ·
-          🛁 ${escapeHTML(alojamiento.banos || "-")} baños
-        </p>
+        <h2>${a.titulo}</h2>
 
-        <p class="detalle-descripcion-top">
-          ${escapeHTML(alojamiento.descripcion || "")}
-        </p>
+        <p>${a.descripcion || ""}</p>
 
-        <div class="detalle-card">
-          <div class="detalle-galeria">
-            ${
-              alojamiento.fotos?.length
-                ? `<img src="${alojamiento.fotos[0]}" alt="${escapeHTML(alojamiento.titulo || "Alojamiento")}">`
-                : `
-                  <div class="detalle-galeria-empty">
-                    <div class="icono">🏡</div>
-                    <div class="texto">Sin fotos disponibles</div>
-                  </div>
-                `
-            }
-          </div>
+        <div><strong>Ubicación:</strong> ${a.ciudad} - ${a.provincia}</div>
 
-          <div class="detalle-info-grid">
-            <div class="detalle-info-left">
-              <div class="detalle-item"><strong>Tipo:</strong> ${escapeHTML(alojamiento.tipo || "-")}</div>
-              <div class="detalle-item"><strong>Servicios:</strong> ${escapeHTML((alojamiento.servicios || []).join(", ") || "-")}</div>
-              <div class="detalle-item"><strong>Reglas:</strong> ${escapeHTML((alojamiento.reglas || []).join(", ") || "-")}</div>
-              <div class="detalle-item"><strong>Check-in:</strong> ${escapeHTML(alojamiento.checkinDesde || "-")}</div>
-              <div class="detalle-item"><strong>Check-out:</strong> ${escapeHTML(alojamiento.checkoutHasta || "-")}</div>
-              <div class="detalle-item"><strong>Cancelación:</strong> ${escapeHTML(alojamiento.cancelacion || "-")}</div>
-            </div>
+        <div><strong>Precio:</strong> $${a.precio} por noche</div>
 
-            <div class="detalle-info-right">
-              <div class="detalle-precio-box">
-                <span class="detalle-precio-numero">$${formatPrecio(alojamiento.precio || 0)}</span>
-                <span class="detalle-precio-texto">/ noche</span>
-              </div>
+        <button id="btnReservar">Reservar</button>
 
-              <p class="detalle-minimo">
-                Máx. ${escapeHTML(alojamiento.maxNoches || 30)} noches
-              </p>
-
-              <div class="detalle-reserva-form">
-                <label class="detalle-label" for="checkinInput">Check-in</label>
-                <input id="checkinInput" type="date" class="detalle-input">
-
-                <label class="detalle-label" for="checkoutInput">Check-out</label>
-                <input id="checkoutInput" type="date" class="detalle-input">
-
-                <label class="detalle-label" for="guestsInput">Huéspedes</label>
-                <input id="guestsInput" type="number" min="1" max="${escapeHTML(alojamiento.capacidad || 1)}" value="1" class="detalle-input">
-              </div>
-
-              <div id="ocupadasBox" class="detalle-total-box" style="background:#fff8e8;border-color:#f2ddb2;color:#7a5a00;">
-                ${
-                  reservasAceptadas.length
-                    ? `Fechas ocupadas: ${reservasAceptadas.map(r => `${formatDate(r.checkin)} al ${formatDate(r.checkout)}`).join(" · ")}`
-                    : "No hay fechas ocupadas actualmente."
-                }
-              </div>
-
-              <div id="totalBox" class="detalle-total-box">
-                Elegí fechas válidas para ver el total.
-              </div>
-
-              <button id="btnReservar" type="button" class="detalle-btn-reservar">
-                Reservar
-              </button>
-
-              <p id="msgReserva" class="detalle-ayuda">
-                No se cobra nada ahora
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     `;
 
-    const checkinInput = document.getElementById("checkinInput");
-    const checkoutInput = document.getElementById("checkoutInput");
-    const guestsInput = document.getElementById("guestsInput");
-    const totalBox = document.getElementById("totalBox");
-    const btnReservar = document.getElementById("btnReservar");
-    const msgReserva = document.getElementById("msgReserva");
-
-    const hoy = new Date().toISOString().split("T")[0];
-    checkinInput.min = hoy;
-    checkoutInput.min = hoy;
-
-    function fechaBloqueada(fecha) {
-      return fechasOcupadas.includes(fecha);
-    }
-
-    function fechasDisponibles(checkin, checkout) {
-      if (!checkin || !checkout) return true;
-
-      const inicio = new Date(checkin + "T00:00:00");
-      const fin = new Date(checkout + "T00:00:00");
-
-      return !reservasAceptadas.some((r) => {
-        const rInicio = new Date(r.checkin + "T00:00:00");
-        const rFin = new Date(r.checkout + "T00:00:00");
-        return rangosSePisan(inicio, fin, rInicio, rFin);
-      });
-    }
-
-    function actualizarTotal() {
-      const checkin = checkinInput.value;
-      const checkout = checkoutInput.value;
-      const guests = Number(guestsInput.value || 1);
-      const noches = nochesEntre(checkin, checkout);
-
-      if (!checkin || !checkout || noches <= 0) {
-        totalBox.textContent = "Elegí fechas válidas para ver el total.";
-        return 0;
-      }
-
-      if (!fechasDisponibles(checkin, checkout)) {
-        totalBox.textContent = "Esas fechas se cruzan con una reserva ya aceptada.";
-        return 0;
-      }
-
-      if (noches > Number(alojamiento.maxNoches || 30)) {
-        totalBox.textContent = `La estadía supera el máximo permitido de ${Number(alojamiento.maxNoches || 30)} noches.`;
-        return 0;
-      }
-
-      if (guests < 1 || guests > Number(alojamiento.capacidad || 1)) {
-        totalBox.textContent = "La cantidad de huéspedes no es válida.";
-        return 0;
-      }
-
-      const total = Number(alojamiento.precio || 0) * noches;
-      totalBox.textContent = `${noches} noche${noches > 1 ? "s" : ""} · ${guests} huésped${guests > 1 ? "es" : ""} · Total estimado: ARS $${formatPrecio(total)}`;
-      return total;
-    }
-
-    const pendingCheckin = localStorage.getItem("pendingReservaCheckin");
-    const pendingCheckout = localStorage.getItem("pendingReservaCheckout");
-    const pendingGuests = localStorage.getItem("pendingReservaGuests");
-
-    checkinInput.value = pendingCheckin || checkinParam || "";
-    checkoutInput.value = pendingCheckout || checkoutParam || "";
-    guestsInput.value = pendingGuests || guestsParam || "1";
-
-    localStorage.removeItem("pendingReservaCheckin");
-    localStorage.removeItem("pendingReservaCheckout");
-    localStorage.removeItem("pendingReservaGuests");
-
-    if (checkinInput.value) {
-      const minCheckout = new Date(checkinInput.value + "T00:00:00");
-      minCheckout.setDate(minCheckout.getDate() + 1);
-      checkoutInput.min = fechaToInputFormat(minCheckout);
-    }
-
-    checkinInput.addEventListener("change", () => {
-      if (fechaBloqueada(checkinInput.value)) {
-        alert("❌ Esa fecha está ocupada");
-        checkinInput.value = "";
-      }
-
-      if (checkinInput.value) {
-        const minCheckout = new Date(checkinInput.value + "T00:00:00");
-        minCheckout.setDate(minCheckout.getDate() + 1);
-        checkoutInput.min = fechaToInputFormat(minCheckout);
-      } else {
-        checkoutInput.min = hoy;
-      }
-
-      if (checkoutInput.value && checkoutInput.value <= checkinInput.value) {
-        checkoutInput.value = "";
-      }
-
-      actualizarTotal();
-    });
-
-    checkoutInput.addEventListener("change", () => {
-      if (fechaBloqueada(checkoutInput.value)) {
-        alert("❌ Esa fecha está ocupada");
-        checkoutInput.value = "";
-      }
-
-      actualizarTotal();
-    });
-
-    guestsInput.addEventListener("input", actualizarTotal);
-
-    btnReservar.addEventListener("click", async () => {
-      const usuario = auth.currentUser;
-
-      if (!usuario) {
-        localStorage.setItem("redirectAfterLogin", location.pathname + location.search);
-        localStorage.setItem("pendingReservaCheckin", checkinInput.value || "");
-        localStorage.setItem("pendingReservaCheckout", checkoutInput.value || "");
-        localStorage.setItem("pendingReservaGuests", guestsInput.value || "1");
-        location.href = "login.html";
-        return;
-      }
-
-      const checkin = checkinInput.value;
-      const checkout = checkoutInput.value;
-      const guests = Number(guestsInput.value || 1);
-      const noches = nochesEntre(checkin, checkout);
-
-      if (!checkin || !checkout || noches <= 0) {
-        msgReserva.textContent = "Elegí fechas válidas.";
-        return;
-      }
-
-      if (!fechasDisponibles(checkin, checkout)) {
-        msgReserva.textContent = "❌ Esas fechas ya están ocupadas.";
-        return;
-      }
-
-      if (guests < 1 || guests > Number(alojamiento.capacidad || 1)) {
-        msgReserva.textContent = "La cantidad de huéspedes no es válida.";
-        return;
-      }
-
-      const total = Number(alojamiento.precio || 0) * noches;
-
-      btnReservar.disabled = true;
-      btnReservar.classList.add("disabled");
-      msgReserva.textContent = "Guardando reserva...";
-
-      try {
-        await addDoc(collection(db, "reservas"), {
-          code: generarCodigoReserva(),
-          listingId: alojamientoId,
-          listingDocId: alojamientoId,
-          listingPublicId: alojamiento.id || "",
-          title: alojamiento.titulo || "",
-          hostEmail: (alojamiento.anfitrionEmail || alojamiento.ownerEmail || "").toLowerCase(),
-          hostId: alojamiento.anfitrionId || alojamiento.createdBy || "",
-          anfitrionEmail: (alojamiento.anfitrionEmail || alojamiento.ownerEmail || "").toLowerCase(),
-          anfitrionId: alojamiento.anfitrionId || alojamiento.createdBy || "",
-          guestEmail: (usuario.email || "").toLowerCase(),
-          guestName: usuario.displayName || "Huésped",
-          guestId: usuario.uid,
-          checkin,
-          checkout,
-          guests,
-          total,
-          status: "pendiente",
-          createdAt: serverTimestamp(),
-          createdBy: usuario.uid
-        });
-
-        msgReserva.textContent = "✅ Reserva enviada correctamente. El anfitrión la verá en su panel.";
-      } catch (error) {
-        console.error(error);
-        msgReserva.textContent = "❌ No se pudo guardar la reserva.";
-        btnReservar.disabled = false;
-        btnReservar.classList.remove("disabled");
-      }
-    });
-
-    actualizarTotal();
   } catch (error) {
-    console.error("Error en detalle:", error);
-    noExiste.style.display = "block";
+    console.error(error);
+    cont.innerHTML = "<p>Error al cargar</p>";
   }
 }
 
