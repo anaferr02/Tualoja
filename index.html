@@ -753,6 +753,41 @@ footer {
 </script>
 
 <script type="module" src="script.js"></script>
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector('form');
+  if (!form) return;
+
+  form.addEventListener("submit", () => {
+    const destino =
+      document.querySelector('input[name="destino"]')?.value?.trim() || "";
+
+    const checkin =
+      document.querySelector('input[name="checkin"]')?.value?.trim() ||
+      document.getElementById("checkin")?.value?.trim() ||
+      document.getElementById("fechaEntrada")?.value?.trim() ||
+      "";
+
+    const checkout =
+      document.querySelector('input[name="checkout"]')?.value?.trim() ||
+      document.getElementById("checkout")?.value?.trim() ||
+      document.getElementById("fechaSalida")?.value?.trim() ||
+      "";
+
+    const guests =
+      document.querySelector('input[name="guests"]')?.value?.trim() ||
+      document.querySelector('input[name="huespedes"]')?.value?.trim() ||
+      document.getElementById("guests")?.value?.trim() ||
+      document.getElementById("huespedes")?.value?.trim() ||
+      "1";
+
+    localStorage.setItem("searchDestino", destino);
+    localStorage.setItem("searchCheckin", checkin);
+    localStorage.setItem("searchCheckout", checkout);
+    localStorage.setItem("searchGuests", guests);
+  });
+});
+</script>
 
 </body>
 </html>
