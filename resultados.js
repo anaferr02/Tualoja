@@ -6,52 +6,37 @@ import {
 
 const cont = document.getElementById("gridResultados");
 
-function getBusqueda() {
-  const params = new URLSearchParams(window.location.search);
-
-  return {
-    destino: params.get("destino") || "",
-    checkin: params.get("checkin") || "",
-    checkout: params.get("checkout") || "",
-    huespedes: params.get("huespedes") || "1"
-  };
-}
-
 async function cargarResultados() {
-  const { checkin, checkout, huespedes } = getBusqueda();
 
   const querySnapshot = await getDocs(collection(db, "alojamientos"));
+
   let html = "";
 
-  querySnapshot.forEach((docSnap) => {
-    const a = docSnap.data();
-    const docId = docSnap.id;
+  querySnapshot.forEach((doc) => {
 
-    const linkDetalle =
-      `detalle.html?id=${encodeURIComponent(docId)}` +
-      `&checkin=${encodeURIComponent(checkin)}` +
-      `&checkout=${encodeURIComponent(checkout)}` +
-      `&huespedes=${encodeURIComponent(huespedes)}`;
+    const a = doc.data();
 
     html += `
       <div class="resultado-card">
-        <img class="resultado-img" src="${a.fotos?.[0] || ""}" alt="${a.titulo || "Alojamiento"}">
+
+        <img class="resultado-img" src="${a.fotos?.[0] || ''}">
 
         <div class="resultado-info">
-          <h3 class="resultado-titulo">${a.titulo || "Sin título"}</h3>
+          <h3 class="resultado-titulo">${a.titulo}</h3>
 
           <div class="resultado-ubicacion">
-            ${a.ciudad || ""} - ${a.provincia || ""}
+            ${a.ciudad} - ${a.provincia}
           </div>
 
           <div class="resultado-precio">
-            $${a.precio || 0} <span>/ noche</span>
+            $${a.precio} <span>/ noche</span>
           </div>
 
           <div class="resultado-acciones">
-            <a href="${linkDetalle}">Ver alojamiento</a>
+            <a href="detalle.html?id=${doc.id}">Ver alojamiento</a>
           </div>
         </div>
+
       </div>
     `;
   });
