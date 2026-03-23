@@ -199,6 +199,30 @@
       font-size:14px;
       line-height:1.5;
     }
+    .campo-archivo{
+      margin-top:14px;
+      display:none;
+    }
+    .campo-archivo label{
+      display:block;
+      font-size:14px;
+      font-weight:700;
+      margin-bottom:8px;
+      color:#222;
+    }
+    .campo-archivo input[type="file"]{
+      width:100%;
+      padding:12px;
+      border:1px solid #d9dced;
+      border-radius:12px;
+      background:#fff;
+    }
+    .mini{
+      font-size:12px;
+      color:#666;
+      margin-top:8px;
+      line-height:1.5;
+    }
     @media(max-width:900px){
       .layout{
         grid-template-columns:1fr;
@@ -232,6 +256,12 @@
 
         <div class="detalle-pago" id="detallePago">
           Cargando método de pago...
+        </div>
+
+        <div class="campo-archivo" id="campoArchivo">
+          <label for="comprobantePago">Cargar comprobante de transferencia</label>
+          <input type="file" id="comprobantePago" accept=".jpg,.jpeg,.png,.pdf,.webp">
+          <div class="mini">Podés subir una imagen o PDF del comprobante. Por ahora se guarda solo el nombre del archivo.</div>
         </div>
 
         <div class="nota-final">
@@ -277,6 +307,10 @@
       onSnapshot
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
+    const MERCADO_PAGO_LINK = "https://link.mercadopago.com.ar/tualoja";
+    const ALIAS_TRANSFERENCIA = "tualoja.com";
+    const TITULAR_TRANSFERENCIA = "Ana Laura Fernandez";
+
     const montoSena = document.getElementById("montoSena");
     const textoSena = document.getElementById("textoSena");
     const detallePago = document.getElementById("detallePago");
@@ -287,6 +321,8 @@
     const wrapCheckPago = document.getElementById("wrapCheckPago");
     const errorBox = document.getElementById("errorBox");
     const okBox = document.getElementById("okBox");
+    const campoArchivo = document.getElementById("campoArchivo");
+    const comprobantePago = document.getElementById("comprobantePago");
 
     let reservaId = null;
     let reservaRef = null;
@@ -330,7 +366,7 @@
       const porcentaje = Number(data.senaPorcentaje || 0);
       const metodo = data.metodoPagoSena || "";
       const estadoPagoSena = data.estadoPagoSena || "pendiente";
-      const mercadoPagoLink = data.mercadoPagoLink || "";
+      const mercadoPagoLink = data.mercadoPagoLink || MERCADO_PAGO_LINK;
       const ubicacion = [data.alojamientoCiudad || "", data.alojamientoProvincia || ""].filter(Boolean).join(" - ") || "No informada";
 
       montoSena.textContent = `$${formatearPrecio(sena)}`;
@@ -359,21 +395,21 @@
         `;
         wrapCheckPago.style.display = "none";
         btnConfirmarPago.style.display = "none";
+        campoArchivo.style.display = "none";
         mostrarOk("Pago aprobado. La seña ya quedó confirmada.");
         return;
       }
 
-      if (estadoPagoSena === "rejected" || estadoPagoSena === "cancelled") {
+      if (estadoPagoSena === "informado") {
         detallePago.innerHTML = `
           <div class="dato"><strong>Método:</strong> ${metodoLegible(metodo)}</div>
-          <div class="dato"><strong>Estado actual:</strong> ${estadoPagoSena}</div>
-          <div class="dato"><strong>Acción:</strong> intentá nuevamente con otro medio de pago.</div>
-          ${
-            metodo === "mercado_pago" && mercadoPagoLink
-              ? `<div class="dato"><a class="btn" href="${mercadoPagoLink}" target="_blank" rel="noopener noreferrer">Pagar seña con Mercado Pago</a></div>`
-              : ""
-          }
+          <div class="dato"><strong>Estado actual:</strong> pendiente de verificación</div>
+          <div class="dato"><strong>Seña informada:</strong> recibimos tu aviso de pago.</div>
         `;
+        wrapCheckPago.style.display = "none";
+        btnConfirmarPago.style.display = "none";
+        campoArchivo.style.display = "none";
+        mostrarOk("Ya informaste el pago. Ahora queda pendiente de verificación.");
         return;
       }
 
@@ -384,28 +420,28 @@
           <div class="dato"><strong>Estado actual:</strong> ${estadoPagoSena}</div>
           <div class="dato"><strong>Saldo restante:</strong> se paga en el check-in o en el alojamiento.</div>
           <div class="dato">
-            ${
-              mercadoPagoLink
-                ? `<a class="btn" href="${mercadoPagoLink}" target="_blank" rel="noopener noreferrer">Pagar seña con Mercado Pago</a>`
-                : "Todavía se está generando el link de pago..."
-            }
+            <a class="btn" href="${mercadoPagoLink}" target="_blank" rel="noopener noreferrer">
+              Pagar seña con Mercado Pago
+            </a>
           </div>
         `;
         wrapCheckPago.style.display = "none";
         btnConfirmarPago.style.display = "none";
+        campoArchivo.style.display = "none";
         return;
       }
 
       detallePago.innerHTML = `
         <div class="dato"><strong>Método elegido:</strong> Transferencia</div>
-        <div class="dato"><strong>Alias:</strong> tualoja.senas</div>
-        <div class="dato"><strong>Titular:</strong> TuAloja</div>
+        <div class="dato"><strong>Alias:</strong> ${ALIAS_TRANSFERENCIA}</div>
+        <div class="dato"><strong>Titular:</strong> ${TITULAR_TRANSFERENCIA}</div>
         <div class="dato"><strong>Importe a transferir:</strong> $${formatearPrecio(sena)}</div>
         <div class="dato"><strong>Estado actual:</strong> ${estadoPagoSena}</div>
         <div class="dato"><strong>Saldo restante:</strong> se paga en el check-in o en el alojamiento.</div>
       `;
       wrapCheckPago.style.display = "flex";
       btnConfirmarPago.style.display = "block";
+      campoArchivo.style.display = "block";
     }
 
     async function cargarPagoSena() {
@@ -472,10 +508,14 @@
       btnConfirmarPago.disabled = true;
 
       try {
+        const archivo = comprobantePago.files[0];
+        const nombreComprobante = archivo ? archivo.name : "";
+
         await updateDoc(reservaRef, {
           estado: "reserva_recibida",
           estadoPagoSena: "informado",
-          senaInformadaEn: serverTimestamp()
+          senaInformadaEn: serverTimestamp(),
+          comprobanteNombre: nombreComprobante
         });
 
         mostrarOk("Transferencia informada. Queda pendiente de verificación.");
