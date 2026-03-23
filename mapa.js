@@ -4,38 +4,45 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-const mapaEl = document.getElementById("mapa");
+let map;
 
-if (mapaEl) {
-  const mapa = L.map("mapa").setView([-34.6, -58.4], 5);
+async function initMap() {
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "© OpenStreetMap"
-  }).addTo(mapa);
+  map = new google.maps.Map(document.getElementById("mapaResultados"), {
+    center: { lat: -34.6037, lng: -58.3816 }, // Buenos Aires base
+    zoom: 5,
+    mapTypeId: "satellite" // 🔥 SATELITAL
+  });
 
-  async function cargarMapa() {
-    try {
-      const snap = await getDocs(collection(db, "alojamientos"));
+  const snapshot = await getDocs(collection(db, "alojamientos"));
 
-      snap.forEach((docSnap) => {
-        const a = docSnap.data();
-        const id = docSnap.id;
+  snapshot.forEach((doc) => {
+    const a = doc.data();
 
-        if (!a.lat || !a.lng) return;
+    // ⚠️ Necesitas guardar lat y lng en Firebase
+    if (!a.lat || !a.lng) return;
 
-        L.marker([a.lat, a.lng])
-          .addTo(mapa)
-          .bindPopup(`
-            <b>${a.titulo || "Alojamiento"}</b><br>
-            ${a.ciudad || ""}<br>
-            $${a.precio || 0}<br>
-            <a href="detalle.html?id=${id}">Ver alojamiento</a>
-          `);
-      });
-    } catch (error) {
-      console.error("Error al cargar mapa:", error);
-    }
-  }
+    const marker = new google.maps.Marker({
+      position: { lat: a.lat, lng: a.lng },
+      map: map,
+      title: a.titulo
+    });
 
-  cargarMapa();
+    const info = new google.maps.InfoWindow({
+      content: `
+        <div style="max-width:200px">
+          <strong>${a.titulo}</strong><br>
+          ${a.ciudad}<br>
+          $${a.precio} / noche<br><br>
+          <a href="detalle.html?id=${doc.id}">Ver</a>
+        </div>
+      `
+    });
+
+    marker.addListener("click", () => {
+      info.open(map, marker);
+    });
+  });
 }
+
+window.onload = initMap;
