@@ -50,6 +50,13 @@ function sinEspacios(texto) {
   return normalizar(texto).replace(/\s+/g, "");
 }
 
+function guardarBusquedaActual() {
+  localStorage.setItem("searchDestino", destinoBuscado || "");
+  localStorage.setItem("searchCheckin", checkinBuscado || "");
+  localStorage.setItem("searchCheckout", checkoutBuscado || "");
+  localStorage.setItem("searchGuests", guestsBuscado || "1");
+}
+
 function initMapa() {
   const mapaEl = document.getElementById("mapa");
   if (!mapaEl || typeof L === "undefined") return;
@@ -119,7 +126,6 @@ function coincideDestino(a, destino) {
   const destinoCompacto = sinEspacios(destino);
 
   const palabras = destinoNormal.split(" ").filter(Boolean);
-
   const coincidencias = palabras.filter((p) => textoNormal.includes(p)).length;
   const minimoNecesario = palabras.length >= 3 ? 2 : 1;
 
@@ -130,19 +136,13 @@ function coincideDestino(a, destino) {
 }
 
 function armarLinkDetalle(idPublico) {
-  const detalleParams = new URLSearchParams();
-
-  detalleParams.set("id", idPublico);
-
-  if (checkinBuscado) detalleParams.set("checkin", checkinBuscado);
-  if (checkoutBuscado) detalleParams.set("checkout", checkoutBuscado);
-  if (guestsBuscado) detalleParams.set("guests", guestsBuscado);
-
-  return `detalle.html?${detalleParams.toString()}`;
+  return `detalle.html?id=${encodeURIComponent(idPublico)}`;
 }
 
 async function cargarResultados() {
   try {
+    guardarBusquedaActual();
+
     const querySnapshot = await getDocs(collection(db, "alojamientos"));
 
     const todos = [];
@@ -207,7 +207,7 @@ async function cargarResultados() {
             </div>
 
             <div class="resultado-acciones">
-              <a href="${linkDetalle}">Ver alojamiento</a>
+              <a class="ver-detalle-link" href="${linkDetalle}">Ver alojamiento</a>
             </div>
           </div>
         </div>
@@ -215,6 +215,13 @@ async function cargarResultados() {
     });
 
     cont.innerHTML = html;
+
+    document.querySelectorAll(".ver-detalle-link").forEach((link) => {
+      link.addEventListener("click", () => {
+        guardarBusquedaActual();
+      });
+    });
+
     renderMapa(filtrados);
   } catch (error) {
     console.error("Error al cargar resultados:", error);
