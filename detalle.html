@@ -276,7 +276,143 @@
   </main>
 
   <script src="script.js"></script>
-  <script type="module" src="detalle.js"></script>
+  <script type="module">
+import { db } from "./firebase-config.js";
+import {
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const wrap = document.getElementById("detalleAlojamiento");
+const noExiste = document.getElementById("noExiste");
+
+const params = new URLSearchParams(window.location.search);
+
+const id = params.get("id");
+const checkinParam = params.get("checkin") || "";
+const checkoutParam = params.get("checkout") || "";
+const guestsParam = params.get("guests") || "1";
+
+function calcularNoches(checkin, checkout) {
+  if (!checkin || !checkout) return 0;
+
+  const entrada = new Date(checkin);
+  const salida = new Date(checkout);
+
+  const diff = salida - entrada;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+function formatearPrecio(valor) {
+  return Number(valor || 0).toLocaleString("es-AR");
+}
+
+async function cargarDetalle() {
+
+  if (!id) {
+    noExiste.style.display = "block";
+    return;
+  }
+
+  const ref = doc(db, "alojamientos", id);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    noExiste.style.display = "block";
+    return;
+  }
+
+  const a = snap.data();
+
+  const foto = a.fotos?.[0] || "";
+  const precio = Number(a.precio || 0);
+
+  wrap.innerHTML = `
+    <section class="detalle-layout">
+      <h1>${a.titulo}</h1>
+
+      <p class="detalle-ubicacion-top">
+        <strong>Ubicación:</strong> ${a.ciudad} - ${a.provincia}
+      </p>
+
+      <p class="detalle-descripcion-top">
+        ${a.descripcion || ""}
+      </p>
+
+      <div class="detalle-card">
+
+        <div class="detalle-galeria">
+          ${
+            foto
+              ? `<img src="${foto}">`
+              : `<div class="detalle-galeria-empty">Sin imagen</div>`
+          }
+        </div>
+
+        <div class="detalle-info-grid">
+
+          <div class="detalle-info-left">
+            <div class="detalle-item">
+              <strong>Capacidad:</strong> ${a.huespedes || "?"} huéspedes
+            </div>
+          </div>
+
+          <div class="detalle-info-right">
+
+            <div class="detalle-precio-box">
+              <span class="detalle-precio-numero">$${formatearPrecio(precio)}</span>
+              <span class="detalle-precio-texto">/ noche</span>
+            </div>
+
+            <div class="detalle-reserva-form">
+              <label class="detalle-label">Check-in</label>
+              <input class="detalle-input" type="date" id="checkin" value="${checkinParam}">
+
+              <label class="detalle-label">Check-out</label>
+              <input class="detalle-input" type="date" id="checkout" value="${checkoutParam}">
+
+              <label class="detalle-label">Huéspedes</label>
+              <input class="detalle-input" type="number" id="guests" value="${guestsParam}">
+            </div>
+
+            <div class="detalle-total-box" id="totalBox">
+              Seleccioná fechas para calcular el total
+            </div>
+
+            <button class="detalle-btn-reservar" id="btnReservar">
+              Reservar
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+  `;
+
+  const checkin = document.getElementById("checkin");
+  const checkout = document.getElementById("checkout");
+  const totalBox = document.getElementById("totalBox");
+
+  function actualizarTotal() {
+    const noches = calcularNoches(checkin.value, checkout.value);
+
+    if (noches > 0) {
+      totalBox.innerHTML = `<strong>Total:</strong> $${formatearPrecio(noches * precio)} (${noches} noches)`;
+    } else {
+      totalBox.innerHTML = "Seleccioná fechas para calcular el total";
+    }
+  }
+
+  checkin.addEventListener("change", actualizarTotal);
+  checkout.addEventListener("change", actualizarTotal);
+
+  // 🔥 CALCULA AUTOMÁTICO AL ENTRAR
+  actualizarTotal();
+}
+
+cargarDetalle();
+</script>
 
 </body>
 </html>
