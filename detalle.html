@@ -683,7 +683,8 @@
           const user = getUser();
 
           if (!user) {
-            localStorage.setItem("redirectAfterLogin", window.location.href);
+            const redirectUrl = `detalle.html?id=${encodeURIComponent(id)}&checkin=${encodeURIComponent(checkin.value)}&checkout=${encodeURIComponent(checkout.value)}&guests=${encodeURIComponent(guests.value)}`;
+localStorage.setItem("redirectAfterLogin", redirectUrl);
             alert("Tenés que iniciar sesión para reservar");
             window.location.href = "login.html";
             return;
