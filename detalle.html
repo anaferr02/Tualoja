@@ -729,7 +729,7 @@ btnReservar.addEventListener("click", () => {
   localStorage.setItem("reservaPendiente", JSON.stringify(reserva));
 
   // 👉 ACA después vamos a mandar a pago o confirmación
-  alert("Reserva lista para continuar 🚀");
+window.location.href = "reservar.html";
 });
 
           if (hayCruceDeFechas(checkin.value, checkout.value)) {
