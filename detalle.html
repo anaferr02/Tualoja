@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="style.css" />
 
 <style>
-
 .detalle-page{
 max-width:1120px;
 margin:0 auto;
@@ -155,8 +154,6 @@ font-size:18px;
 color:#454b6b;
 }
 
-/* NUEVO: FORMULARIO RESERVA */
-
 .detalle-reserva-form{
 display:flex;
 flex-direction:column;
@@ -198,8 +195,6 @@ font-size:16px;
 border:1px solid #ddd9ff;
 }
 
-/* BOTON */
-
 .detalle-btn-reservar{
 display:inline-flex;
 align-items:center;
@@ -238,10 +233,7 @@ color:#6b6b78;
 text-align:center;
 }
 
-/* RESPONSIVE */
-
 @media(max-width:900px){
-
 .detalle-layout h1{
 font-size:42px;
 }
@@ -254,9 +246,7 @@ grid-template-columns:1fr;
 border-right:none;
 border-bottom:1px solid #e6e6ef;
 }
-
 }
-
 </style>
 </head>
 
@@ -275,19 +265,16 @@ border-bottom:1px solid #e6e6ef;
 </header>
 
 <main class="detalle-page">
-
-<a class="detalle-back" href="resultados.html">← Volver a resultados</a>
-
+<a id="volverResultados" class="detalle-back" href="resultados.html">← Volver a resultados</a>
 <div id="detalleWrap"></div>
 
 <p id="noExiste" class="muted" style="display:none;margin-top:16px;">
 Este alojamiento no existe (o fue eliminado).
 </p>
-
 </main>
 
 <script src="script.js"></script>
-<script type="module" src="detalle.js?v=2"></script>
+<script type="module" src="detalle.js"></script>
 
 </body>
 </html>
