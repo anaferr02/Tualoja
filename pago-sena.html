@@ -131,6 +131,9 @@
       cursor:pointer;
       box-shadow:0 10px 24px rgba(79,61,187,.25);
       transition:filter .15s ease, transform .15s ease;
+      text-align:center;
+      text-decoration:none;
+      display:inline-block;
     }
 
     .btn:hover{
@@ -220,6 +223,17 @@
       margin-bottom:14px;
     }
 
+    .nota-final{
+      margin-top:14px;
+      padding:14px;
+      border-radius:14px;
+      background:#fff8e8;
+      border:1px solid #f3dfaa;
+      color:#6a5311;
+      font-size:14px;
+      line-height:1.5;
+    }
+
     @media(max-width:900px){
       .layout{
         grid-template-columns:1fr;
@@ -239,7 +253,10 @@
       <section class="card">
         <div class="tag">Paso final: seña</div>
         <h1>Pagá tu seña</h1>
-        <p>Para terminar de enviar tu reserva, confirmá el pago de la seña. El saldo restante se abona más adelante.</p>
+        <p>
+          Para terminar de enviar tu reserva, confirmá el pago de la seña.
+          El saldo restante se paga al momento del check-in o directamente en el alojamiento.
+        </p>
 
         <div class="monto-box">
           <div class="monto-label">Monto de la seña</div>
@@ -251,6 +268,11 @@
 
         <div class="detalle-pago" id="detallePago">
           Cargando método de pago...
+        </div>
+
+        <div class="nota-final">
+          Importante: la seña confirma el envío de tu solicitud de reserva.
+          El saldo restante no se cobra online desde esta pantalla.
         </div>
 
         <label class="check-wrap">
@@ -335,6 +357,7 @@
 
     async function cargarPagoSena() {
       const user = getUser();
+      const userId = user?.uid || user?.id || null;
 
       if (!user) {
         localStorage.setItem("redirectAfterLogin", window.location.href);
@@ -364,7 +387,7 @@
 
         reservaData = snap.data();
 
-        if (reservaData.huespedId && reservaData.huespedId !== user.id) {
+        if (reservaData.huespedId && userId && reservaData.huespedId !== userId) {
           mostrarError("Esta reserva no pertenece al usuario actual.");
           btnConfirmarPago.disabled = true;
           return;
@@ -381,11 +404,12 @@
         const porcentaje = Number(reservaData.senaPorcentaje || 0);
         const metodo = reservaData.metodoPagoSena || "";
         const estadoPagoSena = reservaData.estadoPagoSena || "pendiente";
+        const mercadoPagoLink = reservaData.mercadoPagoLink || "";
 
         montoSena.textContent = `$${formatearPrecio(sena)}`;
         textoSena.innerHTML = `
           Esta seña representa el <strong>${porcentaje}%</strong> del total de la estadía.
-          El saldo restante es <strong>$${formatearPrecio(saldo)}</strong>.
+          El saldo restante es <strong>$${formatearPrecio(saldo)}</strong> y se paga al momento del check-in o directamente en el alojamiento.
         `;
 
         if (metodo === "transferencia") {
@@ -395,18 +419,29 @@
             <div class="dato"><strong>Titular:</strong> TuAloja</div>
             <div class="dato"><strong>Importe a transferir:</strong> $${formatearPrecio(sena)}</div>
             <div class="dato"><strong>Estado actual:</strong> ${estadoPagoSena}</div>
+            <div class="dato"><strong>Saldo restante:</strong> se paga en el check-in o en el alojamiento.</div>
           `;
         } else if (metodo === "mercado_pago") {
           detallePago.innerHTML = `
             <div class="dato"><strong>Método elegido:</strong> ${metodoLegible(metodo)}</div>
             <div class="dato"><strong>Importe a pagar:</strong> $${formatearPrecio(sena)}</div>
             <div class="dato"><strong>Estado actual:</strong> ${estadoPagoSena}</div>
-            <div class="dato"><strong>Próximo paso:</strong> conectar botón/link real de Mercado Pago.</div>
+            <div class="dato"><strong>Saldo restante:</strong> se paga en el check-in o en el alojamiento.</div>
+            ${
+              mercadoPagoLink
+                ? `<div class="dato">
+                    <a class="btn" href="${mercadoPagoLink}" target="_blank" rel="noopener noreferrer">
+                      Pagar seña con Mercado Pago
+                    </a>
+                  </div>`
+                : `<div class="dato"><strong>Link de pago:</strong> todavía no configurado.</div>`
+            }
           `;
         } else {
           detallePago.innerHTML = `
             <div class="dato"><strong>Método elegido:</strong> No informado</div>
             <div class="dato"><strong>Importe:</strong> $${formatearPrecio(sena)}</div>
+            <div class="dato"><strong>Saldo restante:</strong> se paga en el check-in o en el alojamiento.</div>
           `;
         }
 
@@ -440,8 +475,9 @@
       ocultarMensajes();
 
       const user = getUser();
+      const userId = user?.uid || user?.id || null;
 
-      if (!user) {
+      if (!user || !userId) {
         localStorage.setItem("redirectAfterLogin", window.location.href);
         window.location.href = "login.html";
         return;
