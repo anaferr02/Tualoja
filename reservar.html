@@ -144,30 +144,6 @@
       color:#1b167f;
       margin:4px 0 10px;
     }
-    .mini{
-      font-size:13px;
-      color:#666;
-      line-height:1.5;
-    }
-    .opcion-pago{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      padding:12px;
-      border:1px solid #e4e6f2;
-      border-radius:14px;
-      background:#fff;
-      margin-bottom:10px;
-    }
-    .opcion-pago input{
-      width:auto;
-      margin-top:3px;
-    }
-    .opcion-pago strong{
-      display:block;
-      color:#1d1d26;
-      margin-bottom:4px;
-    }
     .destacado{
       margin-top:12px;
       padding:14px;
@@ -194,7 +170,6 @@
       font-weight:800;
       color:#1b167f;
     }
-
     @media(max-width:900px){
       .layout{
         grid-template-columns:1fr;
@@ -223,7 +198,7 @@
 
           <div class="pago-box">
             <h3>Pago de seña</h3>
-            <p>Para confirmar la solicitud, se paga solo la seña de TuAloja. El resto se paga después según acuerdes con el anfitrión.</p>
+            <p>Para confirmar la solicitud, se paga solo la seña de TuAloja. El resto se paga al momento del check-in o directamente en el alojamiento.</p>
 
             <div class="importe-grande" id="montoSena">$0</div>
 
@@ -272,6 +247,7 @@
       getDoc,
       collection,
       addDoc,
+      updateDoc,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
@@ -345,24 +321,21 @@
         return;
       }
 
+      infoPago.style.display = "block";
+
       if (metodo === "mercado_pago") {
-        infoPago.style.display = "block";
         infoPago.innerHTML = `
           <strong>Mercado Pago:</strong><br>
-          Después vamos a conectar acá el link de pago de la seña.
+          Vas a ir a la pantalla de pago automático de la seña.
         `;
         return;
       }
 
-      if (metodo === "transferencia") {
-        infoPago.style.display = "block";
-        infoPago.innerHTML = `
-          <strong>Transferencia:</strong><br>
-          Alias: tualoja.senas<br>
-          Titular: TuAloja<br>
-          Después podemos agregar comprobante de pago.
-        `;
-      }
+      infoPago.innerHTML = `
+        <strong>Transferencia:</strong><br>
+        Alias: tualoja.senas<br>
+        Titular: TuAloja
+      `;
     }
 
     async function cargarReserva() {
@@ -432,7 +405,7 @@
         montoSena.textContent = `$${formatearPrecio(sena)}`;
         detalleSena.innerHTML = `
           <strong>Seña:</strong> ${SENA_PORCENTAJE}% del total de la estadía.<br>
-          <strong>Restante a pagar luego:</strong> $${formatearPrecio(restante)}.
+          <strong>Saldo restante:</strong> $${formatearPrecio(restante)}. Se paga al momento del check-in o directamente en el alojamiento.
         `;
 
         resumenReserva.innerHTML = `
@@ -498,64 +471,73 @@
         return;
       }
 
-      const noches = calcularNoches(reservaActual.checkin, reservaActual.checkout);
-
-      if (noches <= 0) {
-        mostrarError("Las fechas de la reserva no son válidas.");
-        return;
-      }
-
       btnConfirmar.disabled = true;
 
       try {
         const docRef = await addDoc(collection(db, "reservas"), {
-  alojamientoId: reservaActual.alojamientoId,
-  alojamientoTitulo: alojamientoActual.titulo || "Alojamiento",
-  alojamientoCiudad: alojamientoActual.ciudad || "",
-  alojamientoProvincia: alojamientoActual.provincia || "",
-  anfitrionId: alojamientoActual.anfitrionId || alojamientoActual.userId || "",
-  huespedId: user.id,
-  huespedEmail: user.email || "",
-  huespedNombre: nombre,
-  telefono: telefono,
-  mensaje: mensaje,
-  checkin: reservaActual.checkin,
-  checkout: reservaActual.checkout,
-  guests: Number(reservaActual.guests || 1),
-  noches: totalesActuales.noches,
-  precioPorNoche: totalesActuales.precio,
-  total: totalesActuales.total,
-  senaPorcentaje: SENA_PORCENTAJE,
-  senaMonto: totalesActuales.sena,
-  saldoRestante: totalesActuales.restante,
-  metodoPagoSena: metodo,
-  estado: "pendiente_pago_sena",
-  estadoPagoSena: "pendiente",
-  creadaEn: serverTimestamp()
-});
+          alojamientoId: reservaActual.alojamientoId,
+          alojamientoTitulo: alojamientoActual.titulo || "Alojamiento",
+          alojamientoCiudad: alojamientoActual.ciudad || "",
+          alojamientoProvincia: alojamientoActual.provincia || "",
+          anfitrionId: alojamientoActual.anfitrionId || alojamientoActual.userId || "",
+          huespedId: user.id || user.uid || "",
+          huespedEmail: user.email || "",
+          huespedNombre: nombre,
+          telefono,
+          mensaje,
+          checkin: reservaActual.checkin,
+          checkout: reservaActual.checkout,
+          guests: Number(reservaActual.guests || 1),
+          noches: totalesActuales.noches,
+          precioPorNoche: totalesActuales.precio,
+          total: totalesActuales.total,
+          senaPorcentaje: SENA_PORCENTAJE,
+          senaMonto: totalesActuales.sena,
+          saldoRestante: totalesActuales.restante,
+          metodoPagoSena: metodo,
+          estado: "pendiente_pago_sena",
+          estadoPagoSena: "pendiente",
+          mercadoPagoLink: "",
+          mercadoPagoPreferenceId: "",
+          creadaEn: serverTimestamp()
+        });
 
-localStorage.removeItem("reservaPendiente");
-localStorage.setItem("ultimaReservaId", docRef.id);
+        if (metodo === "mercado_pago") {
+          const resp = await fetch("/api/mp/create-preference", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              reservaId: docRef.id,
+              title: `Seña reserva - ${alojamientoActual.titulo || "TuAloja"}`,
+              amount: totalesActuales.sena,
+              payerEmail: user.email || ""
+            })
+          });
 
-window.location.href = "pago-sena.html";
+          const data = await resp.json();
+
+          if (!resp.ok || !data.init_point) {
+            throw new Error(data.error || "No se pudo crear el pago en Mercado Pago.");
+          }
+
+          await updateDoc(doc(db, "reservas", docRef.id), {
+            mercadoPagoLink: data.init_point,
+            mercadoPagoPreferenceId: data.preference_id || ""
+          });
+        }
+
+        localStorage.removeItem("reservaPendiente");
+        localStorage.setItem("ultimaReservaId", docRef.id);
+        window.location.href = "pago-sena.html";
 
       } catch (error) {
         console.error("Error al guardar la reserva:", error);
-        mostrarError("No se pudo guardar la reserva.");
-      } finally {
+        mostrarError(error.message || "No se pudo guardar la reserva.");
         btnConfirmar.disabled = false;
       }
     });
-
-    function actualizaFormularioDespues() {
-      infoPago.style.display = "none";
-      infoPago.innerHTML = "";
-      montoSena.textContent = "$0";
-      detalleSena.innerHTML = "Reserva enviada correctamente.";
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 1800);
-    }
 
     cargarReserva();
   </script>
