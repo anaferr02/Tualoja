@@ -140,39 +140,38 @@
   </footer>
 
   <!-- ✅ LOGIN conectado a public/js/auth.js -->
- <script type="module">
-import { auth } from "./firebase-config.js";
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+<script type="module">
+  import { login } from "./public/js/auth.js";
 
-const form = document.getElementById("loginForm");
-const err = document.getElementById("err");
+  const form = document.getElementById("loginForm");
+  const err = document.getElementById("err");
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  err.style.display = "none";
-  err.textContent = "";
+    err.style.display = "none";
+    err.textContent = "";
 
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const password = document.getElementById("password").value;
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
 
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
+    try {
+      await login(email, password);
 
-    const redirect = localStorage.getItem("redirectAfterLogin");
+      const redirect = localStorage.getItem("redirectAfterLogin");
 
-    if (redirect) {
-      localStorage.removeItem("redirectAfterLogin");
-      window.location.href = redirect;
-    } else {
-      window.location.href = "panel-anfitrion.html";
+      if (redirect) {
+        localStorage.removeItem("redirectAfterLogin");
+        window.location.href = redirect;
+      } else {
+        window.location.href = "panel-anfitrion.html";
+      }
+    } catch (error) {
+      console.error(error);
+      err.textContent = "Email o contraseña incorrectos.";
+      err.style.display = "block";
     }
-  } catch (error) {
-    console.error(error);
-    err.textContent = "Email o contraseña incorrectos.";
-    err.style.display = "block";
-  }
-});
+  });
 </script>
 </body>
 </html>
