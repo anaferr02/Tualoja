@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pagar seña - TuAloja</title>
+  <style>
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:#f6f7fb;
+      color:#1b1b1f;
+    }
+
+    .page{
+      max-width:1100px;
+      margin:0 auto;
+      padding:24px 16px 50px;
+    }
+
+    .back{
+      display:inline-block;
+      margin-bottom:18px;
+      color:#4f3dbb;
+      font-weight:700;
+      text-decoration:none;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:24px;
+    }
+
+    .card{
+      background:#fff;
+      border:1px solid #e8e9f2;
+      border-radius:22px;
+      padding:22px;
+      box-shadow:0 10px 30px rgba(0,0,0,.06);
+    }
+
+    h1{
+      margin:0 0 10px;
+      font-size:34px;
+      color:#1b167f;
+    }
+
+    h2{
+      margin:0 0 16px;
+      font-size:22px;
+      color:#1b167f;
+    }
+
+    p{
+      margin:0 0 14px;
+      color:#444;
+      line-height:1.55;
+    }
+
+    .monto-box{
+      margin:18px 0;
+      padding:18px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#f6f3ff,#ffffff);
+      border:1px solid #ddd8ff;
+    }
+
+    .monto-label{
+      font-size:14px;
+      color:#5b5f73;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+
+    .monto-valor{
+      font-size:40px;
+      font-weight:800;
+      color:#1b167f;
+      line-height:1.1;
+      margin-bottom:8px;
+    }
+
+    .monto-ayuda{
+      font-size:14px;
+      color:#5c6178;
+      line-height:1.5;
+    }
+
+    .detalle-pago{
+      margin-top:18px;
+      padding:16px;
+      border:1px solid #e4e6f2;
+      border-radius:16px;
+      background:#fafaff;
+    }
+
+    .detalle-pago strong{
+      color:#1d1d26;
+    }
+
+    .dato{
+      padding:10px 0;
+      border-bottom:1px solid #eef0f6;
+      font-size:15px;
+      line-height:1.5;
+    }
+
+    .dato:last-child{
+      border-bottom:none;
+    }
+
+    .acciones{
+      margin-top:20px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:15px;
+      background:linear-gradient(180deg,#6f61ea,#4f3dbb);
+      color:#fff;
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(79,61,187,.25);
+      transition:filter .15s ease, transform .15s ease;
+    }
+
+    .btn:hover{
+      filter:brightness(1.03);
+      transform:translateY(-1px);
+    }
+
+    .btn.secondary{
+      background:#eef0ff;
+      color:#312a7c;
+      box-shadow:none;
+      border:1px solid #d8dcfb;
+    }
+
+    .btn:disabled{
+      opacity:.7;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:none;
+    }
+
+    .check-wrap{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      margin-top:16px;
+      font-size:14px;
+      line-height:1.5;
+      color:#444;
+    }
+
+    .check-wrap input{
+      margin-top:3px;
+      width:auto;
+    }
+
+    .alert{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+      line-height:1.5;
+    }
+
+    .alert.error{
+      background:#ffeaea;
+      color:#a10021;
+      border:1px solid #f0b3c0;
+    }
+
+    .alert.ok{
+      background:#eefbea;
+      color:#2e6b1f;
+      border:1px solid #b8e0ad;
+    }
+
+    .resumen-linea{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 0;
+      border-bottom:1px solid #eef0f6;
+      font-size:15px;
+      line-height:1.5;
+    }
+
+    .resumen-linea:last-child{
+      border-bottom:none;
+    }
+
+    .resumen-linea.total{
+      font-weight:800;
+      color:#1b167f;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#f3f4fb;
+      border:1px solid #e5e7f3;
+      color:#434a63;
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:14px;
+    }
+
+    @media(max-width:900px){
+      .layout{
+        grid-template-columns:1fr;
+      }
+
+      .monto-valor{
+        font-size:34px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <a href="index.html" class="back">← Volver</a>
+
+    <div class="layout">
+      <section class="card">
+        <div class="tag">Paso final: seña</div>
+        <h1>Pagá tu seña</h1>
+        <p>Para terminar de enviar tu reserva, confirmá el pago de la seña. El saldo restante se abona más adelante.</p>
+
+        <div class="monto-box">
+          <div class="monto-label">Monto de la seña</div>
+          <div class="monto-valor" id="montoSena">$0</div>
+          <div class="monto-ayuda" id="textoSena">
+            Cargando datos del pago...
+          </div>
+        </div>
+
+        <div class="detalle-pago" id="detallePago">
+          Cargando método de pago...
+        </div>
+
+        <label class="check-wrap">
+          <input type="checkbox" id="checkPago">
+          <span>Confirmo que realicé el pago de la seña o que voy a continuarlo ahora.</span>
+        </label>
+
+        <div class="acciones">
+          <button class="btn" id="btnConfirmarPago" type="button">
+            Ya pagué la seña
+          </button>
+
+          <button class="btn secondary" id="btnIrInicio" type="button">
+            Ir al inicio
+          </button>
+        </div>
+
+        <div id="errorBox" class="alert error"></div>
+        <div id="okBox" class="alert ok"></div>
+      </section>
+
+      <aside class="card">
+        <h2>Resumen</h2>
+        <div id="resumenReserva">
+          Cargando reserva...
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script type="module">
+    import { getUser } from "./public/js/auth.js";
+    import { db } from "./firebase-config.js";
+    import {
+      doc,
+      getDoc,
+      updateDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+    const montoSena = document.getElementById("montoSena");
+    const textoSena = document.getElementById("textoSena");
+    const detallePago = document.getElementById("detallePago");
+    const resumenReserva = document.getElementById("resumenReserva");
+    const btnConfirmarPago = document.getElementById("btnConfirmarPago");
+    const btnIrInicio = document.getElementById("btnIrInicio");
+    const checkPago = document.getElementById("checkPago");
+    const errorBox = document.getElementById("errorBox");
+    const okBox = document.getElementById("okBox");
+
+    let reservaId = null;
+    let reservaData = null;
+
+    function mostrarError(msg){
+      errorBox.textContent = msg;
+      errorBox.style.display = "block";
+      okBox.style.display = "none";
+    }
+
+    function mostrarOk(msg){
+      okBox.textContent = msg;
+      okBox.style.display = "block";
+      errorBox.style.display = "none";
+    }
+
+    function ocultarMensajes(){
+      errorBox.style.display = "none";
+      okBox.style.display = "none";
+      errorBox.textContent = "";
+      okBox.textContent = "";
+    }
+
+    function formatearPrecio(valor){
+      return Number(valor || 0).toLocaleString("es-AR");
+    }
+
+    function metodoLegible(valor){
+      if (valor === "mercado_pago") return "Mercado Pago";
+      if (valor === "transferencia") return "Transferencia";
+      return "No informado";
+    }
+
+    async function cargarPagoSena() {
+      const user = getUser();
+
+      if (!user) {
+        localStorage.setItem("redirectAfterLogin", window.location.href);
+        window.location.href = "login.html";
+        return;
+      }
+
+      reservaId = localStorage.getItem("ultimaReservaId");
+
+      if (!reservaId) {
+        resumenReserva.innerHTML = "No encontramos una reserva reciente para pagar la seña.";
+        detallePago.innerHTML = "No hay datos de pago disponibles.";
+        btnConfirmarPago.disabled = true;
+        return;
+      }
+
+      try {
+        const ref = doc(db, "reservas", reservaId);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          resumenReserva.innerHTML = "La reserva no existe o fue eliminada.";
+          detallePago.innerHTML = "No se pudo cargar el pago.";
+          btnConfirmarPago.disabled = true;
+          return;
+        }
+
+        reservaData = snap.data();
+
+        if (reservaData.huespedId && reservaData.huespedId !== user.id) {
+          mostrarError("Esta reserva no pertenece al usuario actual.");
+          btnConfirmarPago.disabled = true;
+          return;
+        }
+
+        const alojamientoTitulo = reservaData.alojamientoTitulo || "Alojamiento";
+        const ubicacion = [reservaData.alojamientoCiudad || "", reservaData.alojamientoProvincia || ""]
+          .filter(Boolean)
+          .join(" - ") || "No informada";
+
+        const total = Number(reservaData.total || 0);
+        const sena = Number(reservaData.senaMonto || 0);
+        const saldo = Number(reservaData.saldoRestante || 0);
+        const porcentaje = Number(reservaData.senaPorcentaje || 0);
+        const metodo = reservaData.metodoPagoSena || "";
+        const estadoPagoSena = reservaData.estadoPagoSena || "pendiente";
+
+        montoSena.textContent = `$${formatearPrecio(sena)}`;
+        textoSena.innerHTML = `
+          Esta seña representa el <strong>${porcentaje}%</strong> del total de la estadía.
+          El saldo restante es <strong>$${formatearPrecio(saldo)}</strong>.
+        `;
+
+        if (metodo === "transferencia") {
+          detallePago.innerHTML = `
+            <div class="dato"><strong>Método elegido:</strong> ${metodoLegible(metodo)}</div>
+            <div class="dato"><strong>Alias:</strong> tualoja.senas</div>
+            <div class="dato"><strong>Titular:</strong> TuAloja</div>
+            <div class="dato"><strong>Importe a transferir:</strong> $${formatearPrecio(sena)}</div>
+            <div class="dato"><strong>Estado actual:</strong> ${estadoPagoSena}</div>
+          `;
+        } else if (metodo === "mercado_pago") {
+          detallePago.innerHTML = `
+            <div class="dato"><strong>Método elegido:</strong> ${metodoLegible(metodo)}</div>
+            <div class="dato"><strong>Importe a pagar:</strong> $${formatearPrecio(sena)}</div>
+            <div class="dato"><strong>Estado actual:</strong> ${estadoPagoSena}</div>
+            <div class="dato"><strong>Próximo paso:</strong> conectar botón/link real de Mercado Pago.</div>
+          `;
+        } else {
+          detallePago.innerHTML = `
+            <div class="dato"><strong>Método elegido:</strong> No informado</div>
+            <div class="dato"><strong>Importe:</strong> $${formatearPrecio(sena)}</div>
+          `;
+        }
+
+        resumenReserva.innerHTML = `
+          <div class="resumen-linea"><span>Alojamiento</span><strong>${alojamientoTitulo}</strong></div>
+          <div class="resumen-linea"><span>Ubicación</span><strong>${ubicacion}</strong></div>
+          <div class="resumen-linea"><span>Check-in</span><strong>${reservaData.checkin || "-"}</strong></div>
+          <div class="resumen-linea"><span>Check-out</span><strong>${reservaData.checkout || "-"}</strong></div>
+          <div class="resumen-linea"><span>Huéspedes</span><strong>${reservaData.guests || 1}</strong></div>
+          <div class="resumen-linea"><span>Noches</span><strong>${reservaData.noches || 0}</strong></div>
+          <div class="resumen-linea"><span>Total estadía</span><strong>$${formatearPrecio(total)}</strong></div>
+          <div class="resumen-linea"><span>Seña</span><strong>$${formatearPrecio(sena)}</strong></div>
+          <div class="resumen-linea total"><span>Saldo restante</span><strong>$${formatearPrecio(saldo)}</strong></div>
+        `;
+
+        if (estadoPagoSena === "pagado" || estadoPagoSena === "informado") {
+          checkPago.checked = true;
+          btnConfirmarPago.textContent = "Seña ya informada";
+          btnConfirmarPago.disabled = true;
+          mostrarOk("La seña de esta reserva ya fue informada.");
+        }
+
+      } catch (error) {
+        console.error("Error al cargar pago de seña:", error);
+        mostrarError("No se pudo cargar la información del pago.");
+        btnConfirmarPago.disabled = true;
+      }
+    }
+
+    btnConfirmarPago.addEventListener("click", async () => {
+      ocultarMensajes();
+
+      const user = getUser();
+
+      if (!user) {
+        localStorage.setItem("redirectAfterLogin", window.location.href);
+        window.location.href = "login.html";
+        return;
+      }
+
+      if (!reservaId || !reservaData) {
+        mostrarError("No hay una reserva válida para actualizar.");
+        return;
+      }
+
+      if (!checkPago.checked) {
+        mostrarError("Marcá la casilla para confirmar la seña.");
+        return;
+      }
+
+      btnConfirmarPago.disabled = true;
+
+      try {
+        const ref = doc(db, "reservas", reservaId);
+
+        await updateDoc(ref, {
+          estado: "reserva_recibida",
+          estadoPagoSena: "informado",
+          senaInformadaEn: serverTimestamp()
+        });
+
+        mostrarOk("Perfecto. Informamos la seña y enviamos la reserva.");
+        localStorage.removeItem("ultimaReservaId");
+
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1800);
+
+      } catch (error) {
+        console.error("Error al actualizar la seña:", error);
+        mostrarError("No se pudo confirmar el pago de la seña.");
+        btnConfirmarPago.disabled = false;
+      }
+    });
+
+    btnIrInicio.addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    cargarPagoSena();
+  </script>
+</body>
+</html>
