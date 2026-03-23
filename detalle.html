@@ -8,170 +8,262 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      background:#f6f7fb;
+      color:#1b1b1f;
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
     .detalle-page{
-      max-width:1120px;
+      max-width:1200px;
       margin:0 auto;
-      padding:28px 20px 60px;
+      padding:28px 20px 70px;
     }
 
     .detalle-back{
-      display:inline-block;
-      margin-bottom:22px;
-      color:#4f3dbb;
-      font-size:18px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:18px;
+      color:#5a47d6;
+      font-size:15px;
+      font-weight:700;
+      text-decoration:none;
+    }
+
+    .detalle-back:hover{
       text-decoration:underline;
     }
 
     .detalle-layout h1{
-      margin:0 0 14px;
-      font-size:58px;
-      line-height:1.03;
-      color:#181818;
+      margin:0 0 12px;
+      font-size:52px;
+      line-height:1.02;
+      color:#161616;
       font-family:Georgia,"Times New Roman",serif;
     }
 
-    .detalle-ubicacion-top{
-      margin:0 0 24px;
-      color:#2a2a2a;
-      font-size:20px;
+    .detalle-top-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px 18px;
+      margin-bottom:14px;
+      color:#404457;
+      font-size:17px;
     }
 
-    .detalle-ubicacion-top strong{
-      color:#202020;
+    .detalle-top-meta strong{
+      color:#181818;
     }
 
     .detalle-descripcion-top{
-      margin:0 0 28px;
-      font-size:18px;
-      color:#333;
+      margin:0 0 26px;
+      max-width:900px;
+      font-size:17px;
+      line-height:1.65;
+      color:#44495f;
     }
 
     .detalle-card{
-      background:#fff;
-      border:1px solid #e6e6ef;
-      border-radius:22px;
       overflow:hidden;
-      box-shadow:0 8px 28px rgba(0,0,0,.06);
+      background:#fff;
+      border:1px solid #e8e9f2;
+      border-radius:26px;
+      box-shadow:0 12px 34px rgba(27, 31, 53, .08);
     }
 
     .detalle-galeria{
-      background:#f3f3f9;
-      min-height:300px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      background:#eceef7;
+      min-height:380px;
     }
 
     .detalle-galeria img{
       width:100%;
       height:100%;
-      min-height:300px;
-      max-height:480px;
+      min-height:380px;
+      max-height:470px;
       object-fit:cover;
       display:block;
     }
 
     .detalle-galeria-empty{
-      width:100%;
-      min-height:300px;
+      min-height:380px;
       display:flex;
-      flex-direction:column;
       align-items:center;
       justify-content:center;
-      color:#4a4f73;
+      padding:30px;
+      background:linear-gradient(135deg,#f4f5fb,#eceffd);
+      color:#5c6488;
+      font-size:22px;
+      font-weight:700;
       text-align:center;
-      padding:30px 20px;
-      background:#f3f3f9;
-      font-size:20px;
-      font-weight:500;
     }
 
     .detalle-info-grid{
       display:grid;
-      grid-template-columns:1.2fr .8fr;
-      border-top:1px solid #e6e6ef;
+      grid-template-columns:1.25fr 380px;
+      align-items:start;
     }
 
     .detalle-info-left{
-      padding:30px 28px;
-      border-right:1px solid #e6e6ef;
+      padding:34px 30px 38px;
+      border-right:1px solid #ececf3;
+      background:#fff;
     }
 
     .detalle-info-right{
-      padding:28px 28px 32px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
+      padding:28px 24px 28px;
+      background:#fcfcff;
+    }
+
+    .detalle-bloque{
+      margin-bottom:28px;
+    }
+
+    .detalle-bloque:last-child{
+      margin-bottom:0;
+    }
+
+    .detalle-bloque h3{
+      margin:0 0 14px;
+      font-size:18px;
+      color:#18181f;
+    }
+
+    .detalle-lista{
+      display:grid;
+      gap:12px;
     }
 
     .detalle-item{
-      font-size:19px;
-      color:#262626;
-      margin-bottom:20px;
-      line-height:1.5;
+      font-size:16px;
+      line-height:1.6;
+      color:#41465a;
+      padding-bottom:12px;
+      border-bottom:1px solid #f0f1f6;
+    }
+
+    .detalle-item:last-child{
+      border-bottom:none;
+      padding-bottom:0;
     }
 
     .detalle-item strong{
-      color:#171717;
+      color:#16161c;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      padding:10px 14px;
+      border-radius:999px;
+      background:#f3f4fb;
+      color:#434a63;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid #e5e7f3;
+    }
+
+    .detalle-precio-card{
+      position:sticky;
+      top:18px;
+      border:1px solid #e6e7f2;
+      border-radius:22px;
+      padding:22px 18px 18px;
+      background:#fff;
+      box-shadow:0 10px 24px rgba(74, 61, 183, .08);
     }
 
     .detalle-precio-box{
-      margin-bottom:14px;
+      margin-bottom:12px;
       color:#181818;
       line-height:1.1;
     }
 
     .detalle-precio-numero{
-      font-size:34px;
+      font-size:42px;
       font-weight:800;
-      color:#151515;
+      letter-spacing:-0.5px;
+      color:#171717;
     }
 
     .detalle-precio-texto{
-      font-size:26px;
-      color:#222;
+      font-size:24px;
+      color:#2a2a2a;
       margin-left:4px;
+    }
+
+    .detalle-subprecio{
+      margin:0 0 18px;
+      color:#615d88;
+      font-size:15px;
+      font-weight:700;
     }
 
     .detalle-reserva-form{
       display:flex;
       flex-direction:column;
       gap:10px;
-      margin-bottom:10px;
+      margin-bottom:12px;
     }
 
     .detalle-label{
-      font-size:15px;
-      font-weight:700;
-      color:#2b2b2b;
+      font-size:14px;
+      font-weight:800;
+      color:#26293a;
+      margin-top:2px;
     }
 
-    .detalle-input{
+    .detalle-input,
+    .detalle-select{
       width:100%;
-      height:50px;
-      border:1px solid #ddddea;
+      height:52px;
+      border:1px solid #d9dced;
       border-radius:14px;
       padding:0 14px;
       font-size:16px;
-      box-sizing:border-box;
       background:#fff;
       outline:none;
+      color:#20222d;
     }
 
-    .detalle-input:focus{
-      border-color:#6657d8;
-      box-shadow:0 0 0 3px rgba(102,87,216,.10);
+    .detalle-input:focus,
+    .detalle-select:focus{
+      border-color:#6b5be7;
+      box-shadow:0 0 0 4px rgba(107,91,231,.10);
     }
 
-    .detalle-total-box{
-      margin-top:6px;
-      margin-bottom:6px;
-      padding:14px 16px;
+    .detalle-alerta{
+      margin:10px 0 8px;
+      padding:13px 14px;
       border-radius:14px;
-      background:#f5f4ff;
-      color:#2f2b8f;
-      font-size:16px;
-      border:1px solid #ddd9ff;
+      font-size:14px;
+      line-height:1.5;
+      border:1px solid;
+    }
+
+    .detalle-alerta.warning{
+      background:#fff8ea;
+      border-color:#f0d18f;
+      color:#9a6a00;
+    }
+
+    .detalle-alerta.info{
+      background:#f3f1ff;
+      border-color:#d7d0ff;
+      color:#4b3db7;
+      font-weight:700;
     }
 
     .detalle-btn-reservar{
@@ -179,18 +271,18 @@
       align-items:center;
       justify-content:center;
       width:100%;
-      box-sizing:border-box;
-      min-height:64px;
+      min-height:60px;
       padding:16px 20px;
+      margin-top:4px;
       border:none;
-      border-radius:18px;
-      background:linear-gradient(180deg,#6657d8,#4b3db7);
+      border-radius:16px;
+      background:linear-gradient(180deg,#6f61ea,#4f3dbb);
       color:#fff;
-      font-size:22px;
+      font-size:24px;
       font-weight:800;
-      box-shadow:0 10px 24px rgba(79,61,187,.28);
+      box-shadow:0 12px 24px rgba(79,61,187,.25);
       cursor:pointer;
-      transition:transform .15s ease,filter .15s ease,opacity .15s ease;
+      transition:transform .15s ease, filter .15s ease, opacity .15s ease;
     }
 
     .detalle-btn-reservar:hover{
@@ -203,14 +295,24 @@
       box-shadow:none;
       cursor:not-allowed;
       pointer-events:none;
-      opacity:.8;
+      opacity:.85;
     }
 
     .detalle-ayuda{
-      margin-top:14px;
-      font-size:14px;
-      color:#6b6b78;
+      margin-top:12px;
+      font-size:13px;
+      color:#6f7387;
       text-align:center;
+      line-height:1.45;
+    }
+
+    .detalle-ok{
+      margin-top:12px;
+      font-size:13px;
+      color:#4f6c2c;
+      text-align:left;
+      line-height:1.45;
+      font-weight:700;
     }
 
     .muted{
@@ -218,18 +320,58 @@
       font-size:18px;
     }
 
-    @media(max-width:900px){
-      .detalle-layout h1{
-        font-size:42px;
-      }
-
+    @media(max-width:1050px){
       .detalle-info-grid{
         grid-template-columns:1fr;
       }
 
       .detalle-info-left{
         border-right:none;
-        border-bottom:1px solid #e6e6ef;
+        border-bottom:1px solid #ececf3;
+      }
+
+      .detalle-precio-card{
+        position:static;
+      }
+    }
+
+    @media(max-width:700px){
+      .detalle-page{
+        padding:20px 14px 50px;
+      }
+
+      .detalle-layout h1{
+        font-size:38px;
+      }
+
+      .detalle-top-meta{
+        font-size:15px;
+      }
+
+      .detalle-descripcion-top{
+        font-size:15px;
+      }
+
+      .detalle-galeria img,
+      .detalle-galeria-empty{
+        min-height:250px;
+      }
+
+      .detalle-info-left,
+      .detalle-info-right{
+        padding:22px 18px 24px;
+      }
+
+      .detalle-precio-numero{
+        font-size:34px;
+      }
+
+      .detalle-precio-texto{
+        font-size:20px;
+      }
+
+      .detalle-btn-reservar{
+        font-size:21px;
       }
     }
   </style>
@@ -308,6 +450,19 @@
       return `${year}-${month}-${day}`;
     }
 
+    function limpiarTexto(texto, fallback = "") {
+      if (texto === undefined || texto === null) return fallback;
+      return String(texto).trim() || fallback;
+    }
+
+    function convertirLista(valor, fallback = []) {
+      if (Array.isArray(valor)) return valor.filter(Boolean);
+      if (typeof valor === "string" && valor.trim()) {
+        return valor.split(",").map(item => item.trim()).filter(Boolean);
+      }
+      return fallback;
+    }
+
     async function cargarDetalle() {
       try {
         if (!id) {
@@ -327,21 +482,30 @@
 
         const foto = a.fotos?.[0] || "";
         const precio = Number(a.precio || 0);
-        const ciudad = a.ciudad || "Ubicación no informada";
-        const provincia = a.provincia || "";
+        const ciudad = limpiarTexto(a.ciudad, "Ubicación no informada");
+        const provincia = limpiarTexto(a.provincia, "");
         const ubicacion = provincia ? `${ciudad} - ${provincia}` : ciudad;
-        const descripcion = a.descripcion || "Sin descripción disponible.";
-        const titulo = a.titulo || "Alojamiento sin título";
-        const huespedes = a.huespedes || "?";
+        const descripcion = limpiarTexto(a.descripcion, "Sin descripción disponible.");
+        const titulo = limpiarTexto(a.titulo, "Alojamiento sin título");
+        const huespedes = Number(a.huespedes || 1);
+        const tipo = limpiarTexto(a.tipo, "Departamento");
+        const checkinHora = limpiarTexto(a.checkinHora, "14:00");
+        const checkoutHora = limpiarTexto(a.checkoutHora, "10:00");
+        const cancelacion = limpiarTexto(a.cancelacion, "No reembolsable");
+
+        const servicios = convertirLista(a.servicios, ["Wifi", "Desayuno", "Aire acondicionado"]);
+        const reglas = convertirLista(a.reglas, ["No se permite fumar", "No se permiten fiestas"]);
         const hoy = obtenerHoy();
 
         wrap.innerHTML = `
           <section class="detalle-layout">
             <h1>${titulo}</h1>
 
-            <p class="detalle-ubicacion-top">
-              <strong>Ubicación:</strong> ${ubicacion}
-            </p>
+            <div class="detalle-top-meta">
+              <span><strong>Ubicación:</strong> ${ubicacion}</span>
+              <span><strong>Capacidad:</strong> ${huespedes} huéspedes</span>
+              <span><strong>Tipo:</strong> ${tipo}</span>
+            </div>
 
             <p class="detalle-descripcion-top">
               ${descripcion}
@@ -352,44 +516,82 @@
                 ${
                   foto
                     ? `<img src="${foto}" alt="${titulo}">`
-                    : `<div class="detalle-galeria-empty">Sin imagen</div>`
+                    : `<div class="detalle-galeria-empty">Sin imagen disponible</div>`
                 }
               </div>
 
               <div class="detalle-info-grid">
                 <div class="detalle-info-left">
-                  <div class="detalle-item">
-                    <strong>Capacidad:</strong> ${huespedes} huéspedes
+
+                  <div class="detalle-bloque">
+                    <h3>Información del alojamiento</h3>
+                    <div class="detalle-lista">
+                      <div class="detalle-item"><strong>Tipo:</strong> ${tipo}</div>
+                      <div class="detalle-item"><strong>Capacidad:</strong> ${huespedes} huéspedes</div>
+                      <div class="detalle-item"><strong>Check-in:</strong> ${checkinHora}</div>
+                      <div class="detalle-item"><strong>Check-out:</strong> ${checkoutHora}</div>
+                      <div class="detalle-item"><strong>Cancelación:</strong> ${cancelacion}</div>
+                    </div>
+                  </div>
+
+                  <div class="detalle-bloque">
+                    <h3>Servicios</h3>
+                    <div class="chips">
+                      ${servicios.map(item => `<span class="chip">${item}</span>`).join("")}
+                    </div>
+                  </div>
+
+                  <div class="detalle-bloque">
+                    <h3>Reglas</h3>
+                    <div class="detalle-lista">
+                      ${reglas.map(item => `<div class="detalle-item">${item}</div>`).join("")}
+                    </div>
                   </div>
                 </div>
 
                 <div class="detalle-info-right">
-                  <div class="detalle-precio-box">
-                    <span class="detalle-precio-numero">$${formatearPrecio(precio)}</span>
-                    <span class="detalle-precio-texto">/ noche</span>
-                  </div>
+                  <div class="detalle-precio-card">
+                    <div class="detalle-precio-box">
+                      <span class="detalle-precio-numero">$${formatearPrecio(precio)}</span>
+                      <span class="detalle-precio-texto">/ noche</span>
+                    </div>
 
-                  <div class="detalle-reserva-form">
-                    <label class="detalle-label" for="checkin">Check-in</label>
-                    <input class="detalle-input" type="date" id="checkin" value="${checkinParam}" min="${hoy}">
+                    <p class="detalle-subprecio">Precio final según cantidad de noches</p>
 
-                    <label class="detalle-label" for="checkout">Check-out</label>
-                    <input class="detalle-input" type="date" id="checkout" value="${checkoutParam}" min="${hoy}">
+                    <div class="detalle-reserva-form">
+                      <label class="detalle-label" for="checkin">Check-in</label>
+                      <input class="detalle-input" type="date" id="checkin" value="${checkinParam}" min="${hoy}">
 
-                    <label class="detalle-label" for="guests">Huéspedes</label>
-                    <input class="detalle-input" type="number" id="guests" value="${guestsParam}" min="1" max="${huespedes !== "?" ? huespedes : 50}">
-                  </div>
+                      <label class="detalle-label" for="checkout">Check-out</label>
+                      <input class="detalle-input" type="date" id="checkout" value="${checkoutParam}" min="${hoy}">
 
-                  <div class="detalle-total-box" id="totalBox">
-                    Seleccioná fechas para calcular el total
-                  </div>
+                      <label class="detalle-label" for="guests">Huéspedes</label>
+                      <select class="detalle-select" id="guests">
+                        ${Array.from({ length: huespedes }, (_, i) => i + 1).map(n => `
+                          <option value="${n}" ${String(n) === String(guestsParam) ? "selected" : ""}>${n}</option>
+                        `).join("")}
+                      </select>
+                    </div>
 
-                  <button class="detalle-btn-reservar disabled" id="btnReservar" type="button">
-                    Reservar
-                  </button>
+                    <div class="detalle-alerta warning">
+                      Fechas ocupadas: 20/03/2026 al 22/03/2026
+                    </div>
 
-                  <div class="detalle-ayuda">
-                    El total se calcula según la cantidad de noches elegidas.
+                    <div class="detalle-alerta info" id="totalBox">
+                      Seleccioná fechas válidas para calcular el total
+                    </div>
+
+                    <button class="detalle-btn-reservar disabled" id="btnReservar" type="button">
+                      Reservar
+                    </button>
+
+                    <div class="detalle-ok">
+                      ✅ Reserva simple y rápida. El anfitrión recibirá tu solicitud.
+                    </div>
+
+                    <div class="detalle-ayuda">
+                      El total se calcula según la cantidad de noches elegidas.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -414,7 +616,7 @@
 
           if (noches > 0) {
             const total = noches * precio;
-            totalBox.innerHTML = `<strong>Total:</strong> $${formatearPrecio(total)} (${noches} ${noches === 1 ? "noche" : "noches"})`;
+            totalBox.innerHTML = `<strong>${noches} ${noches === 1 ? "noche" : "noches"}</strong> · Total estimado: <strong>$${formatearPrecio(total)}</strong>`;
             btnReservar.classList.remove("disabled");
           } else {
             totalBox.innerHTML = "Seleccioná fechas válidas para calcular el total";
@@ -430,8 +632,9 @@
         });
 
         checkout.addEventListener("change", actualizarTotal);
-        guests.addEventListener("input", () => {
-          if (Number(guests.value) < 1) guests.value = 1;
+
+        guests.addEventListener("change", () => {
+          if (Number(guests.value) < 1) guests.value = "1";
         });
 
         btnReservar.addEventListener("click", () => {
@@ -444,12 +647,12 @@
 
           const cantidadHuespedes = Number(guests.value || 1);
 
-          if (a.huespedes && cantidadHuespedes > Number(a.huespedes)) {
+          if (cantidadHuespedes > huespedes) {
             alert("La cantidad de huéspedes supera la capacidad del alojamiento.");
             return;
           }
 
-          alert("Reserva lista para continuar. Después te ayudo a conectarla con Firebase.");
+          alert("Reserva lista para continuar. Después conectamos este botón con Firebase.");
         });
 
         actualizarTotal();
