@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reserva - TuAloja</title>
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:#f6f7fb;
+      color:#1b1b1f;
+    }
+    .page{
+      max-width:1100px;
+      margin:0 auto;
+      padding:24px 16px 50px;
+    }
+    .back{
+      display:inline-block;
+      margin-bottom:18px;
+      color:#4f3dbb;
+      font-weight:700;
+      text-decoration:none;
+    }
+    .layout{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:24px;
+    }
+    .card{
+      background:#fff;
+      border:1px solid #e8e9f2;
+      border-radius:22px;
+      padding:22px;
+      box-shadow:0 10px 30px rgba(0,0,0,.06);
+    }
+    h1{
+      margin:0 0 10px;
+      font-size:34px;
+      color:#1b167f;
+    }
+    h2{
+      margin:0 0 16px;
+      font-size:22px;
+      color:#1b167f;
+    }
+    p{
+      margin:0 0 14px;
+      color:#444;
+      line-height:1.5;
+    }
+    label{
+      display:block;
+      margin:14px 0 6px;
+      font-weight:700;
+      font-size:14px;
+      color:#222;
+    }
+    input, textarea{
+      width:100%;
+      padding:13px 14px;
+      border:1px solid #d9dced;
+      border-radius:12px;
+      font-size:14px;
+      outline:none;
+    }
+    textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+    input:focus, textarea:focus{
+      border-color:#6b5be7;
+      box-shadow:0 0 0 4px rgba(107,91,231,.10);
+    }
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:15px;
+      background:linear-gradient(180deg,#6f61ea,#4f3dbb);
+      color:#fff;
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
+      margin-top:18px;
+      box-shadow:0 10px 24px rgba(79,61,187,.25);
+    }
+    .btn:hover{
+      filter:brightness(1.03);
+    }
+    .resumen-item{
+      padding:10px 0;
+      border-bottom:1px solid #eef0f6;
+      font-size:15px;
+    }
+    .resumen-item:last-child{
+      border-bottom:none;
+    }
+    .alert{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+    }
+    .alert.error{
+      background:#ffeaea;
+      color:#a10021;
+      border:1px solid #f0b3c0;
+    }
+    .alert.ok{
+      background:#eefbea;
+      color:#2e6b1f;
+      border:1px solid #b8e0ad;
+    }
+
+    @media(max-width:900px){
+      .layout{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <a href="index.html" class="back">← Volver</a>
+
+    <div class="layout">
+      <section class="card">
+        <h1>Completá tu reserva</h1>
+        <p>Ingresá tus datos para enviar la solicitud al anfitrión.</p>
+
+        <form id="formReserva">
+          <label for="nombre">Nombre y apellido</label>
+          <input type="text" id="nombre" required placeholder="Tu nombre completo">
+
+          <label for="telefono">Teléfono</label>
+          <input type="tel" id="telefono" required placeholder="Ej: 3511234567">
+
+          <label for="mensaje">Mensaje para el anfitrión</label>
+          <textarea id="mensaje" placeholder="Hola, quisiera reservar este alojamiento."></textarea>
+
+          <button type="submit" class="btn">Confirmar solicitud de reserva</button>
+
+          <div id="errorBox" class="alert error"></div>
+          <div id="okBox" class="alert ok"></div>
+        </form>
+      </section>
+
+      <aside class="card">
+        <h2>Resumen de la reserva</h2>
+        <div id="resumenReserva">
+          Cargando datos de la reserva...
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script type="module">
+    import { getUser } from "./public/js/auth.js";
+    import { db } from "./firebase-config.js";
+    import {
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+    const resumenReserva = document.getElementById("resumenReserva");
+    const formReserva = document.getElementById("formReserva");
+    const errorBox = document.getElementById("errorBox");
+    const okBox = document.getElementById("okBox");
+
+    const user = getUser();
+    const reservaPendiente = JSON.parse(localStorage.getItem("reservaPendiente"));
+
+    function mostrarError(msg){
+      errorBox.textContent = msg;
+      errorBox.style.display = "block";
+      okBox.style.display = "none";
+    }
+
+    function mostrarOk(msg){
+      okBox.textContent = msg;
+      okBox.style.display = "block";
+      errorBox.style.display = "none";
+    }
+
+    function formatearPrecio(valor) {
+      return Number(valor || 0).toLocaleString("es-AR");
+    }
+
+    function calcularNoches(checkin, checkout) {
+      if (!checkin || !checkout) return 0;
+
+      const entrada = new Date(checkin + "T00:00:00");
+      const salida = new Date(checkout + "T00:00:00");
+
+      const diff = salida.getTime() - entrada.getTime();
+
+      if (isNaN(diff) || diff <= 0) return 0;
+
+      return Math.round(diff / (1000 * 60 * 60 * 24));
+    }
+
+    async function cargarReserva() {
+      if (!user) {
+        localStorage.setItem("redirectAfterLogin", "reservar.html");
+        window.location.href = "login.html";
+        return;
+      }
+
+      if (!reservaPendiente || !reservaPendiente.alojamientoId) {
+        resumenReserva.innerHTML = "No hay una reserva pendiente.";
+        formReserva.style.display = "none";
+        return;
+      }
+
+      try {
+        const ref = doc(db, "alojamientos", reservaPendiente.alojamientoId);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          resumenReserva.innerHTML = "El alojamiento ya no existe.";
+          formReserva.style.display = "none";
+          return;
+        }
+
+        const alojamiento = snap.data();
+
+        const titulo = alojamiento.titulo || "Alojamiento";
+        const ciudad = alojamiento.ciudad || "";
+        const provincia = alojamiento.provincia || "";
+        const ubicacion = provincia ? `${ciudad} - ${provincia}` : ciudad;
+        const precio = Number(alojamiento.precio || 0);
+
+        const noches = calcularNoches(
+          reservaPendiente.checkin,
+          reservaPendiente.checkout
+        );
+
+        const total = noches * precio;
+
+        resumenReserva.innerHTML = `
+          <div class="resumen-item"><strong>Alojamiento:</strong> ${titulo}</div>
+          <div class="resumen-item"><strong>Ubicación:</strong> ${ubicacion || "No informada"}</div>
+          <div class="resumen-item"><strong>Check-in:</strong> ${reservaPendiente.checkin}</div>
+          <div class="resumen-item"><strong>Check-out:</strong> ${reservaPendiente.checkout}</div>
+          <div class="resumen-item"><strong>Huéspedes:</strong> ${reservaPendiente.guests}</div>
+          <div class="resumen-item"><strong>Noches:</strong> ${noches}</div>
+          <div class="resumen-item"><strong>Precio por noche:</strong> $${formatearPrecio(precio)}</div>
+          <div class="resumen-item"><strong>Total estimado:</strong> $${formatearPrecio(total)}</div>
+        `;
+      } catch (error) {
+        console.error(error);
+        resumenReserva.innerHTML = "No se pudo cargar la reserva.";
+        formReserva.style.display = "none";
+      }
+    }
+
+    formReserva.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      errorBox.style.display = "none";
+      okBox.style.display = "none";
+
+      const nombre = document.getElementById("nombre").value.trim();
+      const telefono = document.getElementById("telefono").value.trim();
+      const mensaje = document.getElementById("mensaje").value.trim();
+
+      if (!nombre || !telefono) {
+        mostrarError("Completá nombre y teléfono.");
+        return;
+      }
+
+      // Por ahora simulamos confirmación.
+      // Después acá lo conectamos con Firebase.
+      console.log("Reserva a guardar:", {
+        usuario: user,
+        reservaPendiente,
+        nombre,
+        telefono,
+        mensaje
+      });
+
+      mostrarOk("Solicitud enviada con éxito. Después conectamos esta parte con Firebase.");
+      localStorage.removeItem("reservaPendiente");
+      formReserva.reset();
+    });
+
+    cargarReserva();
+  </script>
+</body>
+</html>
