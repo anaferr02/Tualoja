@@ -6,12 +6,9 @@
   <title>Tualoja - Alquila fácil, viaja feliz</title>
 
   <style>
-/* ===================== RESET BÁSICO ===================== */
 * { box-sizing: border-box; }
-
 html, body { height: 100%; margin: 0; }
 
-/* ===================== BODY / LAYOUT ===================== */
 body {
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
@@ -23,7 +20,6 @@ body {
 
 main { flex: 1; }
 
-/* ===================== HEADER ===================== */
 header {
   padding: 15px 30px;
   display: flex;
@@ -44,7 +40,6 @@ header {
 
 .logo .icono-maleta { color: #ffb300; }
 
-/* ===================== NAV (DESKTOP) ===================== */
 #hamburgerBtn { display: none; }
 
 #mainNav {
@@ -75,7 +70,6 @@ header {
   flex-wrap: wrap;
 }
 
-/* ===================== LINKS / BOTONES NAV ===================== */
 .nav-link {
   padding: 10px 14px;
   border-radius: 12px;
@@ -105,13 +99,10 @@ header {
   box-shadow: 0 10px 22px rgba(27,22,127,.28);
 }
 
-/* ===================== HERO PRO ===================== */
 .hero {
   text-align: center;
   padding: 70px 20px 50px;
   color: #1b167f;
-
-  /* Fondo liso elegante */
   background: linear-gradient(180deg, #9fe2ff 0%, #6fd3ff 60%, #5fd0ff 100%);
 }
 .hero h2 {
@@ -125,7 +116,6 @@ header {
   opacity: .95;
 }
 
-/* Línea de confianza debajo del título */
 .hero-trust{
   margin: 14px auto 0;
   max-width: 820px;
@@ -139,7 +129,6 @@ header {
   display: inline-block;
 }
 
-/* ===================== SEARCH BOX PRO ===================== */
 .search-box {
   background: linear-gradient(180deg, #ffc933, #ffb300);
   border-radius: 28px;
@@ -179,7 +168,6 @@ header {
   box-shadow: 0 12px 26px rgba(27,22,127,.32);
 }
 
-/* ===================== SELECTOR TIPO BOOKING ===================== */
 .guests {
   position: relative;
   width: 100%;
@@ -220,7 +208,6 @@ header {
 
 .guests-panel.open{ display: block; }
 
-/* ✅ FIX: estas reglas quedan SOLO para el panel (evita romper otras páginas) */
 .guests-panel .row{
   display:flex;
   align-items:center;
@@ -275,7 +262,6 @@ header {
 }
 .panel-done:hover{ filter: brightness(1.05); }
 
-/* ===================== CTA anfitrión PRO ===================== */
 .host-cta{
   text-align: center;
   padding: 18px 16px 6px;
@@ -312,7 +298,6 @@ header {
   filter: brightness(1.03);
 }
 
-/* ✅ NUEVO: 3 líneas de confianza */
 .host-proof, .host-types, .host-time{
   margin: 10px 0 0;
   color: #1b167f;
@@ -323,7 +308,6 @@ header {
 .host-types{ opacity: .78; font-weight: 700; }
 .host-time{ opacity: .80; font-weight: 700; }
 
-/* ===================== CÓMO FUNCIONA (PANEL PRO) ===================== */
 .how-it-works{
   max-width: 1120px;
   margin: 18px auto 40px;
@@ -378,7 +362,6 @@ header {
   font-size: 14px;
 }
 
-/* ===================== FOOTER ===================== */
 footer {
   margin-top: auto;
   padding: 20px;
@@ -390,7 +373,6 @@ footer {
 .footer-legal a { color: #1b167f; text-decoration: none; }
 .footer-legal a:hover { text-decoration: underline; }
 
-/* ===================== RESPONSIVE ===================== */
 @media (max-width: 900px){
   .how-cards{ grid-template-columns: 1fr; }
   .hero h2{ font-size: 34px; }
@@ -497,8 +479,7 @@ footer {
     </div>
 
     <div class="nav-right">
-      <!-- ✅ Cambiado -->
-     <a class="nav-link" href="publicar.html">Publicar alojamiento</a>
+      <a class="nav-link" href="publicar.html">Publicar alojamiento</a>
       <a class="nav-link" href="ayuda.html">Ayuda</a>
       <div id="authArea">
         <a class="btn btn-ghost" href="login.html">Iniciar sesión</a>
@@ -579,14 +560,12 @@ footer {
   </section>
 
   <section class="host-cta">
-    <!-- ✅ Cambiado (huéspedes) -->
     <p class="host-cta-text">
       ¿Tenés un alojamiento? Publicalo gratis y empezá a recibir huéspedes.
     </p>
 
     <a class="host-cta-btn" href="publicar.html">Publicar mi alojamiento</a>
 
-    <!-- ✅ NUEVO -->
     <p class="host-proof">Publicar es gratis · Sin costos fijos · Activación rápida</p>
     <p class="host-types">Casas · Departamentos · Cabañas · Habitaciones · Quinchos</p>
     <p class="host-time">⏱ Publicar tu alojamiento toma menos de 3 minutos</p>
@@ -631,20 +610,31 @@ footer {
 <script>
   function buscar(){
     const destino = document.getElementById("destino")?.value?.trim() || "";
-    const entrada = document.getElementById("entrada")?.value || "";
-    const salida = document.getElementById("salida")?.value || "";
-    const adultos = document.getElementById("adultos")?.value || "1";
-    const ninos = document.getElementById("ninos")?.value || "0";
-    const habitaciones = document.getElementById("habitaciones")?.value || "1";
+    const checkin = document.getElementById("entrada")?.value || "";
+    const checkout = document.getElementById("salida")?.value || "";
+
+    const adultos = Number(document.getElementById("adultos")?.value || 1);
+    const ninos = Number(document.getElementById("ninos")?.value || 0);
+    const habitaciones = Number(document.getElementById("habitaciones")?.value || 1);
+    const guests = adultos + ninos;
+
+    localStorage.setItem("searchDestino", destino);
+    localStorage.setItem("searchCheckin", checkin);
+    localStorage.setItem("searchCheckout", checkout);
+    localStorage.setItem("searchGuests", String(guests));
+    localStorage.setItem("searchAdults", String(adultos));
+    localStorage.setItem("searchKids", String(ninos));
+    localStorage.setItem("searchRooms", String(habitaciones));
 
     const params = new URLSearchParams();
 
     if (destino) params.set("destino", destino);
-    if (entrada) params.set("entrada", entrada);
-    if (salida) params.set("salida", salida);
-    if (adultos) params.set("adultos", adultos);
-    if (ninos) params.set("ninos", ninos);
-    if (habitaciones) params.set("habitaciones", habitaciones);
+    if (checkin) params.set("checkin", checkin);
+    if (checkout) params.set("checkout", checkout);
+    if (guests) params.set("guests", String(guests));
+    if (adultos) params.set("adultos", String(adultos));
+    if (ninos >= 0) params.set("ninos", String(ninos));
+    if (habitaciones) params.set("habitaciones", String(habitaciones));
 
     window.location.href = `resultados.html?${params.toString()}`;
   }
@@ -753,41 +743,6 @@ footer {
 </script>
 
 <script type="module" src="script.js"></script>
-  <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.querySelector('form');
-  if (!form) return;
-
-  form.addEventListener("submit", () => {
-    const destino =
-      document.querySelector('input[name="destino"]')?.value?.trim() || "";
-
-    const checkin =
-      document.querySelector('input[name="checkin"]')?.value?.trim() ||
-      document.getElementById("checkin")?.value?.trim() ||
-      document.getElementById("fechaEntrada")?.value?.trim() ||
-      "";
-
-    const checkout =
-      document.querySelector('input[name="checkout"]')?.value?.trim() ||
-      document.getElementById("checkout")?.value?.trim() ||
-      document.getElementById("fechaSalida")?.value?.trim() ||
-      "";
-
-    const guests =
-      document.querySelector('input[name="guests"]')?.value?.trim() ||
-      document.querySelector('input[name="huespedes"]')?.value?.trim() ||
-      document.getElementById("guests")?.value?.trim() ||
-      document.getElementById("huespedes")?.value?.trim() ||
-      "1";
-
-    localStorage.setItem("searchDestino", destino);
-    localStorage.setItem("searchCheckin", checkin);
-    localStorage.setItem("searchCheckout", checkout);
-    localStorage.setItem("searchGuests", guests);
-  });
-});
-</script>
 
 </body>
 </html>
