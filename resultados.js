@@ -8,10 +8,20 @@ const cont = document.getElementById("gridResultados");
 const emptyResultados = document.getElementById("emptyResultados");
 
 const params = new URLSearchParams(window.location.search);
-const destino = (params.get("destino") || params.get("ubicacion") || params.get("q") || "").toLowerCase();
+const destino = (params.get("destino") || params.get("ubicacion") || params.get("q") || "").trim().toLowerCase();
 const checkin = params.get("checkin") || "";
 const checkout = params.get("checkout") || "";
 const guests = params.get("guests") || params.get("huespedes") || "1";
+
+function armarUbicacion(alojamiento) {
+  const ciudad = alojamiento.ciudad || "";
+  const provincia = alojamiento.provincia || "";
+
+  if (ciudad && provincia) return `${ciudad} - ${provincia}`;
+  if (ciudad) return ciudad;
+  if (provincia) return provincia;
+  return "Ubicación no informada";
+}
 
 async function cargarResultados() {
   try {
@@ -39,19 +49,20 @@ async function cargarResultados() {
 
       encontrados++;
 
-      const foto = a.fotos?.[0] || "";
+      const foto = a.fotos?.[0] || "https://via.placeholder.com/800x500?text=Sin+imagen";
       const precio = Number(a.precio || 0).toLocaleString("es-AR");
+      const ubicacionTexto = armarUbicacion(a);
+      const tituloTexto = a.titulo || "Alojamiento sin título";
 
       html += `
         <div class="resultado-card">
-
-          <img class="resultado-img" src="${foto}" alt="${a.titulo || "Alojamiento"}">
+          <img class="resultado-img" src="${foto}" alt="${tituloTexto}">
 
           <div class="resultado-info">
-            <h3 class="resultado-titulo">${a.titulo || "Alojamiento sin título"}</h3>
+            <h3 class="resultado-titulo">${tituloTexto}</h3>
 
             <div class="resultado-ubicacion">
-              ${(a.ciudad || "")} ${(a.ciudad && a.provincia ? "-" : "")} ${(a.provincia || "")}
+              ${ubicacionTexto}
             </div>
 
             <div class="resultado-precio">
@@ -59,12 +70,11 @@ async function cargarResultados() {
             </div>
 
             <div class="resultado-acciones">
-              <a href="detalle.html?id=${docSnap.id}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}&destino=${encodeURIComponent(destino)}">
+              <a href="detalle.html?id=${docSnap.id}&destino=${encodeURIComponent(destino)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}">
                 Ver alojamiento
               </a>
             </div>
           </div>
-
         </div>
       `;
     });
@@ -74,7 +84,6 @@ async function cargarResultados() {
     if (emptyResultados) {
       emptyResultados.style.display = encontrados === 0 ? "block" : "none";
     }
-
   } catch (error) {
     console.error("Error al cargar resultados:", error);
     cont.innerHTML = `<p class="empty-estado">Hubo un error al cargar los alojamientos.</p>`;
