@@ -175,7 +175,10 @@
     import { db } from "./firebase-config.js";
     import {
       doc,
-      getDoc
+      getDoc,
+      collection,
+      addDoc,
+      serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
     const resumenReserva = document.getElementById("resumenReserva");
@@ -234,7 +237,6 @@
         return;
       }
 
-      // prefijar nombre si existe
       if (user.name) {
         inputNombre.value = user.name;
       }
@@ -335,36 +337,36 @@
         return;
       }
 
+      const precio = Number(alojamientoActual.precio || 0);
+      const total = noches * precio;
+
       btnConfirmar.disabled = true;
 
       try {
-        // Por ahora solo simulamos guardado
-        const precio = Number(alojamientoActual.precio || 0);
-        const total = noches * precio;
-
-        const reservaFinal = {
+        await addDoc(collection(db, "reservas"), {
           alojamientoId: reservaActual.alojamientoId,
           alojamientoTitulo: alojamientoActual.titulo || "Alojamiento",
-          usuarioId: user.id,
-          usuarioEmail: user.email || "",
-          nombreHuesped: nombre,
-          telefono,
-          mensaje,
+          alojamientoCiudad: alojamientoActual.ciudad || "",
+          alojamientoProvincia: alojamientoActual.provincia || "",
+          anfitrionId: alojamientoActual.anfitrionId || alojamientoActual.userId || "",
+          huespedId: user.id,
+          huespedEmail: user.email || "",
+          huespedNombre: nombre,
+          telefono: telefono,
+          mensaje: mensaje,
           checkin: reservaActual.checkin,
           checkout: reservaActual.checkout,
           guests: Number(reservaActual.guests || 1),
-          noches,
+          noches: noches,
           precioPorNoche: precio,
-          total,
+          total: total,
           estado: "pendiente",
-          creadaEn: new Date().toISOString()
-        };
-
-        console.log("Reserva a guardar:", reservaFinal);
+          creadaEn: serverTimestamp()
+        });
 
         localStorage.removeItem("reservaPendiente");
 
-        mostrarOk("Solicitud enviada con éxito. Ahora el siguiente paso es guardarla en Firebase.");
+        mostrarOk("Solicitud enviada con éxito.");
         formReserva.reset();
 
         if (user.name) {
@@ -373,11 +375,11 @@
 
         setTimeout(() => {
           window.location.href = "index.html";
-        }, 1800);
+        }, 1600);
 
       } catch (error) {
-        console.error("Error al confirmar la reserva:", error);
-        mostrarError("No se pudo enviar la solicitud.");
+        console.error("Error al guardar la reserva:", error);
+        mostrarError("No se pudo guardar la reserva.");
       } finally {
         btnConfirmar.disabled = false;
       }
