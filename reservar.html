@@ -508,37 +508,36 @@
       btnConfirmar.disabled = true;
 
       try {
-        await addDoc(collection(db, "reservas"), {
-          alojamientoId: reservaActual.alojamientoId,
-          alojamientoTitulo: alojamientoActual.titulo || "Alojamiento",
-          alojamientoCiudad: alojamientoActual.ciudad || "",
-          alojamientoProvincia: alojamientoActual.provincia || "",
-          anfitrionId: alojamientoActual.anfitrionId || alojamientoActual.userId || "",
-          huespedId: user.id,
-          huespedEmail: user.email || "",
-          huespedNombre: nombre,
-          telefono: telefono,
-          mensaje: mensaje,
-          checkin: reservaActual.checkin,
-          checkout: reservaActual.checkout,
-          guests: Number(reservaActual.guests || 1),
-          noches: totalesActuales.noches,
-          precioPorNoche: totalesActuales.precio,
-          total: totalesActuales.total,
-          senaPorcentaje: SENA_PORCENTAJE,
-          senaMonto: totalesActuales.sena,
-          saldoRestante: totalesActuales.restante,
-          metodoPagoSena: metodo,
-          estado: "pendiente_pago_sena",
-          estadoPagoSena: "pendiente",
-          creadaEn: serverTimestamp()
-        });
+        const docRef = await addDoc(collection(db, "reservas"), {
+  alojamientoId: reservaActual.alojamientoId,
+  alojamientoTitulo: alojamientoActual.titulo || "Alojamiento",
+  alojamientoCiudad: alojamientoActual.ciudad || "",
+  alojamientoProvincia: alojamientoActual.provincia || "",
+  anfitrionId: alojamientoActual.anfitrionId || alojamientoActual.userId || "",
+  huespedId: user.id,
+  huespedEmail: user.email || "",
+  huespedNombre: nombre,
+  telefono: telefono,
+  mensaje: mensaje,
+  checkin: reservaActual.checkin,
+  checkout: reservaActual.checkout,
+  guests: Number(reservaActual.guests || 1),
+  noches: totalesActuales.noches,
+  precioPorNoche: totalesActuales.precio,
+  total: totalesActuales.total,
+  senaPorcentaje: SENA_PORCENTAJE,
+  senaMonto: totalesActuales.sena,
+  saldoRestante: totalesActuales.restante,
+  metodoPagoSena: metodo,
+  estado: "pendiente_pago_sena",
+  estadoPagoSena: "pendiente",
+  creadaEn: serverTimestamp()
+});
 
-        localStorage.removeItem("reservaPendiente");
+localStorage.removeItem("reservaPendiente");
+localStorage.setItem("ultimaReservaId", docRef.id);
 
-        mostrarOk("Reserva creada. Ahora falta cobrar o confirmar la seña.");
-        formReserva.reset();
-        actualizaFormularioDespues();
+window.location.href = "pago-sena.html";
 
       } catch (error) {
         console.error("Error al guardar la reserva:", error);
