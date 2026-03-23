@@ -13,9 +13,24 @@ import {
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-const destinoParam = (params.get("destino") || localStorage.getItem("searchDestino") || "").trim();
-const checkinParam = (params.get("checkin") || localStorage.getItem("searchCheckin") || "").trim();
-const checkoutParam = (params.get("checkout") || localStorage.getItem("searchCheckout") || "").trim();
+const checkinParam = (
+  params.get("checkin") ||
+  localStorage.getItem("searchCheckin") ||
+  ""
+).trim();
+
+const checkoutParam = (
+  params.get("checkout") ||
+  localStorage.getItem("searchCheckout") ||
+  ""
+).trim();
+
+const guestsParam = (
+  params.get("guests") ||
+  params.get("huespedes") ||
+  localStorage.getItem("searchGuests") ||
+  "1"
+).trim();
 const guestsParam = (params.get("guests") || params.get("huespedes") || localStorage.getItem("searchGuests") || "1").trim();
 
 const cont = document.getElementById("detalleWrap");
