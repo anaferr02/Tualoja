@@ -13,10 +13,10 @@ import {
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-const destinoParam = (params.get("destino") || params.get("ubicacion") || params.get("q") || "").trim();
-const checkinParam = (params.get("checkin") || "").trim();
-const checkoutParam = (params.get("checkout") || "").trim();
-const guestsParam = (params.get("guests") || params.get("huespedes") || "1").trim();
+const destinoParam = (params.get("destino") || localStorage.getItem("searchDestino") || "").trim();
+const checkinParam = (params.get("checkin") || localStorage.getItem("searchCheckin") || "").trim();
+const checkoutParam = (params.get("checkout") || localStorage.getItem("searchCheckout") || "").trim();
+const guestsParam = (params.get("guests") || params.get("huespedes") || localStorage.getItem("searchGuests") || "1").trim();
 
 const cont = document.getElementById("detalleWrap");
 const noExiste = document.getElementById("noExiste");
@@ -71,7 +71,6 @@ function actualizarLinkVolver() {
   if (!volverResultados) return;
 
   const qs = new URLSearchParams();
-
   if (destinoParam) qs.set("destino", destinoParam);
   if (checkinParam) qs.set("checkin", checkinParam);
   if (checkoutParam) qs.set("checkout", checkoutParam);
@@ -134,7 +133,6 @@ async function cargarDetalle() {
 
     cont.innerHTML = `
       <div class="detalle-layout">
-
         <h1>${escapeHTML(alojamiento.titulo)}</h1>
 
         <p class="detalle-ubicacion-top">
@@ -152,7 +150,6 @@ async function cargarDetalle() {
         </p>
 
         <div class="detalle-card">
-
           <div class="detalle-galeria">
             ${
               alojamiento.fotos?.length
@@ -167,7 +164,6 @@ async function cargarDetalle() {
           </div>
 
           <div class="detalle-info-grid">
-
             <div class="detalle-info-left">
               <div class="detalle-item"><strong>Tipo:</strong> ${escapeHTML(alojamiento.tipo || "-")}</div>
               <div class="detalle-item"><strong>Servicios:</strong> ${escapeHTML((alojamiento.servicios || []).join(", ") || "-")}</div>
@@ -178,7 +174,6 @@ async function cargarDetalle() {
             </div>
 
             <div class="detalle-info-right">
-
               <div class="detalle-precio-box">
                 <span class="detalle-precio-numero">$${formatPrecio(alojamiento.precio || 0)}</span>
                 <span class="detalle-precio-texto">/ noche</span>
@@ -196,14 +191,7 @@ async function cargarDetalle() {
                 <input id="checkoutInput" type="date" class="detalle-input">
 
                 <label class="detalle-label" for="guestsInput">Huéspedes</label>
-                <input
-                  id="guestsInput"
-                  type="number"
-                  min="1"
-                  max="${escapeHTML(alojamiento.capacidad || 1)}"
-                  value="1"
-                  class="detalle-input"
-                >
+                <input id="guestsInput" type="number" min="1" max="${escapeHTML(alojamiento.capacidad || 1)}" value="1" class="detalle-input">
               </div>
 
               <div id="ocupadasBox" class="detalle-total-box" style="background:#fff8e8;border-color:#f2ddb2;color:#7a5a00;">
@@ -225,9 +213,7 @@ async function cargarDetalle() {
               <p id="msgReserva" class="detalle-ayuda">
                 No se cobra nada ahora
               </p>
-
             </div>
-
           </div>
         </div>
       </div>
@@ -241,28 +227,8 @@ async function cargarDetalle() {
     const msgReserva = document.getElementById("msgReserva");
 
     const hoy = new Date().toISOString().split("T")[0];
-
-checkinInput.min = hoy;
-
-if (checkinParam) {
-  checkinInput.value = checkinParam;
-}
-
-if (checkoutParam) {
-  checkoutInput.value = checkoutParam;
-}
-
-if (guestsParam) {
-  guestsInput.value = guestsParam;
-}
-
-if (checkinInput.value) {
-  const minCheckout = new Date(checkinInput.value + "T00:00:00");
-  minCheckout.setDate(minCheckout.getDate() + 1);
-  checkoutInput.min = fechaToInputFormat(minCheckout);
-} else {
-  checkoutInput.min = hoy;
-}
+    checkinInput.min = hoy;
+    checkoutInput.min = hoy;
 
     function fechaBloqueada(fecha) {
       return fechasOcupadas.includes(fecha);
@@ -413,21 +379,17 @@ if (checkinInput.value) {
       try {
         await addDoc(collection(db, "reservas"), {
           code: generarCodigoReserva(),
-
           listingId: alojamientoId,
           listingDocId: alojamientoId,
           listingPublicId: alojamiento.id || "",
           title: alojamiento.titulo || "",
-
           hostEmail: (alojamiento.anfitrionEmail || alojamiento.ownerEmail || "").toLowerCase(),
           hostId: alojamiento.anfitrionId || alojamiento.createdBy || "",
           anfitrionEmail: (alojamiento.anfitrionEmail || alojamiento.ownerEmail || "").toLowerCase(),
           anfitrionId: alojamiento.anfitrionId || alojamiento.createdBy || "",
-
           guestEmail: (usuario.email || "").toLowerCase(),
           guestName: usuario.displayName || "Huésped",
           guestId: usuario.uid,
-
           checkin,
           checkout,
           guests,
@@ -447,7 +409,6 @@ if (checkinInput.value) {
     });
 
     actualizarTotal();
-
   } catch (error) {
     console.error(error);
     noExiste.style.display = "block";
