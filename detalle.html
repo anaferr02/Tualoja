@@ -412,6 +412,7 @@
 
   <script type="module">
     import { db } from "./firebase-config.js";
+    import { getUser } from "./public/js/auth.js";
     import {
       doc,
       getDoc
@@ -437,7 +438,6 @@
 
       const entrada = new Date(checkin + "T00:00:00");
       const salida = new Date(checkout + "T00:00:00");
-
       const diff = salida.getTime() - entrada.getTime();
 
       if (isNaN(diff) || diff <= 0) return 0;
@@ -484,7 +484,6 @@
       return reservasExistentes.some((reserva) => {
         const reservaDesde = new Date(reserva.desde + "T00:00:00");
         const reservaHasta = new Date(reserva.hasta + "T00:00:00");
-
         return entrada < reservaHasta && salida > reservaDesde;
       });
     }
@@ -680,57 +679,22 @@
           if (Number(guests.value) < 1) guests.value = "1";
         });
 
-        import { getUser } from "./public/js/auth.js";
+        btnReservar.addEventListener("click", () => {
+          const user = getUser();
 
-btnReservar.addEventListener("click", () => {
+          if (!user) {
+            localStorage.setItem("redirectAfterLogin", window.location.href);
+            alert("Tenés que iniciar sesión para reservar");
+            window.location.href = "login.html";
+            return;
+          }
 
-  const user = getUser();
+          const noches = calcularNoches(checkin.value, checkout.value);
 
-  // 🔐 SI NO ESTÁ LOGUEADO
-  if (!user) {
-
-    // Guardamos a dónde volver
-    localStorage.setItem("redirectAfterLogin", window.location.href);
-
-    alert("Tenés que iniciar sesión para reservar");
-
-    window.location.href = "login.html";
-    return;
-  }
-
-  // 🧮 VALIDACIONES NORMALES
-  const noches = calcularNoches(checkin.value, checkout.value);
-
-  if (noches <= 0) {
-    alert("Seleccioná fechas válidas.");
-    return;
-  }
-
-  if (hayCruceDeFechas(checkin.value, checkout.value)) {
-    alert("No disponible para esas fechas.");
-    return;
-  }
-
-  const cantidadHuespedes = Number(guests.value || 1);
-
-  if (cantidadHuespedes > huespedes) {
-    alert("Supera la capacidad.");
-    return;
-  }
-
-  // ✅ GUARDAR DATOS DE RESERVA (IMPORTANTE)
-  const reserva = {
-    alojamientoId: id,
-    checkin: checkin.value,
-    checkout: checkout.value,
-    guests: cantidadHuespedes
-  };
-
-  localStorage.setItem("reservaPendiente", JSON.stringify(reserva));
-
-  // 👉 ACA después vamos a mandar a pago o confirmación
-window.location.href = "reservar.html";
-});
+          if (noches <= 0) {
+            alert("Seleccioná fechas válidas.");
+            return;
+          }
 
           if (hayCruceDeFechas(checkin.value, checkout.value)) {
             alert("Este alojamiento no está disponible para esas fechas.");
@@ -744,19 +708,26 @@ window.location.href = "reservar.html";
             return;
           }
 
-          alert("Reserva lista para continuar. Después conectamos este botón con Firebase.");
+          const reserva = {
+            alojamientoId: id,
+            checkin: checkin.value,
+            checkout: checkout.value,
+            guests: cantidadHuespedes
+          };
+
+          localStorage.setItem("reservaPendiente", JSON.stringify(reserva));
+          window.location.href = "reservar.html";
         });
 
+        const reservaGuardada = JSON.parse(localStorage.getItem("reservaPendiente"));
+
+        if (reservaGuardada && reservaGuardada.alojamientoId === id) {
+          checkin.value = reservaGuardada.checkin || "";
+          checkout.value = reservaGuardada.checkout || "";
+          guests.value = String(reservaGuardada.guests || guests.value);
+        }
+
         actualizarTotal();
-      const reservaGuardada = JSON.parse(localStorage.getItem("reservaPendiente"));
-
-if (reservaGuardada && reservaGuardada.alojamientoId === id) {
-  checkin.value = reservaGuardada.checkin;
-  checkout.value = reservaGuardada.checkout;
-  guests.value = reservaGuardada.guests;
-
-  actualizarTotal();
-}
       } catch (error) {
         console.error("Error al cargar detalle:", error);
         noExiste.style.display = "block";
