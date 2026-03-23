@@ -13,6 +13,14 @@ import {
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
+const destinoParam = (
+  params.get("destino") ||
+  params.get("ubicacion") ||
+  params.get("q") ||
+  localStorage.getItem("searchDestino") ||
+  ""
+).trim();
+
 const checkinParam = (
   params.get("checkin") ||
   localStorage.getItem("searchCheckin") ||
@@ -31,7 +39,6 @@ const guestsParam = (
   localStorage.getItem("searchGuests") ||
   "1"
 ).trim();
-const guestsParam = (params.get("guests") || params.get("huespedes") || localStorage.getItem("searchGuests") || "1").trim();
 
 const cont = document.getElementById("detalleWrap");
 const noExiste = document.getElementById("noExiste");
@@ -148,10 +155,10 @@ async function cargarDetalle() {
 
     cont.innerHTML = `
       <div class="detalle-layout">
-        <h1>${escapeHTML(alojamiento.titulo)}</h1>
+        <h1>${escapeHTML(alojamiento.titulo || "Alojamiento")}</h1>
 
         <p class="detalle-ubicacion-top">
-          📍 <strong>${escapeHTML(alojamiento.ciudad)}, ${escapeHTML(alojamiento.provincia)}</strong>
+          📍 <strong>${escapeHTML(alojamiento.ciudad || "")}, ${escapeHTML(alojamiento.provincia || "")}</strong>
         </p>
 
         <p class="detalle-subtexto">
@@ -168,7 +175,7 @@ async function cargarDetalle() {
           <div class="detalle-galeria">
             ${
               alojamiento.fotos?.length
-                ? `<img src="${alojamiento.fotos[0]}" alt="${escapeHTML(alojamiento.titulo)}">`
+                ? `<img src="${alojamiento.fotos[0]}" alt="${escapeHTML(alojamiento.titulo || "Alojamiento")}">`
                 : `
                   <div class="detalle-galeria-empty">
                     <div class="icono">🏡</div>
@@ -365,18 +372,8 @@ async function cargarDetalle() {
         return;
       }
 
-      if (fechaBloqueada(checkin) || fechaBloqueada(checkout)) {
-        msgReserva.textContent = "❌ Hay fechas ocupadas en tu selección.";
-        return;
-      }
-
       if (!fechasDisponibles(checkin, checkout)) {
         msgReserva.textContent = "❌ Esas fechas ya están ocupadas.";
-        return;
-      }
-
-      if (noches > Number(alojamiento.maxNoches || 30)) {
-        msgReserva.textContent = `❌ El máximo permitido es de ${Number(alojamiento.maxNoches || 30)} noches.`;
         return;
       }
 
@@ -425,7 +422,7 @@ async function cargarDetalle() {
 
     actualizarTotal();
   } catch (error) {
-    console.error(error);
+    console.error("Error en detalle:", error);
     noExiste.style.display = "block";
   }
 }
