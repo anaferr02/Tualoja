@@ -304,7 +304,7 @@
   </main>
 
   <script type="module">
-    import { getUser } from "./public/js/auth.js";
+    import { getUser } from "./js/auth.js";
     import { db } from "./firebase-config.js";
     import {
       doc,
@@ -404,7 +404,7 @@
         const porcentaje = Number(reservaData.senaPorcentaje || 0);
         const metodo = reservaData.metodoPagoSena || "";
         const estadoPagoSena = reservaData.estadoPagoSena || "pendiente";
-        const mercadoPagoLink = reservaData.mercadoPagoLink || "";
+        const mercadoPagoLink = reservaData.mercadoPagoLink || "https://link.mercadopago.com.ar/tualoja";
 
         montoSena.textContent = `$${formatearPrecio(sena)}`;
         textoSena.innerHTML = `
@@ -427,15 +427,11 @@
             <div class="dato"><strong>Importe a pagar:</strong> $${formatearPrecio(sena)}</div>
             <div class="dato"><strong>Estado actual:</strong> ${estadoPagoSena}</div>
             <div class="dato"><strong>Saldo restante:</strong> se paga en el check-in o en el alojamiento.</div>
-            ${
-              mercadoPagoLink
-                ? `<div class="dato">
-                    <a class="btn" href="${mercadoPagoLink}" target="_blank" rel="noopener noreferrer">
-                      Pagar seña con Mercado Pago
-                    </a>
-                  </div>`
-                : `<div class="dato"><strong>Link de pago:</strong> todavía no configurado.</div>`
-            }
+            <div class="dato">
+              <a class="btn" href="${mercadoPagoLink}" target="_blank" rel="noopener noreferrer">
+                Pagar seña con Mercado Pago
+              </a>
+            </div>
           `;
         } else {
           detallePago.innerHTML = `
