@@ -1,71 +1,119 @@
-import { auth } from "../../firebase-config.js";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  signOut,
-  updateProfile
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+import { refreshMe, getUser, logout } from "./public/js/auth.js";
 
-const USER_KEY = "tualoja_user";
-const LOGGED_KEY = "tualoja_logged";
+/* =========================
+   HAMBURGUESA / NAV MOBILE
+========================= */
+function setupHamburgerMenu() {
+  const btn = document.getElementById("hamburgerBtn");
+  const nav = document.getElementById("mainNav");
 
-function saveUser(user){
-  const data = {
-    id: user.uid,
-    name: user.displayName || "",
-    email: user.email
-  };
+  if (!btn || !nav) return;
 
-  localStorage.setItem(USER_KEY, JSON.stringify(data));
-  localStorage.setItem(LOGGED_KEY,"1");
+  const closeNav = () => nav.classList.remove("is-open");
+  const toggleNav = () => nav.classList.toggle("is-open");
 
-  return data;
-}
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleNav();
+  });
 
-export function getUser(){
-  const raw = localStorage.getItem(USER_KEY);
-  return raw ? JSON.parse(raw) : null;
-}
+  nav.addEventListener("click", (e) => {
+    e.stopPropagation();
 
-export async function register(name,email,password){
+    if (e.target && e.target.tagName === "A") {
+      closeNav();
+    }
+  });
 
-  const cleanEmail = email.trim().toLowerCase();
+  document.addEventListener("click", (e) => {
+    const clickedInside = nav.contains(e.target) || btn.contains(e.target);
+    if (!clickedInside) closeNav();
+  });
 
-  const cred = await createUserWithEmailAndPassword(auth, cleanEmail, password);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeNav();
+  });
 
-  if(name){
-    await updateProfile(cred.user,{displayName:name});
-  }
-
-  return saveUser(cred.user);
-}
-
-export async function login(email,password){
-
-  const cleanEmail = email.trim().toLowerCase();
-
-  const cred = await signInWithEmailAndPassword(auth,cleanEmail,password);
-
-  return saveUser(cred.user);
-}
-
-export async function sendReset(email){
-  const cleanEmail = email.trim().toLowerCase();
-  auth.languageCode = "es";
-
-  await sendPasswordResetEmail(auth, cleanEmail, {
-    url: "https://tualoja.com/login.html?reset=ok",
-    handleCodeInApp: false
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 768) closeNav();
   });
 }
 
-export async function logout(){
+/* =========================
+   AUTH UI
+========================= */
+function renderAuthArea(user) {
+  const authArea = document.getElementById("authArea");
+  if (!authArea) return;
 
-  await signOut(auth);
+  if (user) {
+    authArea.innerHTML = `
+      <a class="btn btn-primary" href="mi-cuenta.html">Cuenta</a>
+      <a class="btn btn-ghost" href="#" id="logoutBtnAuthArea">Salir</a>
+    `;
 
-  localStorage.removeItem(USER_KEY);
-  localStorage.removeItem(LOGGED_KEY);
-
-  location.href="index.html";
+    const btn = document.getElementById("logoutBtnAuthArea");
+    if (btn) {
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+      });
+    }
+  } else {
+    authArea.innerHTML = `
+      <a class="btn btn-ghost" href="login.html">Iniciar sesión</a>
+      <a class="btn btn-primary" href="register.html">Hazte una cuenta</a>
+    `;
+  }
 }
+
+function renderUserMenu(user) {
+  const userMenu = document.getElementById("userMenu");
+  const userDropdown = document.getElementById("userDropdown");
+  if (!userMenu || !userDropdown) return;
+
+  if (user) {
+    userMenu.innerHTML = `<i class="fas fa-user"></i> ${user.name || "Mi cuenta"}`;
+
+    userDropdown.innerHTML = `
+      <a href="mis-reservas.html">Mis reservas</a>
+      <a href="publicar.html">Publicar alojamiento</a>
+      <a href="panel-anfitrion.html">Panel anfitrión</a>
+      <a href="#" id="logoutBtn">Cerrar sesión</a>
+    `;
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+      });
+    }
+  } else {
+    userMenu.innerHTML = `<i class="fas fa-user"></i> Cuenta`;
+
+    userDropdown.innerHTML = `
+      <a href="login.html">Iniciar sesión</a>
+      <a href="register.html">Registrarse</a>
+      <a href="recuperar.html" style="font-size:13px; opacity:.85;">
+        ¿Olvidaste tu contraseña?
+      </a>
+    `;
+  }
+}
+
+async function setupAuthUI() {
+  await refreshMe();
+  const user = getUser();
+
+  renderAuthArea(user);
+  renderUserMenu(user);
+}
+
+/* =========================
+   INIT
+========================= */
+document.addEventListener("DOMContentLoaded", async () => {
+  setupHamburgerMenu();
+  await setupAuthUI();
+});
