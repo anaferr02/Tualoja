@@ -261,7 +261,7 @@
         <div class="campo-archivo" id="campoArchivo">
           <label for="comprobantePago">Cargar comprobante de transferencia</label>
           <input type="file" id="comprobantePago" accept=".jpg,.jpeg,.png,.pdf,.webp">
-          <div class="mini">Podés subir una imagen o PDF del comprobante. Por ahora se guarda solo el nombre del archivo.</div>
+          <div class="mini">Podés subir una imagen o PDF del comprobante. El archivo se sube a Firebase Storage y queda guardado con link real.</div>
         </div>
 
         <div class="nota-final">
@@ -298,7 +298,7 @@
 
   <script type="module">
     import { getUser } from "./public/js/auth.js";
-    import { db } from "./firebase-config.js";
+    import { db, storage } from "./firebase-config.js";
     import {
       doc,
       getDoc,
@@ -306,6 +306,11 @@
       serverTimestamp,
       onSnapshot
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+    import {
+      ref,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
     const MERCADO_PAGO_LINK = "https://link.mercadopago.com.ar/tualoja";
     const ALIAS_TRANSFERENCIA = "tualoja.com";
@@ -405,6 +410,11 @@
           <div class="dato"><strong>Método:</strong> ${metodoLegible(metodo)}</div>
           <div class="dato"><strong>Estado actual:</strong> pendiente de verificación</div>
           <div class="dato"><strong>Seña informada:</strong> recibimos tu aviso de pago.</div>
+          ${
+            data.comprobanteUrl
+              ? `<div class="dato"><strong>Comprobante:</strong> <a href="${data.comprobanteUrl}" target="_blank" rel="noopener noreferrer">Ver comprobante</a></div>`
+              : ""
+          }
         `;
         wrapCheckPago.style.display = "none";
         btnConfirmarPago.style.display = "none";
@@ -505,23 +515,40 @@
         return;
       }
 
+      const archivo = comprobantePago.files[0];
+
+      if (!archivo) {
+        mostrarError("Tenés que subir el comprobante.");
+        return;
+      }
+
       btnConfirmarPago.disabled = true;
 
       try {
-        const archivo = comprobantePago.files[0];
-        const nombreComprobante = archivo ? archivo.name : "";
+        const extension = archivo.name.includes(".")
+          ? archivo.name.split(".").pop()
+          : "file";
+
+        const nombreArchivo = `${Date.now()}_${crypto.randomUUID()}.${extension}`;
+        const ruta = `comprobantes/${reservaId}/${nombreArchivo}`;
+        const storageRef = ref(storage, ruta);
+
+        await uploadBytes(storageRef, archivo);
+        const url = await getDownloadURL(storageRef);
 
         await updateDoc(reservaRef, {
           estado: "reserva_recibida",
           estadoPagoSena: "informado",
           senaInformadaEn: serverTimestamp(),
-          comprobanteNombre: nombreComprobante
+          comprobanteNombre: archivo.name,
+          comprobanteUrl: url,
+          comprobantePath: ruta
         });
 
-        mostrarOk("Transferencia informada. Queda pendiente de verificación.");
+        mostrarOk("Comprobante subido correctamente.");
       } catch (error) {
-        console.error("Error al actualizar la seña:", error);
-        mostrarError("No se pudo informar la transferencia.");
+        console.error("Error al subir comprobante:", error);
+        mostrarError("No se pudo subir el comprobante.");
         btnConfirmarPago.disabled = false;
       }
     });
