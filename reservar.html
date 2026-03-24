@@ -44,6 +44,12 @@
       font-weight:bold;
       cursor:pointer;
     }
+
+    .estado{
+      margin-top:10px;
+      font-size:14px;
+      color:#555;
+    }
   </style>
 </head>
 
@@ -69,6 +75,7 @@
         Enviar solicitud de reserva
       </button>
 
+      <div id="estado" class="estado"></div>
     </form>
   </div>
 
@@ -80,7 +87,7 @@
 </div>
 
 <script type="module">
-import { db } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
 import {
   collection,
   addDoc,
@@ -89,61 +96,121 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
 const form = document.getElementById("formReserva");
 const resumen = document.getElementById("resumen");
+const estado = document.getElementById("estado");
 
 let reserva = JSON.parse(localStorage.getItem("reservaPendiente"));
+let usuarioActual = null;
+let authResuelta = false;
 
-async function cargarResumen(){
+function irALogin() {
+  localStorage.setItem("redirectAfterLogin", "reservar.html");
+  alert("Tenés que iniciar sesión para reservar");
+  window.location.href = "login.html";
+}
 
-  if(!reserva){
-    resumen.innerHTML = "No hay reserva";
+onAuthStateChanged(auth, (user) => {
+  authResuelta = true;
+
+  if (!user) {
+    usuarioActual = null;
+    irALogin();
     return;
   }
 
-  const ref = doc(db,"alojamientos",reserva.alojamientoId);
-  const snap = await getDoc(ref);
+  usuarioActual = user;
+});
 
-  if(!snap.exists()){
-    resumen.innerHTML = "No existe";
+async function cargarResumen() {
+  if (!reserva || !reserva.alojamientoId) {
+    resumen.innerHTML = "No hay reserva pendiente.";
+    form.style.display = "none";
     return;
   }
 
-  const a = snap.data();
+  try {
+    const ref = doc(db, "alojamientos", reserva.alojamientoId);
+    const snap = await getDoc(ref);
 
-  resumen.innerHTML = `
-    <p>${a.titulo}</p>
-    <p>${reserva.checkin} → ${reserva.checkout}</p>
-    <p>Huéspedes: ${reserva.guests}</p>
-  `;
+    if (!snap.exists()) {
+      resumen.innerHTML = "El alojamiento ya no existe.";
+      form.style.display = "none";
+      return;
+    }
+
+    const a = snap.data();
+
+    resumen.innerHTML = `
+      <p><strong>${a.titulo || "Alojamiento"}</strong></p>
+      <p>${reserva.checkin} → ${reserva.checkout}</p>
+      <p>Huéspedes: ${reserva.guests}</p>
+    `;
+  } catch (error) {
+    console.error("Error al cargar resumen:", error);
+    resumen.innerHTML = "Hubo un error al cargar el resumen.";
+    form.style.display = "none";
+  }
 }
 
 cargarResumen();
 
-form.addEventListener("submit", async(e)=>{
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const nombre = document.getElementById("nombre").value;
-  const telefono = document.getElementById("telefono").value;
-  const mensaje = document.getElementById("mensaje").value;
+  if (!authResuelta) {
+    alert("Esperá un segundo e intentá de nuevo.");
+    return;
+  }
 
-  await addDoc(collection(db,"reservas"),{
-    alojamientoId: reserva.alojamientoId,
-    checkin: reserva.checkin,
-    checkout: reserva.checkout,
-    guests: reserva.guests,
+  if (!usuarioActual) {
+    irALogin();
+    return;
+  }
 
-    huespedNombre: nombre,
-    telefono,
-    mensaje,
+  if (!reserva || !reserva.alojamientoId) {
+    alert("No hay una reserva pendiente.");
+    return;
+  }
 
-    status: "pendiente",
-    creadaEn: serverTimestamp()
-  });
+  const nombre = document.getElementById("nombre").value.trim();
+  const telefono = document.getElementById("telefono").value.trim();
+  const mensaje = document.getElementById("mensaje").value.trim();
 
-  alert("Solicitud enviada ✅");
-  localStorage.removeItem("reservaPendiente");
-  window.location.href = "index.html";
+  try {
+    estado.textContent = "Enviando solicitud...";
+
+    await addDoc(collection(db, "reservas"), {
+      alojamientoId: reserva.alojamientoId,
+      checkin: reserva.checkin,
+      checkout: reserva.checkout,
+      guests: Number(reserva.guests || 1),
+
+      huespedId: usuarioActual.uid,
+      huespedEmail: usuarioActual.email || "",
+
+      huespedNombre: nombre,
+      telefono,
+      mensaje,
+
+      status: "pendiente",
+      creadaEn: serverTimestamp()
+    });
+
+    localStorage.removeItem("reservaPendiente");
+    localStorage.removeItem("redirectAfterLogin");
+
+    alert("Solicitud enviada ✅");
+    window.location.href = "mis-reservas.html";
+  } catch (error) {
+    console.error("Error al guardar reserva:", error);
+    estado.textContent = "No se pudo enviar la solicitud.";
+    alert("Hubo un error al enviar la solicitud.");
+  }
 });
 </script>
 
