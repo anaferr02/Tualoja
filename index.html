@@ -6,97 +6,793 @@
   <title>Tualoja - Alquila fácil, viaja feliz</title>
 
   <style>
-    * { box-sizing: border-box; }
-    body { font-family: Arial; }
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom, #5fd0ff, #7fdcff);
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main { flex: 1; }
+
+header {
+  padding: 15px 30px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #1b167f;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.logo .icono-maleta { color: #ffb300; }
+
+#hamburgerBtn { display: none; }
+
+#mainNav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-left select {
+  height: 44px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: none;
+}
+
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #1b167f;
+  background: rgba(255,255,255,0.65);
+  border: 1px solid rgba(27,22,127,0.15);
+}
+
+.btn {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.btn-ghost {
+  color: #1b167f;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(27,22,127,0.2);
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #1b167f, #3a35c9);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(27,22,127,.28);
+}
+
+.hero {
+  text-align: center;
+  padding: 70px 20px 50px;
+  color: #1b167f;
+  background: linear-gradient(180deg, #9fe2ff 0%, #6fd3ff 60%, #5fd0ff 100%);
+}
+.hero h2 {
+  font-size: 48px;
+  margin: 0 0 10px;
+  letter-spacing: -0.5px;
+}
+.hero p {
+  font-size: 22px;
+  margin: 0 0 10px;
+  opacity: .95;
+}
+
+.hero-trust{
+  margin: 14px auto 0;
+  max-width: 820px;
+  font-size: 16px;
+  font-weight: 800;
+  color: rgba(27,22,127,0.90);
+  background: rgba(255,255,255,0.70);
+  border: 1px solid rgba(27,22,127,0.12);
+  border-radius: 999px;
+  padding: 12px 16px;
+  display: inline-block;
+}
+
+.search-box {
+  background: linear-gradient(180deg, #ffc933, #ffb300);
+  border-radius: 28px;
+  padding: 26px;
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1040px;
+  margin: 20px auto 0;
+  box-shadow: 0 20px 45px rgba(0,0,0,.28);
+}
+
+.search-box input,
+.search-box select {
+  height: 52px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 14px;
+  font-size: 17px;
+  min-width: 170px;
+  background: rgba(255,255,255,.96);
+  outline: none;
+}
+
+.btn-header {
+  height: 52px;
+  padding: 0 22px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #1b167f, #3a35c9);
+  color: #fff;
+  font-weight: 900;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 26px rgba(27,22,127,.32);
+}
+
+.guests {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+}
+
+.guests-btn{
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 14px;
+  background: rgba(255,255,255,.96);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #1b167f;
+  font-weight: 900;
+}
+
+.guests-btn .chev{ font-size: 16px; opacity: .8; }
+
+.guests-panel{
+  display: none;
+  position: absolute;
+  top: calc(52px + 10px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 14px;
+  border: 1px solid rgba(27,22,127,0.12);
+  box-shadow: 0 18px 55px rgba(0,0,0,0.25);
+  z-index: 50;
+}
+
+.guests-panel.open{ display: block; }
+
+.guests-panel .row{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.guests-panel .row:last-of-type{ border-bottom: none; }
+.guests-panel .row-title{ font-weight: 900; color:#1b167f; }
+.guests-panel .row-sub{ font-size: 12px; opacity: .75; }
+.guests-panel .stepper{ display:flex; align-items:center; gap: 10px; }
+.guests-panel .step{
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(27,22,127,0.2);
+  background: #f4fbff;
+  color:#1b167f;
+  font-size: 18px;
+  font-weight: 900;
+  cursor:pointer;
+}
+.guests-panel .step:disabled{ opacity: .4; cursor: not-allowed; }
+.guests-panel .count{ min-width: 22px; text-align:center; font-weight: 900; color:#1b167f; }
+
+.kids-ages{
+  padding: 10px 0;
+  display:flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kids-ages select{
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(27,22,127,0.15);
+  padding: 10px 12px;
+  background: rgba(255,255,255,.95);
+}
+
+.panel-done{
+  width: 100%;
+  margin-top: 10px;
+  height: 48px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(90deg, #1b167f, #3a35c9);
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
+}
+.panel-done:hover{ filter: brightness(1.05); }
+
+.host-cta{
+  text-align: center;
+  padding: 18px 16px 6px;
+  margin-top: 8px;
+}
+
+.host-cta-text{
+  margin: 0 0 14px;
+  color: #1b167f;
+  font-weight: 900;
+  font-size: 18px;
+  text-shadow: 0 1px 0 rgba(255,255,255,.4);
+}
+
+.host-cta-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 54px;
+  padding: 0 34px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #2a26a0, #1b167f);
+  color: #fff;
+  font-weight: 900;
+  font-size: 18px;
+  text-decoration: none;
+  box-shadow: 0 18px 35px rgba(27,22,127,.35);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+.host-cta-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 22px 44px rgba(27,22,127,.45);
+  filter: brightness(1.03);
+}
+
+.host-proof, .host-types, .host-time{
+  margin: 10px 0 0;
+  color: #1b167f;
+  font-weight: 800;
+  opacity: .85;
+  font-size: 14px;
+}
+.host-types{ opacity: .78; font-weight: 700; }
+.host-time{ opacity: .80; font-weight: 700; }
+
+.how-it-works{
+  max-width: 1120px;
+  margin: 18px auto 40px;
+  padding: 0 16px;
+}
+
+.how-panel{
+  background: rgba(255,255,255,0.80);
+  border: 1px solid rgba(27,22,127,0.08);
+  border-radius: 28px;
+  padding: 26px;
+  box-shadow: 0 25px 60px rgba(0,0,0,.18);
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+
+.how-panel h3{
+  margin: 0 0 18px;
+  color: #1b167f;
+  font-size: 24px;
+}
+
+.how-cards{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.how-card{
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(27,22,127,0.08);
+  border-radius: 22px;
+  padding: 20px 18px 22px;
+  box-shadow: 0 16px 38px rgba(0,0,0,.14);
+  text-align: center;
+}
+
+.how-emoji{ font-size: 42px; margin-bottom: 10px; }
+
+.how-title{
+  color: #1b167f;
+  font-weight: 900;
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.how-sub{
+  margin: 0;
+  color: #333;
+  opacity: .86;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+footer {
+  margin-top: auto;
+  padding: 20px;
+  text-align: center;
+  background: rgba(255,255,255,0.40);
+}
+
+.footer-legal { margin-top: 10px; font-size: 14px; }
+.footer-legal a { color: #1b167f; text-decoration: none; }
+.footer-legal a:hover { text-decoration: underline; }
+
+@media (max-width: 900px){
+  .how-cards{ grid-template-columns: 1fr; }
+  .hero h2{ font-size: 34px; }
+  .hero p{ font-size: 18px; }
+  .hero-trust{ border-radius: 16px; line-height: 1.35; }
+}
+
+@media (max-width: 768px) {
+  header {
+    position: relative;
+    z-index: 1000;
+    flex-wrap: nowrap;
+    padding: 12px 14px;
+  }
+
+  #hamburgerBtn {
+    display: inline-flex;
+    margin-left: auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: rgba(255,255,255,0.45);
+    font-size: 24px;
+    cursor: pointer;
+    color: #1b167f;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+  }
+
+  #mainNav {
+    display: none;
+    position: absolute;
+    top: 68px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(92vw, 420px);
+    z-index: 2000;
+
+    flex-direction: column;
+    gap: 12px;
+
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(27,22,127,0.12);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+  }
+
+  #mainNav.is-open { display: flex; }
+
+  .nav-left,
+  .nav-right {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .nav-left select,
+  .nav-right a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .search-box { flex-direction: column; }
+
+  .search-box input,
+  .search-box select,
+  .btn-header,
+  .guests {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .guests-panel{ left: 0; right: 0; }
+}
   </style>
 </head>
 
 <body>
 
-  <main>
-    <h2>Buscá tu alojamiento</h2>
+<header>
+  <a href="index.html" class="logo">
+    <span class="icono-maleta">🧳</span> Tualoja.com
+  </a>
 
-    <input type="text" id="destino" placeholder="Destino">
+  <button class="hamburger" id="hamburgerBtn" type="button">☰</button>
 
-    <input type="date" id="entrada">
-    <input type="date" id="salida">
+  <nav id="mainNav">
+    <div class="nav-left">
+      <select id="idioma">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="pt">Português</option>
+      </select>
 
-    <input type="number" id="adultos" value="1">
-    <input type="number" id="ninos" value="0">
-    <input type="number" id="habitaciones" value="1">
+      <select id="moneda">
+        <option value="ars">ARS</option>
+        <option value="usd">USD</option>
+        <option value="eur">EUR</option>
+      </select>
+    </div>
 
-    <button onclick="buscar()">Buscar</button>
-  </main>
+    <div class="nav-right">
+      <a class="nav-link" href="publicar.html">Publicar alojamiento</a>
+      <a class="nav-link" href="ayuda.html">Ayuda</a>
+      <div id="authArea">
+        <a class="btn btn-ghost" href="login.html">Iniciar sesión</a>
+        <a class="btn btn-primary" href="register.html">Hazte una cuenta</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h2>Alquila fácil, viaja feliz</h2>
+    <p>Las mejores opciones para tu próxima estadía.</p>
+
+    <p class="hero-trust">
+      Plataforma argentina para hospedajes temporarios · Reservas simples y contacto con el anfitrión
+    </p>
+  </section>
+
+  <section class="search-box">
+    <input type="text" id="destino" placeholder="Destino" />
+    <input type="date" id="entrada" />
+    <input type="date" id="salida" />
+
+    <div class="guests">
+      <button type="button" class="guests-btn" id="guestsBtn" aria-expanded="false">
+        <span id="guestsSummary">1 adulto · 0 niños · 1 habitación</span>
+        <span class="chev">▾</span>
+      </button>
+
+      <div class="guests-panel" id="guestsPanel" aria-hidden="true">
+        <div class="row">
+          <div>
+            <div class="row-title">Adultos</div>
+            <div class="row-sub">13 años o más</div>
+          </div>
+          <div class="stepper">
+            <button type="button" class="step" id="adultsMinus">−</button>
+            <span class="count" id="adultsCount">1</span>
+            <button type="button" class="step" id="adultsPlus">+</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <div class="row-title">Niños</div>
+            <div class="row-sub">0–12 años</div>
+          </div>
+          <div class="stepper">
+            <button type="button" class="step" id="kidsMinus">−</button>
+            <span class="count" id="kidsCount">0</span>
+            <button type="button" class="step" id="kidsPlus">+</button>
+          </div>
+        </div>
+
+        <div id="kidsAges" class="kids-ages"></div>
+
+        <div class="row">
+          <div>
+            <div class="row-title">Habitaciones</div>
+          </div>
+          <div class="stepper">
+            <button type="button" class="step" id="roomsMinus">−</button>
+            <span class="count" id="roomsCount">1</span>
+            <button type="button" class="step" id="roomsPlus">+</button>
+          </div>
+        </div>
+
+        <button type="button" class="panel-done" id="guestsDone">Listo</button>
+      </div>
+
+      <input type="hidden" id="adultos" value="1" />
+      <input type="hidden" id="ninos" value="0" />
+      <input type="hidden" id="habitaciones" value="1" />
+    </div>
+
+    <a href="#" class="btn-header" onclick="buscar()">Buscar</a>
+  </section>
+
+  <section class="host-cta">
+    <p class="host-cta-text">
+      ¿Tenés un alojamiento? Publicalo gratis y empezá a recibir huéspedes.
+    </p>
+
+    <a class="host-cta-btn" href="publicar.html">Publicar mi alojamiento</a>
+
+    <p class="host-proof">Publicar es gratis · Sin costos fijos · Activación rápida</p>
+    <p class="host-types">Casas · Departamentos · Cabañas · Habitaciones · Quinchos</p>
+    <p class="host-time">⏱ Publicar tu alojamiento toma menos de 3 minutos</p>
+  </section>
+
+  <section class="how-it-works">
+    <div class="how-panel">
+      <h3>¿Cómo funciona?</h3>
+      <div class="how-cards">
+        <div class="how-card">
+          <div class="how-emoji">🏠</div>
+          <div class="how-title">Publicá tu alojamiento</div>
+          <div class="how-sub">Cargá fotos, ubicación y precio.</div>
+        </div>
+
+        <div class="how-card">
+          <div class="how-emoji">📅</div>
+          <div class="how-title">Recibí reservas directas</div>
+          <div class="how-sub">Sin vueltas, con confirmación.</div>
+        </div>
+
+        <div class="how-card">
+          <div class="how-emoji">💬</div>
+          <div class="how-title">Contactá al huésped</div>
+          <div class="how-sub">Coordiná detalles sin intermediarios.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+  <div class="footer-legal">
+    <a href="politica-de-privacidad.html">Política de Privacidad</a> |
+    <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
+    <a href="politica-de-cancelacion.html">Política de Cancelaciones</a> |
+    <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+  </div>
+</footer>
 
 <script>
-function hoyLocal() {
-  const hoy = new Date();
-  const anio = hoy.getFullYear();
-  const mes = String(hoy.getMonth() + 1).padStart(2, "0");
-  const dia = String(hoy.getDate()).padStart(2, "0");
-  return `${anio}-${mes}-${dia}`;
-}
-
-function buscar(){
-  const destino = document.getElementById("destino").value;
-  const entradaInput = document.getElementById("entrada");
-  const salidaInput = document.getElementById("salida");
-
-  const checkin = entradaInput.value;
-  const checkout = salidaInput.value;
-  const hoy = hoyLocal();
-
-  // 🔒 BLOQUEO DE FECHAS PASADAS
-  if (checkin && checkin < hoy) {
-    alert("No podés elegir una fecha pasada.");
-    return;
+  function hoyLocal() {
+    const hoy = new Date();
+    const anio = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+    const dia = String(hoy.getDate()).padStart(2, "0");
+    return `${anio}-${mes}-${dia}`;
   }
 
-  if (checkout && checkout < hoy) {
-    alert("No podés elegir una fecha pasada.");
-    return;
-  }
+  function buscar(){
+    const destino = document.getElementById("destino")?.value?.trim() || "";
+    const entradaInput = document.getElementById("entrada");
+    const salidaInput = document.getElementById("salida");
 
-  // 🔒 VALIDACIÓN ENTRE FECHAS
-  if (checkin && checkout && checkout <= checkin) {
-    alert("La salida debe ser después de la entrada.");
-    return;
-  }
+    const checkin = entradaInput?.value || "";
+    const checkout = salidaInput?.value || "";
+    const hoy = hoyLocal();
 
-  const adultos = Number(document.getElementById("adultos").value);
-  const ninos = Number(document.getElementById("ninos").value);
-  const habitaciones = Number(document.getElementById("habitaciones").value);
-  const guests = adultos + ninos;
+    if (entradaInput) entradaInput.min = hoy;
+    if (salidaInput) salidaInput.min = checkin || hoy;
 
-  const params = new URLSearchParams();
-
-  params.set("destino", destino);
-  params.set("checkin", checkin);
-  params.set("checkout", checkout);
-  params.set("guests", guests);
-
-  window.location.href = `resultados.html?${params.toString()}`;
-}
-
-// 🔒 BLOQUEO AUTOMÁTICO EN INPUTS
-document.addEventListener("DOMContentLoaded", () => {
-  const entrada = document.getElementById("entrada");
-  const salida = document.getElementById("salida");
-
-  const hoy = hoyLocal();
-
-  entrada.min = hoy;
-  salida.min = hoy;
-
-  entrada.addEventListener("change", () => {
-    salida.min = entrada.value;
-
-    if (salida.value && salida.value <= entrada.value) {
-      salida.value = "";
+    if (checkin && checkin < hoy) {
+      alert("No podés elegir una fecha de entrada anterior a hoy.");
+      entradaInput?.focus();
+      return;
     }
-  });
-});
+
+    if (checkout && checkout < hoy) {
+      alert("No podés elegir una fecha de salida anterior a hoy.");
+      salidaInput?.focus();
+      return;
+    }
+
+    if (checkin && checkout && checkout <= checkin) {
+      alert("La fecha de salida debe ser posterior a la fecha de entrada.");
+      salidaInput?.focus();
+      return;
+    }
+
+    const adultos = Number(document.getElementById("adultos")?.value || 1);
+    const ninos = Number(document.getElementById("ninos")?.value || 0);
+    const habitaciones = Number(document.getElementById("habitaciones")?.value || 1);
+    const guests = adultos + ninos;
+
+    localStorage.setItem("searchDestino", destino);
+    localStorage.setItem("searchCheckin", checkin);
+    localStorage.setItem("searchCheckout", checkout);
+    localStorage.setItem("searchGuests", String(guests));
+    localStorage.setItem("searchAdults", String(adultos));
+    localStorage.setItem("searchKids", String(ninos));
+    localStorage.setItem("searchRooms", String(habitaciones));
+
+    const params = new URLSearchParams();
+
+    if (destino) params.set("destino", destino);
+    if (checkin) params.set("checkin", checkin);
+    if (checkout) params.set("checkout", checkout);
+    if (guests) params.set("guests", String(guests));
+    if (adultos) params.set("adultos", String(adultos));
+    if (ninos >= 0) params.set("ninos", String(ninos));
+    if (habitaciones) params.set("habitaciones", String(habitaciones));
+
+    window.location.href = `resultados.html?${params.toString()}`;
+  }
+
+  (function(){
+    const entradaInput = document.getElementById("entrada");
+    const salidaInput = document.getElementById("salida");
+    const hoy = hoyLocal();
+
+    if (entradaInput) entradaInput.min = hoy;
+    if (salidaInput) salidaInput.min = hoy;
+
+    entradaInput?.addEventListener("change", () => {
+      const entrada = entradaInput.value || hoy;
+      if (salidaInput) {
+        salidaInput.min = entrada;
+        if (salidaInput.value && salidaInput.value <= entrada) {
+          salidaInput.value = "";
+        }
+      }
+    });
+
+    const btn = document.getElementById("guestsBtn");
+    const panel = document.getElementById("guestsPanel");
+    const done = document.getElementById("guestsDone");
+    const summary = document.getElementById("guestsSummary");
+
+    const adultsH = document.getElementById("adultos");
+    const kidsH = document.getElementById("ninos");
+    const roomsH = document.getElementById("habitaciones");
+
+    const adultsCount = document.getElementById("adultsCount");
+    const kidsCount = document.getElementById("kidsCount");
+    const roomsCount = document.getElementById("roomsCount");
+
+    const adultsMinus = document.getElementById("adultsMinus");
+    const adultsPlus  = document.getElementById("adultsPlus");
+    const kidsMinus   = document.getElementById("kidsMinus");
+    const kidsPlus    = document.getElementById("kidsPlus");
+    const roomsMinus  = document.getElementById("roomsMinus");
+    const roomsPlus   = document.getElementById("roomsPlus");
+
+    const kidsAges = document.getElementById("kidsAges");
+
+    let adults = 1, kids = 0, rooms = 1;
+
+    function updateSummary(){
+      summary.textContent =
+        `${adults} adulto${adults>1?"s":""} · ${kids} niño${kids!==1?"s":""} · ${rooms} habitación${rooms>1?"es":""}`;
+
+      adultsH.value = String(adults);
+      kidsH.value = String(kids);
+      roomsH.value = String(rooms);
+
+      adultsCount.textContent = adults;
+      kidsCount.textContent = kids;
+      roomsCount.textContent = rooms;
+
+      adultsMinus.disabled = adults <= 1;
+      kidsMinus.disabled = kids <= 0;
+      roomsMinus.disabled = rooms <= 1;
+    }
+
+    function renderKidsAges(){
+      kidsAges.innerHTML = "";
+      for(let i=1; i<=kids; i++){
+        const sel = document.createElement("select");
+        sel.name = `edad-nino-${i}`;
+        sel.dataset.index = String(i);
+
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = `Edad niño ${i}`;
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        sel.appendChild(placeholder);
+
+        for(let age=0; age<=17; age++){
+          const opt = document.createElement("option");
+          opt.value = String(age);
+          opt.textContent = `${age} año${age!==1?"s":""}`;
+          sel.appendChild(opt);
+        }
+        kidsAges.appendChild(sel);
+      }
+    }
+
+    function openPanel(){
+      panel.classList.add("open");
+      btn.setAttribute("aria-expanded","true");
+      panel.setAttribute("aria-hidden","false");
+    }
+
+    function closePanel(){
+      panel.classList.remove("open");
+      btn.setAttribute("aria-expanded","false");
+      panel.setAttribute("aria-hidden","true");
+    }
+
+    btn.addEventListener("click", (e)=>{
+      e.preventDefault();
+      panel.classList.contains("open") ? closePanel() : openPanel();
+    });
+
+    done.addEventListener("click", closePanel);
+
+    document.addEventListener("click", (e)=>{
+      if(!panel.contains(e.target) && !btn.contains(e.target)) closePanel();
+    });
+
+    adultsMinus.addEventListener("click", ()=>{ adults = Math.max(1, adults-1); updateSummary(); });
+    adultsPlus.addEventListener("click",  ()=>{ adults = adults+1; updateSummary(); });
+
+    kidsMinus.addEventListener("click", ()=>{ kids = Math.max(0, kids-1); renderKidsAges(); updateSummary(); });
+    kidsPlus.addEventListener("click",  ()=>{ kids = kids+1; renderKidsAges(); updateSummary(); });
+
+    roomsMinus.addEventListener("click", ()=>{ rooms = Math.max(1, rooms-1); updateSummary(); });
+    roomsPlus.addEventListener("click",  ()=>{ rooms = rooms+1; updateSummary(); });
+
+    updateSummary();
+    renderKidsAges();
+  })();
 </script>
+
+<script type="module" src="script.js"></script>
 
 </body>
 </html>
