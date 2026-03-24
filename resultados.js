@@ -13,6 +13,43 @@ const checkin = params.get("checkin") || "";
 const checkout = params.get("checkout") || "";
 const guests = params.get("guests") || params.get("huespedes") || "1";
 
+const coordsLugares = {
+  "mendoza": [-32.8895, -68.8458],
+  "capital federal": [-34.6037, -58.3816],
+  "buenos aires": [-34.6037, -58.3816],
+  "la plata": [-34.9214, -57.9544],
+  "mar del plata": [-38.0055, -57.5426],
+  "cordoba": [-31.4201, -64.1888],
+  "villa carlos paz": [-31.4241, -64.4978],
+  "salta": [-24.7821, -65.4232],
+  "neuquen": [-38.9516, -68.0591],
+  "bariloche": [-41.1335, -71.3103],
+  "san carlos de bariloche": [-41.1335, -71.3103],
+  "jujuy": [-24.1858, -65.2995],
+  "tucuman": [-26.8083, -65.2176],
+  "san miguel de tucuman": [-26.8083, -65.2176],
+  "santa fe": [-31.6333, -60.7000],
+  "rosario": [-32.9442, -60.6505],
+  "entre rios": [-31.7319, -60.5238],
+  "parana": [-31.7319, -60.5238],
+  "misiones": [-27.3621, -55.9009],
+  "posadas": [-27.3621, -55.9009],
+  "chubut": [-43.3002, -65.1023],
+  "puerto madryn": [-42.7692, -65.0385],
+  "santa cruz": [-51.6230, -69.2168],
+  "ushuaia": [-54.8019, -68.3030],
+  "tierra del fuego": [-54.8019, -68.3030],
+  "san juan": [-31.5375, -68.5364],
+  "san luis": [-33.2950, -66.3356],
+  "la rioja": [-29.4131, -66.8558],
+  "catamarca": [-28.4696, -65.7852],
+  "santiago del estero": [-27.7951, -64.2615],
+  "formosa": [-26.1775, -58.1781],
+  "resistencia": [-27.4514, -58.9867],
+  "chaco": [-27.4514, -58.9867],
+  "corrientes": [-27.4692, -58.8306]
+};
+
 function armarUbicacion(alojamiento) {
   const ciudad = alojamiento.ciudad || "";
   const provincia = alojamiento.provincia || "";
@@ -23,12 +60,78 @@ function armarUbicacion(alojamiento) {
   return "Ubicación no informada";
 }
 
+function obtenerCentroPorDestino(destinoTexto) {
+  if (!destinoTexto) return null;
+
+  const limpio = destinoTexto.trim().toLowerCase();
+  return coordsLugares[limpio] || null;
+}
+
+function obtenerCoordenadasAlojamiento(a, docId) {
+  const lat = Number(a.lat);
+  const lng = Number(a.lng);
+
+  if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0) {
+    return [lat, lng];
+  }
+
+  const ciudad = (a.ciudad || "").trim().toLowerCase();
+  const provincia = (a.provincia || "").trim().toLowerCase();
+  const ubicacion = (a.ubicacion || "").trim().toLowerCase();
+
+  let base =
+    coordsLugares[ciudad] ||
+    coordsLugares[provincia] ||
+    coordsLugares[ubicacion] ||
+    null;
+
+  if (!base) return null;
+
+  const hash = [...String(docId || "0")].reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  const offsetLat = ((hash % 10) - 5) * 0.01;
+  const offsetLng = (((hash * 3) % 10) - 5) * 0.01;
+
+  return [base[0] + offsetLat, base[1] + offsetLng];
+}
+
+function crearIconoPrecio(precioTexto) {
+  return L.divIcon({
+    className: "custom-price-icon",
+    html: `<div class="precio-marker">$${precioTexto}</div>`,
+    iconSize: [1, 1],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -18]
+  });
+}
+
+function limpiarHtml(texto = "") {
+  return String(texto)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function esperarMapaListo() {
+  return new Promise((resolve) => {
+    if (window.mapaGlobal) {
+      resolve(window.mapaGlobal);
+      return;
+    }
+
+    window.addEventListener("mapa-listo", () => resolve(window.mapaGlobal), { once: true });
+  });
+}
+
 async function cargarResultados() {
   try {
+    const mapa = await esperarMapaListo();
     const querySnapshot = await getDocs(collection(db, "alojamientos"));
 
     let html = "";
     let encontrados = 0;
+    const markers = [];
 
     querySnapshot.forEach((docSnap) => {
       const a = docSnap.data();
@@ -50,19 +153,20 @@ async function cargarResultados() {
       encontrados++;
 
       const foto = a.fotos?.[0] || "https://via.placeholder.com/800x500?text=Sin+imagen";
-      const precio = Number(a.precio || 0).toLocaleString("es-AR");
+      const precioNumero = Number(a.precio || 0);
+      const precio = precioNumero.toLocaleString("es-AR");
       const ubicacionTexto = armarUbicacion(a);
       const tituloTexto = a.titulo || "Alojamiento sin título";
 
       html += `
         <div class="resultado-card">
-          <img class="resultado-img" src="${foto}" alt="${tituloTexto}">
+          <img class="resultado-img" src="${foto}" alt="${limpiarHtml(tituloTexto)}">
 
           <div class="resultado-info">
-            <h3 class="resultado-titulo">${tituloTexto}</h3>
+            <h3 class="resultado-titulo">${limpiarHtml(tituloTexto)}</h3>
 
             <div class="resultado-ubicacion">
-              ${ubicacionTexto}
+              ${limpiarHtml(ubicacionTexto)}
             </div>
 
             <div class="resultado-precio">
@@ -77,12 +181,49 @@ async function cargarResultados() {
           </div>
         </div>
       `;
+
+      const coords = obtenerCoordenadasAlojamiento(a, docSnap.id);
+
+      if (coords && mapa) {
+        const marker = L.marker(coords, {
+          icon: crearIconoPrecio(precio)
+        }).addTo(mapa);
+
+        marker.bindPopup(`
+          <strong>${limpiarHtml(tituloTexto)}</strong><br>
+          ${limpiarHtml(ubicacionTexto)}<br>
+          $${precio} por noche<br><br>
+          <a href="detalle.html?id=${docSnap.id}&destino=${encodeURIComponent(destino)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}">
+            Ver alojamiento
+          </a>
+        `);
+
+        markers.push(marker);
+      }
     });
 
     cont.innerHTML = html;
 
     if (emptyResultados) {
       emptyResultados.style.display = encontrados === 0 ? "block" : "none";
+    }
+
+    if (mapa) {
+      if (markers.length > 0) {
+        const group = L.featureGroup(markers);
+        mapa.fitBounds(group.getBounds(), { padding: [30, 30] });
+
+        if (mapa.getZoom() > 14) {
+          mapa.setZoom(14);
+        }
+      } else {
+        const centro = obtenerCentroPorDestino(destino);
+        if (centro) {
+          mapa.setView(centro, 10);
+        } else {
+          mapa.setView([-34.6037, -58.3816], 5);
+        }
+      }
     }
   } catch (error) {
     console.error("Error al cargar resultados:", error);
