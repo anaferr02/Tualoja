@@ -3,739 +3,216 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Detalle - TuAloja</title>
-
-  <link rel="stylesheet" href="style.css" />
+  <title>Reserva - TuAloja</title>
 
   <style>
-    *{
-      box-sizing:border-box;
-    }
-
     body{
       margin:0;
+      font-family:Arial;
       background:#f6f7fb;
-      color:#1b1b1f;
-      font-family:Arial, Helvetica, sans-serif;
     }
 
-    .detalle-page{
-      max-width:1200px;
-      margin:0 auto;
-      padding:28px 20px 70px;
-    }
-
-    .detalle-back{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      margin-bottom:18px;
-      color:#5a47d6;
-      font-size:15px;
-      font-weight:700;
-      text-decoration:none;
-    }
-
-    .detalle-back:hover{
-      text-decoration:underline;
-    }
-
-    .detalle-layout h1{
-      margin:0 0 12px;
-      font-size:52px;
-      line-height:1.02;
-      color:#161616;
-      font-family:Georgia,"Times New Roman",serif;
-    }
-
-    .detalle-top-meta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px 18px;
-      margin-bottom:14px;
-      color:#404457;
-      font-size:17px;
-    }
-
-    .detalle-top-meta strong{
-      color:#181818;
-    }
-
-    .detalle-descripcion-top{
-      margin:0 0 26px;
+    .page{
       max-width:900px;
-      font-size:17px;
-      line-height:1.65;
-      color:#44495f;
+      margin:auto;
+      padding:20px;
     }
 
-    .detalle-card{
-      overflow:hidden;
-      background:#fff;
-      border:1px solid #e8e9f2;
-      border-radius:26px;
-      box-shadow:0 12px 34px rgba(27, 31, 53, .08);
+    .card{
+      background:white;
+      padding:20px;
+      border-radius:20px;
+      margin-bottom:20px;
     }
 
-    .detalle-galeria{
-      background:#eceef7;
-      min-height:380px;
-    }
-
-    .detalle-galeria img{
+    input, textarea{
       width:100%;
-      height:100%;
-      min-height:380px;
-      max-height:470px;
-      object-fit:cover;
-      display:block;
+      padding:12px;
+      margin-top:8px;
+      border-radius:10px;
+      border:1px solid #ccc;
     }
 
-    .detalle-galeria-empty{
-      min-height:380px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:30px;
-      background:linear-gradient(135deg,#f4f5fb,#eceffd);
-      color:#5c6488;
-      font-size:22px;
-      font-weight:700;
-      text-align:center;
-    }
-
-    .detalle-info-grid{
-      display:grid;
-      grid-template-columns:1.25fr 380px;
-      align-items:start;
-    }
-
-    .detalle-info-left{
-      padding:34px 30px 38px;
-      border-right:1px solid #ececf3;
-      background:#fff;
-    }
-
-    .detalle-info-right{
-      padding:28px 24px 28px;
-      background:#fcfcff;
-    }
-
-    .detalle-bloque{
-      margin-bottom:28px;
-    }
-
-    .detalle-bloque:last-child{
-      margin-bottom:0;
-    }
-
-    .detalle-bloque h3{
-      margin:0 0 14px;
-      font-size:18px;
-      color:#18181f;
-    }
-
-    .detalle-lista{
-      display:grid;
-      gap:12px;
-    }
-
-    .detalle-item{
-      font-size:16px;
-      line-height:1.6;
-      color:#41465a;
-      padding-bottom:12px;
-      border-bottom:1px solid #f0f1f6;
-    }
-
-    .detalle-item:last-child{
-      border-bottom:none;
-      padding-bottom:0;
-    }
-
-    .detalle-item strong{
-      color:#16161c;
-    }
-
-    .chips{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      padding:10px 14px;
-      border-radius:999px;
-      background:#f3f4fb;
-      color:#434a63;
-      font-size:14px;
-      font-weight:700;
-      border:1px solid #e5e7f3;
-    }
-
-    .detalle-precio-card{
-      position:sticky;
-      top:18px;
-      border:1px solid #e6e7f2;
-      border-radius:22px;
-      padding:22px 18px 18px;
-      background:#fff;
-      box-shadow:0 10px 24px rgba(74, 61, 183, .08);
-    }
-
-    .detalle-precio-box{
-      margin-bottom:12px;
-      color:#181818;
-      line-height:1.1;
-    }
-
-    .detalle-precio-numero{
-      font-size:42px;
-      font-weight:800;
-      letter-spacing:-0.5px;
-      color:#171717;
-    }
-
-    .detalle-precio-texto{
-      font-size:24px;
-      color:#2a2a2a;
-      margin-left:4px;
-    }
-
-    .detalle-subprecio{
-      margin:0 0 18px;
-      color:#615d88;
-      font-size:15px;
-      font-weight:700;
-    }
-
-    .detalle-reserva-form{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      margin-bottom:12px;
-    }
-
-    .detalle-label{
-      font-size:14px;
-      font-weight:800;
-      color:#26293a;
-      margin-top:2px;
-    }
-
-    .detalle-input,
-    .detalle-select{
+    button{
       width:100%;
-      height:52px;
-      border:1px solid #d9dced;
-      border-radius:14px;
-      padding:0 14px;
-      font-size:16px;
-      background:#fff;
-      outline:none;
-      color:#20222d;
-    }
-
-    .detalle-input:focus,
-    .detalle-select:focus{
-      border-color:#6b5be7;
-      box-shadow:0 0 0 4px rgba(107,91,231,.10);
-    }
-
-    .detalle-alerta{
-      margin:10px 0 8px;
-      padding:13px 14px;
-      border-radius:14px;
-      font-size:14px;
-      line-height:1.5;
-      border:1px solid;
-    }
-
-    .detalle-alerta.warning{
-      background:#fff8ea;
-      border-color:#f0d18f;
-      color:#9a6a00;
-    }
-
-    .detalle-alerta.info{
-      background:#f3f1ff;
-      border-color:#d7d0ff;
-      color:#4b3db7;
-      font-weight:700;
-    }
-
-    .detalle-alerta.no-disponible{
-      background:#f6f3ff;
-      border-color:#d6cffd;
-      color:#4a3ab8;
-      font-weight:700;
-    }
-
-    .detalle-btn-reservar{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      width:100%;
-      min-height:60px;
-      padding:16px 20px;
-      margin-top:4px;
+      padding:15px;
+      margin-top:20px;
+      background:#4f3dbb;
+      color:white;
       border:none;
-      border-radius:16px;
-      background:linear-gradient(180deg,#6f61ea,#4f3dbb);
-      color:#fff;
-      font-size:24px;
-      font-weight:800;
-      box-shadow:0 12px 24px rgba(79,61,187,.25);
+      border-radius:12px;
+      font-weight:bold;
       cursor:pointer;
-      transition:transform .15s ease, filter .15s ease, opacity .15s ease;
     }
 
-    .detalle-btn-reservar:hover{
-      transform:translateY(-1px);
-      filter:brightness(1.03);
-    }
-
-    .detalle-btn-reservar.disabled{
-      background:#b9b7d9;
-      box-shadow:none;
-      cursor:not-allowed;
-      pointer-events:none;
-      opacity:.85;
-    }
-
-    .detalle-ayuda{
-      margin-top:12px;
-      font-size:13px;
-      color:#6f7387;
-      text-align:center;
-      line-height:1.45;
-    }
-
-    .detalle-ok{
-      margin-top:12px;
-      font-size:13px;
-      color:#4f6c2c;
-      text-align:left;
-      line-height:1.45;
-      font-weight:700;
-    }
-
-    .muted{
-      color:#666;
-      font-size:18px;
-    }
-
-    @media(max-width:1050px){
-      .detalle-info-grid{
-        grid-template-columns:1fr;
-      }
-
-      .detalle-info-left{
-        border-right:none;
-        border-bottom:1px solid #ececf3;
-      }
-
-      .detalle-precio-card{
-        position:static;
-      }
-    }
-
-    @media(max-width:700px){
-      .detalle-page{
-        padding:20px 14px 50px;
-      }
-
-      .detalle-layout h1{
-        font-size:38px;
-      }
-
-      .detalle-top-meta{
-        font-size:15px;
-      }
-
-      .detalle-descripcion-top{
-        font-size:15px;
-      }
-
-      .detalle-galeria img,
-      .detalle-galeria-empty{
-        min-height:250px;
-      }
-
-      .detalle-info-left,
-      .detalle-info-right{
-        padding:22px 18px 24px;
-      }
-
-      .detalle-precio-numero{
-        font-size:34px;
-      }
-
-      .detalle-precio-texto{
-        font-size:20px;
-      }
-
-      .detalle-btn-reservar{
-        font-size:21px;
-      }
+    .estado{
+      margin-top:10px;
+      font-size:14px;
+      color:#555;
     }
   </style>
 </head>
 
 <body>
 
-  <header class="header">
-    <a class="logo" href="index.html">TuAloja.com</a>
+<div class="page">
 
-    <nav id="mainNav" class="nav">
-      <a href="alojamiento.html">Registra tu alojamiento</a>
-      <a href="ayuda.html">Ayuda</a>
-      <span id="navAuth"></span>
-    </nav>
+  <div class="card">
+    <h2>Completar reserva</h2>
 
-    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
-  </header>
+    <form id="formReserva">
 
-  <main class="detalle-page">
-    <a id="volverResultados" class="detalle-back" href="resultados.html">← Volver a resultados</a>
+      <label>Nombre</label>
+      <input id="nombre" required>
 
-    <div id="detalleAlojamiento"></div>
+      <label>Teléfono</label>
+      <input id="telefono" required>
 
-    <p id="noExiste" class="muted" style="display:none; margin-top:16px;">
-      Este alojamiento no existe o fue eliminado.
-    </p>
-  </main>
+      <label>Mensaje</label>
+      <textarea id="mensaje"></textarea>
 
-  <script src="script.js"></script>
+      <button type="submit">
+        Enviar solicitud de reserva
+      </button>
 
-  <script type="module">
-    import { db } from "./firebase-config.js";
-    import { getUser } from "./public/js/auth.js";
-    import {
-      doc,
-      getDoc
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+      <div id="estado" class="estado"></div>
+    </form>
+  </div>
 
-    const wrap = document.getElementById("detalleAlojamiento");
-    const noExiste = document.getElementById("noExiste");
-    const volverResultados = document.getElementById("volverResultados");
+  <div class="card">
+    <h3>Resumen</h3>
+    <div id="resumen"></div>
+  </div>
 
-    const params = new URLSearchParams(window.location.search);
+</div>
 
-    const id = params.get("id");
-    const checkinParam = params.get("checkin") || "";
-    const checkoutParam = params.get("checkout") || "";
-    const guestsParam = params.get("guests") || "1";
+<script type="module">
+import { db, auth } from "./firebase-config.js";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-    if (checkinParam || checkoutParam || guestsParam) {
-      volverResultados.href = `resultados.html?checkin=${encodeURIComponent(checkinParam)}&checkout=${encodeURIComponent(checkoutParam)}&guests=${encodeURIComponent(guestsParam)}`;
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+const form = document.getElementById("formReserva");
+const resumen = document.getElementById("resumen");
+const estado = document.getElementById("estado");
+
+let reserva = JSON.parse(localStorage.getItem("reservaPendiente"));
+let usuarioActual = null;
+let authResuelta = false;
+
+function irALogin() {
+  localStorage.setItem("redirectAfterLogin", "reservar.html");
+  alert("Tenés que iniciar sesión para reservar");
+  window.location.href = "login.html";
+}
+
+onAuthStateChanged(auth, (user) => {
+  authResuelta = true;
+
+  if (!user) {
+    usuarioActual = null;
+    irALogin();
+    return;
+  }
+
+  usuarioActual = user;
+});
+
+async function cargarResumen() {
+  if (!reserva || !reserva.alojamientoId) {
+    resumen.innerHTML = "No hay reserva pendiente.";
+    form.style.display = "none";
+    return;
+  }
+
+  try {
+    const ref = doc(db, "alojamientos", reserva.alojamientoId);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      resumen.innerHTML = "El alojamiento ya no existe.";
+      form.style.display = "none";
+      return;
     }
 
-    function calcularNoches(checkin, checkout) {
-      if (!checkin || !checkout) return 0;
+    const a = snap.data();
 
-      const entrada = new Date(checkin + "T00:00:00");
-      const salida = new Date(checkout + "T00:00:00");
-      const diff = salida.getTime() - entrada.getTime();
+    resumen.innerHTML = `
+      <p><strong>${a.titulo || "Alojamiento"}</strong></p>
+      <p>${reserva.checkin} → ${reserva.checkout}</p>
+      <p>Huéspedes: ${reserva.guests}</p>
+    `;
+  } catch (error) {
+    console.error("Error al cargar resumen:", error);
+    resumen.innerHTML = "Hubo un error al cargar el resumen.";
+    form.style.display = "none";
+  }
+}
 
-      if (isNaN(diff) || diff <= 0) return 0;
+cargarResumen();
 
-      return Math.round(diff / (1000 * 60 * 60 * 24));
-    }
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    function formatearPrecio(valor) {
-      return Number(valor || 0).toLocaleString("es-AR");
-    }
+  if (!authResuelta) {
+    alert("Esperá un segundo e intentá de nuevo.");
+    return;
+  }
 
-    function obtenerHoy() {
-      const hoy = new Date();
-      const year = hoy.getFullYear();
-      const month = String(hoy.getMonth() + 1).padStart(2, "0");
-      const day = String(hoy.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    }
+  if (!usuarioActual) {
+    irALogin();
+    return;
+  }
 
-    function limpiarTexto(texto, fallback = "") {
-      if (texto === undefined || texto === null) return fallback;
-      return String(texto).trim() || fallback;
-    }
+  if (!reserva || !reserva.alojamientoId) {
+    alert("No hay una reserva pendiente.");
+    return;
+  }
 
-    function convertirLista(valor, fallback = []) {
-      if (Array.isArray(valor)) return valor.filter(Boolean);
-      if (typeof valor === "string" && valor.trim()) {
-        return valor.split(",").map(item => item.trim()).filter(Boolean);
-      }
-      return fallback;
-    }
+  const nombre = document.getElementById("nombre").value.trim();
+  const telefono = document.getElementById("telefono").value.trim();
+  const mensaje = document.getElementById("mensaje").value.trim();
 
-    function hayCruceDeFechas(checkin, checkout) {
-      if (!checkin || !checkout) return false;
+  try {
+    estado.textContent = "Enviando solicitud...";
 
-      const reservasExistentes = [
-        { desde: "2026-03-20", hasta: "2026-03-22" },
-        { desde: "2026-04-10", hasta: "2026-04-15" }
-      ];
+    await addDoc(collection(db, "reservas"), {
+      alojamientoId: reserva.alojamientoId,
+      checkin: reserva.checkin,
+      checkout: reserva.checkout,
+      guests: Number(reserva.guests || 1),
 
-      const entrada = new Date(checkin + "T00:00:00");
-      const salida = new Date(checkout + "T00:00:00");
+      huespedId: usuarioActual.uid,
+      huespedEmail: usuarioActual.email || "",
 
-      return reservasExistentes.some((reserva) => {
-        const reservaDesde = new Date(reserva.desde + "T00:00:00");
-        const reservaHasta = new Date(reserva.hasta + "T00:00:00");
-        return entrada < reservaHasta && salida > reservaDesde;
-      });
-    }
+      huespedNombre: nombre,
+      telefono,
+      mensaje,
 
-    async function cargarDetalle() {
-      try {
-        if (!id) {
-          noExiste.style.display = "block";
-          return;
-        }
+      status: "pendiente",
+      creadaEn: serverTimestamp()
+    });
 
-        const ref = doc(db, "alojamientos", id);
-        const snap = await getDoc(ref);
+    localStorage.removeItem("reservaPendiente");
+    localStorage.removeItem("redirectAfterLogin");
 
-        if (!snap.exists()) {
-          noExiste.style.display = "block";
-          return;
-        }
+    alert("Solicitud enviada ✅");
+    window.location.href = "mis-reservas.html";
+  } catch (error) {
+    console.error("Error al guardar reserva:", error);
+    estado.textContent = "No se pudo enviar la solicitud.";
+    alert("Hubo un error al enviar la solicitud.");
+  }
+});
+</script>
 
-        const a = snap.data();
-
-        const foto = a.fotos?.[0] || "";
-        const precio = Number(a.precio || 0);
-        const ciudad = limpiarTexto(a.ciudad, "Ubicación no informada");
-        const provincia = limpiarTexto(a.provincia, "");
-        const ubicacion = provincia ? `${ciudad} - ${provincia}` : ciudad;
-        const descripcion = limpiarTexto(a.descripcion, "Sin descripción disponible.");
-        const titulo = limpiarTexto(a.titulo, "Alojamiento sin título");
-        const huespedes = Number(a.huespedes || 1);
-        const tipo = limpiarTexto(a.tipo, "Departamento");
-        const checkinHora = limpiarTexto(a.checkinHora, "14:00");
-        const checkoutHora = limpiarTexto(a.checkoutHora, "10:00");
-        const cancelacion = limpiarTexto(a.cancelacion, "No reembolsable");
-
-        const servicios = convertirLista(a.servicios, ["Wifi", "Desayuno", "Aire acondicionado"]);
-        const reglas = convertirLista(a.reglas, ["No se permite fumar", "No se permiten fiestas"]);
-        const hoy = obtenerHoy();
-
-        wrap.innerHTML = `
-          <section class="detalle-layout">
-            <h1>${titulo}</h1>
-
-            <div class="detalle-top-meta">
-              <span><strong>Ubicación:</strong> ${ubicacion}</span>
-              <span><strong>Capacidad:</strong> ${huespedes} huéspedes</span>
-              <span><strong>Tipo:</strong> ${tipo}</span>
-            </div>
-
-            <p class="detalle-descripcion-top">
-              ${descripcion}
-            </p>
-
-            <div class="detalle-card">
-              <div class="detalle-galeria">
-                ${
-                  foto
-                    ? `<img src="${foto}" alt="${titulo}">`
-                    : `<div class="detalle-galeria-empty">Sin imagen disponible</div>`
-                }
-              </div>
-
-              <div class="detalle-info-grid">
-                <div class="detalle-info-left">
-
-                  <div class="detalle-bloque">
-                    <h3>Información del alojamiento</h3>
-                    <div class="detalle-lista">
-                      <div class="detalle-item"><strong>Tipo:</strong> ${tipo}</div>
-                      <div class="detalle-item"><strong>Capacidad:</strong> ${huespedes} huéspedes</div>
-                      <div class="detalle-item"><strong>Check-in:</strong> ${checkinHora}</div>
-                      <div class="detalle-item"><strong>Check-out:</strong> ${checkoutHora}</div>
-                      <div class="detalle-item"><strong>Cancelación:</strong> ${cancelacion}</div>
-                    </div>
-                  </div>
-
-                  <div class="detalle-bloque">
-                    <h3>Servicios</h3>
-                    <div class="chips">
-                      ${servicios.map(item => `<span class="chip">${item}</span>`).join("")}
-                    </div>
-                  </div>
-
-                  <div class="detalle-bloque">
-                    <h3>Reglas</h3>
-                    <div class="detalle-lista">
-                      ${reglas.map(item => `<div class="detalle-item">${item}</div>`).join("")}
-                    </div>
-                  </div>
-                </div>
-
-                <div class="detalle-info-right">
-                  <div class="detalle-precio-card">
-                    <div class="detalle-precio-box">
-                      <span class="detalle-precio-numero">$${formatearPrecio(precio)}</span>
-                      <span class="detalle-precio-texto">/ noche</span>
-                    </div>
-
-                    <p class="detalle-subprecio">Precio final según cantidad de noches</p>
-
-                    <div class="detalle-reserva-form">
-                      <label class="detalle-label" for="checkin">Check-in</label>
-                      <input class="detalle-input" type="date" id="checkin" value="${checkinParam}" min="${hoy}">
-
-                      <label class="detalle-label" for="checkout">Check-out</label>
-                      <input class="detalle-input" type="date" id="checkout" value="${checkoutParam}" min="${hoy}">
-
-                      <label class="detalle-label" for="guests">Huéspedes</label>
-                      <select class="detalle-select" id="guests">
-                        ${Array.from({ length: huespedes }, (_, i) => i + 1).map(n => `
-                          <option value="${n}" ${String(n) === String(guestsParam) ? "selected" : ""}>${n}</option>
-                        `).join("")}
-                      </select>
-                    </div>
-
-                    <div class="detalle-alerta warning" id="alertaDisponibilidad" style="display:none;">
-                      Este alojamiento ya está reservado para esas fechas.
-                    </div>
-
-                    <div class="detalle-alerta info" id="totalBox">
-                      Seleccioná fechas válidas para calcular el total
-                    </div>
-
-                    <button class="detalle-btn-reservar disabled" id="btnReservar" type="button">
-                      Reservar
-                    </button>
-
-                    <div class="detalle-ok">
-                      ✅ Reserva simple y rápida. El anfitrión recibirá tu solicitud.
-                    </div>
-
-                    <div class="detalle-ayuda">
-                      El total se calcula según la cantidad de noches elegidas.
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        `;
-
-        const checkin = document.getElementById("checkin");
-        const checkout = document.getElementById("checkout");
-        const guests = document.getElementById("guests");
-        const totalBox = document.getElementById("totalBox");
-        const btnReservar = document.getElementById("btnReservar");
-        const alertaDisponibilidad = document.getElementById("alertaDisponibilidad");
-
-        function actualizarTotal() {
-          if (checkin.value) {
-            checkout.min = checkin.value;
-          } else {
-            checkout.min = hoy;
-          }
-
-          const noches = calcularNoches(checkin.value, checkout.value);
-
-          if (noches <= 0) {
-            alertaDisponibilidad.style.display = "none";
-            totalBox.innerHTML = "Seleccioná fechas válidas para calcular el total";
-            totalBox.className = "detalle-alerta info";
-            btnReservar.classList.add("disabled");
-            return;
-          }
-
-          const reservado = hayCruceDeFechas(checkin.value, checkout.value);
-
-          if (reservado) {
-            alertaDisponibilidad.style.display = "block";
-            totalBox.innerHTML = "No disponible para las fechas seleccionadas";
-            totalBox.className = "detalle-alerta no-disponible";
-            btnReservar.classList.add("disabled");
-            return;
-          }
-
-          alertaDisponibilidad.style.display = "none";
-
-          const total = noches * precio;
-          totalBox.innerHTML = `<strong>${noches} ${noches === 1 ? "noche" : "noches"}</strong> · Total estimado: <strong>$${formatearPrecio(total)}</strong>`;
-          totalBox.className = "detalle-alerta info";
-          btnReservar.classList.remove("disabled");
-        }
-
-        checkin.addEventListener("change", () => {
-          if (checkout.value && checkout.value <= checkin.value) {
-            checkout.value = "";
-          }
-          actualizarTotal();
-        });
-
-        checkout.addEventListener("change", actualizarTotal);
-
-        guests.addEventListener("change", () => {
-          if (Number(guests.value) < 1) guests.value = "1";
-        });
-
-        btnReservar.addEventListener("click", () => {
-          const user = getUser();
-
-          if (!user) {
-            const redirectUrl = `detalle.html?id=${encodeURIComponent(id)}&checkin=${encodeURIComponent(checkin.value)}&checkout=${encodeURIComponent(checkout.value)}&guests=${encodeURIComponent(guests.value)}`;
-localStorage.setItem("redirectAfterLogin", redirectUrl);
-            alert("Tenés que iniciar sesión para reservar");
-            window.location.href = "login.html";
-            return;
-          }
-
-          const noches = calcularNoches(checkin.value, checkout.value);
-
-          if (noches <= 0) {
-            alert("Seleccioná fechas válidas.");
-            return;
-          }
-
-          if (hayCruceDeFechas(checkin.value, checkout.value)) {
-            alert("Este alojamiento no está disponible para esas fechas.");
-            return;
-          }
-
-          const cantidadHuespedes = Number(guests.value || 1);
-
-          if (cantidadHuespedes > huespedes) {
-            alert("La cantidad de huéspedes supera la capacidad del alojamiento.");
-            return;
-          }
-
-          const reserva = {
-            alojamientoId: id,
-            checkin: checkin.value,
-            checkout: checkout.value,
-            guests: cantidadHuespedes
-          };
-
-          localStorage.setItem("reservaPendiente", JSON.stringify(reserva));
-          window.location.href = "reservar.html";
-        });
-
-        const reservaGuardada = JSON.parse(localStorage.getItem("reservaPendiente"));
-
-        if (reservaGuardada && reservaGuardada.alojamientoId === id) {
-          checkin.value = reservaGuardada.checkin || "";
-          checkout.value = reservaGuardada.checkout || "";
-          guests.value = String(reservaGuardada.guests || guests.value);
-        }
-
-        actualizarTotal();
-      } catch (error) {
-        console.error("Error al cargar detalle:", error);
-        noExiste.style.display = "block";
-      }
-    }
-
-    cargarDetalle();
-  </script>
 </body>
 </html>
