@@ -278,12 +278,29 @@
 
     #mapa{
       width:100%;
-      height:320px;
+      height:360px;
       margin-top:18px;
       border-radius:18px;
       overflow:hidden;
       border:1px solid #e5e5ef;
       background:#eee;
+    }
+
+    .precio-marker{
+      background:#4f3dbb;
+      color:#fff;
+      padding:7px 10px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:13px;
+      border:2px solid #fff;
+      box-shadow:0 8px 20px rgba(0,0,0,.18);
+      white-space:nowrap;
+    }
+
+    .leaflet-popup-content{
+      font-size:14px;
+      line-height:1.4;
     }
 
     @media (max-width: 900px){
@@ -364,8 +381,6 @@
     </section>
   </main>
 
-  <script type="module" src="resultados.js?v=2"></script>
-
   <script>
     const params = new URLSearchParams(window.location.search);
 
@@ -380,21 +395,10 @@
     const hiddenGuests = document.getElementById("hiddenGuests");
     const resumenBusqueda = document.getElementById("resumenBusqueda");
 
-    if (inputDestino && destino) {
-      inputDestino.value = destino;
-    }
-
-    if (hiddenCheckin) {
-      hiddenCheckin.value = checkin;
-    }
-
-    if (hiddenCheckout) {
-      hiddenCheckout.value = checkout;
-    }
-
-    if (hiddenGuests) {
-      hiddenGuests.value = guests;
-    }
+    if (inputDestino && destino) inputDestino.value = destino;
+    if (hiddenCheckin) hiddenCheckin.value = checkin;
+    if (hiddenCheckout) hiddenCheckout.value = checkout;
+    if (hiddenGuests) hiddenGuests.value = guests;
 
     if (destino) {
       resumenBusqueda.textContent = `Buscando alojamientos para "${destino}".`;
@@ -422,33 +426,22 @@
     }
   </script>
 
- <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script>
-  let mapa;
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const mapa = L.map("mapa").setView([-34.6037, -58.3816], 5);
 
-  function iniciarMapa() {
-    mapa = L.map('mapa').setView([-34.6037, -58.3816], 5);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap"
+      }).addTo(mapa);
 
-    // 🔥 CAPA SATELITAL (estilo pro)
-    L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-      maxZoom: 17,
-    }).addTo(mapa);
+      window.mapaGlobal = mapa;
+      window.dispatchEvent(new Event("mapa-listo"));
+    });
+  </script>
 
-    // 💡 También podés usar esta alternativa (más “Google style”):
-    /*
-    L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-      subdomains:['mt0','mt1','mt2','mt3'],
-      maxZoom: 20
-    }).addTo(mapa);
-    */
-
-    // Guardamos mapa global para usarlo en resultados.js
-    window.mapaGlobal = mapa;
-  }
-
-  document.addEventListener("DOMContentLoaded", iniciarMapa);
-</script>
-
+  <script type="module" src="resultados.js?v=3"></script>
 </body>
 </html>
