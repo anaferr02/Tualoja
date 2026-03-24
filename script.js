@@ -56,7 +56,12 @@ function renderAuthArea(user) {
     if (btn) {
       btn.addEventListener("click", async (e) => {
         e.preventDefault();
-        await logout();
+        try {
+          await logout();
+        } catch (error) {
+          console.error("Error al cerrar sesión:", error);
+          alert("No se pudo cerrar sesión.");
+        }
       });
     }
   } else {
@@ -70,10 +75,11 @@ function renderAuthArea(user) {
 function renderUserMenu(user) {
   const userMenu = document.getElementById("userMenu");
   const userDropdown = document.getElementById("userDropdown");
+
   if (!userMenu || !userDropdown) return;
 
   if (user) {
-    userMenu.innerHTML = `<i class="fas fa-user"></i> ${user.name || "Mi cuenta"}`;
+    userMenu.innerHTML = `${user.name || "Mi cuenta"}`;
 
     userDropdown.innerHTML = `
       <a href="mis-reservas.html">Mis reservas</a>
@@ -86,11 +92,16 @@ function renderUserMenu(user) {
     if (logoutBtn) {
       logoutBtn.addEventListener("click", async (e) => {
         e.preventDefault();
-        await logout();
+        try {
+          await logout();
+        } catch (error) {
+          console.error("Error al cerrar sesión:", error);
+          alert("No se pudo cerrar sesión.");
+        }
       });
     }
   } else {
-    userMenu.innerHTML = `<i class="fas fa-user"></i> Cuenta`;
+    userMenu.innerHTML = `Cuenta`;
 
     userDropdown.innerHTML = `
       <a href="login.html">Iniciar sesión</a>
@@ -103,11 +114,17 @@ function renderUserMenu(user) {
 }
 
 async function setupAuthUI() {
-  await refreshMe();
-  const user = getUser();
+  try {
+    await refreshMe();
+    const user = getUser();
 
-  renderAuthArea(user);
-  renderUserMenu(user);
+    renderAuthArea(user);
+    renderUserMenu(user);
+  } catch (error) {
+    console.error("Error al cargar sesión:", error);
+    renderAuthArea(null);
+    renderUserMenu(null);
+  }
 }
 
 /* =========================
