@@ -648,7 +648,7 @@
           btnAccept.className = "mini-btn success";
           btnAccept.textContent = "Aceptar";
           btnAccept.onclick = async () => {
-            await updateDoc(doc(db, "reservas", b._docId), { status: "aceptada" });
+          await updateDoc(doc(db, "reservas", b._docId), { status: "confirmada" });
             await renderBookings();
             await renderCalendar();
           };
