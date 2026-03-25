@@ -1,13 +1,155 @@
 import { db } from "./firebase-config.js";
-import { refreshMe } from "./public/js/auth.js";
+import { refreshMe, logout } from "./public/js/auth.js";
 import {
   collection,
   getDocs,
   updateDoc,
   doc,
   query,
-  where
+  where,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const lista = document.getElementById("listaReservas");
+const estadoCarga = document.getElementById("estadoCarga");
+const botonesFiltro = document.querySelectorAll("[data-filter]");
+const logoutBtn = document.getElementById("logoutBtn");
+
+let reservasCache = [];
+let filtroActual = "todas";
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    await logout();
+  });
+}
+
+function formatearEstado(estado = "pendiente") {
+  const limpio = String(estado).toLowerCase();
+
+  if (limpio === "aceptada") {
+    return {
+      texto: "aceptada",
+      clase: "estado-aceptada"
+    };
+  }
+
+  if (limpio === "cancelada") {
+    return {
+      texto: "cancelada",
+      clase: "estado-cancelada"
+    };
+  }
+
+  return {
+    texto: "pendiente",
+    clase: "estado-pendiente"
+  };
+}
+
+function renderReservas() {
+  if (!lista) return;
+
+  const visibles = reservasCache.filter((r) => {
+    if (filtroActual === "todas") return true;
+    return (r.status || "pendiente").toLowerCase() === filtroActual;
+  });
+
+  if (!visibles.length) {
+    lista.innerHTML = `
+      <div class="empty-box">
+        No tenés reservas para este filtro.
+      </div>
+    `;
+    return;
+  }
+
+  lista.innerHTML = visibles.map((r) => {
+    const estado = formatearEstado(r.status);
+    const titulo = r.alojamientoTitulo || r.title || r.titulo || "Reserva";
+    const total = r.total
+      ? `$${Number(r.total).toLocaleString("es-AR")}`
+      : "A confirmar";
+
+    const imagen = r.alojamientoFoto
+      ? `<img class="reserva-img" src="${r.alojamientoFoto}" alt="${titulo}">`
+      : `<div class="reserva-placeholder">Sin imagen</div>`;
+
+    return `
+      <article class="reserva-card">
+        <div>
+          ${imagen}
+        </div>
+
+        <div class="reserva-main">
+          <h3>${titulo}</h3>
+          <p><strong>Desde:</strong> ${r.checkin || "-" } — <strong>Hasta:</strong> ${r.checkout || "-"}</p>
+          <p><strong>Huéspedes:</strong> ${r.guests || "-"}</p>
+          <p><strong>Estado:</strong> <span class="estado-badge ${estado.clase}">${estado.texto}</span></p>
+          <p><strong>Total:</strong> ${total}</p>
+        </div>
+
+        <div class="reserva-side">
+          <a class="btn-outline" href="detalle.html?id=${encodeURIComponent(r.alojamientoId || "")}">
+            Ver detalle
+          </a>
+
+          ${
+            (r.status || "pendiente").toLowerCase() === "pendiente" ||
+            (r.status || "pendiente").toLowerCase() === "aceptada"
+              ? `<button class="btn-danger" data-cancel="${r._docId}">Cancelar</button>`
+              : ""
+          }
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  lista.querySelectorAll("[data-cancel]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-cancel");
+
+      try {
+        await updateDoc(doc(db, "reservas", id), {
+          status: "cancelada"
+        });
+
+        const index = reservasCache.findIndex((r) => r._docId === id);
+        if (index !== -1) {
+          reservasCache[index].status = "cancelada";
+        }
+
+        renderReservas();
+      } catch (error) {
+        console.error("Error al cancelar reserva:", error);
+        alert("No se pudo cancelar la reserva.");
+      }
+    });
+  });
+}
+
+async function enriquecerReserva(r) {
+  try {
+    if (!r.alojamientoId) return r;
+
+    const snap = await getDoc(doc(db, "alojamientos", r.alojamientoId));
+
+    if (!snap.exists()) return r;
+
+    const alojamiento = snap.data();
+
+    return {
+      ...r,
+      alojamientoTitulo: alojamiento.titulo || r.alojamientoTitulo || "Reserva",
+      alojamientoFoto: alojamiento.fotos?.[0] || r.alojamientoFoto || "",
+      total: r.total || null
+    };
+  } catch (error) {
+    console.warn("No se pudo enriquecer reserva:", error);
+    return r;
+  }
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -19,11 +161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const container = document.querySelector("[data-reservas]");
-    if (!container) return;
-
     const reservasRef = collection(db, "reservas");
-
     let rows = [];
 
     try {
@@ -34,7 +172,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         rows.push({ ...d.data(), _docId: d.id });
       });
     } catch (error) {
-      console.warn("No se pudo filtrar por huespedId, pruebo por email.", error);
+      console.warn("Filtro por huespedId no disponible, pruebo por email.", error);
 
       const snap = await getDocs(reservasRef);
 
@@ -50,59 +188,41 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
 
-    if (!rows.length) {
-      container.innerHTML = `<p>No tenés reservas todavía.</p>`;
-      return;
-    }
-
     rows.sort((a, b) => {
       const fa = a.creadaEn?.seconds || 0;
       const fb = b.creadaEn?.seconds || 0;
       return fb - fa;
     });
 
-    container.innerHTML = rows.map((r) => {
-      const titulo = r.title || r.titulo || r.alojamientoTitulo || "Reserva";
-      const total = r.total ? `$${Number(r.total).toLocaleString("es-AR")}` : "A confirmar";
-      const estado = r.status || "pendiente";
+    reservasCache = await Promise.all(rows.map(enriquecerReserva));
 
-      return `
-        <div class="card" style="padding:12px;margin:10px 0;border-radius:12px;background:#fff;">
-          <div style="font-weight:700;">${titulo}</div>
-          <div>Desde: ${r.checkin || "-"} — Hasta: ${r.checkout || "-"}</div>
-          <div>Huéspedes: ${r.guests || "-"}</div>
-          <div>Estado: ${estado} — Total: ${total}</div>
-          ${
-            estado === "pendiente" || estado === "aceptada"
-              ? `<button data-cancel="${r._docId}" style="margin-top:8px;">Cancelar</button>`
-              : ""
-          }
-        </div>
-      `;
-    }).join("");
+    if (estadoCarga) {
+      estadoCarga.style.display = "none";
+    }
 
-    container.querySelectorAll("button[data-cancel]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const id = btn.getAttribute("data-cancel");
-
-        try {
-          await updateDoc(doc(db, "reservas", id), {
-            status: "cancelada"
-          });
-
-          location.reload();
-        } catch (err) {
-          console.error(err);
-          alert("No se pudo cancelar la reserva.");
-        }
-      });
-    });
+    renderReservas();
   } catch (error) {
     console.error("Error al cargar mis reservas:", error);
 
-    const container = document.querySelector("[data-reservas]");
-    if (container) {
-      container.innerHTML = `<p>No se pudieron cargar tus reservas.</p>`;
+    if (estadoCarga) {
+      estadoCarga.style.display = "none";
+    }
+
+    if (lista) {
+      lista.innerHTML = `
+        <div class="empty-box">
+          No se pudieron cargar tus reservas.
+        </div>
+      `;
     }
   }
+});
+
+botonesFiltro.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    botonesFiltro.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    filtroActual = btn.getAttribute("data-filter") || "todas";
+    renderReservas();
+  });
 });
