@@ -3,818 +3,374 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Panel anfitrión - TuAloja</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Mis reservas - TuAloja</title>
 
   <style>
-    .page-wrap{ max-width: 1040px; margin: 24px auto 40px; padding: 0 16px; }
-    .card{
-      background: rgba(255,255,255,.85);
-      border: 1px solid rgba(0,0,0,.08);
-      border-radius: 22px;
-      box-shadow: 0 18px 40px rgba(0,0,0,.12);
-      padding: 18px;
-    }
-    .top{
-      display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
-      margin-bottom: 12px;
-    }
-    .top h1{ margin:0; }
-    .muted{ opacity:.85; }
-    .btn{ cursor:pointer; }
-    .btn-row{ display:flex; gap:10px; flex-wrap:wrap; }
+    *{box-sizing:border-box}
 
-    .tabs{
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:#f7f8fc;
+      color:#1f2450;
+    }
+
+    .header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:#fff;
+      border-bottom:1px solid #e8eaf4;
       display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:18px 24px;
+    }
+
+    .logo{
+      text-decoration:none;
+      font-size:22px;
+      font-weight:800;
+      color:#222a78;
+      font-family:Georgia, "Times New Roman", serif;
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
       gap:10px;
       flex-wrap:wrap;
-      margin-bottom:14px;
-      padding-bottom:10px;
-      border-bottom:1px solid rgba(0,0,0,.08);
     }
-    .tab-btn{
-      border:0;
-      cursor:pointer;
-      padding:12px 16px;
+
+    .nav a{
+      text-decoration:none;
+      color:#222a78;
+      border:1px solid #d7dcef;
+      padding:10px 16px;
       border-radius:14px;
-      background: rgba(0,0,0,.08);
-      color:#222;
       font-weight:700;
-      transition: .18s ease;
-    }
-    .tab-btn:hover{
-      transform: translateY(-1px);
-      background: rgba(0,0,0,.12);
-    }
-    .tab-btn.active{
-      background:#1b167f;
-      color:#fff;
-      box-shadow: 0 10px 22px rgba(27,22,127,.22);
+      background:#fff;
+      font-size:14px;
     }
 
-    .panel-note{
-      background: rgba(255,255,255,.62);
-      border: 1px solid rgba(0,0,0,.06);
-      border-radius: 16px;
-      padding: 12px 14px;
-      margin-bottom: 12px;
+    .nav a:hover{
+      background:#f5f6ff;
     }
 
-    .list{ margin-top: 12px; display:grid; gap: 12px; }
-    .item{
-      background: rgba(255,255,255,.7);
-      border: 1px solid rgba(0,0,0,.06);
-      border-radius: 18px;
-      padding: 14px;
-      display:grid;
-      grid-template-columns: 150px 1fr;
-      gap: 12px;
-      align-items: start;
-    }
-    @media (max-width: 720px){
-      .item{ grid-template-columns: 1fr; }
+    .page{
+      max-width:1100px;
+      margin:0 auto;
+      padding:42px 20px 70px;
     }
 
-    .thumb{
-      width: 100%;
-      height: 120px;
-      border-radius: 14px;
-      overflow:hidden;
-      background: rgba(0,0,0,.06);
-      border: 1px solid rgba(0,0,0,.08);
-    }
-    .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
-
-    .meta h3{ margin:0 0 4px; }
-    .meta p{ margin:0; color:#333; }
-
-    .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    .chip{
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(0,0,0,.08);
-      border: 1px solid rgba(0,0,0,.06);
-      white-space: nowrap;
-    }
-    .chip-strong{
-      background: rgba(27,22,127,.12);
-      border-color: rgba(27,22,127,.22);
-      color:#1b167f;
-      font-weight: 700;
-    }
-    .chip-ok{
-      background: rgba(0,128,0,.10);
-      border-color: rgba(0,128,0,.20);
-      color: rgba(0,128,0,.95);
-      font-weight: 800;
-    }
-    .chip-bad{
-      background: rgba(176,0,32,.10);
-      border-color: rgba(176,0,32,.20);
-      color:#b00020;
-      font-weight: 800;
+    .hero{
+      margin-bottom:26px;
     }
 
-    .actions{
+    .hero h1{
+      margin:0 0 10px;
+      font-size:56px;
+      line-height:1;
+      color:#23296f;
+      font-family:Georgia, "Times New Roman", serif;
+    }
+
+    .hero p{
+      margin:0;
+      color:#686e93;
+      font-size:18px;
+    }
+
+    .info-box{
       display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top: 12px;
-    }
-    .mini-btn{
-      border:0; cursor:pointer;
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(0,0,0,.08);
-      text-decoration: none;
-      color: inherit;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-    }
-    .mini-btn:hover{
-      background: rgba(0,0,0,.12);
-    }
-    .mini-btn.danger{
-      background: rgba(176,0,32,.12);
-      color:#b00020;
-      font-weight: 700;
-    }
-    .mini-btn.danger:hover{
-      background: rgba(176,0,32,.18);
+      gap:18px;
+      align-items:flex-start;
+      background:#eef3ff;
+      border:1px solid #d8e3ff;
+      border-radius:24px;
+      padding:24px 26px;
+      margin-bottom:28px;
     }
 
-    /* Modal simple */
-    .modal-backdrop{
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.45);
-      display:none;
+    .info-icon{
+      width:46px;
+      height:46px;
+      border-radius:999px;
+      background:#4e86d9;
+      color:#fff;
+      display:flex;
       align-items:center;
       justify-content:center;
-      padding: 18px;
-      z-index: 50;
+      font-size:26px;
+      flex:0 0 auto;
     }
-    .modal{
-      width: min(720px, 96vw);
+
+    .info-text h3{
+      margin:0 0 10px;
+      font-size:22px;
+      color:#23296f;
+      font-family:Georgia, "Times New Roman", serif;
+    }
+
+    .info-text p{
+      margin:0;
+      color:#4f5678;
+      font-size:16px;
+      line-height:1.5;
+    }
+
+    .filters{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:26px;
+    }
+
+    .filter-btn{
+      border:1px solid #cfd6ec;
       background:#fff;
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 18px 40px rgba(0,0,0,.20);
+      color:#23296f;
+      border-radius:16px;
+      padding:12px 20px;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
     }
-    .modal-top{
-      display:flex; justify-content:space-between; align-items:center; gap:12px;
-      margin-bottom: 10px;
-    }
-    .modal-top h2{ margin:0; color:#1b167f; }
-    .close-x{
-      border:0; cursor:pointer;
-      background: rgba(0,0,0,.08);
-      border-radius: 12px;
-      padding: 8px 10px;
-    }
-    .grid-2{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-    @media (max-width: 720px){ .grid-2{ grid-template-columns: 1fr; } }
-    label{ display:block; font-weight: 600; margin-top: 10px; }
-    input, textarea{
-      width:100%;
-      box-sizing:border-box;
-      margin-top: 6px;
-      padding: 12px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(0,0,0,.12);
-      background: #fff;
-      outline: none;
-    }
-    textarea{ resize: vertical; }
-    .modal-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
-    .primary{
-      border:0; cursor:pointer;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background:#1b167f;
+
+    .filter-btn.active{
+      background:#2f348c;
       color:#fff;
-      font-weight: 800;
+      border-color:#2f348c;
+      box-shadow:0 8px 18px rgba(47,52,140,.20);
     }
-    .hamburger{
-  font-size:20px;
-  background:none;
-  border:none;
-  cursor:pointer;
-}
 
-@media (max-width:800px){
+    .reservas-list{
+      display:grid;
+      gap:18px;
+    }
 
-  .nav{
-    display:none;
-    position:absolute;
-    right:20px;
-    top:70px;
-    background:white;
-    padding:15px;
-    border-radius:12px;
-    box-shadow:0 10px 30px rgba(0,0,0,.15);
-    flex-direction:column;
-    gap:10px;
-  }
+    .reserva-card{
+      background:#fff;
+      border:1px solid #dde3f2;
+      border-radius:24px;
+      padding:26px;
+      display:grid;
+      grid-template-columns:170px 1fr auto;
+      gap:24px;
+      align-items:start;
+      box-shadow:0 10px 28px rgba(17,24,39,.04);
+    }
 
-  .nav-open{
-    display:flex;
-  }
+    .reserva-img{
+      width:100%;
+      height:160px;
+      border-radius:18px;
+      object-fit:cover;
+      display:block;
+      background:#eef1fa;
+    }
 
-}
+    .reserva-placeholder{
+      width:100%;
+      height:160px;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#eef1fa;
+      color:#7a80a5;
+      font-weight:700;
+      text-align:center;
+      padding:12px;
+    }
+
+    .reserva-main h3{
+      margin:0 0 12px;
+      font-size:22px;
+      color:#23296f;
+      font-family:Georgia, "Times New Roman", serif;
+    }
+
+    .reserva-main p{
+      margin:0 0 10px;
+      font-size:16px;
+      color:#353b5f;
+    }
+
+    .estado-badge{
+      display:inline-flex;
+      align-items:center;
+      padding:6px 10px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .estado-pendiente{
+      background:#f7ebc7;
+      color:#7a6120;
+    }
+
+    .estado-aceptada{
+      background:#dff5df;
+      color:#2d6b2d;
+    }
+
+    .estado-cancelada{
+      background:#fbe0e0;
+      color:#9b2f2f;
+    }
+
+    .reserva-side{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      min-width:140px;
+    }
+
+    .btn-outline,
+    .btn-danger{
+      border:none;
+      border-radius:16px;
+      padding:14px 18px;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+      text-decoration:none;
+      text-align:center;
+    }
+
     .btn-outline{
-  padding:10px 14px;
-  border-radius:12px;
-  border:1px solid rgba(0,0,0,.15);
-  background:white;
-  font-weight:600;
-  cursor:pointer;
-}
+      background:#fff;
+      color:#23296f;
+      border:1px solid #cfd6ec;
+    }
 
-.btn-outline:hover{
-  background:#f2f2f2;
-}
-    .footer-links{
-margin-top:6px;
-font-size:13px;
-}
+    .btn-danger{
+      background:#f7ecec;
+      color:#7f322b;
+      border:1px solid #e3c8c8;
+    }
 
-.footer-links a{
-color:#1b167f;
-text-decoration:none;
-margin:0 4px;
-}
+    .empty-box{
+      background:#fff;
+      border:1px dashed #d6dced;
+      border-radius:22px;
+      padding:34px 24px;
+      text-align:center;
+      color:#616887;
+      font-size:18px;
+    }
 
-.footer-links a:hover{
-text-decoration:underline;
-}
+    .footer{
+      text-align:center;
+      padding:30px 18px 40px;
+      color:#676d8d;
+      font-size:13px;
+    }
+
+    .footer a{
+      color:#3a3f8f;
+      text-decoration:none;
+      margin:0 6px;
+    }
+
+    .loading{
+      padding:18px 0;
+      color:#6b7194;
+      font-size:16px;
+    }
+
+    @media (max-width: 900px){
+      .hero h1{font-size:42px}
+      .reserva-card{
+        grid-template-columns:1fr;
+      }
+      .reserva-side{
+        min-width:100%;
+      }
+    }
+
+    @media (max-width: 640px){
+      .header{
+        padding:14px 12px;
+        align-items:flex-start;
+        flex-direction:column;
+      }
+      .nav{
+        width:100%;
+      }
+      .nav a{
+        font-size:13px;
+        padding:9px 12px;
+      }
+      .page{
+        padding:28px 14px 50px;
+      }
+      .hero h1{
+        font-size:34px;
+      }
+      .info-box{
+        padding:18px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <script>
-    if (localStorage.getItem("tualoja_logged") !== "1") {
-      location.href = "login.html?next=" + encodeURIComponent("panel-anfitrion.html");
-    }
-  </script>
-
   <header class="header">
     <a class="logo" href="index.html">TuAloja.com</a>
-    <nav id="mainNav" class="nav">
+
+    <nav class="nav">
       <a href="publicar.html">Publicar alojamiento</a>
+      <a href="mis-reservas.html">Mis reservas</a>
+      <a href="panel-anfitrion.html">Panel anfitrión</a>
+      <a href="mi-cuenta.html">Mi cuenta</a>
       <a href="ayuda.html">Ayuda</a>
-      <span id="navAuth"></span>
+      <a href="#" id="logoutBtn">Cerrar sesión</a>
     </nav>
-    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
   </header>
 
-  <main class="page-wrap">
-    <div class="card">
-      <div class="top">
-        <div>
-          <h1>Panel anfitrión</h1>
-          <p class="muted" style="margin:6px 0 0;">
-            Administrá tus alojamientos, reservas y fechas ocupadas.
-          </p>
-        </div>
+  <main class="page">
+    <section class="hero">
+      <h1>Mis reservas ✈️</h1>
+      <p>Están en orden de la más reciente a la más antigua.</p>
+    </section>
 
-        <div class="btn-row">
-          <a class="btn btn-outline" href="publicar.html">+ Publicar</a>
-          <button class="btn btn-outline" id="btnLogout" type="button">Cerrar sesión</button>
-        </div>
+    <section class="info-box">
+      <div class="info-icon">i</div>
+
+      <div class="info-text">
+        <h3>Tus reservas están pendientes ⏳</h3>
+        <p>
+          Esperá la aprobación del anfitrión. Te llegará una notificación al email.
+        </p>
       </div>
+    </section>
 
-      <div class="tabs">
-        <button class="tab-btn active" id="tabListings" type="button">Mis alojamientos</button>
-        <button class="tab-btn" id="tabBookings" type="button">Reservas recibidas</button>
-        <button class="tab-btn" id="tabCalendar" type="button">Calendario</button>
-      </div>
+    <section class="filters">
+      <button class="filter-btn active" data-filter="todas">Todas</button>
+      <button class="filter-btn" data-filter="pendiente">Pendientes ⏳</button>
+      <button class="filter-btn" data-filter="aceptada">Aceptadas ✅</button>
+      <button class="filter-btn" data-filter="cancelada">Canceladas 🚫</button>
+    </section>
 
-      <section id="secListings">
-        <div id="summary" class="muted"></div>
-        <div id="list" class="list"></div>
-        <p id="empty" class="muted" style="display:none; margin-top:12px;">
-          Todavía no tenés publicaciones. Tocá “+ Publicar”.
-        </p>
-      </section>
+    <section id="estadoCarga" class="loading">Cargando reservas...</section>
 
-      <section id="secBookings" style="display:none;">
-        <div class="panel-note muted">
-          Acá vas a ver las reservas que te hacen tus huéspedes.
-        </div>
-
-        <div id="bookSummary" class="muted"></div>
-        <div id="bookList" class="list"></div>
-        <p id="bookEmpty" class="muted" style="display:none; margin-top:12px;">
-          Todavía no recibiste reservas.
-        </p>
-      </section>
-
-      <section id="secCalendar" style="display:none;">
-        <div class="panel-note muted">
-          Fechas reservadas de tus alojamientos.
-        </div>
-
-        <div id="calList" class="list"></div>
-        <p id="calEmpty" class="muted" style="display:none; margin-top:12px;">
-          Aún no hay reservas para mostrar en el calendario.
-        </p>
-      </section>
-    </div>
+    <section id="listaReservas" class="reservas-list" data-reservas></section>
   </main>
 
-  <div id="backdrop" class="modal-backdrop">
-    <div class="modal">
-      <div class="modal-top">
-        <h2>Editar publicación</h2>
-        <button class="close-x" id="closeModal" type="button">✕</button>
-      </div>
-
-      <form id="editForm">
-        <input type="hidden" name="id" />
-
-        <label>Título</label>
-        <input name="titulo" required />
-
-        <div class="grid-2">
-          <div>
-            <label>Precio por noche (ARS)</label>
-            <input name="precio" type="number" min="0" required />
-          </div>
-          <div>
-            <label>Máximo de noches</label>
-            <input name="maxNoches" type="number" min="1" max="365" />
-          </div>
-        </div>
-
-        <label>Descripción</label>
-        <textarea name="descripcion" rows="4" required></textarea>
-
-        <div class="modal-actions">
-          <button class="primary" type="submit">Guardar cambios</button>
-          <button class="btn btn-outline" id="cancelModal" type="button">Cancelar</button>
-        </div>
-      </form>
+  <footer class="footer">
+    <div>© 2026 TuAloja. Todos los derechos reservados.</div>
+    <div style="margin-top:10px;">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a> |
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
+      <a href="politica-de-cancelacion.html">Política de cancelaciones</a> |
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
     </div>
-  </div>
+  </footer>
 
-  
-<footer class="footer-ayuda">
-
-<p>© 2026 TuAloja. Todos los derechos reservados.</p>
-
-<div class="footer-links">
-<a href="politica-de-privacidad.html">Política de privacidad</a> |
-<a href="terminos-y-condiciones.html">Términos y condiciones</a> |
-<a href="politica-de-cancelacion.html">Política de cancelación</a> |
-<a href="politica-anti-estafas.html">Política anti-estafas</a>
-</div>
-
-</footer>
-
-  <script type="module">
-    import { logout, getUser } from "./public/js/auth.js";
-
-    document.getElementById("btnLogout").addEventListener("click", () => {
-      logout();
-    });
-
-    const KEY = "tualoja_listings";
-    const BOOKINGS_KEY = "tualoja_bookings";
-    const userObj = getUser();
-    const myEmail = (userObj?.email || "").toLowerCase();
-
-    function loadAll() {
-      try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
-      catch { return []; }
-    }
-    function saveAll(arr) {
-      localStorage.setItem(KEY, JSON.stringify(arr));
-    }
-
-    function loadBookings() {
-      try { return JSON.parse(localStorage.getItem(BOOKINGS_KEY) || "[]"); }
-      catch { return []; }
-    }
-    function saveBookings(arr) {
-      localStorage.setItem(BOOKINGS_KEY, JSON.stringify(arr));
-    }
-
-    function coverFromFotos(listing) {
-      if (!listing?.fotos?.length) return "";
-      return listing.fotos[0];
-    }
-
-    function formatARS(n) {
-      const num = Number(n || 0);
-      try { return num.toLocaleString("es-AR"); } catch { return String(num); }
-    }
-
-    function formatDate(fecha) {
-      if (!fecha || fecha === "pendiente") return "-";
-      const d = new Date(fecha + "T00:00:00");
-      if (Number.isNaN(d.getTime())) return fecha;
-      return d.toLocaleDateString("es-AR");
-    }
-
-    function calcularNoches(checkin, checkout) {
-      if (!checkin || !checkout || checkin === "pendiente" || checkout === "pendiente") return null;
-      const d1 = new Date(checkin + "T00:00:00");
-      const d2 = new Date(checkout + "T00:00:00");
-      const diff = d2 - d1;
-      const noches = diff / (1000 * 60 * 60 * 24);
-      return noches > 0 ? noches : null;
-    }
-
-    function render() {
-      const list = document.getElementById("list");
-      const empty = document.getElementById("empty");
-      const summary = document.getElementById("summary");
-
-      const all = loadAll();
-      const mine = all.filter(x => (x.email || "").toLowerCase() === myEmail);
-
-      summary.textContent = `Publicaciones: ${mine.length}`;
-      list.innerHTML = "";
-
-      if (!mine.length) {
-        empty.style.display = "block";
-        return;
-      }
-      empty.style.display = "none";
-
-      mine.forEach((x) => {
-        const item = document.createElement("div");
-        item.className = "item";
-
-        const imgWrap = document.createElement("div");
-        imgWrap.className = "thumb";
-        const cover = coverFromFotos(x);
-        if (cover) {
-          const img = document.createElement("img");
-          img.src = cover;
-          img.alt = x.titulo || "Alojamiento";
-          imgWrap.appendChild(img);
-        }
-
-        const meta = document.createElement("div");
-        meta.className = "meta";
-        meta.innerHTML = `
-          <h3>${escapeHTML(x.titulo || "Sin título")}</h3>
-          <p><b>${escapeHTML(x.ciudad || "-")}</b>, ${escapeHTML(x.provincia || "-")}</p>
-          <div class="chips">
-            <span class="chip chip-strong">⏳ Pendiente de revisión</span>
-            <span class="chip">ARS $${formatARS(x.precio)}</span>
-            <span class="chip">Máx. noches: ${x.maxNoches ?? 30}</span>
-            <span class="chip">ID: ${escapeHTML(x.id || "")}</span>
-          </div>
-        `;
-
-        const actions = document.createElement("div");
-        actions.className = "actions";
-
-        const btnEdit = document.createElement("button");
-        btnEdit.type = "button";
-        btnEdit.className = "mini-btn";
-        btnEdit.textContent = "Editar";
-        btnEdit.onclick = () => openEdit(x.id);
-
-        const btnCopy = document.createElement("button");
-        btnCopy.type = "button";
-        btnCopy.className = "mini-btn";
-        btnCopy.textContent = "Copiar ID";
-        btnCopy.onclick = async () => {
-          try {
-            await navigator.clipboard.writeText(x.id || "");
-            toast("✅ ID copiado");
-          } catch {
-            toast("No pude copiar. Copialo manualmente.");
-          }
-        };
-
-        const btnDel = document.createElement("button");
-        btnDel.type = "button";
-        btnDel.className = "mini-btn danger";
-        btnDel.textContent = "Eliminar";
-        btnDel.onclick = () => {
-          const ok = confirm("¿Eliminar esta publicación?");
-          if (!ok) return;
-          const all2 = loadAll().filter(z => z.id !== x.id);
-          saveAll(all2);
-          render();
-          toast("✅ Eliminado");
-        };
-
-        actions.appendChild(btnEdit);
-        actions.appendChild(btnCopy);
-        actions.appendChild(btnDel);
-
-        meta.appendChild(actions);
-
-        item.appendChild(imgWrap);
-        item.appendChild(meta);
-        list.appendChild(item);
-      });
-    }
-
-    function renderHostBookings() {
-      const bookSummary = document.getElementById("bookSummary");
-      const bookList = document.getElementById("bookList");
-      const bookEmpty = document.getElementById("bookEmpty");
-
-      const all = loadBookings();
-      const mine = all.filter(b => (b.hostEmail || "").toLowerCase() === myEmail);
-
-      bookSummary.textContent = `Reservas recibidas: ${mine.length}`;
-      bookList.innerHTML = "";
-
-      if (!mine.length) {
-        bookEmpty.style.display = "block";
-        return;
-      }
-      bookEmpty.style.display = "none";
-
-      mine.forEach((b) => {
-        const item = document.createElement("div");
-        item.className = "item";
-
-        const left = document.createElement("div");
-        left.className = "thumb";
-        left.innerHTML = `
-          <div style="padding:10px; font-size:12px; color:#333;">
-            <b>${escapeHTML(b.title || "Reserva")}</b><br/>
-            Código: ${escapeHTML(b.code || "")}
-          </div>
-        `;
-
-        const stateClass =
-          b.status === "aceptada" ? "chip-ok" :
-          b.status === "rechazada" ? "chip-bad" :
-          "chip-strong";
-
-        const noches = calcularNoches(b.checkin, b.checkout);
-
-        const meta = document.createElement("div");
-        meta.className = "meta";
-        meta.innerHTML = `
-          <h3>${escapeHTML(b.guestName || "Huésped")}</h3>
-          <p><b>${escapeHTML(b.guestEmail || "-")}</b></p>
-          <div class="chips">
-            <span class="chip ${stateClass}">Estado: ${escapeHTML(b.status || "pendiente")}</span>
-            <span class="chip">Check-in: ${escapeHTML(formatDate(b.checkin))}</span>
-            <span class="chip">Check-out: ${escapeHTML(formatDate(b.checkout))}</span>
-            ${noches ? `<span class="chip">Noches: ${escapeHTML(String(noches))}</span>` : ""}
-            <span class="chip">Huéspedes: ${escapeHTML(String(b.guests ?? "-"))}</span>
-            <span class="chip">Total: ARS $${formatARS(b.total)}</span>
-          </div>
-        `;
-
-        const actions = document.createElement("div");
-        actions.className = "actions";
-
-        if (b.status !== "aceptada") {
-          const btnAccept = document.createElement("button");
-          btnAccept.type = "button";
-          btnAccept.className = "mini-btn";
-          btnAccept.textContent = "Aceptar";
-          btnAccept.onclick = () => updateBookingStatus(b.id, "aceptada");
-          actions.appendChild(btnAccept);
-        }
-
-        if (b.status !== "rechazada") {
-          const btnReject = document.createElement("button");
-          btnReject.type = "button";
-          btnReject.className = "mini-btn danger";
-          btnReject.textContent = "Rechazar";
-          btnReject.onclick = () => updateBookingStatus(b.id, "rechazada");
-          actions.appendChild(btnReject);
-        }
-
-        const btnContact = document.createElement("a");
-        btnContact.className = "mini-btn";
-        btnContact.href = `mailto:${b.guestEmail || ""}?subject=${encodeURIComponent("Tu reserva en TuAloja")}&body=${encodeURIComponent("Hola! Te contacto por tu reserva " + (b.code || ""))}`;
-        btnContact.textContent = "Contactar";
-        actions.appendChild(btnContact);
-
-        meta.appendChild(actions);
-
-        item.appendChild(left);
-        item.appendChild(meta);
-        bookList.appendChild(item);
-      });
-    }
-
-    function renderCalendar() {
-      const calList = document.getElementById("calList");
-      const calEmpty = document.getElementById("calEmpty");
-
-      const all = loadBookings();
-      const mine = all.filter(b => (b.hostEmail || "").toLowerCase() === myEmail && b.status !== "rechazada");
-
-      calList.innerHTML = "";
-
-      if (!mine.length) {
-        calEmpty.style.display = "block";
-        return;
-      }
-      calEmpty.style.display = "none";
-
-      mine.forEach((b) => {
-        const noches = calcularNoches(b.checkin, b.checkout);
-
-        const item = document.createElement("div");
-        item.className = "item";
-        item.style.gridTemplateColumns = "1fr";
-
-        item.innerHTML = `
-          <div class="meta">
-            <h3>${escapeHTML(b.title || "Alojamiento")}</h3>
-            <div class="chips">
-              <span class="chip chip-strong">${escapeHTML(b.status || "pendiente")}</span>
-              <span class="chip">Check-in: ${escapeHTML(formatDate(b.checkin))}</span>
-              <span class="chip">Check-out: ${escapeHTML(formatDate(b.checkout))}</span>
-              ${noches ? `<span class="chip">Noches: ${escapeHTML(String(noches))}</span>` : ""}
-              <span class="chip">Código: ${escapeHTML(b.code || "")}</span>
-              <span class="chip">Huésped: ${escapeHTML(b.guestName || "-")}</span>
-            </div>
-          </div>
-        `;
-        calList.appendChild(item);
-      });
-    }
-
-    function updateBookingStatus(id, status) {
-      const all = loadBookings();
-      const idx = all.findIndex(x => x.id === id);
-      if (idx === -1) return;
-
-      all[idx].status = status;
-      saveBookings(all);
-      renderHostBookings();
-      renderCalendar();
-
-      toast(status === "aceptada" ? "✅ Reserva aceptada" : "✅ Reserva rechazada");
-    }
-
-    const backdrop = document.getElementById("backdrop");
-    const editForm = document.getElementById("editForm");
-
-    function openEdit(id) {
-      const all = loadAll();
-      const item = all.find(x => x.id === id);
-      if (!item) return;
-
-      editForm.id.value = item.id;
-      editForm.titulo.value = item.titulo || "";
-      editForm.precio.value = Number(item.precio || 0);
-      editForm.maxNoches.value = item.maxNoches ?? 30;
-      editForm.descripcion.value = item.descripcion || "";
-
-      backdrop.style.display = "flex";
-    }
-
-    function closeEdit() {
-      backdrop.style.display = "none";
-    }
-
-    document.getElementById("closeModal").addEventListener("click", closeEdit);
-    document.getElementById("cancelModal").addEventListener("click", closeEdit);
-    backdrop.addEventListener("click", (e) => {
-      if (e.target === backdrop) closeEdit();
-    });
-
-    editForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const id = editForm.id.value;
-
-      let maxNoches = parseInt(editForm.maxNoches.value || "30", 10);
-      if (Number.isNaN(maxNoches)) maxNoches = 30;
-      if (maxNoches < 1) maxNoches = 1;
-      if (maxNoches > 365) maxNoches = 365;
-
-      const all = loadAll();
-      const idx = all.findIndex(x => x.id === id);
-      if (idx === -1) return;
-
-      all[idx].titulo = editForm.titulo.value.trim();
-      all[idx].precio = Number(editForm.precio.value || 0);
-      all[idx].maxNoches = maxNoches;
-      all[idx].descripcion = editForm.descripcion.value.trim();
-      all[idx].moneda = "ARS";
-
-      saveAll(all);
-      closeEdit();
-      render();
-      toast("✅ Guardado");
-    });
-
-    const secListings = document.getElementById("secListings");
-    const secBookings = document.getElementById("secBookings");
-    const secCalendar = document.getElementById("secCalendar");
-
-    const tabListings = document.getElementById("tabListings");
-    const tabBookings = document.getElementById("tabBookings");
-    const tabCalendar = document.getElementById("tabCalendar");
-
-    function setActiveTab(activeBtn) {
-      [tabListings, tabBookings, tabCalendar].forEach(btn => btn.classList.remove("active"));
-      activeBtn.classList.add("active");
-    }
-
-    function showTab(which) {
-      secListings.style.display = which === "listings" ? "block" : "none";
-      secBookings.style.display = which === "bookings" ? "block" : "none";
-      secCalendar.style.display = which === "calendar" ? "block" : "none";
-
-      if (which === "listings") {
-        setActiveTab(tabListings);
-        render();
-      }
-      if (which === "bookings") {
-        setActiveTab(tabBookings);
-        renderHostBookings();
-      }
-      if (which === "calendar") {
-        setActiveTab(tabCalendar);
-        renderCalendar();
-      }
-    }
-
-    tabListings.addEventListener("click", () => showTab("listings"));
-    tabBookings.addEventListener("click", () => showTab("bookings"));
-    tabCalendar.addEventListener("click", () => showTab("calendar"));
-
-    let toastTimer = null;
-    function toast(msg) {
-      clearTimeout(toastTimer);
-      let el = document.getElementById("toast");
-      if (!el) {
-        el = document.createElement("div");
-        el.id = "toast";
-        el.style.position = "fixed";
-        el.style.left = "50%";
-        el.style.bottom = "18px";
-        el.style.transform = "translateX(-50%)";
-        el.style.background = "rgba(0,0,0,.75)";
-        el.style.color = "#fff";
-        el.style.padding = "10px 14px";
-        el.style.borderRadius = "999px";
-        el.style.fontSize = "13px";
-        el.style.zIndex = "999";
-        document.body.appendChild(el);
-      }
-      el.textContent = msg;
-      el.style.display = "block";
-      toastTimer = setTimeout(() => { el.style.display = "none"; }, 1600);
-    }
-
-    function escapeHTML(str) {
-      return String(str || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    showTab("listings");
-  </script>
-  <script>
-const btn = document.getElementById("hamburgerBtn");
-const nav = document.getElementById("mainNav");
-
-btn.addEventListener("click", () => {
-  nav.classList.toggle("nav-open");
-});
-</script>
-  <script>
-
-const hamburger = document.getElementById("hamburgerBtn");
-const nav = document.getElementById("mainNav");
-
-hamburger.addEventListener("click", () => {
-nav.classList.toggle("open");
-});
-
-const logout = document.getElementById("logoutLink");
-
-if(logout){
-
-logout.addEventListener("click", (e)=>{
-
-e.preventDefault();
-
-localStorage.removeItem("tualoja_logged");
-localStorage.removeItem("tualoja_user");
-
-window.location.href = "index.html";
-
-});
-
-}
-
-</script>
+  <script type="module" src="mis-reservas.js?v=2"></script>
 </body>
 </html>
