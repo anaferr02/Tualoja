@@ -1,8 +1,5 @@
 import { refreshMe, getUser, logout } from "./public/js/auth.js";
 
-/* =========================
-   HAMBURGUESA / NAV MOBILE
-========================= */
 function setupHamburgerMenu() {
   const btn = document.getElementById("hamburgerBtn");
   const nav = document.getElementById("mainNav");
@@ -19,7 +16,6 @@ function setupHamburgerMenu() {
 
   nav.addEventListener("click", (e) => {
     e.stopPropagation();
-
     if (e.target && e.target.tagName === "A") {
       closeNav();
     }
@@ -39,9 +35,6 @@ function setupHamburgerMenu() {
   });
 }
 
-/* =========================
-   AUTH UI
-========================= */
 function renderAuthArea(user) {
   const authArea = document.getElementById("authArea");
   if (!authArea) return;
@@ -56,7 +49,11 @@ function renderAuthArea(user) {
     if (btn) {
       btn.addEventListener("click", async (e) => {
         e.preventDefault();
-        await logout();
+        try {
+          await logout();
+        } catch (error) {
+          console.error("Error al cerrar sesión:", error);
+        }
       });
     }
   } else {
@@ -73,7 +70,7 @@ function renderUserMenu(user) {
   if (!userMenu || !userDropdown) return;
 
   if (user) {
-    userMenu.innerHTML = `<i class="fas fa-user"></i> ${user.name || "Mi cuenta"}`;
+    userMenu.innerHTML = `${user.name || "Mi cuenta"}`;
 
     userDropdown.innerHTML = `
       <a href="mis-reservas.html">Mis reservas</a>
@@ -86,11 +83,15 @@ function renderUserMenu(user) {
     if (logoutBtn) {
       logoutBtn.addEventListener("click", async (e) => {
         e.preventDefault();
-        await logout();
+        try {
+          await logout();
+        } catch (error) {
+          console.error("Error al cerrar sesión:", error);
+        }
       });
     }
   } else {
-    userMenu.innerHTML = `<i class="fas fa-user"></i> Cuenta`;
+    userMenu.innerHTML = `Cuenta`;
 
     userDropdown.innerHTML = `
       <a href="login.html">Iniciar sesión</a>
@@ -103,16 +104,18 @@ function renderUserMenu(user) {
 }
 
 async function setupAuthUI() {
-  await refreshMe();
-  const user = getUser();
-
-  renderAuthArea(user);
-  renderUserMenu(user);
+  try {
+    await refreshMe();
+    const user = getUser();
+    renderAuthArea(user);
+    renderUserMenu(user);
+  } catch (error) {
+    console.error("Error al cargar sesión:", error);
+    renderAuthArea(null);
+    renderUserMenu(null);
+  }
 }
 
-/* =========================
-   INIT
-========================= */
 document.addEventListener("DOMContentLoaded", async () => {
   setupHamburgerMenu();
   await setupAuthUI();
