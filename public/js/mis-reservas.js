@@ -1,5 +1,4 @@
-import { db } from "./firebase-config.js";
-import { refreshMe, logout } from "./public/js/auth.js";
+import { db, auth } from "./firebase-config.js";
 import {
   collection,
   getDocs,
@@ -9,6 +8,11 @@ import {
   where,
   getDoc
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+import {
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
 let reservasCache = [];
 let filtroActual = "todas";
@@ -25,6 +29,15 @@ function formatearEstado(estado = "pendiente") {
   }
 
   return { texto: "pendiente", clase: "estado-pendiente" };
+}
+
+function esperarUsuario() {
+  return new Promise((resolve) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe();
+      resolve(user || null);
+    });
+  });
 }
 
 async function enriquecerReserva(r) {
@@ -134,12 +147,12 @@ function activarBotonesFiltro() {
   const botonesFiltro = document.querySelectorAll("[data-filter]");
 
   botonesFiltro.forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.onclick = () => {
       botonesFiltro.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       filtroActual = btn.getAttribute("data-filter") || "todas";
       renderReservas();
-    });
+    };
   });
 }
 
@@ -148,9 +161,9 @@ async function cargarReservas() {
   const lista = document.getElementById("listaReservas");
 
   try {
-    const me = await refreshMe();
+    const user = await esperarUsuario();
 
-    if (!me) {
+    if (!user) {
       alert("Iniciá sesión para ver tus reservas.");
       location.href = "login.html";
       return;
@@ -160,21 +173,21 @@ async function cargarReservas() {
     let rows = [];
 
     try {
-      const q = query(reservasRef, where("huespedId", "==", me.id));
+      const q = query(reservasRef, where("huespedId", "==", user.uid));
       const snap = await getDocs(q);
 
       snap.forEach((d) => {
         rows.push({ ...d.data(), _docId: d.id });
       });
     } catch (error) {
-      console.warn("Filtro por huespedId no disponible, pruebo por email.", error);
+      console.warn("No se pudo filtrar por huespedId, pruebo por email.", error);
 
       const snap = await getDocs(reservasRef);
 
       snap.forEach((d) => {
         const x = d.data();
         const emailReserva = (x.huespedEmail || x.guestEmail || "").toLowerCase();
-        const emailUsuario = (me.email || "").toLowerCase();
+        const emailUsuario = (user.email || "").toLowerCase();
 
         if (emailReserva === emailUsuario) {
           rows.push({ ...x, _docId: d.id });
@@ -190,17 +203,12 @@ async function cargarReservas() {
 
     reservasCache = await Promise.all(rows.map(enriquecerReserva));
 
-    if (estadoCarga) {
-      estadoCarga.style.display = "none";
-    }
-
+    if (estadoCarga) estadoCarga.style.display = "none";
     renderReservas();
   } catch (error) {
     console.error("Error al cargar mis reservas:", error);
 
-    if (estadoCarga) {
-      estadoCarga.style.display = "none";
-    }
+    if (estadoCarga) estadoCarga.style.display = "none";
 
     if (lista) {
       lista.innerHTML = `
@@ -216,10 +224,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const logoutBtn = document.getElementById("logoutBtn");
 
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", async (e) => {
+    logoutBtn.onclick = async (e) => {
       e.preventDefault();
-      await logout();
-    });
+      await signOut(auth);
+      localStorage.removeItem("tualoja_user");
+      localStorage.removeItem("tualoja_logged");
+      location.href = "index.html";
+    };
   }
 
   activarBotonesFiltro();
