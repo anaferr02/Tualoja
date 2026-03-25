@@ -7,370 +7,229 @@
 
   <style>
     *{box-sizing:border-box}
-
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:#f7f8fc;
-      color:#1f2450;
-    }
+    body{margin:0;font-family:Arial;background:#f7f8fc;color:#1f2450}
 
     .header{
-      position:sticky;
-      top:0;
-      z-index:50;
       background:#fff;
-      border-bottom:1px solid #e8eaf4;
+      border-bottom:1px solid #eee;
+      padding:16px 20px;
       display:flex;
-      align-items:center;
       justify-content:space-between;
-      gap:16px;
-      padding:18px 24px;
+      align-items:center;
     }
 
     .logo{
+      font-weight:bold;
+      font-size:20px;
+      color:#2f2b8f;
       text-decoration:none;
-      font-size:22px;
-      font-weight:800;
-      color:#222a78;
-      font-family:Georgia, "Times New Roman", serif;
-    }
-
-    .nav{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .nav a{
-      text-decoration:none;
-      color:#222a78;
-      border:1px solid #d7dcef;
-      padding:10px 16px;
-      border-radius:14px;
-      font-weight:700;
-      background:#fff;
-      font-size:14px;
-    }
-
-    .nav a:hover{
-      background:#f5f6ff;
     }
 
     .page{
-      max-width:1100px;
-      margin:0 auto;
-      padding:42px 20px 70px;
+      max-width:1000px;
+      margin:auto;
+      padding:30px 20px;
     }
 
-    .hero{
-      margin-bottom:26px;
-    }
-
-    .hero h1{
-      margin:0 0 10px;
-      font-size:56px;
-      line-height:1;
-      color:#23296f;
-      font-family:Georgia, "Times New Roman", serif;
-    }
-
-    .hero p{
-      margin:0;
-      color:#686e93;
-      font-size:18px;
-    }
-
-    .info-box{
-      display:flex;
-      gap:18px;
-      align-items:flex-start;
-      background:#eef3ff;
-      border:1px solid #d8e3ff;
-      border-radius:24px;
-      padding:24px 26px;
-      margin-bottom:28px;
-    }
-
-    .info-icon{
-      width:46px;
-      height:46px;
-      border-radius:999px;
-      background:#4e86d9;
-      color:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:26px;
-      flex:0 0 auto;
-    }
-
-    .info-text h3{
-      margin:0 0 10px;
-      font-size:22px;
-      color:#23296f;
-      font-family:Georgia, "Times New Roman", serif;
-    }
-
-    .info-text p{
-      margin:0;
-      color:#4f5678;
-      font-size:16px;
-      line-height:1.5;
-    }
+    h1{margin-bottom:10px}
 
     .filters{
       display:flex;
+      gap:10px;
+      margin-bottom:20px;
       flex-wrap:wrap;
-      gap:12px;
-      margin-bottom:26px;
     }
 
     .filter-btn{
-      border:1px solid #cfd6ec;
-      background:#fff;
-      color:#23296f;
-      border-radius:16px;
-      padding:12px 20px;
-      font-size:16px;
-      font-weight:700;
+      padding:10px 16px;
+      border-radius:12px;
+      border:1px solid #ccc;
       cursor:pointer;
+      background:#fff;
     }
 
     .filter-btn.active{
-      background:#2f348c;
+      background:#4f3dbb;
       color:#fff;
-      border-color:#2f348c;
-      box-shadow:0 8px 18px rgba(47,52,140,.20);
-    }
-
-    .reservas-list{
-      display:grid;
-      gap:18px;
     }
 
     .reserva-card{
       background:#fff;
-      border:1px solid #dde3f2;
-      border-radius:24px;
-      padding:26px;
-      display:grid;
-      grid-template-columns:170px 1fr auto;
-      gap:24px;
-      align-items:start;
-      box-shadow:0 10px 28px rgba(17,24,39,.04);
+      padding:20px;
+      border-radius:16px;
+      margin-bottom:15px;
+      display:flex;
+      gap:20px;
+      align-items:center;
     }
 
     .reserva-img{
-      width:100%;
-      height:160px;
-      border-radius:18px;
+      width:120px;
+      height:90px;
       object-fit:cover;
-      display:block;
-      background:#eef1fa;
-    }
-
-    .reserva-placeholder{
-      width:100%;
-      height:160px;
-      border-radius:18px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#eef1fa;
-      color:#7a80a5;
-      font-weight:700;
-      text-align:center;
-      padding:12px;
-    }
-
-    .reserva-main h3{
-      margin:0 0 12px;
-      font-size:22px;
-      color:#23296f;
-      font-family:Georgia, "Times New Roman", serif;
-    }
-
-    .reserva-main p{
-      margin:0 0 10px;
-      font-size:16px;
-      color:#353b5f;
-    }
-
-    .estado-badge{
-      display:inline-flex;
-      align-items:center;
-      padding:6px 10px;
       border-radius:10px;
-      font-size:14px;
-      font-weight:700;
     }
 
-    .estado-pendiente{
-      background:#f7ebc7;
-      color:#7a6120;
+    .estado{
+      font-weight:bold;
+      margin-top:6px;
     }
 
-    .estado-aceptada{
-      background:#dff5df;
-      color:#2d6b2d;
-    }
-
-    .estado-cancelada{
-      background:#fbe0e0;
-      color:#9b2f2f;
-    }
-
-    .reserva-side{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      min-width:140px;
-    }
-
-    .btn-outline,
-    .btn-danger{
+    .btn{
+      padding:10px 14px;
+      border-radius:10px;
       border:none;
-      border-radius:16px;
-      padding:14px 18px;
-      font-size:16px;
-      font-weight:700;
       cursor:pointer;
-      text-decoration:none;
-      text-align:center;
     }
 
-    .btn-outline{
+    .btn-cancel{
+      background:#ffe5e5;
+      color:#a30000;
+    }
+
+    .empty{
+      text-align:center;
+      padding:30px;
       background:#fff;
-      color:#23296f;
-      border:1px solid #cfd6ec;
-    }
-
-    .btn-danger{
-      background:#f7ecec;
-      color:#7f322b;
-      border:1px solid #e3c8c8;
-    }
-
-    .empty-box{
-      background:#fff;
-      border:1px dashed #d6dced;
-      border-radius:22px;
-      padding:34px 24px;
-      text-align:center;
-      color:#616887;
-      font-size:18px;
-    }
-
-    .footer{
-      text-align:center;
-      padding:30px 18px 40px;
-      color:#676d8d;
-      font-size:13px;
-    }
-
-    .footer a{
-      color:#3a3f8f;
-      text-decoration:none;
-      margin:0 6px;
-    }
-
-    .loading{
-      padding:18px 0;
-      color:#6b7194;
-      font-size:16px;
-    }
-
-    @media (max-width: 900px){
-      .hero h1{font-size:42px}
-      .reserva-card{
-        grid-template-columns:1fr;
-      }
-      .reserva-side{
-        min-width:100%;
-      }
-    }
-
-    @media (max-width: 640px){
-      .header{
-        padding:14px 12px;
-        align-items:flex-start;
-        flex-direction:column;
-      }
-      .nav{
-        width:100%;
-      }
-      .nav a{
-        font-size:13px;
-        padding:9px 12px;
-      }
-      .page{
-        padding:28px 14px 50px;
-      }
-      .hero h1{
-        font-size:34px;
-      }
-      .info-box{
-        padding:18px;
-      }
+      border-radius:12px;
     }
   </style>
 </head>
 
 <body>
-  <header class="header">
-    <a class="logo" href="index.html">TuAloja.com</a>
 
-    <nav class="nav">
-      <a href="publicar.html">Publicar alojamiento</a>
-      <a href="mis-reservas.html">Mis reservas</a>
-      <a href="panel-anfitrion.html">Panel anfitrión</a>
-      <a href="mi-cuenta.html">Mi cuenta</a>
-      <a href="ayuda.html">Ayuda</a>
-      <a href="#" id="logoutBtn">Cerrar sesión</a>
-    </nav>
-  </header>
+<header class="header">
+  <a class="logo" href="index.html">TuAloja</a>
+  <button id="logoutBtn">Cerrar sesión</button>
+</header>
 
-  <main class="page">
-    <section class="hero">
-      <h1>Mis reservas ✈️</h1>
-      <p>Están en orden de la más reciente a la más antigua.</p>
-    </section>
+<main class="page">
 
-    <section class="info-box">
-      <div class="info-icon">i</div>
+  <h1>Mis reservas</h1>
 
-      <div class="info-text">
-        <h3>Tus reservas están pendientes ⏳</h3>
-        <p>
-          Esperá la aprobación del anfitrión. Te llegará una notificación al email.
-        </p>
+  <div class="filters">
+    <button class="filter-btn active" data-filter="todas">Todas</button>
+    <button class="filter-btn" data-filter="pendiente">Pendientes</button>
+    <button class="filter-btn" data-filter="aceptada">Aceptadas</button>
+    <button class="filter-btn" data-filter="cancelada">Canceladas</button>
+  </div>
+
+  <div id="estadoCarga">Cargando reservas...</div>
+
+  <div id="listaReservas"></div>
+
+</main>
+
+<script type="module">
+import { db, auth } from "./firebase-config.js";
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  doc,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+import {
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+let reservas = [];
+let filtro = "todas";
+
+function render() {
+  const cont = document.getElementById("listaReservas");
+
+  const filtradas = reservas.filter(r => {
+    if (filtro === "todas") return true;
+    return (r.status || "pendiente") === filtro;
+  });
+
+  if (!filtradas.length) {
+    cont.innerHTML = `<div class="empty">No hay reservas</div>`;
+    return;
+  }
+
+  cont.innerHTML = filtradas.map(r => `
+    <div class="reserva-card">
+      <img class="reserva-img" src="${r.foto || 'https://via.placeholder.com/150'}">
+
+      <div style="flex:1">
+        <div><strong>${r.titulo || "Alojamiento"}</strong></div>
+        <div>${r.checkin} → ${r.checkout}</div>
+        <div>Huéspedes: ${r.guests}</div>
+        <div class="estado">Estado: ${r.status}</div>
       </div>
-    </section>
 
-    <section class="filters">
-      <button class="filter-btn active" data-filter="todas">Todas</button>
-      <button class="filter-btn" data-filter="pendiente">Pendientes ⏳</button>
-      <button class="filter-btn" data-filter="aceptada">Aceptadas ✅</button>
-      <button class="filter-btn" data-filter="cancelada">Canceladas 🚫</button>
-    </section>
-
-    <section id="estadoCarga" class="loading">Cargando reservas...</section>
-
-    <section id="listaReservas" class="reservas-list" data-reservas></section>
-  </main>
-
-  <footer class="footer">
-    <div>© 2026 TuAloja. Todos los derechos reservados.</div>
-    <div style="margin-top:10px;">
-      <a href="politica-de-privacidad.html">Política de Privacidad</a> |
-      <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
-      <a href="politica-de-cancelacion.html">Política de cancelaciones</a> |
-      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+      ${
+        r.status === "pendiente" || r.status === "aceptada"
+        ? `<button class="btn btn-cancel" data-id="${r.id}">Cancelar</button>`
+        : ""
+      }
     </div>
-  </footer>
+  `).join("");
 
-  <script type="module" src="mis-reservas.js?v=2"></script>
+  document.querySelectorAll("[data-id]").forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.getAttribute("data-id");
+      await updateDoc(doc(db, "reservas", id), { status: "cancelada" });
+      location.reload();
+    };
+  });
+}
+
+function activarFiltros(){
+  document.querySelectorAll("[data-filter]").forEach(btn=>{
+    btn.onclick = ()=>{
+      document.querySelectorAll("[data-filter]").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      filtro = btn.getAttribute("data-filter");
+      render();
+    };
+  });
+}
+
+async function cargar(){
+  const user = await new Promise(res=>{
+    const unsub = onAuthStateChanged(auth,u=>{
+      unsub();
+      res(u);
+    });
+  });
+
+  if(!user){
+    alert("Iniciá sesión");
+    location.href="login.html";
+    return;
+  }
+
+  const snap = await getDocs(collection(db,"reservas"));
+
+  snap.forEach(d=>{
+    const r = d.data();
+
+    if(r.huespedId === user.uid){
+      reservas.push({
+        ...r,
+        id: d.id
+      });
+    }
+  });
+
+  document.getElementById("estadoCarga").style.display="none";
+  render();
+}
+
+document.getElementById("logoutBtn").onclick = async ()=>{
+  await signOut(auth);
+  location.href="index.html";
+};
+
+activarFiltros();
+cargar();
+</script>
+
 </body>
 </html>
