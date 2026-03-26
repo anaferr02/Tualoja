@@ -7,6 +7,51 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
+    .header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:#fff;
+      border-bottom:1px solid #e6e8f2;
+      padding:16px 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .logo{
+      text-decoration:none;
+      font-size:28px;
+      font-weight:800;
+      color:#272d7d;
+      font-family:Georgia, "Times New Roman", serif;
+    }
+
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .top-btn{
+      text-decoration:none;
+      border:1px solid #d8dcef;
+      background:#fff;
+      color:#272d7d;
+      padding:10px 16px;
+      border-radius:14px;
+      font-weight:700;
+      font-size:14px;
+      cursor:pointer;
+    }
+
+    .top-btn:hover{
+      background:#f7f8ff;
+    }
+
     .page-wrap{ max-width:1040px; margin:24px auto 40px; padding:0 16px; }
     .card{
       background: rgba(255,255,255,.92);
@@ -21,7 +66,6 @@
     }
     .top h1{ margin:0; }
     .muted{ opacity:.85; }
-    .btn-row{ display:flex; gap:10px; flex-wrap:wrap; }
 
     .tabs{
       display:flex;
@@ -173,6 +217,7 @@
     }
 
     .hamburger{
+      display:none;
       font-size:20px;
       background:none;
       border:none;
@@ -180,19 +225,27 @@
     }
 
     @media (max-width:800px){
-      .nav{
+      .hamburger{ display:block; }
+
+      .header-actions{
         display:none;
         position:absolute;
-        right:20px;
-        top:70px;
+        right:16px;
+        top:72px;
         background:white;
-        padding:15px;
-        border-radius:12px;
+        padding:14px;
+        border-radius:14px;
         box-shadow:0 10px 30px rgba(0,0,0,.15);
         flex-direction:column;
-        gap:10px;
+        align-items:stretch;
+        min-width:220px;
       }
-      .nav.nav-open{ display:flex; }
+
+      .header-actions.nav-open{ display:flex; }
+
+      .top-btn{
+        text-align:center;
+      }
     }
 
     .btn-outline{
@@ -289,10 +342,15 @@
 <body>
   <header class="header">
     <a class="logo" href="index.html">TuAloja.com</a>
-    <nav id="mainNav" class="nav">
-      <a href="publicar.html">Publicar alojamiento</a>
-      <a href="ayuda.html">Ayuda</a>
-    </nav>
+
+    <div id="headerActions" class="header-actions">
+      <a class="top-btn" href="index.html">Volver al inicio</a>
+      <a class="top-btn" href="mi-cuenta.html">Mi cuenta</a>
+      <a class="top-btn" href="publicar.html">Publicar alojamiento</a>
+      <a class="top-btn" href="ayuda.html">Ayuda</a>
+      <button class="top-btn" id="btnLogoutTop" type="button">Cerrar sesión</button>
+    </div>
+
     <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
   </header>
 
@@ -304,11 +362,6 @@
           <p class="muted" style="margin:6px 0 0;">
             Administrá tus alojamientos, reservas y fechas ocupadas.
           </p>
-        </div>
-
-        <div class="btn-row">
-          <a class="btn-outline" href="publicar.html">+ Publicar</a>
-          <button class="btn-outline" id="btnLogout" type="button">Cerrar sesión</button>
         </div>
       </div>
 
@@ -322,7 +375,7 @@
         <div id="summary" class="muted"></div>
         <div id="list" class="list"></div>
         <p id="empty" class="muted" style="display:none; margin-top:12px;">
-          Todavía no tenés publicaciones. Tocá “+ Publicar”.
+          Todavía no tenés publicaciones. Tocá “Publicar alojamiento”.
         </p>
       </section>
 
@@ -415,9 +468,9 @@
     const calList = document.getElementById("calList");
     const calEmpty = document.getElementById("calEmpty");
 
-    const btnLogout = document.getElementById("btnLogout");
+    const btnLogoutTop = document.getElementById("btnLogoutTop");
     const hamburgerBtn = document.getElementById("hamburgerBtn");
-    const mainNav = document.getElementById("mainNav");
+    const headerActions = document.getElementById("headerActions");
 
     const editBackdrop = document.getElementById("editBackdrop");
     const editForm = document.getElementById("editForm");
@@ -610,8 +663,10 @@
       mine.forEach(b => {
         const noches = calcularNoches(b.checkin, b.checkout);
         const stateClass =
-          b.status === "aceptada" ? "chip-ok" :
+          b.status === "aceptada" || b.status === "confirmada" ? "chip-ok" :
           b.status === "rechazada" ? "chip-bad" : "chip-strong";
+
+        const estadoTexto = b.status === "confirmada" ? "confirmada" : (b.status || "pendiente");
 
         const item = document.createElement("div");
         item.className = "item";
@@ -624,10 +679,10 @@
             </div>
           </div>
           <div>
-            <h3>${escapeHTML(b.guestName || "Huésped")}</h3>
-            <p><b>${escapeHTML(b.guestEmail || "-")}</b></p>
+            <h3>${escapeHTML(b.guestName || b.huespedNombre || "Huésped")}</h3>
+            <p><b>${escapeHTML(b.guestEmail || b.huespedEmail || "-")}</b></p>
             <div class="chips">
-              <span class="chip ${stateClass}">Estado: ${escapeHTML(b.status || "pendiente")}</span>
+              <span class="chip ${stateClass}">Estado: ${escapeHTML(estadoTexto)}</span>
               <span class="chip">Check-in: ${escapeHTML(formatDate(b.checkin))}</span>
               <span class="chip">Check-out: ${escapeHTML(formatDate(b.checkout))}</span>
               ${noches ? `<span class="chip">Noches: ${escapeHTML(String(noches))}</span>` : ""}
@@ -642,13 +697,13 @@
         const actions = document.createElement("div");
         actions.className = "actions";
 
-        if (b.status !== "aceptada") {
+        if (b.status !== "aceptada" && b.status !== "confirmada") {
           const btnAccept = document.createElement("button");
           btnAccept.type = "button";
           btnAccept.className = "mini-btn success";
           btnAccept.textContent = "Aceptar";
           btnAccept.onclick = async () => {
-          await updateDoc(doc(db, "reservas", b._docId), { status: "confirmada" });
+            await updateDoc(doc(db, "reservas", b._docId), { status: "confirmada" });
             await renderBookings();
             await renderCalendar();
           };
@@ -692,6 +747,7 @@
 
       mine.forEach(b => {
         const noches = calcularNoches(b.checkin, b.checkout);
+        const estadoTexto = b.status === "confirmada" ? "confirmada" : (b.status || "pendiente");
 
         const row = document.createElement("div");
         row.className = "calendar-row";
@@ -703,7 +759,7 @@
               </div>
             </div>
             <div class="chips">
-              <span class="chip chip-strong">${escapeHTML(b.status || "pendiente")}</span>
+              <span class="chip chip-strong">${escapeHTML(estadoTexto)}</span>
               ${noches ? `<span class="chip">${escapeHTML(String(noches))} noches</span>` : ""}
             </div>
           </div>
@@ -712,8 +768,8 @@
 
           <div class="chips">
             <span class="chip">Código: ${escapeHTML(b.code || b._docId || "")}</span>
-            <span class="chip">Huésped: ${escapeHTML(b.guestName || "-")}</span>
-            <span class="chip">Email: ${escapeHTML(b.guestEmail || "-")}</span>
+            <span class="chip">Huésped: ${escapeHTML(b.guestName || b.huespedNombre || "-")}</span>
+            <span class="chip">Email: ${escapeHTML(b.guestEmail || b.huespedEmail || "-")}</span>
             <span class="chip">Huéspedes: ${escapeHTML(String(b.guests ?? "-"))}</span>
             <span class="chip">Total: ARS $${formatARS(b.total)}</span>
           </div>
@@ -738,13 +794,13 @@
       await renderCalendar();
     });
 
-    btnLogout.addEventListener("click", async () => {
+    btnLogoutTop.addEventListener("click", async () => {
       await signOut(auth);
       window.location.href = "login.html";
     });
 
     hamburgerBtn?.addEventListener("click", () => {
-      mainNav?.classList.toggle("nav-open");
+      headerActions?.classList.toggle("nav-open");
     });
 
     closeEditModal.addEventListener("click", cerrarEdicion);
