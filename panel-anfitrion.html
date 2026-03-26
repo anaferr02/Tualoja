@@ -1,58 +1,968 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Panel anfitrión - TuAloja</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel anfitrión - TuAloja</title>
+  <link rel="stylesheet" href="style.css" />
 
-<style>
-body{margin:0;font-family:Arial;background:#f7f8fc}
+  <style>
+    .header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:#fff;
+      border-bottom:1px solid #e6e8f2;
+      padding:16px 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
 
-.header{
-  background:#fff;
-  padding:16px;
-  display:flex;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  border-bottom:1px solid #eee;
-}
+    .logo{
+      text-decoration:none;
+      font-size:28px;
+      font-weight:800;
+      color:#272d7d;
+      font-family:Georgia, "Times New Roman", serif;
+    }
 
-.logo{font-weight:bold;font-size:22px;color:#2f2b8f;text-decoration:none}
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
 
-.header-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .top-btn{
+      text-decoration:none;
+      border:1px solid #d8dcef;
+      background:#fff;
+      color:#272d7d;
+      padding:10px 16px;
+      border-radius:14px;
+      font-weight:700;
+      font-size:14px;
+      cursor:pointer;
+    }
 
-.top-btn{
-  padding:10px 14px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  text-decoration:none;
-  background:#fff;
-  cursor:pointer;
-}
+    .top-btn:hover{
+      background:#f7f8ff;
+    }
 
-.page{max-width:1000px;margin:auto;padding:20px}
+    .page-wrap{
+      max-width:1040px;
+      margin:24px auto 40px;
+      padding:0 16px;
+    }
 
-.card{background:#fff;padding:20px;border-radius:20px}
+    .card{
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:22px;
+      box-shadow:0 18px 40px rgba(0,0,0,.12);
+      padding:18px;
+    }
 
-.tabs{display:flex;gap:10px;margin-bottom:20px}
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
 
-.tab-btn{
-  padding:10px 16px;
-  border-radius:10px;
-  border:none;
-  cursor:pointer;
-}
+    .top h1{ margin:0; }
+    .muted{ opacity:.85; }
 
-.tab-btn.active{background:#4f3dbb;color:#fff}
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:12px;
+      margin-bottom:16px;
+    }
 
-/* 🔥 STATS */
-.stats{
-  display:grid;
-  grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
-  gap:10px;
-  margin-bottom:20px;
-}
+    .stat-card{
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(0,0,0,.06);
+      border-radius:18px;
+      padding:14px;
+      box-shadow:0 8px 20px rgba(0,0,0,.04);
+    }
 
-.stat{
-  background:#fff;
-  padding:
+    .stat-label{
+      font-size:13px;
+      color:#666;
+      margin-bottom:8px;
+    }
+
+    .stat-value{
+      font-size:28px;
+      font-weight:800;
+      color:#1b167f;
+      line-height:1;
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+      padding-bottom:10px;
+      border-bottom:1px solid rgba(0,0,0,.08);
+    }
+
+    .tab-btn{
+      border:0;
+      cursor:pointer;
+      padding:12px 16px;
+      border-radius:14px;
+      background:rgba(0,0,0,.08);
+      color:#222;
+      font-weight:700;
+    }
+
+    .tab-btn.active{
+      background:#1b167f;
+      color:#fff;
+    }
+
+    .panel-note{
+      background:rgba(255,255,255,.62);
+      border:1px solid rgba(0,0,0,.06);
+      border-radius:16px;
+      padding:12px 14px;
+      margin-bottom:12px;
+    }
+
+    .list{
+      margin-top:12px;
+      display:grid;
+      gap:12px;
+    }
+
+    .item{
+      background:rgba(255,255,255,.7);
+      border:1px solid rgba(0,0,0,.06);
+      border-radius:18px;
+      padding:14px;
+      display:grid;
+      grid-template-columns:150px 1fr;
+      gap:12px;
+      align-items:start;
+    }
+
+    .thumb{
+      width:100%;
+      height:120px;
+      border-radius:14px;
+      overflow:hidden;
+      background:rgba(0,0,0,.06);
+      border:1px solid rgba(0,0,0,.08);
+    }
+
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .chip{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(0,0,0,.08);
+      border:1px solid rgba(0,0,0,.06);
+      white-space:nowrap;
+    }
+
+    .chip-strong{
+      background:rgba(27,22,127,.12);
+      border-color:rgba(27,22,127,.22);
+      color:#1b167f;
+      font-weight:700;
+    }
+
+    .chip-ok{
+      background:rgba(0,128,0,.10);
+      border-color:rgba(0,128,0,.20);
+      color:rgba(0,128,0,.95);
+      font-weight:800;
+    }
+
+    .chip-bad{
+      background:rgba(176,0,32,.10);
+      border-color:rgba(176,0,32,.20);
+      color:#b00020;
+      font-weight:800;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .mini-btn{
+      border:0;
+      cursor:pointer;
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(0,0,0,.08);
+      text-decoration:none;
+      color:inherit;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:600;
+    }
+
+    .mini-btn.danger{
+      background:rgba(176,0,32,.12);
+      color:#b00020;
+      font-weight:700;
+    }
+
+    .mini-btn.success{
+      background:rgba(0,128,0,.12);
+      color:rgba(0,128,0,.95);
+      font-weight:700;
+    }
+
+    .calendar-grid{
+      display:grid;
+      gap:12px;
+    }
+
+    .calendar-row{
+      background:rgba(255,255,255,.7);
+      border:1px solid rgba(0,0,0,.06);
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .calendar-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+
+    .calendar-range{
+      font-weight:800;
+      color:#1b167f;
+      background:rgba(27,22,127,.10);
+      border:1px solid rgba(27,22,127,.18);
+      padding:8px 12px;
+      border-radius:999px;
+      display:inline-block;
+    }
+
+    .hamburger{
+      display:none;
+      font-size:20px;
+      background:none;
+      border:none;
+      cursor:pointer;
+    }
+
+    .btn-outline{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.15);
+      background:white;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.42);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:999;
+    }
+
+    .modal{
+      width:min(620px, 96vw);
+      background:#fff;
+      border-radius:18px;
+      box-shadow:0 18px 40px rgba(0,0,0,.20);
+      padding:16px;
+    }
+
+    .modal-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .close-x{
+      border:0;
+      cursor:pointer;
+      background:rgba(0,0,0,.08);
+      border-radius:12px;
+      padding:8px 10px;
+      font-weight:700;
+    }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+
+    label{
+      display:block;
+      font-weight:600;
+      margin-top:10px;
+    }
+
+    input, textarea{
+      width:100%;
+      box-sizing:border-box;
+      margin-top:6px;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+      outline:none;
+    }
+
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .primary{
+      border:0;
+      cursor:pointer;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#1b167f;
+      color:#fff;
+      font-weight:800;
+    }
+
+    @media (max-width:900px){
+      .stats{
+        grid-template-columns:repeat(2, minmax(0,1fr));
+      }
+    }
+
+    @media (max-width:800px){
+      .hamburger{ display:block; }
+
+      .header-actions{
+        display:none;
+        position:absolute;
+        right:16px;
+        top:72px;
+        background:white;
+        padding:14px;
+        border-radius:14px;
+        box-shadow:0 10px 30px rgba(0,0,0,.15);
+        flex-direction:column;
+        align-items:stretch;
+        min-width:220px;
+      }
+
+      .header-actions.nav-open{ display:flex; }
+
+      .top-btn{
+        text-align:center;
+      }
+    }
+
+    @media (max-width:720px){
+      .item{ grid-template-columns:1fr; }
+      .grid-2{ grid-template-columns:1fr; }
+    }
+
+    @media (max-width:560px){
+      .stats{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <a class="logo" href="index.html">TuAloja.com</a>
+
+    <div id="headerActions" class="header-actions">
+      <a class="top-btn" href="index.html">Volver al inicio</a>
+      <a class="top-btn" href="mi-cuenta.html">Mi cuenta</a>
+      <a class="top-btn" href="publicar.html">Publicar alojamiento</a>
+      <a class="top-btn" href="ayuda.html">Ayuda</a>
+      <button class="top-btn" id="btnLogoutTop" type="button">Cerrar sesión</button>
+    </div>
+
+    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
+  </header>
+
+  <main class="page-wrap">
+    <div class="card">
+      <div class="top">
+        <div>
+          <h1>Panel anfitrión</h1>
+          <p class="muted" style="margin:6px 0 0;">
+            Administrá tus alojamientos, reservas y fechas ocupadas.
+          </p>
+        </div>
+      </div>
+
+      <section class="stats">
+        <div class="stat-card">
+          <div class="stat-label">Alojamientos</div>
+          <div id="statAlojamientos" class="stat-value">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Reservas</div>
+          <div id="statReservas" class="stat-value">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Confirmadas</div>
+          <div id="statConfirmadas" class="stat-value">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Ingresos</div>
+          <div id="statIngresos" class="stat-value">$0</div>
+        </div>
+      </section>
+
+      <div class="tabs">
+        <button class="tab-btn active" id="tabListings" type="button">Mis alojamientos</button>
+        <button class="tab-btn" id="tabBookings" type="button">Reservas recibidas</button>
+        <button class="tab-btn" id="tabCalendar" type="button">Calendario</button>
+      </div>
+
+      <section id="secListings">
+        <div id="summary" class="muted"></div>
+        <div id="list" class="list"></div>
+        <p id="empty" class="muted" style="display:none; margin-top:12px;">
+          Todavía no tenés publicaciones. Tocá “Publicar alojamiento”.
+        </p>
+      </section>
+
+      <section id="secBookings" style="display:none;">
+        <div class="panel-note muted">
+          Acá vas a ver las reservas que te hacen tus huéspedes.
+        </div>
+        <div id="bookSummary" class="muted"></div>
+        <div id="bookList" class="list"></div>
+        <p id="bookEmpty" class="muted" style="display:none; margin-top:12px;">
+          Todavía no recibiste reservas.
+        </p>
+      </section>
+
+      <section id="secCalendar" style="display:none;">
+        <div class="panel-note muted">
+          Fechas reservadas de tus alojamientos.
+        </div>
+        <div id="calList" class="calendar-grid"></div>
+        <p id="calEmpty" class="muted" style="display:none; margin-top:12px;">
+          Aún no hay reservas para mostrar en el calendario.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <div id="editBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-top">
+        <h2 style="margin:0;">Editar publicación</h2>
+        <button id="closeEditModal" class="close-x" type="button">✕</button>
+      </div>
+
+      <form id="editForm">
+        <label for="editTitulo">Título</label>
+        <input id="editTitulo" name="titulo" required />
+
+        <div class="grid-2">
+          <div>
+            <label for="editPrecio">Precio por noche</label>
+            <input id="editPrecio" name="precio" type="number" min="0" required />
+          </div>
+          <div>
+            <label for="editMaxNoches">Máx. noches</label>
+            <input id="editMaxNoches" name="maxNoches" type="number" min="1" max="365" />
+          </div>
+        </div>
+
+        <label for="editDescripcion">Descripción</label>
+        <textarea id="editDescripcion" name="descripcion" rows="4"></textarea>
+
+        <div class="modal-actions">
+          <button class="primary" type="submit">Guardar cambios</button>
+          <button class="btn-outline" id="cancelEditModal" type="button">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import {
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+    import {
+      collection,
+      getDocs,
+      doc,
+      deleteDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+    const secListings = document.getElementById("secListings");
+    const secBookings = document.getElementById("secBookings");
+    const secCalendar = document.getElementById("secCalendar");
+
+    const tabListings = document.getElementById("tabListings");
+    const tabBookings = document.getElementById("tabBookings");
+    const tabCalendar = document.getElementById("tabCalendar");
+
+    const list = document.getElementById("list");
+    const empty = document.getElementById("empty");
+    const summary = document.getElementById("summary");
+
+    const bookSummary = document.getElementById("bookSummary");
+    const bookList = document.getElementById("bookList");
+    const bookEmpty = document.getElementById("bookEmpty");
+
+    const calList = document.getElementById("calList");
+    const calEmpty = document.getElementById("calEmpty");
+
+    const btnLogoutTop = document.getElementById("btnLogoutTop");
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const headerActions = document.getElementById("headerActions");
+
+    const editBackdrop = document.getElementById("editBackdrop");
+    const editForm = document.getElementById("editForm");
+    const closeEditModal = document.getElementById("closeEditModal");
+    const cancelEditModal = document.getElementById("cancelEditModal");
+
+    const statAlojamientos = document.getElementById("statAlojamientos");
+    const statReservas = document.getElementById("statReservas");
+    const statConfirmadas = document.getElementById("statConfirmadas");
+    const statIngresos = document.getElementById("statIngresos");
+
+    let currentUser = null;
+    let currentEditDocId = null;
+    let listingsCache = [];
+    let bookingsCache = [];
+
+    function setActiveTab(activeBtn) {
+      [tabListings, tabBookings, tabCalendar].forEach(btn => btn.classList.remove("active"));
+      activeBtn.classList.add("active");
+    }
+
+    function showTab(which) {
+      secListings.style.display = which === "listings" ? "block" : "none";
+      secBookings.style.display = which === "bookings" ? "block" : "none";
+      secCalendar.style.display = which === "calendar" ? "block" : "none";
+
+      if (which === "listings") setActiveTab(tabListings);
+      if (which === "bookings") setActiveTab(tabBookings);
+      if (which === "calendar") setActiveTab(tabCalendar);
+    }
+
+    function escapeHTML(str) {
+      return String(str || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatARS(n) {
+      const num = Number(n || 0);
+      try { return num.toLocaleString("es-AR"); } catch { return String(num); }
+    }
+
+    function formatDate(fecha) {
+      if (!fecha) return "-";
+      const d = new Date(fecha + "T00:00:00");
+      if (Number.isNaN(d.getTime())) return fecha;
+      return d.toLocaleDateString("es-AR");
+    }
+
+    function calcularNoches(checkin, checkout) {
+      if (!checkin || !checkout) return null;
+      const d1 = new Date(checkin + "T00:00:00");
+      const d2 = new Date(checkout + "T00:00:00");
+      const diff = d2 - d1;
+      const noches = diff / (1000 * 60 * 60 * 24);
+      return noches > 0 ? noches : null;
+    }
+
+    function coverFromFotos(item) {
+      return item?.fotos?.[0] || "";
+    }
+
+    function esMioAlojamiento(x, user) {
+      const myEmail = String(user?.email || "").toLowerCase().trim();
+      const myUid = String(user?.uid || "").trim();
+
+      const emails = [
+        x.ownerEmail, x.anfitrionEmail, x.email, x.userEmail, x.hostEmail, x.correo
+      ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
+
+      const uids = [
+        x.anfitrionId, x.ownerUid, x.ownerId, x.hostUid, x.hostId,
+        x.uid, x.userUid, x.userId, x.propietarioId
+      ].map(v => String(v || "").trim()).filter(Boolean);
+
+      return emails.includes(myEmail) || (myUid && uids.includes(myUid));
+    }
+
+    function esMiReserva(x, user) {
+      const myEmail = String(user?.email || "").toLowerCase().trim();
+      const myUid = String(user?.uid || "").trim();
+
+      const emails = [
+        x.hostEmail, x.anfitrionEmail, x.ownerEmail, x.email
+      ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
+
+      const uids = [
+        x.hostId, x.hostUid, x.anfitrionId, x.ownerId, x.ownerUid, x.uid
+      ].map(v => String(v || "").trim()).filter(Boolean);
+
+      return emails.includes(myEmail) || (myUid && uids.includes(myUid));
+    }
+
+    function actualizarStats() {
+      const totalAlojamientos = listingsCache.length;
+      const totalReservas = bookingsCache.length;
+      const totalConfirmadas = bookingsCache.filter(b =>
+        b.status === "aceptada" || b.status === "confirmada"
+      ).length;
+
+      const totalIngresos = bookingsCache
+        .filter(b => b.status === "aceptada" || b.status === "confirmada")
+        .reduce((acc, b) => acc + Number(b.total || 0), 0);
+
+      statAlojamientos.textContent = String(totalAlojamientos);
+      statReservas.textContent = String(totalReservas);
+      statConfirmadas.textContent = String(totalConfirmadas);
+      statIngresos.textContent = `$${formatARS(totalIngresos)}`;
+    }
+
+    function abrirEdicion(x) {
+      currentEditDocId = x._docId;
+      editForm.titulo.value = x.titulo || "";
+      editForm.precio.value = Number(x.precio || 0);
+      editForm.maxNoches.value = Number(x.maxNoches || 30);
+      editForm.descripcion.value = x.descripcion || "";
+      editBackdrop.style.display = "flex";
+    }
+
+    function cerrarEdicion() {
+      editBackdrop.style.display = "none";
+      currentEditDocId = null;
+      editForm.reset();
+    }
+
+    async function cargarListingsCache() {
+      const snap = await getDocs(collection(db, "alojamientos"));
+      const all = [];
+      snap.forEach(d => all.push({ ...d.data(), _docId: d.id }));
+      listingsCache = all.filter(x => esMioAlojamiento(x, currentUser));
+      actualizarStats();
+    }
+
+    async function cargarBookingsCache() {
+      const snap = await getDocs(collection(db, "reservas"));
+      const all = [];
+      snap.forEach(d => all.push({ ...d.data(), _docId: d.id }));
+      bookingsCache = all.filter(x => esMiReserva(x, currentUser));
+      actualizarStats();
+    }
+
+    async function renderListings() {
+      list.innerHTML = "";
+      empty.style.display = "none";
+
+      await cargarListingsCache();
+      summary.textContent = `Publicaciones: ${listingsCache.length}`;
+
+      if (!listingsCache.length) {
+        empty.style.display = "block";
+        return;
+      }
+
+      listingsCache.forEach(x => {
+        const item = document.createElement("div");
+        item.className = "item";
+
+        const imgWrap = document.createElement("div");
+        imgWrap.className = "thumb";
+        const cover = coverFromFotos(x);
+        if (cover) {
+          imgWrap.innerHTML = `<img src="${cover}" alt="${escapeHTML(x.titulo || "Alojamiento")}">`;
+        }
+
+        const meta = document.createElement("div");
+        meta.innerHTML = `
+          <h3>${escapeHTML(x.titulo || "Sin título")}</h3>
+          <p><b>${escapeHTML(x.ciudad || "-")}</b>, ${escapeHTML(x.provincia || "-")}</p>
+          <div class="chips">
+            <span class="chip chip-strong">${escapeHTML(x.status || "activo")}</span>
+            <span class="chip">ARS $${formatARS(x.precio)}</span>
+            <span class="chip">Máx. noches: ${x.maxNoches ?? 30}</span>
+            <span class="chip">ID: ${escapeHTML(x.id || x._docId || "")}</span>
+          </div>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const btnEdit = document.createElement("button");
+        btnEdit.type = "button";
+        btnEdit.className = "mini-btn";
+        btnEdit.textContent = "Editar";
+        btnEdit.onclick = () => abrirEdicion(x);
+
+        const btnDelete = document.createElement("button");
+        btnDelete.type = "button";
+        btnDelete.className = "mini-btn danger";
+        btnDelete.textContent = "Eliminar";
+        btnDelete.onclick = async () => {
+          const ok = confirm("¿Eliminar este alojamiento?");
+          if (!ok) return;
+          await deleteDoc(doc(db, "alojamientos", x._docId));
+          await renderListings();
+          await renderBookings();
+          await renderCalendar();
+        };
+
+        actions.appendChild(btnEdit);
+        actions.appendChild(btnDelete);
+
+        meta.appendChild(actions);
+        item.appendChild(imgWrap);
+        item.appendChild(meta);
+        list.appendChild(item);
+      });
+    }
+
+    async function renderBookings() {
+      bookList.innerHTML = "";
+      bookEmpty.style.display = "none";
+
+      await cargarBookingsCache();
+      bookSummary.textContent = `Reservas recibidas: ${bookingsCache.length}`;
+
+      if (!bookingsCache.length) {
+        bookEmpty.style.display = "block";
+        return;
+      }
+
+      bookingsCache.forEach(b => {
+        const noches = calcularNoches(b.checkin, b.checkout);
+        const stateClass =
+          b.status === "aceptada" || b.status === "confirmada" ? "chip-ok" :
+          b.status === "rechazada" ? "chip-bad" : "chip-strong";
+
+        const estadoTexto = b.status === "confirmada" ? "confirmada" : (b.status || "pendiente");
+
+        const item = document.createElement("div");
+        item.className = "item";
+
+        item.innerHTML = `
+          <div class="thumb">
+            <div style="padding:10px; font-size:12px; color:#333;">
+              <b>${escapeHTML(b.title || b.titulo || "Reserva")}</b><br>
+              Código: ${escapeHTML(b.code || b._docId || "")}
+            </div>
+          </div>
+          <div>
+            <h3>${escapeHTML(b.guestName || b.huespedNombre || "Huésped")}</h3>
+            <p><b>${escapeHTML(b.guestEmail || b.huespedEmail || "-")}</b></p>
+            <div class="chips">
+              <span class="chip ${stateClass}">Estado: ${escapeHTML(estadoTexto)}</span>
+              <span class="chip">Check-in: ${escapeHTML(formatDate(b.checkin))}</span>
+              <span class="chip">Check-out: ${escapeHTML(formatDate(b.checkout))}</span>
+              ${noches ? `<span class="chip">Noches: ${escapeHTML(String(noches))}</span>` : ""}
+              <span class="chip">Huéspedes: ${escapeHTML(String(b.guests ?? "-"))}</span>
+              <span class="chip">Total: ARS $${formatARS(b.total)}</span>
+            </div>
+          </div>
+        `;
+
+        const right = item.children[1];
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        if (b.status !== "aceptada" && b.status !== "confirmada") {
+          const btnAccept = document.createElement("button");
+          btnAccept.type = "button";
+          btnAccept.className = "mini-btn success";
+          btnAccept.textContent = "Aceptar";
+          btnAccept.onclick = async () => {
+            await updateDoc(doc(db, "reservas", b._docId), { status: "confirmada" });
+            await renderBookings();
+            await renderCalendar();
+          };
+          actions.appendChild(btnAccept);
+        }
+
+        if (b.status !== "rechazada") {
+          const btnReject = document.createElement("button");
+          btnReject.type = "button";
+          btnReject.className = "mini-btn danger";
+          btnReject.textContent = "Rechazar";
+          btnReject.onclick = async () => {
+            await updateDoc(doc(db, "reservas", b._docId), { status: "rechazada" });
+            await renderBookings();
+            await renderCalendar();
+          };
+          actions.appendChild(btnReject);
+        }
+
+        right.appendChild(actions);
+        bookList.appendChild(item);
+      });
+    }
+
+    async function renderCalendar() {
+      calList.innerHTML = "";
+      calEmpty.style.display = "none";
+
+      await cargarBookingsCache();
+
+      const mine = bookingsCache
+        .filter(x => x.status !== "rechazada")
+        .sort((a, b) => String(a.checkin || "").localeCompare(String(b.checkin || "")));
+
+      if (!mine.length) {
+        calEmpty.style.display = "block";
+        return;
+      }
+
+      mine.forEach(b => {
+        const noches = calcularNoches(b.checkin, b.checkout);
+        const estadoTexto = b.status === "confirmada" ? "confirmada" : (b.status || "pendiente");
+
+        const row = document.createElement("div");
+        row.className = "calendar-row";
+        row.innerHTML = `
+          <div class="calendar-head">
+            <div>
+              <div class="calendar-range">
+                ${escapeHTML(formatDate(b.checkin))} → ${escapeHTML(formatDate(b.checkout))}
+              </div>
+            </div>
+            <div class="chips">
+              <span class="chip chip-strong">${escapeHTML(estadoTexto)}</span>
+              ${noches ? `<span class="chip">${escapeHTML(String(noches))} noches</span>` : ""}
+            </div>
+          </div>
+
+          <h3 style="margin:6px 0 6px;">${escapeHTML(b.title || b.titulo || "Alojamiento")}</h3>
+
+          <div class="chips">
+            <span class="chip">Código: ${escapeHTML(b.code || b._docId || "")}</span>
+            <span class="chip">Huésped: ${escapeHTML(b.guestName || b.huespedNombre || "-")}</span>
+            <span class="chip">Email: ${escapeHTML(b.guestEmail || b.huespedEmail || "-")}</span>
+            <span class="chip">Huéspedes: ${escapeHTML(String(b.guests ?? "-"))}</span>
+            <span class="chip">Total: ARS $${formatARS(b.total)}</span>
+          </div>
+        `;
+
+        calList.appendChild(row);
+      });
+    }
+
+    tabListings.addEventListener("click", async () => {
+      showTab("listings");
+      await renderListings();
+    });
+
+    tabBookings.addEventListener("click", async () => {
+      showTab("bookings");
+      await renderBookings();
+    });
+
+    tabCalendar.addEventListener("click", async () => {
+      showTab("calendar");
+      await renderCalendar();
+    });
+
+    btnLogoutTop.addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "login.html";
+    });
+
+    hamburgerBtn?.addEventListener("click", () => {
+      headerActions?.classList.toggle("nav-open");
+    });
+
+    closeEditModal.addEventListener("click", cerrarEdicion);
+    cancelEditModal.addEventListener("click", cerrarEdicion);
+    editBackdrop.addEventListener("click", (e) => {
+      if (e.target === editBackdrop) cerrarEdicion();
+    });
+
+    editForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentEditDocId) return;
+
+      let maxNoches = parseInt(editForm.maxNoches.value || "30", 10);
+      if (Number.isNaN(maxNoches)) maxNoches = 30;
+      if (maxNoches < 1) maxNoches = 1;
+      if (maxNoches > 365) maxNoches = 365;
+
+      await updateDoc(doc(db, "alojamientos", currentEditDocId), {
+        titulo: editForm.titulo.value.trim(),
+        precio: Number(editForm.precio.value || 0),
+        maxNoches,
+        descripcion: editForm.descripcion.value.trim()
+      });
+
+      cerrarEdicion();
+      await renderListings();
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentUser = user;
+      await cargarListingsCache();
+      await cargarBookingsCache();
+      showTab("listings");
+      await renderListings();
+    });
+  </script>
+</body>
+</html>
