@@ -31,6 +31,7 @@
       margin-top:8px;
       border-radius:10px;
       border:1px solid #ccc;
+      box-sizing:border-box;
     }
 
     button{
@@ -93,7 +94,10 @@ import {
   addDoc,
   serverTimestamp,
   doc,
-  getDoc
+  getDoc,
+  getDocs,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 import {
@@ -104,14 +108,52 @@ const form = document.getElementById("formReserva");
 const resumen = document.getElementById("resumen");
 const estado = document.getElementById("estado");
 
-let reserva = JSON.parse(localStorage.getItem("reservaPendiente"));
+let reserva = JSON.parse(localStorage.getItem("reservaPendiente") || "null");
 let usuarioActual = null;
 let authResuelta = false;
+let alojamientoActual = null;
 
 function irALogin() {
   localStorage.setItem("redirectAfterLogin", "reservar.html");
   alert("Tenés que iniciar sesión para reservar");
   window.location.href = "login.html";
+}
+
+function calcularNoches(checkin, checkout) {
+  if (!checkin || !checkout) return 0;
+  const entrada = new Date(checkin + "T00:00:00");
+  const salida = new Date(checkout + "T00:00:00");
+  const diff = salida.getTime() - entrada.getTime();
+
+  if (isNaN(diff) || diff <= 0) return 0;
+  return Math.round(diff / (1000 * 60 * 60 * 24));
+}
+
+function obtenerHostId(a) {
+  return (
+    a?.anfitrionId ||
+    a?.ownerUid ||
+    a?.ownerId ||
+    a?.hostUid ||
+    a?.hostId ||
+    a?.uid ||
+    a?.userUid ||
+    a?.userId ||
+    a?.propietarioId ||
+    ""
+  );
+}
+
+function obtenerHostEmail(a) {
+  return (
+    a?.anfitrionEmail ||
+    a?.ownerEmail ||
+    a?.email ||
+    a?.userEmail ||
+    a?.hostEmail ||
+    a?.correo ||
+    ""
+  );
 }
 
 onAuthStateChanged(auth, (user) => {
@@ -125,6 +167,33 @@ onAuthStateChanged(auth, (user) => {
 
   usuarioActual = user;
 });
+
+async function existeCruceDeFechas(alojamientoId, checkin, checkout) {
+  const snap = await getDocs(
+    query(collection(db, "reservas"), where("alojamientoId", "==", alojamientoId))
+  );
+
+  let ocupado = false;
+
+  snap.forEach((d) => {
+    const r = d.data();
+    const estadoActual = String(r.status || "").toLowerCase();
+
+    if (!["aceptada", "confirmada"].includes(estadoActual)) return;
+    if (!r.checkin || !r.checkout) return;
+
+    const inicioExistente = new Date(r.checkin + "T00:00:00").getTime();
+    const finExistente = new Date(r.checkout + "T00:00:00").getTime();
+    const inicioNueva = new Date(checkin + "T00:00:00").getTime();
+    const finNueva = new Date(checkout + "T00:00:00").getTime();
+
+    if (inicioNueva < finExistente && finNueva > inicioExistente) {
+      ocupado = true;
+    }
+  });
+
+  return ocupado;
+}
 
 async function cargarResumen() {
   if (!reserva || !reserva.alojamientoId) {
@@ -143,12 +212,18 @@ async function cargarResumen() {
       return;
     }
 
-    const a = snap.data();
+    alojamientoActual = snap.data();
+
+    const precio = Number(alojamientoActual.precio || 0);
+    const noches = calcularNoches(reserva.checkin, reserva.checkout);
+    const total = noches > 0 ? precio * noches : 0;
 
     resumen.innerHTML = `
-      <p><strong>${a.titulo || "Alojamiento"}</strong></p>
+      <p><strong>${alojamientoActual.titulo || "Alojamiento"}</strong></p>
       <p>${reserva.checkin} → ${reserva.checkout}</p>
       <p>Huéspedes: ${reserva.guests}</p>
+      <p>Noches: ${noches || "-"}</p>
+      <p><strong>Total estimado:</strong> $${Number(total || 0).toLocaleString("es-AR")}</p>
     `;
   } catch (error) {
     console.error("Error al cargar resumen:", error);
@@ -177,9 +252,37 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  if (!alojamientoActual) {
+    alert("No se pudo cargar el alojamiento.");
+    return;
+  }
+
+  const noches = calcularNoches(reserva.checkin, reserva.checkout);
+
+  if (noches <= 0) {
+    alert("Las fechas no son válidas.");
+    return;
+  }
+
+  const estaOcupado = await existeCruceDeFechas(
+    reserva.alojamientoId,
+    reserva.checkin,
+    reserva.checkout
+  );
+
+  if (estaOcupado) {
+    alert("Esas fechas ya no están disponibles.");
+    return;
+  }
+
   const nombre = document.getElementById("nombre").value.trim();
   const telefono = document.getElementById("telefono").value.trim();
   const mensaje = document.getElementById("mensaje").value.trim();
+
+  const precioNoche = Number(alojamientoActual.precio || 0);
+  const total = precioNoche * noches;
+  const anfitrionId = obtenerHostId(alojamientoActual);
+  const anfitrionEmail = obtenerHostEmail(alojamientoActual);
 
   try {
     estado.textContent = "Enviando solicitud...";
@@ -189,15 +292,38 @@ form.addEventListener("submit", async (e) => {
       checkin: reserva.checkin,
       checkout: reserva.checkout,
       guests: Number(reserva.guests || 1),
+      noches,
+      precioNoche,
+      total,
 
       huespedId: usuarioActual.uid,
       huespedEmail: usuarioActual.email || "",
-
       huespedNombre: nombre,
+      guestName: nombre,
+      guestEmail: usuarioActual.email || "",
+
       telefono,
       mensaje,
 
+      anfitrionId,
+      anfitrionEmail,
+      hostId: anfitrionId,
+      hostEmail: anfitrionEmail,
+      ownerId: anfitrionId,
+      ownerEmail: anfitrionEmail,
+
+      titulo: alojamientoActual.titulo || "Alojamiento",
+      title: alojamientoActual.titulo || "Alojamiento",
+      foto: alojamientoActual.fotos?.[0] || "",
+      alojamientoFoto: alojamientoActual.fotos?.[0] || "",
+      alojamientoTitulo: alojamientoActual.titulo || "Alojamiento",
+
       status: "pendiente",
+      chatHabilitado: false,
+      chatIniciado: false,
+      puedeCancelarHuesped: true,
+      puedeCancelarAnfitrion: true,
+
       creadaEn: serverTimestamp()
     });
 
