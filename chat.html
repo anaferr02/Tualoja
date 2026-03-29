@@ -262,6 +262,16 @@
         alert("Falta el id de la reserva.");
         location.href = "mis-reservas.html";
         return false;
+        // 🔥 marcar como leído al entrar
+if (usuarioActual.uid === reservaActual.huespedId) {
+  await updateDoc(doc(db, "reservas", reservaId), {
+    noLeidoHuesped: false
+  });
+} else {
+  await updateDoc(doc(db, "reservas", reservaId), {
+    noLeidoAnfitrion: false
+  });
+}
       }
 
       const snap = await getDoc(doc(db, "reservas", reservaId));
@@ -357,14 +367,21 @@
 
       try {
         await addDoc(collection(db, "reservas", reservaId, "mensajes"), {
-          texto: contenido,
-          remitenteId: usuarioActual.uid,
-          remitenteEmail: usuarioActual.email || "",
-          remitenteNombre: usuarioActual.displayName || usuarioActual.email || "Usuario",
-          remitenteRol: remitenteEsHuesped ? "huesped" : "anfitrion",
-          creadoEn: serverTimestamp()
-        });
+  texto: contenido,
+  remitenteId: usuarioActual.uid,
+  remitenteEmail: usuarioActual.email || "",
+  remitenteNombre: usuarioActual.displayName || usuarioActual.email || "Usuario",
+  creadoEn: serverTimestamp()
+});
 
+// 🔥 NUEVO (notificación)
+await updateDoc(doc(db, "reservas", reservaId), {
+  ultimoMensaje: contenido,
+  ultimoMensajeDe: usuarioActual.uid,
+  ultimoMensajeAt: serverTimestamp(),
+  noLeidoHuesped: reservaActual.huespedId === usuarioActual.uid ? false : true,
+  noLeidoAnfitrion: reservaActual.huespedId === usuarioActual.uid ? true : false
+});
         if (reservaActual.chatIniciado !== true) {
           await updateDoc(doc(db, "reservas", reservaId), {
             chatIniciado: true,
