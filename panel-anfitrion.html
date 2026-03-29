@@ -706,6 +706,16 @@
       actualizarStats();
     }
 
+    function puedeCancelarComoAnfitrion(b) {
+      const estado = String(b.status || "pendiente").toLowerCase();
+
+      if (!["pendiente", "aceptada", "confirmada"].includes(estado)) return false;
+      if (b.chatIniciado === true) return false;
+      if (b.puedeCancelarAnfitrion === false) return false;
+
+      return true;
+    }
+
     async function renderListings() {
       list.innerHTML = "";
       empty.style.display = "none";
@@ -813,6 +823,11 @@
               ${noches ? `<span class="chip">Noches: ${escapeHTML(String(noches))}</span>` : ""}
               <span class="chip">Huéspedes: ${escapeHTML(String(b.guests ?? "-"))}</span>
               <span class="chip">Total: ARS $${formatARS(b.total)}</span>
+              ${
+                b.chatIniciado
+                  ? `<span class="chip chip-bad">Chat iniciado: ya no se puede cancelar online</span>`
+                  : ""
+              }
             </div>
           </div>
         `;
@@ -827,7 +842,12 @@
           btnAccept.className = "mini-btn success";
           btnAccept.textContent = "Aceptar";
           btnAccept.onclick = async () => {
-            await updateDoc(doc(db, "reservas", b._docId), { status: "confirmada" });
+            await updateDoc(doc(db, "reservas", b._docId), {
+              status: "confirmada",
+              chatHabilitado: true,
+              puedeCancelarHuesped: true,
+              puedeCancelarAnfitrion: true
+            });
             await renderBookings();
             await renderCalendar();
           };
@@ -840,11 +860,24 @@
           btnReject.className = "mini-btn danger";
           btnReject.textContent = "Rechazar";
           btnReject.onclick = async () => {
+            if (!puedeCancelarComoAnfitrion(b)) {
+              alert("Esta reserva ya no se puede cancelar online.");
+              return;
+            }
+
             await updateDoc(doc(db, "reservas", b._docId), { status: "rechazada" });
             await renderBookings();
             await renderCalendar();
           };
           actions.appendChild(btnReject);
+        }
+
+        if ((b.status === "aceptada" || b.status === "confirmada") && b.chatHabilitado === true) {
+          const btnChat = document.createElement("a");
+          btnChat.className = "mini-btn";
+          btnChat.href = `chat.html?reserva=${encodeURIComponent(b._docId)}`;
+          btnChat.textContent = "Abrir chat";
+          actions.appendChild(btnChat);
         }
 
         right.appendChild(actions);
