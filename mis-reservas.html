@@ -3,341 +3,546 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reserva - TuAloja</title>
+  <title>Mis reservas - TuAloja</title>
 
   <style>
+    *{box-sizing:border-box}
+
     body{
       margin:0;
-      font-family:Arial;
-      background:#f6f7fb;
+      font-family:Arial, Helvetica, sans-serif;
+      background:#f5f6fb;
+      color:#1f2450;
     }
 
-    .page{
-      max-width:900px;
-      margin:auto;
-      padding:20px;
+    .header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:#fff;
+      border-bottom:1px solid #e6e8f2;
+      padding:16px 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
     }
 
-    .card{
-      background:white;
-      padding:20px;
-      border-radius:20px;
-      margin-bottom:20px;
+    .logo{
+      text-decoration:none;
+      font-size:28px;
+      font-weight:800;
+      color:#272d7d;
+      font-family:Georgia, "Times New Roman", serif;
     }
 
-    input, textarea{
-      width:100%;
-      padding:12px;
-      margin-top:8px;
-      border-radius:10px;
-      border:1px solid #ccc;
-      box-sizing:border-box;
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
     }
 
-    button{
-      width:100%;
-      padding:15px;
-      margin-top:20px;
-      background:#4f3dbb;
-      color:white;
-      border:none;
-      border-radius:12px;
-      font-weight:bold;
+    .top-btn{
+      text-decoration:none;
+      border:1px solid #d8dcef;
+      background:#fff;
+      color:#272d7d;
+      padding:10px 16px;
+      border-radius:14px;
+      font-weight:700;
+      font-size:14px;
       cursor:pointer;
     }
 
-    .estado{
-      margin-top:10px;
+    .top-btn:hover{
+      background:#f7f8ff;
+    }
+
+    .page{
+      max-width:1100px;
+      margin:0 auto;
+      padding:40px 18px 70px;
+    }
+
+    .hero{
+      margin-bottom:28px;
+    }
+
+    .hero h1{
+      margin:0 0 10px;
+      font-size:56px;
+      line-height:1;
+      color:#272d7d;
+      font-family:Georgia, "Times New Roman", serif;
+    }
+
+    .hero p{
+      margin:0;
+      font-size:18px;
+      color:#676f97;
+    }
+
+    .info-box{
+      background:#edf3ff;
+      border:1px solid #d4e0ff;
+      border-radius:24px;
+      padding:22px 24px;
+      margin-bottom:26px;
+      display:flex;
+      gap:16px;
+      align-items:flex-start;
+    }
+
+    .info-icon{
+      width:42px;
+      height:42px;
+      min-width:42px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#4a7ed7;
+      color:#fff;
+      font-weight:800;
+      font-size:24px;
+    }
+
+    .info-box h3{
+      margin:0 0 8px;
+      font-size:22px;
+      color:#272d7d;
+      font-family:Georgia, "Times New Roman", serif;
+    }
+
+    .info-box p{
+      margin:0;
+      color:#4e567a;
+      font-size:16px;
+      line-height:1.5;
+    }
+
+    .filters{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:28px;
+    }
+
+    .filter-btn{
+      border:1px solid #cfd6ec;
+      background:#fff;
+      color:#272d7d;
+      border-radius:16px;
+      padding:12px 18px;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .filter-btn.active{
+      background:#31368d;
+      color:#fff;
+      border-color:#31368d;
+      box-shadow:0 8px 18px rgba(49,54,141,.20);
+    }
+
+    #estadoCarga{
+      color:#6a7195;
+      margin-bottom:18px;
+      font-size:16px;
+    }
+
+    #listaReservas{
+      display:grid;
+      gap:18px;
+    }
+
+    .reserva-card{
+      background:#fff;
+      border:1px solid #dde3f2;
+      border-radius:24px;
+      padding:22px;
+      display:grid;
+      grid-template-columns:160px 1fr auto;
+      gap:22px;
+      align-items:center;
+      box-shadow:0 8px 24px rgba(0,0,0,.04);
+    }
+
+    .reserva-img{
+      width:160px;
+      height:120px;
+      border-radius:18px;
+      object-fit:cover;
+      display:block;
+      background:#eceff7;
+    }
+
+    .reserva-main h3{
+      margin:0 0 12px;
+      font-size:24px;
+      color:#272d7d;
+      font-family:Georgia, "Times New Roman", serif;
+    }
+
+    .reserva-main p{
+      margin:0 0 9px;
+      color:#38405f;
+      font-size:16px;
+    }
+
+    .estado-badge{
+      display:inline-flex;
+      align-items:center;
+      padding:6px 10px;
+      border-radius:10px;
       font-size:14px;
-      color:#555;
+      font-weight:800;
+    }
+
+    .estado-pendiente{
+      background:#f7ebc9;
+      color:#7a6221;
+    }
+
+    .estado-aceptada{
+      background:#dff3df;
+      color:#2f6b31;
+    }
+
+    .estado-cancelada{
+      background:#fde3e3;
+      color:#9a3232;
+    }
+
+    .reserva-side{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-width:150px;
+    }
+
+    .btn-outline,
+    .btn-danger{
+      text-decoration:none;
+      border:none;
+      border-radius:14px;
+      padding:13px 16px;
+      font-size:15px;
+      font-weight:700;
+      cursor:pointer;
+      text-align:center;
+    }
+
+    .btn-outline{
+      background:#fff;
+      color:#272d7d;
+      border:1px solid #cfd6ec;
+    }
+
+    .btn-danger{
+      background:#f9e8e8;
+      color:#8c2e2e;
+      border:1px solid #e6c9c9;
+    }
+
+    .empty{
+      background:#fff;
+      border:1px dashed #d6dced;
+      border-radius:22px;
+      padding:36px 20px;
+      text-align:center;
+      color:#666d91;
+      font-size:18px;
+    }
+
+    .footer{
+      text-align:center;
+      padding:34px 16px 40px;
+      color:#6a7191;
+      font-size:13px;
+    }
+
+    .footer a{
+      color:#3c438f;
+      text-decoration:none;
+      margin:0 6px;
+    }
+
+    @media (max-width: 900px){
+      .hero h1{font-size:42px}
+      .reserva-card{
+        grid-template-columns:1fr;
+        align-items:start;
+      }
+
+      .reserva-img{
+        width:100%;
+        height:220px;
+      }
+
+      .reserva-side{
+        min-width:100%;
+        width:100%;
+      }
+    }
+
+    @media (max-width: 640px){
+      .header{
+        padding:14px 12px;
+      }
+
+      .logo{
+        font-size:22px;
+      }
+
+      .hero h1{
+        font-size:34px;
+      }
+
+      .page{
+        padding:28px 14px 50px;
+      }
+
+      .info-box{
+        padding:18px;
+      }
+
+      .filter-btn{
+        font-size:14px;
+        padding:10px 14px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<div class="page">
+<header class="header">
+  <a class="logo" href="index.html">TuAloja.com</a>
 
-  <div class="card">
-    <h2>Completar reserva</h2>
-
-    <form id="formReserva">
-
-      <label>Nombre</label>
-      <input id="nombre" required>
-
-      <label>Teléfono</label>
-      <input id="telefono" required>
-
-      <label>Mensaje</label>
-      <textarea id="mensaje"></textarea>
-
-      <button type="submit">
-        Enviar solicitud de reserva
-      </button>
-
-      <div id="estado" class="estado"></div>
-    </form>
+  <div class="header-actions">
+    <a class="top-btn" href="index.html">Volver al inicio</a>
+    <a class="top-btn" href="mi-cuenta.html">Mi cuenta</a>
+    <button class="top-btn" id="logoutBtn" type="button">Cerrar sesión</button>
   </div>
+</header>
 
-  <div class="card">
-    <h3>Resumen</h3>
-    <div id="resumen"></div>
+<main class="page">
+
+  <section class="hero">
+    <h1>Mis reservas ✈️</h1>
+    <p>Acá podés ver tus reservas como huésped, filtrarlas y cancelarlas.</p>
+  </section>
+
+  <section class="info-box">
+    <div class="info-icon">i</div>
+    <div>
+      <h3>Seguí el estado de tus reservas</h3>
+      <p>
+        Revisá cuáles están pendientes, aceptadas o canceladas. También podés entrar al detalle del alojamiento.
+      </p>
+    </div>
+  </section>
+
+  <section class="filters">
+    <button class="filter-btn active" data-filter="todas" type="button">Todas</button>
+    <button class="filter-btn" data-filter="pendiente" type="button">Pendientes</button>
+    <button class="filter-btn" data-filter="aceptada" type="button">Aceptadas</button>
+    <button class="filter-btn" data-filter="cancelada" type="button">Canceladas</button>
+  </section>
+
+  <div id="estadoCarga">Cargando reservas...</div>
+  <div id="listaReservas"></div>
+
+</main>
+
+<footer class="footer">
+  <div>© 2026 TuAloja. Todos los derechos reservados.</div>
+  <div style="margin-top:10px;">
+    <a href="politica-de-privacidad.html">Política de Privacidad</a> |
+    <a href="terminos-y-condiciones.html">Términos y Condiciones</a> |
+    <a href="politica-de-cancelacion.html">Política de cancelaciones</a> |
+    <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
   </div>
-
-</div>
+</footer>
 
 <script type="module">
 import { db, auth } from "./firebase-config.js";
 import {
   collection,
-  addDoc,
-  serverTimestamp,
-  doc,
-  getDoc,
   getDocs,
+  updateDoc,
+  doc,
   query,
   where
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 import {
-  onAuthStateChanged
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-const form = document.getElementById("formReserva");
-const resumen = document.getElementById("resumen");
-const estado = document.getElementById("estado");
+let reservas = [];
+let filtro = "todas";
 
-let reserva = JSON.parse(localStorage.getItem("reservaPendiente") || "null");
-let usuarioActual = null;
-let authResuelta = false;
-let alojamientoActual = null;
+function badgeEstado(estado) {
+  const limpio = String(estado || "pendiente").toLowerCase();
 
-function irALogin() {
-  localStorage.setItem("redirectAfterLogin", "reservar.html");
-  alert("Tenés que iniciar sesión para reservar");
-  window.location.href = "login.html";
-}
-
-function calcularNoches(checkin, checkout) {
-  if (!checkin || !checkout) return 0;
-  const entrada = new Date(checkin + "T00:00:00");
-  const salida = new Date(checkout + "T00:00:00");
-  const diff = salida.getTime() - entrada.getTime();
-
-  if (isNaN(diff) || diff <= 0) return 0;
-  return Math.round(diff / (1000 * 60 * 60 * 24));
-}
-
-function obtenerHostId(a) {
-  return (
-    a?.anfitrionId ||
-    a?.ownerUid ||
-    a?.ownerId ||
-    a?.hostUid ||
-    a?.hostId ||
-    a?.uid ||
-    a?.userUid ||
-    a?.userId ||
-    a?.propietarioId ||
-    ""
-  );
-}
-
-function obtenerHostEmail(a) {
-  return (
-    a?.anfitrionEmail ||
-    a?.ownerEmail ||
-    a?.email ||
-    a?.userEmail ||
-    a?.hostEmail ||
-    a?.correo ||
-    ""
-  );
-}
-
-onAuthStateChanged(auth, (user) => {
-  authResuelta = true;
-
-  if (!user) {
-    usuarioActual = null;
-    irALogin();
-    return;
+  if (limpio === "aceptada" || limpio === "confirmada") {
+    return `<span class="estado-badge estado-aceptada">aceptada</span>`;
   }
 
-  usuarioActual = user;
-});
+  if (limpio === "cancelada" || limpio === "rechazada") {
+    return `<span class="estado-badge estado-cancelada">${limpio}</span>`;
+  }
 
-async function existeCruceDeFechas(alojamientoId, checkin, checkout) {
-  const snap = await getDocs(
-    query(collection(db, "reservas"), where("alojamientoId", "==", alojamientoId))
-  );
+  return `<span class="estado-badge estado-pendiente">pendiente</span>`;
+}
 
-  let ocupado = false;
+function puedeAbrirChat(r) {
+  const estado = String(r.status || "").toLowerCase();
+  return (estado === "aceptada" || estado === "confirmada") && r.chatHabilitado === true;
+}
 
-  snap.forEach((d) => {
-    const r = d.data();
-    const estadoActual = String(r.status || "").toLowerCase();
+function puedeCancelar(r) {
+  const estado = String(r.status || "pendiente").toLowerCase();
 
-    if (!["aceptada", "confirmada"].includes(estadoActual)) return;
-    if (!r.checkin || !r.checkout) return;
+  if (!["pendiente", "aceptada", "confirmada"].includes(estado)) return false;
+  if (r.chatIniciado === true) return false;
+  if (r.puedeCancelarHuesped === false) return false;
 
-    const inicioExistente = new Date(r.checkin + "T00:00:00").getTime();
-    const finExistente = new Date(r.checkout + "T00:00:00").getTime();
-    const inicioNueva = new Date(checkin + "T00:00:00").getTime();
-    const finNueva = new Date(checkout + "T00:00:00").getTime();
+  return true;
+}
 
-    if (inicioNueva < finExistente && finNueva > inicioExistente) {
-      ocupado = true;
+function render() {
+  const cont = document.getElementById("listaReservas");
+
+  const filtradas = reservas.filter(r => {
+    if (filtro === "todas") return true;
+    if (filtro === "aceptada") {
+      const estado = String(r.status || "pendiente").toLowerCase();
+      return estado === "aceptada" || estado === "confirmada";
     }
+    return String(r.status || "pendiente").toLowerCase() === filtro;
   });
 
-  return ocupado;
+  if (!filtradas.length) {
+    cont.innerHTML = `<div class="empty">No hay reservas para este filtro.</div>`;
+    return;
+  }
+
+  cont.innerHTML = filtradas.map(r => `
+    <article class="reserva-card">
+      <div>
+        <img class="reserva-img" src="${r.foto || 'https://via.placeholder.com/400x300?text=Alojamiento'}" alt="Alojamiento">
+      </div>
+
+      <div class="reserva-main">
+        <h3>${r.titulo || "Alojamiento"}</h3>
+        <p><strong>Desde:</strong> ${r.checkin || "-" } — <strong>Hasta:</strong> ${r.checkout || "-"}</p>
+        <p><strong>Huéspedes:</strong> ${r.guests || "-"}</p>
+        <p><strong>Estado:</strong> ${badgeEstado(r.status)}</p>
+        ${
+          r.chatIniciado
+            ? `<p style="margin-top:8px; color:#8c2e2e;"><strong>Chat activo:</strong> ya no podés cancelar online. Si hubo fuerza mayor, hacelo desde Ayuda.</p>`
+            : ""
+        }
+      </div>
+
+      <div class="reserva-side">
+        <a class="btn-outline" href="detalle.html?id=${encodeURIComponent(r.alojamientoId || "")}">
+          Ver detalle
+        </a>
+
+        ${
+          puedeAbrirChat(r)
+            ? `<a class="btn-outline" href="chat.html?reserva=${encodeURIComponent(r.id)}">Abrir chat</a>`
+            : ""
+        }
+
+        ${
+          puedeCancelar(r)
+            ? `<button class="btn-danger" data-id="${r.id}" type="button">Cancelar</button>`
+            : ""
+        }
+      </div>
+    </article>
+  `).join("");
+
+  document.querySelectorAll("[data-id]").forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.getAttribute("data-id");
+      const reserva = reservas.find(x => x.id === id);
+
+      if (!reserva) return;
+
+      if (!puedeCancelar(reserva)) {
+        alert("Esta reserva ya no se puede cancelar online.");
+        return;
+      }
+
+      const ok = confirm("¿Querés cancelar esta reserva?");
+      if (!ok) return;
+
+      await updateDoc(doc(db, "reservas", id), { status: "cancelada" });
+      location.reload();
+    };
+  });
 }
 
-async function cargarResumen() {
-  if (!reserva || !reserva.alojamientoId) {
-    resumen.innerHTML = "No hay reserva pendiente.";
-    form.style.display = "none";
-    return;
-  }
-
-  try {
-    const ref = doc(db, "alojamientos", reserva.alojamientoId);
-    const snap = await getDoc(ref);
-
-    if (!snap.exists()) {
-      resumen.innerHTML = "El alojamiento ya no existe.";
-      form.style.display = "none";
-      return;
-    }
-
-    alojamientoActual = snap.data();
-
-    const precio = Number(alojamientoActual.precio || 0);
-    const noches = calcularNoches(reserva.checkin, reserva.checkout);
-    const total = noches > 0 ? precio * noches : 0;
-
-    resumen.innerHTML = `
-      <p><strong>${alojamientoActual.titulo || "Alojamiento"}</strong></p>
-      <p>${reserva.checkin} → ${reserva.checkout}</p>
-      <p>Huéspedes: ${reserva.guests}</p>
-      <p>Noches: ${noches || "-"}</p>
-      <p><strong>Total estimado:</strong> $${Number(total || 0).toLocaleString("es-AR")}</p>
-    `;
-  } catch (error) {
-    console.error("Error al cargar resumen:", error);
-    resumen.innerHTML = "Hubo un error al cargar el resumen.";
-    form.style.display = "none";
-  }
+function activarFiltros() {
+  document.querySelectorAll("[data-filter]").forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      filtro = btn.getAttribute("data-filter");
+      render();
+    };
+  });
 }
 
-cargarResumen();
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  if (!authResuelta) {
-    alert("Esperá un segundo e intentá de nuevo.");
-    return;
-  }
-
-  if (!usuarioActual) {
-    irALogin();
-    return;
-  }
-
-  if (!reserva || !reserva.alojamientoId) {
-    alert("No hay una reserva pendiente.");
-    return;
-  }
-
-  if (!alojamientoActual) {
-    alert("No se pudo cargar el alojamiento.");
-    return;
-  }
-
-  const noches = calcularNoches(reserva.checkin, reserva.checkout);
-
-  if (noches <= 0) {
-    alert("Las fechas no son válidas.");
-    return;
-  }
-
-  const estaOcupado = await existeCruceDeFechas(
-    reserva.alojamientoId,
-    reserva.checkin,
-    reserva.checkout
-  );
-
-  if (estaOcupado) {
-    alert("Esas fechas ya no están disponibles.");
-    return;
-  }
-
-  const nombre = document.getElementById("nombre").value.trim();
-  const telefono = document.getElementById("telefono").value.trim();
-  const mensaje = document.getElementById("mensaje").value.trim();
-
-  const precioNoche = Number(alojamientoActual.precio || 0);
-  const total = precioNoche * noches;
-  const anfitrionId = obtenerHostId(alojamientoActual);
-  const anfitrionEmail = obtenerHostEmail(alojamientoActual);
-
-  try {
-    estado.textContent = "Enviando solicitud...";
-
-    await addDoc(collection(db, "reservas"), {
-      alojamientoId: reserva.alojamientoId,
-      checkin: reserva.checkin,
-      checkout: reserva.checkout,
-      guests: Number(reserva.guests || 1),
-      noches,
-      precioNoche,
-      total,
-
-      huespedId: usuarioActual.uid,
-      huespedEmail: usuarioActual.email || "",
-      huespedNombre: nombre,
-      guestName: nombre,
-      guestEmail: usuarioActual.email || "",
-
-      telefono,
-      mensaje,
-
-      anfitrionId,
-      anfitrionEmail,
-      hostId: anfitrionId,
-      hostEmail: anfitrionEmail,
-      ownerId: anfitrionId,
-      ownerEmail: anfitrionEmail,
-
-      titulo: alojamientoActual.titulo || "Alojamiento",
-      title: alojamientoActual.titulo || "Alojamiento",
-      foto: alojamientoActual.fotos?.[0] || "",
-      alojamientoFoto: alojamientoActual.fotos?.[0] || "",
-      alojamientoTitulo: alojamientoActual.titulo || "Alojamiento",
-
-      status: "pendiente",
-      chatHabilitado: false,
-      chatIniciado: false,
-      puedeCancelarHuesped: true,
-      puedeCancelarAnfitrion: true,
-
-      creadaEn: serverTimestamp()
+async function cargar() {
+  const user = await new Promise(res => {
+    const unsub = onAuthStateChanged(auth, u => {
+      unsub();
+      res(u);
     });
+  });
 
-    localStorage.removeItem("reservaPendiente");
-    localStorage.removeItem("redirectAfterLogin");
-
-    alert("Solicitud enviada ✅");
-    window.location.href = "mis-reservas.html";
-  } catch (error) {
-    console.error("Error al guardar reserva:", error);
-    estado.textContent = "No se pudo enviar la solicitud.";
-    alert("Hubo un error al enviar la solicitud.");
+  if (!user) {
+    alert("Iniciá sesión");
+    location.href = "login.html";
+    return;
   }
-});
+
+  const q = query(collection(db, "reservas"), where("huespedId", "==", user.uid));
+  const snap = await getDocs(q);
+
+  snap.forEach(d => {
+    const r = d.data();
+
+    reservas.push({
+      ...r,
+      id: d.id,
+      titulo: r.titulo || "Alojamiento",
+      foto: r.foto || "https://via.placeholder.com/400x300?text=Reserva"
+    });
+  });
+
+  document.getElementById("estadoCarga").style.display = "none";
+  render();
+}
+
+document.getElementById("logoutBtn").onclick = async () => {
+  await signOut(auth);
+  location.href = "index.html";
+};
+
+activarFiltros();
+cargar();
 </script>
 
 </body>
