@@ -261,7 +261,7 @@
       if (!reservaId) {
         alert("Falta el id de la reserva.");
         location.href = "mis-reservas.html";
-        return;
+        return false;
       }
 
       const snap = await getDoc(doc(db, "reservas", reservaId));
@@ -269,7 +269,7 @@
       if (!snap.exists()) {
         alert("La reserva no existe.");
         location.href = "mis-reservas.html";
-        return;
+        return false;
       }
 
       reservaActual = { ...snap.data(), _docId: snap.id };
@@ -277,7 +277,7 @@
       if (!esParticipante(reservaActual, usuarioActual)) {
         alert("No tenés permiso para entrar a este chat.");
         location.href = "mis-reservas.html";
-        return;
+        return false;
       }
 
       const estado = String(reservaActual.status || "").toLowerCase();
@@ -285,7 +285,7 @@
       if (!["aceptada", "confirmada"].includes(estado) || reservaActual.chatHabilitado !== true) {
         alert("El chat todavía no está habilitado para esta reserva.");
         location.href = "mis-reservas.html";
-        return;
+        return false;
       }
 
       const titulo = reservaActual.alojamientoTitulo || reservaActual.title || reservaActual.titulo || "Reserva";
@@ -295,6 +295,8 @@
       bloqueoInfo.textContent = reservaActual.chatIniciado
         ? "El chat ya fue iniciado. La reserva ya no puede cancelarse online salvo fuerza mayor o gestión por ayuda."
         : "Cuando se envía el primer mensaje, la cancelación online queda bloqueada para ambas partes.";
+
+      return true;
     }
 
     function escucharMensajes() {
@@ -303,33 +305,45 @@
         orderBy("creadoEn", "asc")
       );
 
-      onSnapshot(q, (snap) => {
-        if (snap.empty) {
-          mensajesEl.innerHTML = `<div class="empty">Todavía no hay mensajes.</div>`;
-          return;
-        }
+      onSnapshot(
+        q,
+        (snap) => {
+          if (snap.empty) {
+            mensajesEl.innerHTML = `<div class="empty">Todavía no hay mensajes.</div>`;
+            return;
+          }
 
-        let html = "";
+          let html = "";
 
-        snap.forEach((d) => {
-          const m = d.data();
-          const mine = String(m.remitenteId || "") === String(usuarioActual.uid || "");
-          const fecha = m.creadoEn?.toDate ? m.creadoEn.toDate() : null;
+          snap.forEach((d) => {
+            const m = d.data();
+            const mine = String(m.remitenteId || "") === String(usuarioActual.uid || "");
+            const fecha = m.creadoEn?.toDate ? m.creadoEn.toDate() : null;
 
-          html += `
-            <div class="msg ${mine ? "mine" : "other"}">
-              <div>${escapeHTML(m.texto || "")}</div>
-              <div class="msg-meta">
-                ${escapeHTML(m.remitenteNombre || "Usuario")}
-                ${fecha ? " · " + fecha.toLocaleString("es-AR") : ""}
+            html += `
+              <div class="msg ${mine ? "mine" : "other"}">
+                <div>${escapeHTML(m.texto || "")}</div>
+                <div class="msg-meta">
+                  ${escapeHTML(m.remitenteNombre || "Usuario")}
+                  ${fecha ? " · " + fecha.toLocaleString("es-AR") : ""}
+                </div>
               </div>
+            `;
+          });
+
+          mensajesEl.innerHTML = html;
+          mensajesEl.scrollTop = mensajesEl.scrollHeight;
+        },
+        (error) => {
+          console.error("Error al cargar mensajes:", error);
+          mensajesEl.innerHTML = `
+            <div class="empty">
+              No se pudieron cargar los mensajes.<br><br>
+              Revisá las reglas de Firestore o los permisos del chat.
             </div>
           `;
-        });
-
-        mensajesEl.innerHTML = html;
-        mensajesEl.scrollTop = mensajesEl.scrollHeight;
-      });
+        }
+      );
     }
 
     async function enviarMensaje(e) {
@@ -341,28 +355,33 @@
 
       const remitenteEsHuesped = esHuesped(reservaActual, usuarioActual);
 
-      await addDoc(collection(db, "reservas", reservaId, "mensajes"), {
-        texto: contenido,
-        remitenteId: usuarioActual.uid,
-        remitenteEmail: usuarioActual.email || "",
-        remitenteNombre: usuarioActual.displayName || usuarioActual.email || "Usuario",
-        remitenteRol: remitenteEsHuesped ? "huesped" : "anfitrion",
-        creadoEn: serverTimestamp()
-      });
-
-      if (reservaActual.chatIniciado !== true) {
-        await updateDoc(doc(db, "reservas", reservaId), {
-          chatIniciado: true,
-          puedeCancelarHuesped: false,
-          puedeCancelarAnfitrion: false
+      try {
+        await addDoc(collection(db, "reservas", reservaId, "mensajes"), {
+          texto: contenido,
+          remitenteId: usuarioActual.uid,
+          remitenteEmail: usuarioActual.email || "",
+          remitenteNombre: usuarioActual.displayName || usuarioActual.email || "Usuario",
+          remitenteRol: remitenteEsHuesped ? "huesped" : "anfitrion",
+          creadoEn: serverTimestamp()
         });
 
-        reservaActual.chatIniciado = true;
-        bloqueoInfo.textContent = "El chat ya fue iniciado. La reserva ya no puede cancelarse online salvo fuerza mayor o gestión por ayuda.";
-      }
+        if (reservaActual.chatIniciado !== true) {
+          await updateDoc(doc(db, "reservas", reservaId), {
+            chatIniciado: true,
+            puedeCancelarHuesped: false,
+            puedeCancelarAnfitrion: false
+          });
 
-      texto.value = "";
-      texto.focus();
+          reservaActual.chatIniciado = true;
+          bloqueoInfo.textContent = "El chat ya fue iniciado. La reserva ya no puede cancelarse online salvo fuerza mayor o gestión por ayuda.";
+        }
+
+        texto.value = "";
+        texto.focus();
+      } catch (error) {
+        console.error("Error al enviar mensaje:", error);
+        alert("No se pudo enviar el mensaje.");
+      }
     }
 
     onAuthStateChanged(auth, async (user) => {
@@ -372,7 +391,8 @@
       }
 
       usuarioActual = user;
-      await cargarReserva();
+      const ok = await cargarReserva();
+      if (!ok) return;
       escucharMensajes();
     });
 
