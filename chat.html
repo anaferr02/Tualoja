@@ -356,23 +356,223 @@ if (usuarioActual.uid === reservaActual.huespedId) {
       );
     }
 
-    async function enviarMensaje(e) {
-      e.preventDefault();
+    <script type="module">
+  import { db, auth } from "./firebase-config.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+  import {
+    doc,
+    getDoc,
+    updateDoc,
+    collection,
+    addDoc,
+    serverTimestamp,
+    query,
+    orderBy,
+    onSnapshot
+  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-      const contenido = texto.value.trim();
-      if (!contenido) return;
-      if (!reservaActual) return;
+  const params = new URLSearchParams(window.location.search);
+  const reservaId = params.get("reserva");
 
-      const remitenteEsHuesped = esHuesped(reservaActual, usuarioActual);
+  const chatInfo = document.getElementById("chatInfo");
+  const bloqueoInfo = document.getElementById("bloqueoInfo");
+  const mensajesEl = document.getElementById("mensajes");
+  const chatForm = document.getElementById("chatForm");
+  const texto = document.getElementById("texto");
 
-      try {
-        await addDoc(collection(db, "reservas", reservaId, "mensajes"), {
-  texto: contenido,
-  remitenteId: usuarioActual.uid,
-  remitenteEmail: usuarioActual.email || "",
-  remitenteNombre: usuarioActual.displayName || usuarioActual.email || "Usuario",
-  creadoEn: serverTimestamp()
-});
+  let usuarioActual = null;
+  let reservaActual = null;
+
+  function escapeHTML(str) {
+    return String(str || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function esParticipante(reserva, user) {
+    const uid = String(user?.uid || "");
+    const email = String(user?.email || "").toLowerCase();
+
+    const posiblesUids = [
+      reserva?.huespedId,
+      reserva?.anfitrionId,
+      reserva?.hostId,
+      reserva?.ownerId
+    ].map(x => String(x || "")).filter(Boolean);
+
+    const posiblesEmails = [
+      reserva?.huespedEmail,
+      reserva?.guestEmail,
+      reserva?.anfitrionEmail,
+      reserva?.hostEmail,
+      reserva?.ownerEmail
+    ].map(x => String(x || "").toLowerCase()).filter(Boolean);
+
+    return posiblesUids.includes(uid) || posiblesEmails.includes(email);
+  }
+
+  async function cargarReserva() {
+    if (!reservaId) {
+      alert("Falta el id de la reserva.");
+      location.href = "mis-reservas.html";
+      return false;
+    }
+
+    const snap = await getDoc(doc(db, "reservas", reservaId));
+
+    if (!snap.exists()) {
+      alert("La reserva no existe.");
+      location.href = "mis-reservas.html";
+      return false;
+    }
+
+    reservaActual = { ...snap.data(), _docId: snap.id };
+
+    if (!esParticipante(reservaActual, usuarioActual)) {
+      alert("No tenés permiso para entrar a este chat.");
+      location.href = "mis-reservas.html";
+      return false;
+    }
+
+    const estado = String(reservaActual.status || "").toLowerCase();
+
+    if (!["aceptada", "confirmada"].includes(estado) || reservaActual.chatHabilitado !== true) {
+      alert("El chat todavía no está habilitado para esta reserva.");
+      location.href = "mis-reservas.html";
+      return false;
+    }
+
+    const titulo = reservaActual.alojamientoTitulo || reservaActual.title || reservaActual.titulo || "Reserva";
+    chatInfo.textContent = `${titulo} · ${reservaActual.checkin || "-"} → ${reservaActual.checkout || "-"}`;
+
+    bloqueoInfo.style.display = "block";
+    bloqueoInfo.textContent = reservaActual.chatIniciado
+      ? "El chat ya fue iniciado. La reserva ya no puede cancelarse online salvo fuerza mayor o gestión por ayuda."
+      : "Cuando se envía el primer mensaje, la cancelación online queda bloqueada para ambas partes.";
+
+    if (usuarioActual.uid === reservaActual.huespedId) {
+      await updateDoc(doc(db, "reservas", reservaId), {
+        noLeidoHuesped: false
+      });
+      reservaActual.noLeidoHuesped = false;
+    } else {
+      await updateDoc(doc(db, "reservas", reservaId), {
+        noLeidoAnfitrion: false
+      });
+      reservaActual.noLeidoAnfitrion = false;
+    }
+
+    return true;
+  }
+
+  function escucharMensajes() {
+    const q = query(
+      collection(db, "reservas", reservaId, "mensajes"),
+      orderBy("creadoEn", "asc")
+    );
+
+    onSnapshot(
+      q,
+      (snap) => {
+        if (snap.empty) {
+          mensajesEl.innerHTML = `<div class="empty">Todavía no hay mensajes.</div>`;
+          return;
+        }
+
+        let html = "";
+
+        snap.forEach((d) => {
+          const m = d.data();
+          const mine = String(m.remitenteId || "") === String(usuarioActual.uid || "");
+          const fecha = m.creadoEn?.toDate ? m.creadoEn.toDate() : null;
+
+          html += `
+            <div class="msg ${mine ? "mine" : "other"}">
+              <div>${escapeHTML(m.texto || "")}</div>
+              <div class="msg-meta">
+                ${escapeHTML(m.remitenteNombre || "Usuario")}
+                ${fecha ? " · " + fecha.toLocaleString("es-AR") : ""}
+              </div>
+            </div>
+          `;
+        });
+
+        mensajesEl.innerHTML = html;
+        mensajesEl.scrollTop = mensajesEl.scrollHeight;
+      },
+      (error) => {
+        console.error("Error al cargar mensajes:", error);
+        mensajesEl.innerHTML = `
+          <div class="empty">
+            No se pudieron cargar los mensajes.
+          </div>
+        `;
+      }
+    );
+  }
+
+  async function enviarMensaje(e) {
+    e.preventDefault();
+
+    const contenido = texto.value.trim();
+    if (!contenido) return;
+    if (!reservaActual) return;
+
+    const esHuesped = String(usuarioActual.uid || "") === String(reservaActual.huespedId || "");
+
+    try {
+      await addDoc(collection(db, "reservas", reservaId, "mensajes"), {
+        texto: contenido,
+        remitenteId: usuarioActual.uid,
+        remitenteEmail: usuarioActual.email || "",
+        remitenteNombre: usuarioActual.displayName || usuarioActual.email || "Usuario",
+        creadoEn: serverTimestamp()
+      });
+
+      await updateDoc(doc(db, "reservas", reservaId), {
+        ultimoMensaje: contenido,
+        ultimoMensajeDe: usuarioActual.uid,
+        ultimoMensajeAt: serverTimestamp(),
+        noLeidoHuesped: esHuesped ? false : true,
+        noLeidoAnfitrion: esHuesped ? true : false,
+        chatIniciado: true,
+        puedeCancelarHuesped: false,
+        puedeCancelarAnfitrion: false
+      });
+
+      reservaActual.ultimoMensaje = contenido;
+      reservaActual.ultimoMensajeDe = usuarioActual.uid;
+      reservaActual.chatIniciado = true;
+      reservaActual.noLeidoHuesped = esHuesped ? false : true;
+      reservaActual.noLeidoAnfitrion = esHuesped ? true : false;
+
+      bloqueoInfo.textContent = "El chat ya fue iniciado. La reserva ya no puede cancelarse online salvo fuerza mayor o gestión por ayuda.";
+
+      texto.value = "";
+      texto.focus();
+    } catch (error) {
+      console.error("Error al enviar mensaje:", error);
+      alert("No se pudo enviar el mensaje.");
+    }
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      location.href = "login.html";
+      return;
+    }
+
+    usuarioActual = user;
+    const ok = await cargarReserva();
+    if (!ok) return;
+    escucharMensajes();
+  });
+
+  chatForm.addEventListener("submit", enviarMensaje);
+</script>
 
 // 🔥 NUEVO (notificación)
 await updateDoc(doc(db, "reservas", reservaId), {
