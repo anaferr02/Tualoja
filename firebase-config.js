@@ -1,62 +1,20 @@
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
-    function signedIn() {
-      return request.auth != null;
-    }
+const firebaseConfig = {
+  apiKey: "AIzaSyCj82nKioR0zTYQJPMUme0yFCXDKivVC_g",
+  authDomain: "tualoja-5210e.firebaseapp.com",
+  projectId: "tualoja-5210e",
+  storageBucket: "tualoja-5210e.firebasestorage.app",
+  messagingSenderId: "472294290866",
+  appId: "1:472294290866:web:7bc5d811c4c63bea9660ab",
+  measurementId: "G-M9H49YEZSN"
+};
 
-    function userEmail() {
-      return request.auth.token.email;
-    }
+const app = initializeApp(firebaseConfig);
 
-    function esParticipanteReserva() {
-      return signedIn() && (
-        resource.data.huespedId == request.auth.uid ||
-        resource.data.anfitrionId == request.auth.uid ||
-        resource.data.hostId == request.auth.uid ||
-        resource.data.ownerId == request.auth.uid ||
-        resource.data.huespedEmail == userEmail() ||
-        resource.data.guestEmail == userEmail() ||
-        resource.data.anfitrionEmail == userEmail() ||
-        resource.data.hostEmail == userEmail() ||
-        resource.data.ownerEmail == userEmail()
-      );
-    }
-
-    function esParticipanteReservaNuevo() {
-      return signedIn() && (
-        request.resource.data.huespedId == request.auth.uid ||
-        request.resource.data.anfitrionId == request.auth.uid ||
-        request.resource.data.hostId == request.auth.uid ||
-        request.resource.data.ownerId == request.auth.uid ||
-        request.resource.data.huespedEmail == userEmail() ||
-        request.resource.data.guestEmail == userEmail() ||
-        request.resource.data.anfitrionEmail == userEmail() ||
-        request.resource.data.hostEmail == userEmail() ||
-        request.resource.data.ownerEmail == userEmail()
-      );
-    }
-
-    match /alojamientos/{id} {
-      allow read: if true;
-      allow write: if signedIn();
-    }
-
-    match /reservas/{id} {
-      allow create: if signedIn();
-      allow read: if esParticipanteReserva();
-      allow update: if esParticipanteReserva();
-      allow delete: if false;
-
-      match /mensajes/{mensajeId} {
-        allow read: if esParticipanteReserva();
-
-        allow create: if esParticipanteReserva()
-          && request.resource.data.remitenteId == request.auth.uid;
-
-        allow update, delete: if false;
-      }
-    }
-  }
-}
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app); // 👈 IMPORTANTE
