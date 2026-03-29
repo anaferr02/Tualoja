@@ -103,12 +103,28 @@ function renderReservas() {
           <p><strong>Huéspedes:</strong> ${r.guests || "-"}</p>
           <p><strong>Estado:</strong> <span class="estado-badge ${estado.clase}">${estado.texto}</span></p>
           <p><strong>Total:</strong> ${total}</p>
+          ${
+  r.noLeidoHuesped
+    ? `<p style="color:#d93025; font-weight:700;">🔴 Nuevo mensaje</p>`
+    : ""
+}
+
+${
+  r.ultimoMensaje
+    ? `<p style="color:#6a7195; font-size:14px;">💬 ${r.ultimoMensaje}</p>`
+    : ""
+}
         </div>
 
         <div class="reserva-side">
           <a class="btn-outline" href="detalle.html?id=${encodeURIComponent(r.alojamientoId || "")}">
             Ver detalle
           </a>
+          ${
+  r.status === "aceptada"
+    ? `<a class="btn-outline" href="chat.html?reserva=${r._docId}">Abrir chat</a>`
+    : ""
+}
 
           ${
             ["pendiente", "aceptada"].includes(String(r.status || "pendiente").toLowerCase())
