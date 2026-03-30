@@ -291,6 +291,151 @@
     .footer-links a:hover{
       text-decoration:underline;
     }
+
+    .notif-wrap{
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:#eef1ff;
+      color:#1b167f;
+      cursor:pointer;
+      user-select:none;
+      font-size:20px;
+      font-weight:700;
+      transition:.18s ease;
+      margin:0 4px;
+      border:1px solid rgba(27,22,127,.08);
+    }
+
+    .notif-wrap:hover{
+      background:#e2e8ff;
+      transform:translateY(-1px);
+    }
+
+    .notif-count{
+      position:absolute;
+      top:-5px;
+      right:-5px;
+      min-width:20px;
+      height:20px;
+      padding:0 5px;
+      border-radius:999px;
+      background:#ff4d4f;
+      color:#fff;
+      font-size:11px;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 6px 14px rgba(255,77,79,.28);
+    }
+
+    .notif-dropdown{
+      position:absolute;
+      right:0;
+      top:52px;
+      width:300px;
+      max-width:calc(100vw - 32px);
+      background:#fff;
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:18px;
+      box-shadow:0 18px 40px rgba(0,0,0,.16);
+      padding:10px;
+      display:none;
+      z-index:999;
+    }
+
+    .notif-dropdown.open{
+      display:block;
+    }
+
+    .notif-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      padding:6px 8px 10px;
+      border-bottom:1px solid rgba(0,0,0,.06);
+      margin-bottom:6px;
+    }
+
+    .notif-head strong{
+      color:#15123d;
+      font-size:15px;
+    }
+
+    .notif-clear{
+      border:0;
+      background:transparent;
+      color:#1b167f;
+      font-weight:700;
+      cursor:pointer;
+      font-size:12px;
+    }
+
+    .notif-list{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .notif-item{
+      display:block;
+      text-decoration:none;
+      background:#f7f8ff;
+      border:1px solid rgba(27,22,127,.08);
+      border-radius:14px;
+      padding:10px 12px;
+      color:#15123d;
+      transition:.18s ease;
+    }
+
+    .notif-item:hover{
+      background:#eef1ff;
+    }
+
+    .notif-item strong{
+      display:block;
+      font-size:13px;
+      margin-bottom:4px;
+      color:#15123d;
+    }
+
+    .notif-item p{
+      margin:0;
+      font-size:12px;
+      color:#555;
+      line-height:1.35;
+    }
+
+    .notif-item small{
+      display:block;
+      margin-top:5px;
+      color:#777;
+      font-size:11px;
+    }
+
+    .notif-empty{
+      padding:16px 10px;
+      text-align:center;
+      font-size:13px;
+      color:#666;
+    }
+
+    @media (max-width: 780px){
+      .notif-wrap{
+        width:40px;
+        height:40px;
+      }
+
+      .notif-dropdown{
+        right:-20px;
+      }
+    }
   </style>
 </head>
 
@@ -310,6 +455,33 @@
       <a href="panel-anfitrion.html">Panel anfitrión</a>
       <a href="mi-cuenta.html">Mi cuenta</a>
       <a href="ayuda.html">Ayuda</a>
+
+      <div class="notif-wrap" id="notifBtn" title="Notificaciones" aria-label="Notificaciones">
+        🔔
+        <span class="notif-count" id="notifCount">2</span>
+
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="notif-head">
+            <strong>Notificaciones</strong>
+            <button class="notif-clear" id="markReadBtn" type="button">Marcar leídas</button>
+          </div>
+
+          <div class="notif-list" id="notifList">
+            <a href="mis-reservas.html" class="notif-item">
+              <strong>Nueva reserva</strong>
+              <p>Recibiste una nueva reserva en TuAloja.</p>
+              <small>Hace unos minutos</small>
+            </a>
+
+            <a href="chat.html" class="notif-item">
+              <strong>Nuevo mensaje</strong>
+              <p>Tenés un mensaje nuevo sobre una reserva.</p>
+              <small>Hace unos minutos</small>
+            </a>
+          </div>
+        </div>
+      </div>
+
       <a href="#" id="logoutLink">Cerrar sesión</a>
     </nav>
 
@@ -331,8 +503,6 @@
             <p class="muted">Este es tu perfil y panel de control.</p>
           </div>
         </div>
-
-       
       </div>
 
       <section class="box">
@@ -445,6 +615,13 @@
     const passwordFields = document.getElementById("passwordFields");
     const profilePhotoInput = document.getElementById("profilePhoto");
 
+    const notifBtn = document.getElementById("notifBtn");
+    const notifDropdown = document.getElementById("notifDropdown");
+    const notifCount = document.getElementById("notifCount");
+    const notifList = document.getElementById("notifList");
+    const markReadBtn = document.getElementById("markReadBtn");
+    const logoutLink = document.getElementById("logoutLink");
+
     let editMode = false;
     let passOpen = false;
 
@@ -455,6 +632,70 @@
 
     function saveUsers(u) {
       localStorage.setItem(usersKey, JSON.stringify(u));
+    }
+
+    function getNotifKey() {
+      return "tualoja_notificaciones_" + myEmail;
+    }
+
+    function loadNotifications() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(getNotifKey()) || "null");
+        if (Array.isArray(saved)) return saved;
+      } catch {}
+
+      return [
+        {
+          titulo: "Nueva reserva",
+          texto: "Recibiste una nueva reserva en TuAloja.",
+          fecha: "Hace unos minutos",
+          url: "mis-reservas.html",
+          leida: false
+        },
+        {
+          titulo: "Nuevo mensaje",
+          texto: "Tenés un mensaje nuevo sobre una reserva.",
+          fecha: "Hace unos minutos",
+          url: "chat.html",
+          leida: false
+        }
+      ];
+    }
+
+    function saveNotifications(list) {
+      localStorage.setItem(getNotifKey(), JSON.stringify(list));
+    }
+
+    function renderNotifications() {
+      const list = loadNotifications();
+      const unread = list.filter(n => !n.leida).length;
+
+      notifCount.textContent = unread;
+      notifCount.style.display = unread > 0 ? "flex" : "none";
+
+      if (!list.length) {
+        notifList.innerHTML = `<div class="notif-empty">No tenés notificaciones por ahora.</div>`;
+        return;
+      }
+
+      notifList.innerHTML = list.map((n, i) => `
+        <a href="${n.url || '#'}" class="notif-item" data-index="${i}">
+          <strong>${n.titulo || "Notificación"}</strong>
+          <p>${n.texto || ""}</p>
+          <small>${n.fecha || ""}</small>
+        </a>
+      `).join("");
+
+      notifList.querySelectorAll(".notif-item").forEach(item => {
+        item.addEventListener("click", () => {
+          const idx = Number(item.dataset.index);
+          const notifications = loadNotifications();
+          if (notifications[idx]) {
+            notifications[idx].leida = true;
+            saveNotifications(notifications);
+          }
+        });
+      });
     }
 
     function setEditMode(state) {
@@ -525,6 +766,7 @@
       nameEl.value = currentName;
       updateGreeting(currentName);
       renderPhoto();
+      renderNotifications();
       setEditMode(false);
       setPassMode(false);
     })();
@@ -629,7 +871,26 @@
       profilePhotoInput.value = "";
     });
 
-    document.getElementById("btnLogout").addEventListener("click", () => {
+    notifBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      notifDropdown.classList.toggle("open");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
+        notifDropdown.classList.remove("open");
+      }
+    });
+
+    markReadBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const list = loadNotifications().map(n => ({ ...n, leida: true }));
+      saveNotifications(list);
+      renderNotifications();
+    });
+
+    logoutLink.addEventListener("click", (e) => {
+      e.preventDefault();
       logout();
     });
   </script>
