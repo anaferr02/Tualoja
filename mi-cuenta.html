@@ -645,21 +645,21 @@
       } catch {}
 
       return [
-        {
-          titulo: "Nueva reserva",
-          texto: "Recibiste una nueva reserva en TuAloja.",
-          fecha: "Hace unos minutos",
-          url: "mis-reservas.html",
-          leida: false
-        },
-        {
-          titulo: "Nuevo mensaje",
-          texto: "Tenés un mensaje nuevo sobre una reserva.",
-          fecha: "Hace unos minutos",
-          url: "chat.html",
-          leida: false
-        }
-      ];
+  {
+    titulo: "Nueva reserva",
+    texto: "Recibiste una nueva reserva en TuAloja.",
+    fecha: "Hace unos minutos",
+    url: "mis-reservas.html",
+    leida: false
+  },
+  {
+    titulo: "Nuevo mensaje",
+    texto: "Tenés un mensaje nuevo sobre una reserva.",
+    fecha: "Hace unos minutos",
+    url: "chat.html?reserva=123", // 🔥 IMPORTANTE
+    leida: false
+  }
+];
     }
 
     function saveNotifications(list) {
