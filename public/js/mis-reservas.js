@@ -20,12 +20,12 @@ let filtroActual = "todas";
 function formatearEstado(estado = "pendiente") {
   const limpio = String(estado).toLowerCase();
 
-  if (limpio === "aceptada") {
+  if (limpio === "aceptada" || limpio === "confirmada") {
     return { texto: "aceptada", clase: "estado-aceptada" };
   }
 
-  if (limpio === "cancelada") {
-    return { texto: "cancelada", clase: "estado-cancelada" };
+  if (limpio === "cancelada" || limpio === "rechazada") {
+    return { texto: limpio, clase: "estado-cancelada" };
   }
 
   return { texto: "pendiente", clase: "estado-pendiente" };
@@ -62,13 +62,30 @@ async function enriquecerReserva(r) {
   }
 }
 
+function puedeCancelar(r) {
+  const estado = String(r.status || "pendiente").toLowerCase();
+
+  if (!["pendiente", "aceptada", "confirmada"].includes(estado)) return false;
+  if (r.chatIniciado === true) return false;
+  if (r.puedeCancelarHuesped === false) return false;
+
+  return true;
+}
+
 function renderReservas() {
   const lista = document.getElementById("listaReservas");
   if (!lista) return;
 
   const visibles = reservasCache.filter((r) => {
     if (filtroActual === "todas") return true;
-    return String(r.status || "pendiente").toLowerCase() === filtroActual;
+
+    const estado = String(r.status || "pendiente").toLowerCase();
+
+    if (filtroActual === "aceptada") {
+      return estado === "aceptada" || estado === "confirmada";
+    }
+
+    return estado === filtroActual;
   });
 
   if (!visibles.length) {
@@ -103,31 +120,39 @@ function renderReservas() {
           <p><strong>Huéspedes:</strong> ${r.guests || "-"}</p>
           <p><strong>Estado:</strong> <span class="estado-badge ${estado.clase}">${estado.texto}</span></p>
           <p><strong>Total:</strong> ${total}</p>
-          ${
-  r.noLeidoHuesped
-    ? `<p style="color:#d93025; font-weight:700;">🔴 Nuevo mensaje</p>`
-    : ""
-}
 
-${
-  r.ultimoMensaje
-    ? `<p style="color:#6a7195; font-size:14px;">💬 ${r.ultimoMensaje}</p>`
-    : ""
-}
+          ${
+            r.noLeidoHuesped
+              ? `<p style="color:#d93025; font-weight:700;">🔴 Nuevo mensaje</p>`
+              : ""
+          }
+
+          ${
+            r.ultimoMensaje
+              ? `<p style="color:#6a7195; font-size:14px;">💬 ${r.ultimoMensaje}</p>`
+              : ""
+          }
+
+          ${
+            r.chatIniciado
+              ? `<p style="margin-top:8px; color:#8c2e2e;"><strong>Chat activo:</strong> ya no podés cancelar online. Si hubo fuerza mayor, hacelo desde Ayuda.</p>`
+              : ""
+          }
         </div>
 
         <div class="reserva-side">
           <a class="btn-outline" href="detalle.html?id=${encodeURIComponent(r.alojamientoId || "")}">
             Ver detalle
           </a>
-          ${
-  r.status === "aceptada"
-    ? `<a class="btn-outline" href="chat.html?reserva=${r._docId}">Abrir chat</a>`
-    : ""
-}
 
           ${
-            ["pendiente", "aceptada"].includes(String(r.status || "pendiente").toLowerCase())
+            ["aceptada", "confirmada"].includes(String(r.status || "").toLowerCase())
+              ? `<a class="btn-outline" href="chat.html?reserva=${r._docId}">Abrir chat</a>`
+              : ""
+          }
+
+          ${
+            puedeCancelar(r)
               ? `<button class="btn-danger" data-cancel="${r._docId}">Cancelar</button>`
               : ""
           }
@@ -139,6 +164,14 @@ ${
   lista.querySelectorAll("[data-cancel]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-cancel");
+      const reserva = reservasCache.find((r) => r._docId === id);
+
+      if (!reserva) return;
+
+      if (!puedeCancelar(reserva)) {
+        alert("Esta reserva ya no se puede cancelar online.");
+        return;
+      }
 
       try {
         await updateDoc(doc(db, "reservas", id), {
