@@ -204,7 +204,13 @@
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
     const params = new URLSearchParams(window.location.search);
-    const reservaId = params.get("reserva");
+
+const reservaId =
+  params.get("reserva") ||
+  params.get("reservaId") ||
+  params.get("id");
+    params.get("reservaId") ||
+    params.get("id");
 
     const chatInfo = document.getElementById("chatInfo");
     const bloqueoInfo = document.getElementById("bloqueoInfo");
