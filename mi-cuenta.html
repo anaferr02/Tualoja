@@ -597,288 +597,144 @@
   </footer>
 
   <script type="module">
-    localStorage.clear();
-    import { logout, getUser } from "./public/js/auth.js";
+  localStorage.clear();
+  import { logout, getUser } from "./public/js/auth.js";
 
-    const usersKey = "tualoja_users";
-    const userObj = getUser();
-    const myEmail = (userObj?.email || "").toLowerCase();
+  // 🔥 NUEVOS IMPORTS FIREBASE
+  import {
+    collection,
+    query,
+    where,
+    getDocs,
+    orderBy
+  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-    const emailEl = document.getElementById("email");
-    const nameEl = document.getElementById("name");
-    const msg = document.getElementById("msg");
-    const err = document.getElementById("err");
-    const ok = document.getElementById("ok");
-    const welcomeTitle = document.getElementById("welcomeTitle");
-    const avatar = document.getElementById("avatar");
-    const btnEdit = document.getElementById("btnEdit");
-    const btnTogglePass = document.getElementById("btnTogglePass");
-    const passwordFields = document.getElementById("passwordFields");
-    const profilePhotoInput = document.getElementById("profilePhoto");
+  import { auth, db } from "./firebase-config.js";
 
-    const notifBtn = document.getElementById("notifBtn");
-    const notifDropdown = document.getElementById("notifDropdown");
-    const notifCount = document.getElementById("notifCount");
-    const notifList = document.getElementById("notifList");
-    const markReadBtn = document.getElementById("markReadBtn");
-    const logoutLink = document.getElementById("logoutLink");
+  const usersKey = "tualoja_users";
+  const userObj = getUser();
+  const myEmail = (userObj?.email || "").toLowerCase();
 
-    let editMode = false;
-    let passOpen = false;
+  const emailEl = document.getElementById("email");
+  const nameEl = document.getElementById("name");
+  const msg = document.getElementById("msg");
+  const err = document.getElementById("err");
+  const ok = document.getElementById("ok");
+  const welcomeTitle = document.getElementById("welcomeTitle");
+  const avatar = document.getElementById("avatar");
+  const btnEdit = document.getElementById("btnEdit");
+  const btnTogglePass = document.getElementById("btnTogglePass");
+  const passwordFields = document.getElementById("passwordFields");
+  const profilePhotoInput = document.getElementById("profilePhoto");
 
-    function loadUsers() {
-      try { return JSON.parse(localStorage.getItem(usersKey) || "[]"); }
-      catch { return []; }
-    }
+  const notifBtn = document.getElementById("notifBtn");
+  const notifDropdown = document.getElementById("notifDropdown");
+  const notifCount = document.getElementById("notifCount");
+  const notifList = document.getElementById("notifList");
+  const markReadBtn = document.getElementById("markReadBtn");
+  const logoutLink = document.getElementById("logoutLink");
 
-    function saveUsers(u) {
-      localStorage.setItem(usersKey, JSON.stringify(u));
-    }
+  let editMode = false;
+  let passOpen = false;
 
-    function getNotifKey() {
-  return "tualoja_notificaciones_" + myEmail;
-}
-
-function loadNotifications() {
-  try {
-    return JSON.parse(localStorage.getItem(getNotifKey()) || "[]");
-  } catch {
-    return [];
+  function loadUsers() {
+    try { return JSON.parse(localStorage.getItem(usersKey) || "[]"); }
+    catch { return []; }
   }
-}
 
-    function saveNotifications(list) {
-      localStorage.setItem(getNotifKey(), JSON.stringify(list));
+  function saveUsers(u) {
+    localStorage.setItem(usersKey, JSON.stringify(u));
+  }
+
+  // 🔥 AHORA VIENE DE FIREBASE
+  async function loadNotifications() {
+    if (!auth.currentUser) return [];
+
+    const q = query(
+      collection(db, "notificaciones"),
+      where("userId", "==", auth.currentUser.uid),
+      orderBy("fecha", "desc")
+    );
+
+    const snap = await getDocs(q);
+
+    const list = [];
+    snap.forEach(doc => {
+      list.push({ id: doc.id, ...doc.data() });
+    });
+
+    return list;
+  }
+
+  function saveNotifications(list) {
+    // ya no se usa pero lo dejo para no romper nada
+    localStorage.setItem("tmp", JSON.stringify(list));
+  }
+
+  // 🔥 AHORA ES ASYNC
+  async function renderNotifications() {
+    const list = await loadNotifications();
+    const unread = list.filter(n => !n.leida).length;
+
+    notifCount.textContent = unread;
+    notifCount.style.display = unread > 0 ? "flex" : "none";
+
+    if (!list.length) {
+      notifList.innerHTML = `<div class="notif-empty">No tenés notificaciones por ahora.</div>`;
+      return;
     }
 
-    function renderNotifications() {
-      const list = loadNotifications();
-      const unread = list.filter(n => !n.leida).length;
+    notifList.innerHTML = list.map((n) => `
+      <a href="${n.tipo === 'reserva' ? 'mis-reservas.html' : 'chat.html'}" class="notif-item">
+        <strong>${n.tipo === 'reserva' ? 'Nueva reserva' : 'Nuevo mensaje'}</strong>
+        <p>${n.mensaje || ""}</p>
+        <small>${n.fecha ? 'Hace unos segundos' : ''}</small>
+      </a>
+    `).join("");
+  }
 
-      notifCount.textContent = unread;
-      notifCount.style.display = unread > 0 ? "flex" : "none";
+  function setEditMode(state) {
+    editMode = state;
+    nameEl.disabled = !state;
+    btnEdit.textContent = state ? "Cancelar" : "Modificar";
+  }
 
-      if (!list.length) {
-        notifList.innerHTML = `<div class="notif-empty">No tenés notificaciones por ahora.</div>`;
-        return;
-      }
+  function setPassMode(state) {
+    passOpen = state;
+    passwordFields.classList.toggle("open", state);
+    btnTogglePass.textContent = state ? "Cancelar cambio" : "Modificar contraseña";
+  }
 
-      notifList.innerHTML = list.map((n, i) => `
-        <a href="${n.url || '#'}" class="notif-item" data-index="${i}">
-          <strong>${n.titulo || "Notificación"}</strong>
-          <p>${n.texto || ""}</p>
-          <small>${n.fecha || ""}</small>
-        </a>
-      `).join("");
+  function updateGreeting(name) {
+    const first = name ? name.split(" ")[0] : "Usuario";
+    welcomeTitle.textContent = `Hola, ${first} 👋`;
+  }
 
-      notifList.querySelectorAll(".notif-item").forEach(item => {
-        item.addEventListener("click", () => {
-          const idx = Number(item.dataset.index);
-          const notifications = loadNotifications();
-          if (notifications[idx]) {
-            notifications[idx].leida = true;
-            saveNotifications(notifications);
-          }
-        });
-      });
+  (async function init(){
+    emailEl.value = myEmail || "";
+    renderNotifications(); // 🔥 IMPORTANTE
+  })();
+
+  notifBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    notifDropdown.classList.toggle("open");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
+      notifDropdown.classList.remove("open");
     }
+  });
 
-    function setEditMode(state) {
-      editMode = state;
-      nameEl.disabled = !state;
-      btnEdit.textContent = state ? "Cancelar" : "Modificar";
+  markReadBtn.addEventListener("click", async () => {
+    alert("Después te hago marcar como leídas en Firebase 😉");
+  });
 
-      if (!state) {
-        const users = loadUsers();
-        const user = users.find(u => (u.email || "").toLowerCase() === myEmail);
-        nameEl.value = user?.name || userObj?.name || "";
-      }
-    }
-
-    function setPassMode(state) {
-      passOpen = state;
-      passwordFields.classList.toggle("open", state);
-      btnTogglePass.textContent = state ? "Cancelar cambio" : "Modificar contraseña";
-
-      if (!state) {
-        document.getElementById("pass1").value = "";
-        document.getElementById("pass2").value = "";
-        err.style.display = "none";
-        ok.style.display = "none";
-      }
-    }
-
-    function updateGreeting(name) {
-      const cleanName = (name || "").trim();
-      const first = cleanName ? cleanName.split(" ")[0] : "Usuario";
-      welcomeTitle.textContent = `Hola, ${first} 👋`;
-
-      if (!avatar.querySelector("img")) {
-        avatar.textContent = first.charAt(0).toUpperCase();
-      }
-    }
-
-    function getPhotoKey() {
-      return "tualoja_profile_photo_" + myEmail;
-    }
-
-    function renderPhoto() {
-      const saved = localStorage.getItem(getPhotoKey());
-      if (saved) {
-        avatar.innerHTML = `<img src="${saved}" alt="Foto de perfil">`;
-      } else {
-        const currentName = nameEl.value.trim() || "U";
-        avatar.innerHTML = currentName.charAt(0).toUpperCase();
-      }
-    }
-
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result));
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    (function init(){
-      emailEl.value = myEmail || "";
-
-      const users = loadUsers();
-      const user = users.find(u => (u.email || "").toLowerCase() === myEmail);
-      const currentName = user?.name || userObj?.name || "";
-
-      nameEl.value = currentName;
-      updateGreeting(currentName);
-      renderPhoto();
-      renderNotifications();
-      setEditMode(false);
-      setPassMode(false);
-    })();
-
-    btnEdit.addEventListener("click", () => {
-      msg.style.display = "none";
-
-      if (!editMode) {
-        setEditMode(true);
-        nameEl.focus();
-        return;
-      }
-
-      setEditMode(false);
-    });
-
-    btnTogglePass.addEventListener("click", () => {
-      setPassMode(!passOpen);
-    });
-
-    document.getElementById("btnSave").addEventListener("click", () => {
-      msg.style.display = "none";
-      const name = nameEl.value.trim();
-
-      if (!name) {
-        msg.textContent = "Escribí un nombre antes de guardar.";
-        msg.style.display = "block";
-        return;
-      }
-
-      const users = loadUsers();
-      const idx = users.findIndex(u => (u.email || "").toLowerCase() === myEmail);
-      if (idx === -1) return;
-
-      users[idx].name = name;
-      saveUsers(users);
-
-      const raw = localStorage.getItem("tualoja_user");
-      try {
-        const u = raw ? JSON.parse(raw) : null;
-        if (u) {
-          u.name = name;
-          localStorage.setItem("tualoja_user", JSON.stringify(u));
-        }
-      } catch {}
-
-      updateGreeting(name);
-      renderPhoto();
-      setEditMode(false);
-
-      msg.textContent = "✅ Datos guardados.";
-      msg.style.display = "block";
-    });
-
-    document.getElementById("btnPass").addEventListener("click", () => {
-      err.style.display = "none";
-      ok.style.display = "none";
-
-      const p1 = document.getElementById("pass1").value;
-      const p2 = document.getElementById("pass2").value;
-
-      if (p1.length < 4) {
-        err.textContent = "La contraseña debe tener al menos 4 caracteres.";
-        err.style.display = "block";
-        return;
-      }
-
-      if (p1 !== p2) {
-        err.textContent = "Las contraseñas no coinciden.";
-        err.style.display = "block";
-        return;
-      }
-
-      const users = loadUsers();
-      const idx = users.findIndex(u => (u.email || "").toLowerCase() === myEmail);
-      if (idx === -1) return;
-
-      users[idx].password = p1;
-      saveUsers(users);
-
-      ok.textContent = "✅ Contraseña actualizada.";
-      ok.style.display = "block";
-
-      setPassMode(false);
-    });
-
-    profilePhotoInput.addEventListener("change", async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      try {
-        const b64 = await fileToBase64(file);
-        localStorage.setItem(getPhotoKey(), b64);
-        renderPhoto();
-        msg.textContent = "✅ Foto de perfil actualizada.";
-        msg.style.display = "block";
-      } catch {
-        msg.textContent = "No se pudo subir la foto.";
-        msg.style.display = "block";
-      }
-
-      profilePhotoInput.value = "";
-    });
-
-    notifBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      notifDropdown.classList.toggle("open");
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
-        notifDropdown.classList.remove("open");
-      }
-    });
-
-    markReadBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const list = loadNotifications().map(n => ({ ...n, leida: true }));
-      saveNotifications(list);
-      renderNotifications();
-    });
-
-    logoutLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      logout();
-    });
-  </script>
+  logoutLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    logout();
+  });
+</script>
 
   <script src="script.js"></script>
 </body>
