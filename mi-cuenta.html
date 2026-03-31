@@ -103,8 +103,8 @@
 
   function setEditMode(state) {
     editMode = state;
-    nameEl.disabled = !state;
-    btnEdit.textContent = state ? "Cancelar" : "Modificar";
+    if (nameEl) nameEl.disabled = !state;
+   if (btnEdit) btnEdit.textContent = state ? "Cancelar" : "Modificar";
 
     if (!state) {
       const users = loadUsers();
@@ -115,7 +115,7 @@
 
   function setPassMode(state) {
     passOpen = state;
-    passwordFields.classList.toggle("open", state);
+    if (passwordFields) passwordFields.classList.toggle("open", state);
     btnTogglePass.textContent = state ? "Cancelar cambio" : "Modificar contraseña";
 
     if (!state) {
@@ -166,7 +166,7 @@
     const user = users.find(u => (u.email || "").toLowerCase() === myEmail);
     const currentName = user?.name || userObj?.name || "";
 
-    nameEl.value = currentName;
+    if (nameEl) nameEl.value = currentName;
     updateGreeting(currentName);
     renderPhoto();
     setEditMode(false);
@@ -267,7 +267,7 @@
     setPassMode(false);
   });
 
-  profilePhotoInput.addEventListener("change", async (e) => {
+ if (profilePhotoInput) profilePhotoInput.addEventListener("change", async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
