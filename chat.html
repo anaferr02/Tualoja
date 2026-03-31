@@ -381,6 +381,30 @@ const reservaId =
           puedeCancelarHuesped: false,
           puedeCancelarAnfitrion: false
         });
+        const receptorEmail = esHuesped
+  ? (reservaActual.anfitrionEmail || reservaActual.hostEmail || reservaActual.ownerEmail || "")
+  : (reservaActual.huespedEmail || reservaActual.guestEmail || "");
+
+if (receptorEmail) {
+  const notifKey = "tualoja_notificaciones_" + receptorEmail.toLowerCase();
+
+  let actuales = [];
+  try {
+    actuales = JSON.parse(localStorage.getItem(notifKey) || "[]");
+  } catch {
+    actuales = [];
+  }
+
+  actuales.unshift({
+    titulo: "Nuevo mensaje",
+    texto: "Tenés un mensaje nuevo sobre una reserva.",
+    fecha: "Hace un momento",
+    url: "chat.html?reserva=" + reservaId,
+    leida: false
+  });
+
+  localStorage.setItem(notifKey, JSON.stringify(actuales));
+}
 
         reservaActual.ultimoMensaje = contenido;
         reservaActual.ultimoMensajeDe = usuarioActual.uid;
