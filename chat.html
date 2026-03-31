@@ -384,16 +384,20 @@
           ? (reservaActual.anfitrionId || reservaActual.hostId || reservaActual.ownerId || "")
           : (reservaActual.huespedId || "");
 
-        if (receptorId) {
-          await addDoc(collection(db, "notificaciones"), {
-            userId: receptorId,
-            tipo: "mensaje",
-            mensaje: "Tenés un mensaje nuevo sobre una reserva.",
-            leida: false,
-            reservaId: reservaId,
-            fecha: serverTimestamp()
-          });
-        }
+       if (receptorId) {
+  try {
+    await addDoc(collection(db, "notificaciones"), {
+      userId: receptorId,
+      tipo: "mensaje",
+      mensaje: "Tenés un mensaje nuevo sobre una reserva.",
+      leida: false,
+      reservaId: reservaId,
+      fecha: serverTimestamp()
+    });
+  } catch (notifError) {
+    console.error("No se pudo guardar la notificación:", notifError);
+  }
+}
 
         reservaActual.ultimoMensaje = contenido;
         reservaActual.ultimoMensajeDe = usuarioActual.uid;
