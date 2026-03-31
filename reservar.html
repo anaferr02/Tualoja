@@ -295,7 +295,15 @@ form.addEventListener("submit", async (e) => {
     estado.textContent = "No se pudo enviar la solicitud.";
     alert("Hubo un error al enviar la solicitud.");
   }
+  // 🔔 NOTIFICACIÓN PARA EL ANFITRIÓN
+await addDoc(collection(db, "notificaciones"), {
+  userId: anfitrionId,
+  tipo: "reserva",
+  mensaje: "Tenés una nueva reserva",
+  leida: false,
+  fecha: serverTimestamp()
 });
+
 </script>
 
 </body>
