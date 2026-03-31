@@ -205,12 +205,10 @@
 
     const params = new URLSearchParams(window.location.search);
 
-const reservaId =
-  params.get("reserva") ||
-  params.get("reservaId") ||
-  params.get("id");
-    params.get("reservaId") ||
-    params.get("id");
+    const reservaId =
+      params.get("reserva") ||
+      params.get("reservaId") ||
+      params.get("id");
 
     const chatInfo = document.getElementById("chatInfo");
     const bloqueoInfo = document.getElementById("bloqueoInfo");
@@ -381,30 +379,21 @@ const reservaId =
           puedeCancelarHuesped: false,
           puedeCancelarAnfitrion: false
         });
-        const receptorEmail = esHuesped
-  ? (reservaActual.anfitrionEmail || reservaActual.hostEmail || reservaActual.ownerEmail || "")
-  : (reservaActual.huespedEmail || reservaActual.guestEmail || "");
 
-if (receptorEmail) {
-  const notifKey = "tualoja_notificaciones_" + receptorEmail.toLowerCase();
+        const receptorId = esHuesped
+          ? (reservaActual.anfitrionId || reservaActual.hostId || reservaActual.ownerId || "")
+          : (reservaActual.huespedId || "");
 
-  let actuales = [];
-  try {
-    actuales = JSON.parse(localStorage.getItem(notifKey) || "[]");
-  } catch {
-    actuales = [];
-  }
-
-  actuales.unshift({
-    titulo: "Nuevo mensaje",
-    texto: "Tenés un mensaje nuevo sobre una reserva.",
-    fecha: "Hace un momento",
-    url: "chat.html?reserva=" + reservaId,
-    leida: false
-  });
-
-  localStorage.setItem(notifKey, JSON.stringify(actuales));
-}
+        if (receptorId) {
+          await addDoc(collection(db, "notificaciones"), {
+            userId: receptorId,
+            tipo: "mensaje",
+            mensaje: "Tenés un mensaje nuevo sobre una reserva.",
+            leida: false,
+            reservaId: reservaId,
+            fecha: serverTimestamp()
+          });
+        }
 
         reservaActual.ultimoMensaje = contenido;
         reservaActual.ultimoMensajeDe = usuarioActual.uid;
