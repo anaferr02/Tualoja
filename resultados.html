@@ -197,6 +197,44 @@
       font-size:28px;
       font-family: Georgia, "Times New Roman", serif;
     }
+    <div class="layout-resultados">
+
+  <!-- FILTROS -->
+  <aside class="filtros">
+
+    <h3>Filtrar</h3>
+
+    <!-- TIPO -->
+    <div class="filtro-bloque">
+      <p class="filtro-titulo">Tipo de alojamiento</p>
+
+      <label><input type="checkbox" value="Casa" class="filtro-tipo"> Casa</label>
+      <label><input type="checkbox" value="Departamento" class="filtro-tipo"> Departamento</label>
+      <label><input type="checkbox" value="Cabaña" class="filtro-tipo"> Cabaña</label>
+      <label><input type="checkbox" value="Hotel" class="filtro-tipo"> Hotel</label>
+      <label><input type="checkbox" value="Habitación" class="filtro-tipo"> Habitación</label>
+    </div>
+
+    <!-- SERVICIOS -->
+    <div class="filtro-bloque">
+      <p class="filtro-titulo">Servicios</p>
+
+      <label><input type="checkbox" value="Wifi" class="filtro-servicio"> Wifi</label>
+      <label><input type="checkbox" value="Pileta" class="filtro-servicio"> Piscina</label>
+      <label><input type="checkbox" value="Aire acondicionado" class="filtro-servicio"> Aire</label>
+      <label><input type="checkbox" value="Parrilla" class="filtro-servicio"> Parrilla</label>
+      <label><input type="checkbox" value="Mascotas" class="filtro-servicio"> Mascotas</label>
+    </div>
+
+  </aside>
+
+  <!-- RESULTADOS -->
+  <div class="resultados">
+    <div id="gridResultados" class="grid-resultados"></div>
+    <div id="emptyResultados" class="empty-estado"></div>
+  </div>
+
+</div>
 
     .grid-resultados{
       display:grid;
