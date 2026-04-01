@@ -42,6 +42,7 @@
       align-items:center;
       gap:10px;
       flex-wrap:wrap;
+      margin-left:auto;
     }
 
     .top-btn{
@@ -54,6 +55,7 @@
       font-weight:700;
       font-size:14px;
       cursor:pointer;
+      transition:.2s ease;
     }
 
     .top-btn:hover{
@@ -139,6 +141,7 @@
       font-size:16px;
       font-weight:700;
       cursor:pointer;
+      transition:.2s ease;
     }
 
     .filter-btn.active{
@@ -171,13 +174,18 @@
       box-shadow:0 8px 24px rgba(0,0,0,.04);
     }
 
-    .reserva-img{
+    .reserva-img,
+    .reserva-placeholder{
       width:160px;
       height:120px;
       border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       object-fit:cover;
-      display:block;
       background:#eceff7;
+      color:#666d91;
+      font-weight:700;
     }
 
     .reserva-main h3{
@@ -221,7 +229,7 @@
       display:flex;
       flex-direction:column;
       gap:10px;
-      min-width:150px;
+      min-width:170px;
     }
 
     .btn-outline,
@@ -234,6 +242,7 @@
       font-weight:700;
       cursor:pointer;
       text-align:center;
+      transition:.2s ease;
     }
 
     .btn-outline{
@@ -242,13 +251,21 @@
       border:1px solid #cfd6ec;
     }
 
+    .btn-outline:hover{
+      background:#f7f8ff;
+    }
+
     .btn-danger{
       background:#f9e8e8;
       color:#8c2e2e;
       border:1px solid #e6c9c9;
     }
 
-    .empty{
+    .btn-danger:hover{
+      background:#f6dddd;
+    }
+
+    .empty-box{
       background:#fff;
       border:1px dashed #d6dced;
       border-radius:22px;
@@ -273,12 +290,14 @@
 
     @media (max-width: 900px){
       .hero h1{font-size:42px}
+
       .reserva-card{
         grid-template-columns:1fr;
         align-items:start;
       }
 
-      .reserva-img{
+      .reserva-img,
+      .reserva-placeholder{
         width:100%;
         height:220px;
       }
@@ -331,7 +350,6 @@
 </header>
 
 <main class="page">
-
   <section class="hero">
     <h1>Mis reservas ✈️</h1>
     <p>Acá podés ver tus reservas como huésped, filtrarlas y cancelarlas.</p>
@@ -356,7 +374,6 @@
 
   <div id="estadoCarga">Cargando reservas...</div>
   <div id="listaReservas"></div>
-
 </main>
 
 <footer class="footer">
@@ -377,7 +394,8 @@ import {
   updateDoc,
   doc,
   query,
-  where
+  where,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 import {
@@ -385,26 +403,52 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-let reservas = [];
-let filtro = "todas";
+let reservasCache = [];
+let filtroActual = "todas";
 
-function badgeEstado(estado) {
-  const limpio = String(estado || "pendiente").toLowerCase();
+function formatearEstado(estado = "pendiente") {
+  const limpio = String(estado).toLowerCase();
 
   if (limpio === "aceptada" || limpio === "confirmada") {
-    return `<span class="estado-badge estado-aceptada">aceptada</span>`;
+    return { texto: "aceptada", clase: "estado-aceptada" };
   }
 
   if (limpio === "cancelada" || limpio === "rechazada") {
-    return `<span class="estado-badge estado-cancelada">${limpio}</span>`;
+    return { texto: limpio, clase: "estado-cancelada" };
   }
 
-  return `<span class="estado-badge estado-pendiente">pendiente</span>`;
+  return { texto: "pendiente", clase: "estado-pendiente" };
 }
 
-function puedeAbrirChat(r) {
-  const estado = String(r.status || "").toLowerCase();
-  return (estado === "aceptada" || estado === "confirmada") && r.chatHabilitado === true;
+function esperarUsuario() {
+  return new Promise((resolve) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe();
+      resolve(user || null);
+    });
+  });
+}
+
+async function enriquecerReserva(r) {
+  try {
+    if (!r.alojamientoId) return r;
+
+    const snap = await getDoc(doc(db, "alojamientos", r.alojamientoId));
+
+    if (!snap.exists()) return r;
+
+    const alojamiento = snap.data();
+
+    return {
+      ...r,
+      alojamientoTitulo: alojamiento.titulo || r.alojamientoTitulo || r.title || r.titulo || "Reserva",
+      alojamientoFoto: alojamiento.fotos?.[0] || r.alojamientoFoto || r.foto || "",
+      total: r.total || null
+    };
+  } catch (error) {
+    console.warn("No se pudo enriquecer reserva:", error);
+    return r;
+  }
 }
 
 function puedeCancelar(r) {
@@ -417,65 +461,99 @@ function puedeCancelar(r) {
   return true;
 }
 
-function render() {
-  const cont = document.getElementById("listaReservas");
+function renderReservas() {
+  const lista = document.getElementById("listaReservas");
+  if (!lista) return;
 
-  const filtradas = reservas.filter(r => {
-    if (filtro === "todas") return true;
-    if (filtro === "aceptada") {
-      const estado = String(r.status || "pendiente").toLowerCase();
+  const visibles = reservasCache.filter((r) => {
+    if (filtroActual === "todas") return true;
+
+    const estado = String(r.status || "pendiente").toLowerCase();
+
+    if (filtroActual === "aceptada") {
       return estado === "aceptada" || estado === "confirmada";
     }
-    return String(r.status || "pendiente").toLowerCase() === filtro;
+
+    return estado === filtroActual;
   });
 
-  if (!filtradas.length) {
-    cont.innerHTML = `<div class="empty">No hay reservas para este filtro.</div>`;
+  if (!visibles.length) {
+    lista.innerHTML = `
+      <div class="empty-box">
+        No tenés reservas para este filtro.
+      </div>
+    `;
     return;
   }
 
-  cont.innerHTML = filtradas.map(r => `
-    <article class="reserva-card">
-      <div>
-        <img class="reserva-img" src="${r.foto || 'https://via.placeholder.com/400x300?text=Alojamiento'}" alt="Alojamiento">
-      </div>
+  lista.innerHTML = visibles.map((r) => {
+    const estado = formatearEstado(r.status);
+    const titulo = r.alojamientoTitulo || r.title || r.titulo || "Reserva";
+    const total = r.total
+      ? `$${Number(r.total).toLocaleString("es-AR")}`
+      : "A confirmar";
 
-      <div class="reserva-main">
-        <h3>${r.titulo || "Alojamiento"}</h3>
-        <p><strong>Desde:</strong> ${r.checkin || "-" } — <strong>Hasta:</strong> ${r.checkout || "-"}</p>
-        <p><strong>Huéspedes:</strong> ${r.guests || "-"}</p>
-        <p><strong>Estado:</strong> ${badgeEstado(r.status)}</p>
-        ${
-          r.chatIniciado
-            ? `<p style="margin-top:8px; color:#8c2e2e;"><strong>Chat activo:</strong> ya no podés cancelar online. Si hubo fuerza mayor, hacelo desde Ayuda.</p>`
-            : ""
-        }
-      </div>
+    const imagen = r.alojamientoFoto
+      ? `<img class="reserva-img" src="${r.alojamientoFoto}" alt="${titulo}">`
+      : `<div class="reserva-placeholder">Sin imagen</div>`;
 
-      <div class="reserva-side">
-        <a class="btn-outline" href="detalle.html?id=${encodeURIComponent(r.alojamientoId || "")}">
-          Ver detalle
-        </a>
+    return `
+      <article class="reserva-card">
+        <div>
+          ${imagen}
+        </div>
 
-        ${
-          puedeAbrirChat(r)
-            ? `<a class="btn-outline" href="chat.html?reserva=${encodeURIComponent(r.id)}">Abrir chat</a>`
-            : ""
-        }
+        <div class="reserva-main">
+          <h3>${titulo}</h3>
+          <p><strong>Desde:</strong> ${r.checkin || "-"} — <strong>Hasta:</strong> ${r.checkout || "-"}</p>
+          <p><strong>Huéspedes:</strong> ${r.guests || "-"}</p>
+          <p><strong>Estado:</strong> <span class="estado-badge ${estado.clase}">${estado.texto}</span></p>
+          <p><strong>Total:</strong> ${total}</p>
 
-        ${
-          puedeCancelar(r)
-            ? `<button class="btn-danger" data-id="${r.id}" type="button">Cancelar</button>`
-            : ""
-        }
-      </div>
-    </article>
-  `).join("");
+          ${
+            r.noLeidoHuesped
+              ? `<p style="color:#d93025; font-weight:700;">🔴 Nuevo mensaje</p>`
+              : ""
+          }
 
-  document.querySelectorAll("[data-id]").forEach(btn => {
-    btn.onclick = async () => {
-      const id = btn.getAttribute("data-id");
-      const reserva = reservas.find(x => x.id === id);
+          ${
+            r.ultimoMensaje
+              ? `<p style="color:#6a7195; font-size:14px;">💬 ${r.ultimoMensaje}</p>`
+              : ""
+          }
+
+          ${
+            r.chatIniciado
+              ? `<p style="margin-top:8px; color:#8c2e2e;"><strong>Chat activo:</strong> ya no podés cancelar online. Si hubo fuerza mayor, hacelo desde Ayuda.</p>`
+              : ""
+          }
+        </div>
+
+        <div class="reserva-side">
+          <a class="btn-outline" href="detalle.html?id=${encodeURIComponent(r.alojamientoId || "")}">
+            Ver detalle
+          </a>
+
+          ${
+            ["aceptada", "confirmada"].includes(String(r.status || "").toLowerCase())
+              ? `<a class="btn-outline" href="chat.html?reserva=${r._docId}">Abrir chat</a>`
+              : ""
+          }
+
+          ${
+            puedeCancelar(r)
+              ? `<button class="btn-danger" data-cancel="${r._docId}" type="button">Cancelar</button>`
+              : ""
+          }
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  lista.querySelectorAll("[data-cancel]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-cancel");
+      const reserva = reservasCache.find((r) => r._docId === id);
 
       if (!reserva) return;
 
@@ -487,62 +565,118 @@ function render() {
       const ok = confirm("¿Querés cancelar esta reserva?");
       if (!ok) return;
 
-      await updateDoc(doc(db, "reservas", id), { status: "cancelada" });
-      location.reload();
-    };
-  });
-}
+      try {
+        await updateDoc(doc(db, "reservas", id), {
+          status: "cancelada"
+        });
 
-function activarFiltros() {
-  document.querySelectorAll("[data-filter]").forEach(btn => {
-    btn.onclick = () => {
-      document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      filtro = btn.getAttribute("data-filter");
-      render();
-    };
-  });
-}
+        const index = reservasCache.findIndex((r) => r._docId === id);
+        if (index !== -1) {
+          reservasCache[index].status = "cancelada";
+        }
 
-async function cargar() {
-  const user = await new Promise(res => {
-    const unsub = onAuthStateChanged(auth, u => {
-      unsub();
-      res(u);
+        renderReservas();
+      } catch (error) {
+        console.error("Error al cancelar reserva:", error);
+        alert("No se pudo cancelar la reserva.");
+      }
     });
   });
+}
 
-  if (!user) {
-    alert("Iniciá sesión");
-    location.href = "login.html";
-    return;
+function activarBotonesFiltro() {
+  const botonesFiltro = document.querySelectorAll("[data-filter]");
+
+  botonesFiltro.forEach((btn) => {
+    btn.onclick = () => {
+      botonesFiltro.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      filtroActual = btn.getAttribute("data-filter") || "todas";
+      renderReservas();
+    };
+  });
+}
+
+async function cargarReservas() {
+  const estadoCarga = document.getElementById("estadoCarga");
+  const lista = document.getElementById("listaReservas");
+
+  try {
+    const user = await esperarUsuario();
+
+    if (!user) {
+      alert("Iniciá sesión para ver tus reservas.");
+      location.href = "login.html";
+      return;
+    }
+
+    const reservasRef = collection(db, "reservas");
+    let rows = [];
+
+    try {
+      const q = query(reservasRef, where("huespedId", "==", user.uid));
+      const snap = await getDocs(q);
+
+      snap.forEach((d) => {
+        rows.push({ ...d.data(), _docId: d.id });
+      });
+    } catch (error) {
+      console.warn("No se pudo filtrar por huespedId, pruebo por email.", error);
+
+      const snap = await getDocs(reservasRef);
+
+      snap.forEach((d) => {
+        const x = d.data();
+        const emailReserva = (x.huespedEmail || x.guestEmail || "").toLowerCase();
+        const emailUsuario = (user.email || "").toLowerCase();
+
+        if (emailReserva === emailUsuario) {
+          rows.push({ ...x, _docId: d.id });
+        }
+      });
+    }
+
+    rows.sort((a, b) => {
+      const fa = a.creadaEn?.seconds || 0;
+      const fb = b.creadaEn?.seconds || 0;
+      return fb - fa;
+    });
+
+    reservasCache = await Promise.all(rows.map(enriquecerReserva));
+
+    if (estadoCarga) estadoCarga.style.display = "none";
+    renderReservas();
+  } catch (error) {
+    console.error("Error al cargar mis reservas:", error);
+
+    if (estadoCarga) estadoCarga.style.display = "none";
+
+    if (lista) {
+      lista.innerHTML = `
+        <div class="empty-box">
+          No se pudieron cargar tus reservas.
+        </div>
+      `;
+    }
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if (logoutBtn) {
+    logoutBtn.onclick = async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      localStorage.removeItem("tualoja_user");
+      localStorage.removeItem("tualoja_logged");
+      location.href = "index.html";
+    };
   }
 
-  const q = query(collection(db, "reservas"), where("huespedId", "==", user.uid));
-  const snap = await getDocs(q);
-
-  snap.forEach(d => {
-    const r = d.data();
-
-    reservas.push({
-      ...r,
-      id: d.id,
-      titulo: r.titulo || "Alojamiento",
-      foto: r.foto || "https://via.placeholder.com/400x300?text=Reserva"
-    });
-  });
-
-  document.getElementById("estadoCarga").style.display = "none";
-  render();
-}
-
-document.getElementById("logoutBtn").onclick = async () => {
-  await signOut(auth);
-  location.href = "index.html";
-};
-
-activarFiltros();
-cargar();
+  activarBotonesFiltro();
+  await cargarReservas();
+});
 </script>
 
 </body>
