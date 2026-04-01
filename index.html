@@ -1063,8 +1063,7 @@
     const roomsPlus = document.getElementById("roomsPlus");
 
     const kidsAges = document.getElementById("kidsAges");
-    const hamburgerBtn = document.getElementById("hamburgerBtn");
-    const mainNav = document.getElementById("mainNav");
+    
 
     let adults = 1, kids = 0, rooms = 1;
 
@@ -1143,9 +1142,7 @@
     roomsMinus?.addEventListener("click", () => { rooms = Math.max(1, rooms - 1); updateSummary(); });
     roomsPlus?.addEventListener("click", () => { rooms = rooms + 1; updateSummary(); });
 
-    hamburgerBtn?.addEventListener("click", () => {
-      mainNav?.classList.toggle("is-open");
-    });
+
 
     updateSummary();
     renderKidsAges();
