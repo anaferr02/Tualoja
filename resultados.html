@@ -1,7 +1,10 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Resultados - TuAloja</title>
@@ -17,9 +20,7 @@
       --fondo:#fafafa;
       --card:#ffffff;
       --shadow:0 10px 30px rgba(0,0,0,.06);
-      --radius:18px;
-      --radius-sm:12px;
-      --container:1100px;
+      --container:1180px;
     }
 
     *{ box-sizing:border-box; }
@@ -41,7 +42,7 @@
       align-items:center;
       justify-content:space-between;
       gap:16px;
-      padding:20px 32px;
+      padding:18px 24px;
     }
 
     .logo{
@@ -56,14 +57,15 @@
       display:flex;
       align-items:center;
       gap:14px;
+      margin-left:auto;
     }
 
     .nav a{
       text-decoration:none;
       color:#2f2b8f;
       border:1px solid #d9d9ea;
-      padding:14px 22px;
-      border-radius:16px;
+      padding:12px 18px;
+      border-radius:14px;
       font-weight:600;
       background:#fff;
       transition:.2s ease;
@@ -84,7 +86,7 @@
     .contenedor{
       max-width:var(--container);
       margin:0 auto;
-      padding:34px 20px 60px;
+      padding:30px 18px 60px;
     }
 
     .buscador-box{
@@ -93,12 +95,12 @@
       border-radius:20px;
       padding:18px;
       box-shadow:var(--shadow);
-      margin-bottom:28px;
+      margin-bottom:24px;
     }
 
     .buscador-form{
       display:grid;
-      grid-template-columns: 1fr 160px;
+      grid-template-columns: 1fr 170px;
       gap:14px;
       align-items:center;
     }
@@ -109,11 +111,11 @@
 
     .campo-busqueda input{
       width:100%;
-      height:62px;
+      height:58px;
       border:1px solid #dcdceb;
-      border-radius:18px;
-      padding:0 18px 0 56px;
-      font-size:20px;
+      border-radius:16px;
+      padding:0 18px 0 52px;
+      font-size:18px;
       outline:none;
       background:#fff;
     }
@@ -123,17 +125,17 @@
       left:18px;
       top:50%;
       transform:translateY(-50%);
-      font-size:24px;
+      font-size:22px;
       color:#444;
     }
 
     .btn-buscar{
-      height:62px;
+      height:58px;
       border:none;
-      border-radius:18px;
+      border-radius:16px;
       background:var(--violeta);
       color:#fff;
-      font-size:20px;
+      font-size:18px;
       font-weight:700;
       cursor:pointer;
       transition:.2s ease;
@@ -144,13 +146,13 @@
     }
 
     .alerta-busqueda{
-      margin:0 0 30px;
+      margin:0 0 24px;
       background:#f4f4f8;
       border:1px solid #e5e5ef;
       border-radius:16px;
-      padding:22px 24px;
+      padding:18px 20px;
       color:#333;
-      font-size:17px;
+      font-size:16px;
       line-height:1.5;
     }
 
@@ -160,7 +162,7 @@
 
     .encabezado-resultados h1{
       margin:0 0 12px;
-      font-size:56px;
+      font-size:48px;
       line-height:1;
       font-family: Georgia, "Times New Roman", serif;
       font-weight:700;
@@ -171,24 +173,33 @@
       justify-content:space-between;
       align-items:center;
       gap:16px;
-      padding-bottom:22px;
+      padding-bottom:18px;
       border-bottom:1px solid #ececf1;
-      <select id="ordenPrecio" style="padding:10px; border-radius:10px;">
-  <option value="">Ordenar</option>
-  <option value="menor">Precio menor a mayor</option>
-  <option value="mayor">Precio mayor a menor</option>
-</select>
+      flex-wrap:wrap;
+    }
+
+    .resumen-left{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .resumen-right{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
     .muted{
       color:var(--muted);
-      font-size:18px;
+      font-size:17px;
       margin:0;
     }
 
     .link-cambiar{
       color:var(--violeta);
-      font-size:18px;
+      font-size:16px;
       font-weight:600;
       text-decoration:none;
     }
@@ -197,126 +208,14 @@
       text-decoration:underline;
     }
 
-    .titulo-seccion{
-      margin:26px 0 20px;
-      font-size:28px;
-      font-family: Georgia, "Times New Roman", serif;
-    }
-    <div class="layout-resultados">
-
-  <!-- FILTROS -->
-  <aside class="filtros">
-
-    <h3>Filtrar</h3>
-
-    <!-- TIPO -->
-    <div class="filtro-bloque">
-      <p class="filtro-titulo">Tipo de alojamiento</p>
-
-      <label><input type="checkbox" value="Casa" class="filtro-tipo"> Casa</label>
-      <label><input type="checkbox" value="Departamento" class="filtro-tipo"> Departamento</label>
-      <label><input type="checkbox" value="Cabaña" class="filtro-tipo"> Cabaña</label>
-      <label><input type="checkbox" value="Hotel" class="filtro-tipo"> Hotel</label>
-      <label><input type="checkbox" value="Habitación" class="filtro-tipo"> Habitación</label>
-    </div>
-
-    <!-- SERVICIOS -->
-    <div class="filtro-bloque">
-      <p class="filtro-titulo">Servicios</p>
-
-      <label><input type="checkbox" value="Wifi" class="filtro-servicio"> Wifi</label>
-      <label><input type="checkbox" value="Pileta" class="filtro-servicio"> Piscina</label>
-      <label><input type="checkbox" value="Aire acondicionado" class="filtro-servicio"> Aire</label>
-      <label><input type="checkbox" value="Parrilla" class="filtro-servicio"> Parrilla</label>
-      <label><input type="checkbox" value="Mascotas" class="filtro-servicio"> Mascotas</label>
-    </div>
-
-  </aside>
-
-  <!-- RESULTADOS -->
-  <div class="resultados">
-    <div id="gridResultados" class="grid-resultados"></div>
-    <div id="emptyResultados" class="empty-estado"></div>
-  </div>
-
-</div>
-
-    .grid-resultados{
-      display:grid;
-      gap:24px;
-    }
-
-    .resultado-card{
-      display:grid;
-      grid-template-columns: 46% 54%;
-      background:var(--card);
-      border:1px solid var(--borde);
-      border-radius:20px;
-      overflow:hidden;
-      box-shadow:var(--shadow);
-    }
-
-    .resultado-img{
-      width:100%;
-      height:100%;
-      min-height:320px;
-      object-fit:cover;
-      display:block;
-      background:#ececf4;
-    }
-
-    .resultado-info{
-      padding:28px 34px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-    }
-
-    .resultado-titulo{
-      margin:0 0 16px;
-      font-size:28px;
-      line-height:1.2;
-      font-family: Georgia, "Times New Roman", serif;
-    }
-
-    .resultado-ubicacion{
-      font-size:18px;
-      color:var(--violeta);
-      font-weight:600;
-      margin-bottom:16px;
-    }
-
-    .resultado-precio{
-      font-size:24px;
-      font-weight:700;
-      margin-bottom:22px;
-    }
-
-    .resultado-precio span{
-      font-weight:400;
-      color:#444;
-    }
-
-    .resultado-acciones a{
-      display:inline-block;
-      background:var(--violeta);
-      color:#fff;
-      text-decoration:none;
-      padding:14px 28px;
+    .orden-select{
+      height:44px;
+      border:1px solid #dddceb;
       border-radius:12px;
-      font-weight:700;
-      font-size:18px;
-    }
-
-    .resultado-acciones a:hover{
-      background:var(--violeta-oscuro);
-    }
-
-    .empty-estado{
-      text-align:center;
-      color:#666;
-      font-size:22px;
-      margin:28px 0 0;
+      padding:0 12px;
+      font-size:15px;
+      background:#fff;
+      outline:none;
     }
 
     #mapa{
@@ -327,6 +226,218 @@
       overflow:hidden;
       border:1px solid #e5e5ef;
       background:#eee;
+    }
+
+    .layout-resultados{
+      display:grid;
+      grid-template-columns: 290px 1fr;
+      gap:28px;
+      margin-top:28px;
+      align-items:start;
+    }
+
+    .filtros{
+      background:#fff;
+      border:1px solid #eee;
+      border-radius:18px;
+      padding:20px;
+      height: fit-content;
+      box-shadow:0 10px 25px rgba(0,0,0,.05);
+      position:sticky;
+      top:95px;
+    }
+
+    .filtros h3{
+      margin:0 0 18px;
+      color:#1b167f;
+      font-size:22px;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .filtro-bloque{
+      margin-bottom:22px;
+      padding-bottom:18px;
+      border-bottom:1px solid #f0f0f6;
+    }
+
+    .filtro-bloque:last-child{
+      margin-bottom:0;
+      padding-bottom:0;
+      border-bottom:none;
+    }
+
+    .filtro-titulo{
+      font-weight:800;
+      margin:0 0 12px;
+      color:#222;
+      font-size:15px;
+    }
+
+    .filtros label{
+      display:block;
+      margin-bottom:9px;
+      font-size:14px;
+      cursor:pointer;
+      color:#333;
+    }
+
+    .filtros input[type="checkbox"]{
+      margin-right:8px;
+      accent-color:#4f3dbb;
+    }
+
+    .price-range{
+      position: relative;
+      height: 42px;
+      margin-top: 4px;
+    }
+
+    .price-range input[type="range"]{
+      position: absolute;
+      width: 100%;
+      pointer-events: none;
+      appearance: none;
+      -webkit-appearance: none;
+      height: 6px;
+      background: #ddd;
+      border-radius: 999px;
+      outline: none;
+      top: 14px;
+    }
+
+    .price-range input[type="range"]::-webkit-slider-thumb{
+      pointer-events: all;
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #1b167f;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 3px 10px rgba(0,0,0,.16);
+    }
+
+    .price-range input[type="range"]::-moz-range-thumb{
+      pointer-events: all;
+      width: 18px;
+      height: 18px;
+      background: #1b167f;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 3px 10px rgba(0,0,0,.16);
+    }
+
+    .price-values{
+      display:flex;
+      justify-content:space-between;
+      font-weight:700;
+      font-size:14px;
+      margin-top:10px;
+      color:#1b167f;
+    }
+
+    .titulo-seccion{
+      margin:0 0 20px;
+      font-size:28px;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .resultados{
+      width:100%;
+    }
+
+    .grid-resultados{
+      display:grid;
+      gap:22px;
+    }
+
+    .resultado-card{
+      display:grid;
+      grid-template-columns: 42% 58%;
+      background:var(--card);
+      border:1px solid var(--borde);
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+
+    .resultado-img{
+      width:100%;
+      height:100%;
+      min-height:300px;
+      object-fit:cover;
+      display:block;
+      background:#ececf4;
+    }
+
+    .resultado-info{
+      padding:24px 28px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .resultado-titulo{
+      margin:0 0 14px;
+      font-size:28px;
+      line-height:1.2;
+      font-family: Georgia, "Times New Roman", serif;
+      color:#1d1d1d;
+    }
+
+    .resultado-ubicacion{
+      font-size:16px;
+      color:var(--violeta);
+      font-weight:700;
+      margin-bottom:10px;
+    }
+
+    .resultado-tipo{
+      font-size:14px;
+      color:#6d6d7d;
+      margin-bottom:12px;
+      font-weight:600;
+    }
+
+    .resultado-precio{
+      font-size:24px;
+      font-weight:700;
+      margin-bottom:18px;
+      color:#1b167f;
+    }
+
+    .resultado-precio span{
+      font-weight:400;
+      color:#444;
+      font-size:16px;
+    }
+
+    .resultado-acciones a{
+      display:inline-block;
+      background:var(--violeta);
+      color:#fff;
+      text-decoration:none;
+      padding:13px 22px;
+      border-radius:12px;
+      font-weight:700;
+      font-size:16px;
+    }
+
+    .resultado-acciones a:hover{
+      background:var(--violeta-oscuro);
+    }
+
+    .empty-estado{
+      text-align:center;
+      color:#666;
+      font-size:20px;
+      margin:28px 0 0;
+      background:#fff;
+      border:1px solid #ececf1;
+      border-radius:18px;
+      padding:30px 20px;
     }
 
     .precio-marker{
@@ -346,24 +457,81 @@
       line-height:1.4;
     }
 
-    @media (max-width: 900px){
-      .resultado-card{ grid-template-columns:1fr; }
-      .resultado-img{ min-height:240px; }
-      .encabezado-resultados h1{ font-size:42px; }
+    @media (max-width: 980px){
+      .layout-resultados{
+        grid-template-columns:1fr;
+      }
+
+      .filtros{
+        position:static;
+      }
+
+      .resultado-card{
+        grid-template-columns:1fr;
+      }
+
+      .resultado-img{
+        min-height:240px;
+      }
+
+      .encabezado-resultados h1{
+        font-size:40px;
+      }
     }
 
     @media (max-width: 768px){
-      .nav{ display:none; }
-      .hamburger{ display:block; }
-      .buscador-form{ grid-template-columns:1fr; }
+      .nav{
+        display:none;
+        position:absolute;
+        top:72px;
+        right:16px;
+        flex-direction:column;
+        background:white;
+        padding:14px;
+        border-radius:14px;
+        box-shadow:0 10px 30px rgba(0,0,0,.15);
+      }
+
+      .nav.open{
+        display:flex;
+      }
+
+      .hamburger{
+        display:block;
+      }
+
+      .buscador-form{
+        grid-template-columns:1fr;
+      }
+
       .resumen-row{
         flex-direction:column;
         align-items:flex-start;
       }
-      .resultado-info{ padding:22px; }
-      .resultado-titulo{ font-size:24px; }
-      .header{ padding:18px 16px; }
-      .contenedor{ padding:24px 16px 50px; }
+
+      .resultado-info{
+        padding:20px;
+      }
+
+      .resultado-titulo{
+        font-size:24px;
+      }
+
+      .header{
+        padding:16px;
+      }
+
+      .contenedor{
+        padding:22px 16px 50px;
+      }
+
+      .filtros{
+        padding:16px;
+      }
+
+      .encabezado-resultados h1{
+        font-size:34px;
+      }
     }
   </style>
 </head>
@@ -406,23 +574,85 @@
       <h1>Resultados</h1>
 
       <div class="resumen-row">
-        <p id="resumenBusqueda" class="muted">Mostrando alojamientos disponibles.</p>
-        <a class="link-cambiar" href="index.html">Cambiar búsqueda</a>
+        <div class="resumen-left">
+          <p id="resumenBusqueda" class="muted">Mostrando alojamientos disponibles.</p>
+          <a class="link-cambiar" href="index.html">Cambiar búsqueda</a>
+        </div>
+
+        <div class="resumen-right">
+          <label for="ordenPrecio" class="muted" style="font-size:15px;">Ordenar por:</label>
+          <select id="ordenPrecio" class="orden-select">
+            <option value="">Relevancia</option>
+            <option value="menor">Precio menor a mayor</option>
+            <option value="mayor">Precio mayor a menor</option>
+          </select>
+        </div>
       </div>
 
       <div id="mapa"></div>
     </section>
 
-    <section>
-      <h2 class="titulo-seccion">Alojamientos</h2>
+    <div class="layout-resultados">
+      <aside class="filtros">
+        <h3>Filtrar</h3>
 
-      <div id="gridResultados" class="grid-resultados"></div>
+        <div class="filtro-bloque">
+          <p class="filtro-titulo">Tipo de alojamiento</p>
 
-      <p id="emptyResultados" class="empty-estado" style="display:none;">
-        No hay alojamientos disponibles para esta búsqueda.
-      </p>
-    </section>
+          <label><input type="checkbox" value="Casa" class="filtro-tipo"> Casa</label>
+          <label><input type="checkbox" value="Departamento" class="filtro-tipo"> Departamento</label>
+          <label><input type="checkbox" value="Cabaña" class="filtro-tipo"> Cabaña</label>
+          <label><input type="checkbox" value="Hotel" class="filtro-tipo"> Hotel</label>
+          <label><input type="checkbox" value="Habitación" class="filtro-tipo"> Habitación</label>
+          <label><input type="checkbox" value="Hostel" class="filtro-tipo"> Hostel</label>
+          <label><input type="checkbox" value="Apart hotel" class="filtro-tipo"> Apart hotel</label>
+        </div>
+
+        <div class="filtro-bloque">
+          <p class="filtro-titulo">Servicios</p>
+
+          <label><input type="checkbox" value="Wifi" class="filtro-servicio"> Wifi</label>
+          <label><input type="checkbox" value="Pileta" class="filtro-servicio"> Pileta</label>
+          <label><input type="checkbox" value="Aire acondicionado" class="filtro-servicio"> Aire acondicionado</label>
+          <label><input type="checkbox" value="Parrilla" class="filtro-servicio"> Parrilla</label>
+          <label><input type="checkbox" value="Mascotas" class="filtro-servicio"> Mascotas</label>
+          <label><input type="checkbox" value="Estacionamiento" class="filtro-servicio"> Estacionamiento</label>
+          <label><input type="checkbox" value="Cocina" class="filtro-servicio"> Cocina</label>
+          <label><input type="checkbox" value="Calefacción" class="filtro-servicio"> Calefacción</label>
+          <label><input type="checkbox" value="TV" class="filtro-servicio"> TV</label>
+          <label><input type="checkbox" value="Lavarropas" class="filtro-servicio"> Lavarropas</label>
+          <label><input type="checkbox" value="Balcón" class="filtro-servicio"> Balcón</label>
+          <label><input type="checkbox" value="Vista" class="filtro-servicio"> Vista</label>
+        </div>
+
+        <div class="filtro-bloque">
+          <p class="filtro-titulo">Rango de precio</p>
+
+          <div class="price-range">
+            <input type="range" id="precioMin" min="0" max="200000" step="1000" value="0">
+            <input type="range" id="precioMax" min="0" max="200000" step="1000" value="200000">
+          </div>
+
+          <div class="price-values">
+            <span id="precioMinTxt">$0</span>
+            <span id="precioMaxTxt">$200.000</span>
+          </div>
+        </div>
+      </aside>
+
+      <section class="resultados">
+        <h2 class="titulo-seccion">Alojamientos</h2>
+
+        <div id="gridResultados" class="grid-resultados"></div>
+
+        <p id="emptyResultados" class="empty-estado" style="display:none;">
+          No hay alojamientos disponibles para esta búsqueda.
+        </p>
+      </section>
+    </div>
   </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
     const params = new URLSearchParams(window.location.search);
@@ -437,6 +667,7 @@
     const hiddenCheckout = document.getElementById("hiddenCheckout");
     const hiddenGuests = document.getElementById("hiddenGuests");
     const resumenBusqueda = document.getElementById("resumenBusqueda");
+    const alertaBusqueda = document.getElementById("alertaBusqueda");
 
     if (inputDestino && destino) inputDestino.value = destino;
     if (hiddenCheckin) hiddenCheckin.value = checkin;
@@ -447,44 +678,43 @@
       resumenBusqueda.textContent = `Buscando alojamientos para "${destino}".`;
     }
 
+    if (checkin || checkout || guests) {
+      const partes = [];
+      if (checkin) partes.push(`entrada: ${checkin}`);
+      if (checkout) partes.push(`salida: ${checkout}`);
+      if (guests) partes.push(`huéspedes: ${guests}`);
+
+      if (partes.length > 0) {
+        alertaBusqueda.style.display = "block";
+        alertaBusqueda.textContent = `Tu búsqueda: ${partes.join(" · ")}`;
+      }
+    }
+
     const hamburgerBtn = document.getElementById("hamburgerBtn");
     const mainNav = document.getElementById("mainNav");
 
-    if (hamburgerBtn && mainNav) {
-      hamburgerBtn.addEventListener("click", () => {
-        if (mainNav.style.display === "flex") {
-          mainNav.style.display = "none";
-        } else {
-          mainNav.style.display = "flex";
-          mainNav.style.flexDirection = "column";
-          mainNav.style.position = "absolute";
-          mainNav.style.top = "70px";
-          mainNav.style.right = "16px";
-          mainNav.style.background = "#fff";
-          mainNav.style.padding = "12px";
-          mainNav.style.border = "1px solid #ddd";
-          mainNav.style.borderRadius = "12px";
-        }
-      });
-    }
-  </script>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const mapa = L.map("mapa").setView([-34.6037, -58.3816], 5);
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap"
-      }).addTo(mapa);
-
-      window.mapaGlobal = mapa;
-      window.dispatchEvent(new Event("mapa-listo"));
+    hamburgerBtn?.addEventListener("click", () => {
+      mainNav?.classList.toggle("open");
     });
+
+    document.addEventListener("click", (e) => {
+      if (!mainNav?.contains(e.target) && !hamburgerBtn?.contains(e.target)) {
+        mainNav?.classList.remove("open");
+      }
+    });
+
+    const mapa = L.map("mapa", {
+      zoomControl: true
+    }).setView([-34.6037, -58.3816], 5);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(mapa);
+
+    window.mapaGlobal = mapa;
+    window.dispatchEvent(new Event("mapa-listo"));
   </script>
 
-  <script type="module" src="resultados.js?v=3"></script>
+  <script type="module" src="resultados.js"></script>
 </body>
 </html>
