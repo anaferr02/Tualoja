@@ -13,6 +13,14 @@ const checkin = params.get("checkin") || "";
 const checkout = params.get("checkout") || "";
 const guests = params.get("guests") || params.get("huespedes") || "1";
 
+const precioMinInput = document.getElementById("precioMin");
+const precioMaxInput = document.getElementById("precioMax");
+const precioMinTxt = document.getElementById("precioMinTxt");
+const precioMaxTxt = document.getElementById("precioMaxTxt");
+const ordenPrecioSelect = document.getElementById("ordenPrecio");
+
+let markersActuales = [];
+
 const coordsLugares = {
   "mendoza": [-32.8895, -68.8458],
   "capital federal": [-34.6037, -58.3816],
@@ -124,6 +132,30 @@ function esperarMapaListo() {
   });
 }
 
+function actualizarPrecioUI() {
+  if (!precioMinInput || !precioMaxInput || !precioMinTxt || !precioMaxTxt) return;
+
+  let min = Number(precioMinInput.value || 0);
+  let max = Number(precioMaxInput.value || 0);
+
+  if (min > max) {
+    [min, max] = [max, min];
+  }
+
+  precioMinTxt.textContent = `$${min.toLocaleString("es-AR")}`;
+  precioMaxTxt.textContent = `$${max.toLocaleString("es-AR")}`;
+}
+
+function limpiarMapa(mapa) {
+  if (!mapa || !markersActuales.length) return;
+
+  markersActuales.forEach((marker) => {
+    mapa.removeLayer(marker);
+  });
+
+  markersActuales = [];
+}
+
 async function cargarResultados() {
   try {
     const mapa = await esperarMapaListo();
@@ -132,6 +164,9 @@ async function cargarResultados() {
     let html = "";
     let encontrados = 0;
     const markers = [];
+    let alojamientos = [];
+
+    limpiarMapa(mapa);
 
     querySnapshot.forEach((docSnap) => {
       const a = docSnap.data();
@@ -148,19 +183,59 @@ async function cargarResultados() {
         ubicacion.includes(destino) ||
         titulo.includes(destino);
 
-     const tiposSeleccionados = Array.from(document.querySelectorAll(".filtro-tipo:checked")).map(e => e.value);
-const serviciosSeleccionados = Array.from(document.querySelectorAll(".filtro-servicio:checked")).map(e => e.value);
+      const tiposSeleccionados = Array.from(
+        document.querySelectorAll(".filtro-tipo:checked")
+      ).map((e) => e.value);
 
-const coincideTipo =
-  tiposSeleccionados.length === 0 ||
-  tiposSeleccionados.includes(a.tipo);
+      const serviciosSeleccionados = Array.from(
+        document.querySelectorAll(".filtro-servicio:checked")
+      ).map((e) => e.value);
 
-const coincideServicios =
-  serviciosSeleccionados.length === 0 ||
-  serviciosSeleccionados.every(s => (a.servicios || []).includes(s));
+      const coincideTipo =
+        tiposSeleccionados.length === 0 ||
+        tiposSeleccionados.includes(a.tipo);
 
-if (!coincideDestino || !coincideTipo || !coincideServicios) return;
+      const coincideServicios =
+        serviciosSeleccionados.length === 0 ||
+        serviciosSeleccionados.every((s) => (a.servicios || []).includes(s));
 
+      let precioMin = 0;
+      let precioMax = Number.MAX_SAFE_INTEGER;
+
+      if (precioMinInput && precioMaxInput) {
+        precioMin = Number(precioMinInput.value || 0);
+        precioMax = Number(precioMaxInput.value || 0);
+
+        if (precioMin > precioMax) {
+          [precioMin, precioMax] = [precioMax, precioMin];
+        }
+      }
+
+      const precioAlojamiento = Number(a.precio || 0);
+
+      const coincidePrecio =
+        precioAlojamiento >= precioMin &&
+        precioAlojamiento <= precioMax;
+
+      if (coincideDestino && coincideTipo && coincideServicios && coincidePrecio) {
+        alojamientos.push({
+          ...a,
+          id: docSnap.id
+        });
+      }
+    });
+
+    const orden = ordenPrecioSelect?.value || "";
+
+    if (orden === "menor") {
+      alojamientos.sort((a, b) => Number(a.precio || 0) - Number(b.precio || 0));
+    }
+
+    if (orden === "mayor") {
+      alojamientos.sort((a, b) => Number(b.precio || 0) - Number(a.precio || 0));
+    }
+
+    alojamientos.forEach((a) => {
       encontrados++;
 
       const foto = a.fotos?.[0] || "https://via.placeholder.com/800x500?text=Sin+imagen";
@@ -168,6 +243,7 @@ if (!coincideDestino || !coincideTipo || !coincideServicios) return;
       const precio = precioNumero.toLocaleString("es-AR");
       const ubicacionTexto = armarUbicacion(a);
       const tituloTexto = a.titulo || "Alojamiento sin título";
+      const tipoTexto = a.tipo || "Alojamiento";
 
       html += `
         <div class="resultado-card">
@@ -180,12 +256,16 @@ if (!coincideDestino || !coincideTipo || !coincideServicios) return;
               ${limpiarHtml(ubicacionTexto)}
             </div>
 
+            <div style="margin-bottom:10px; color:#666; font-size:15px;">
+              ${limpiarHtml(tipoTexto)}
+            </div>
+
             <div class="resultado-precio">
               $${precio} <span>/ noche</span>
             </div>
 
             <div class="resultado-acciones">
-              <a href="detalle.html?id=${docSnap.id}&destino=${encodeURIComponent(destino)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}">
+              <a href="detalle.html?id=${a.id}&destino=${encodeURIComponent(destino)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}">
                 Ver alojamiento
               </a>
             </div>
@@ -193,7 +273,7 @@ if (!coincideDestino || !coincideTipo || !coincideServicios) return;
         </div>
       `;
 
-      const coords = obtenerCoordenadasAlojamiento(a, docSnap.id);
+      const coords = obtenerCoordenadasAlojamiento(a, a.id);
 
       if (coords && mapa) {
         const marker = L.marker(coords, {
@@ -203,8 +283,9 @@ if (!coincideDestino || !coincideTipo || !coincideServicios) return;
         marker.bindPopup(`
           <strong>${limpiarHtml(tituloTexto)}</strong><br>
           ${limpiarHtml(ubicacionTexto)}<br>
+          ${limpiarHtml(tipoTexto)}<br>
           $${precio} por noche<br><br>
-          <a href="detalle.html?id=${docSnap.id}&destino=${encodeURIComponent(destino)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}">
+          <a href="detalle.html?id=${a.id}&destino=${encodeURIComponent(destino)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}">
             Ver alojamiento
           </a>
         `);
@@ -216,10 +297,18 @@ if (!coincideDestino || !coincideTipo || !coincideServicios) return;
     cont.innerHTML = html;
 
     if (emptyResultados) {
-      emptyResultados.style.display = encontrados === 0 ? "block" : "none";
+      if (encontrados === 0) {
+        emptyResultados.style.display = "block";
+        emptyResultados.textContent = "No se encontraron alojamientos con esos filtros.";
+      } else {
+        emptyResultados.style.display = "none";
+        emptyResultados.textContent = "";
+      }
     }
 
     if (mapa) {
+      markersActuales = markers;
+
       if (markers.length > 0) {
         const group = L.featureGroup(markers);
         mapa.fitBounds(group.getBounds(), { padding: [30, 30] });
@@ -244,7 +333,26 @@ if (!coincideDestino || !coincideTipo || !coincideServicios) return;
 }
 
 document.addEventListener("change", (e) => {
-  if (e.target.classList.contains("filtro-tipo") || e.target.classList.contains("filtro-servicio")) {
+  if (
+    e.target.classList.contains("filtro-tipo") ||
+    e.target.classList.contains("filtro-servicio") ||
+    e.target.id === "ordenPrecio"
+  ) {
     cargarResultados();
   }
+});
+
+precioMinInput?.addEventListener("input", () => {
+  actualizarPrecioUI();
+  cargarResultados();
+});
+
+precioMaxInput?.addEventListener("input", () => {
+  actualizarPrecioUI();
+  cargarResultados();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  actualizarPrecioUI();
+  cargarResultados();
 });
