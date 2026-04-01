@@ -594,7 +594,10 @@
       collection,
       query,
       where,
-      getDocs
+      onSnapshot,
+      writeBatch,
+      doc,
+      updateDoc
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
     const usersKey = "tualoja_users";
@@ -623,6 +626,8 @@
     let editMode = false;
     let passOpen = false;
     let firebaseUid = "";
+    let notificacionesActuales = [];
+    let stopNotifications = null;
 
     function loadUsers() {
       try { return JSON.parse(localStorage.getItem(usersKey) || "[]"); }
@@ -631,62 +636,6 @@
 
     function saveUsers(u) {
       localStorage.setItem(usersKey, JSON.stringify(u));
-    }
-
-    async function loadNotifications(uid) {
-      if (!uid) return [];
-
-      try {
-        const q = query(
-          collection(db, "notificaciones"),
-          where("userId", "==", uid)
-        );
-
-        const snap = await getDocs(q);
-        const list = [];
-
-        snap.forEach((d) => {
-          list.push({ id: d.id, ...d.data() });
-        });
-
-        list.sort((a, b) => {
-          const ta = a.fecha?.seconds || 0;
-          const tb = b.fecha?.seconds || 0;
-          return tb - ta;
-        });
-
-        return list;
-      } catch (error) {
-        console.error("Error cargando notificaciones:", error);
-        return [];
-      }
-    }
-
-    async function renderNotifications(uid) {
-      const list = await loadNotifications(uid);
-      const unread = list.filter(n => !n.leida).length;
-
-      notifCount.textContent = unread;
-      notifCount.style.display = unread > 0 ? "flex" : "none";
-
-      if (!list.length) {
-        notifList.innerHTML = `<div class="notif-empty">No tenés notificaciones por ahora.</div>`;
-        return;
-      }
-
-      notifList.innerHTML = list.map((n) => {
-        const url = n.tipo === "reserva"
-          ? "mis-reservas.html"
-          : "chat.html?reserva=" + (n.reservaId || "");
-
-        return `
-          <a href="${url}" class="notif-item">
-            <strong>${n.tipo === "reserva" ? "Nueva reserva" : "Nuevo mensaje"}</strong>
-            <p>${n.mensaje || ""}</p>
-            <small>${n.leida ? "Leída" : "Nueva"}</small>
-          </a>
-        `;
-      }).join("");
     }
 
     function setEditMode(state) {
@@ -747,6 +696,83 @@
       });
     }
 
+    function renderNotifications(list) {
+      notificacionesActuales = [...list];
+
+      const unread = list.filter(n => !n.leida).length;
+      notifCount.textContent = unread;
+      notifCount.style.display = unread > 0 ? "flex" : "none";
+
+      if (!list.length) {
+        notifList.innerHTML = `<div class="notif-empty">No tenés notificaciones por ahora.</div>`;
+        return;
+      }
+
+      notifList.innerHTML = list.map((n) => {
+        const url = n.tipo === "reserva"
+          ? "mis-reservas.html"
+          : "chat.html?reserva=" + (n.reservaId || "");
+
+        return `
+          <a href="${url}" class="notif-item" data-id="${n.id}">
+            <strong>${n.tipo === "reserva" ? "Nueva reserva" : "Nuevo mensaje"}</strong>
+            <p>${n.mensaje || ""}</p>
+            <small>${n.leida ? "Leída" : "Nueva"}</small>
+          </a>
+        `;
+      }).join("");
+
+      notifList.querySelectorAll(".notif-item").forEach((item) => {
+        item.addEventListener("click", async () => {
+          const notifId = item.dataset.id;
+          if (!notifId) return;
+
+          const encontrada = notificacionesActuales.find(n => n.id === notifId);
+          if (!encontrada || encontrada.leida) return;
+
+          try {
+            await updateDoc(doc(db, "notificaciones", notifId), {
+              leida: true
+            });
+          } catch (error) {
+            console.error("No se pudo marcar la notificación como leída:", error);
+          }
+        });
+      });
+    }
+
+    function escucharNotificaciones(uid) {
+      if (!uid) return;
+
+      if (stopNotifications) {
+        stopNotifications();
+        stopNotifications = null;
+      }
+
+      const q = query(
+        collection(db, "notificaciones"),
+        where("userId", "==", uid)
+      );
+
+      stopNotifications = onSnapshot(q, (snap) => {
+        const list = [];
+
+        snap.forEach((d) => {
+          list.push({ id: d.id, ...d.data() });
+        });
+
+        list.sort((a, b) => {
+          const ta = a.fecha?.seconds || 0;
+          const tb = b.fecha?.seconds || 0;
+          return tb - ta;
+        });
+
+        renderNotifications(list);
+      }, (error) => {
+        console.error("Error escuchando notificaciones:", error);
+      });
+    }
+
     (function init(){
       emailEl.value = myEmail || "";
 
@@ -770,7 +796,7 @@
 
       firebaseUid = user.uid;
       emailEl.value = user.email || myEmail || "";
-      await renderNotifications(firebaseUid);
+      escucharNotificaciones(firebaseUid);
     });
 
     btnEdit.addEventListener("click", () => {
@@ -873,13 +899,9 @@
       profilePhotoInput.value = "";
     });
 
-    notifBtn.addEventListener("click", async (e) => {
+    notifBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       notifDropdown.classList.toggle("open");
-
-      if (firebaseUid && notifDropdown.classList.contains("open")) {
-        await renderNotifications(firebaseUid);
-      }
     });
 
     document.addEventListener("click", (e) => {
@@ -888,9 +910,27 @@
       }
     });
 
-    markReadBtn.addEventListener("click", (e) => {
+    markReadBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
-      alert("Después te hago marcar como leídas en Firebase 😉");
+
+      if (!firebaseUid || !notificacionesActuales.length) return;
+
+      const pendientes = notificacionesActuales.filter(n => !n.leida);
+      if (!pendientes.length) return;
+
+      try {
+        const batch = writeBatch(db);
+
+        pendientes.forEach((n) => {
+          batch.update(doc(db, "notificaciones", n.id), {
+            leida: true
+          });
+        });
+
+        await batch.commit();
+      } catch (error) {
+        console.error("No se pudieron marcar las notificaciones como leídas:", error);
+      }
     });
 
     logoutLink.addEventListener("click", (e) => {
