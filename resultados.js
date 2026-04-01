@@ -148,7 +148,18 @@ async function cargarResultados() {
         ubicacion.includes(destino) ||
         titulo.includes(destino);
 
-      if (!coincideDestino) return;
+     const tiposSeleccionados = Array.from(document.querySelectorAll(".filtro-tipo:checked")).map(e => e.value);
+const serviciosSeleccionados = Array.from(document.querySelectorAll(".filtro-servicio:checked")).map(e => e.value);
+
+const coincideTipo =
+  tiposSeleccionados.length === 0 ||
+  tiposSeleccionados.includes(a.tipo);
+
+const coincideServicios =
+  serviciosSeleccionados.length === 0 ||
+  serviciosSeleccionados.every(s => (a.servicios || []).includes(s));
+
+if (!coincideDestino || !coincideTipo || !coincideServicios) return;
 
       encontrados++;
 
@@ -232,4 +243,8 @@ async function cargarResultados() {
   }
 }
 
-cargarResultados();
+document.addEventListener("change", (e) => {
+  if (e.target.classList.contains("filtro-tipo") || e.target.classList.contains("filtro-servicio")) {
+    cargarResultados();
+  }
+});
