@@ -389,7 +389,7 @@
     await addDoc(collection(db, "notificaciones"), {
   userId: receptorId,
   tipo: "mensaje",
-  mensaje: `${usuarioActual.email} te escribió: "${contenido.slice(0, 40)}"`,
+  mensaje: `${usuarioActual.email} te escribió: "${contenido.slice(0, 40)}${contenido.length > 40 ? "..." : ""}"`,
   leida: false,
   reservaId: reservaId,
   fecha: serverTimestamp()
