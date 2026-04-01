@@ -35,6 +35,23 @@ function setupHamburgerMenu() {
   });
 }
 
+function bindLogoutButton(buttonId) {
+  const btn = document.getElementById(buttonId);
+  if (!btn) return;
+
+  btn.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    try {
+      await logout();
+      window.location.href = "index.html";
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      alert("No se pudo cerrar sesión. Intentá de nuevo.");
+    }
+  });
+}
+
 function renderAuthArea(user) {
   const authArea = document.getElementById("authArea");
   if (!authArea) return;
@@ -45,17 +62,7 @@ function renderAuthArea(user) {
       <a class="btn btn-ghost" href="#" id="logoutBtnAuthArea">Salir</a>
     `;
 
-    const btn = document.getElementById("logoutBtnAuthArea");
-    if (btn) {
-      btn.addEventListener("click", async (e) => {
-        e.preventDefault();
-        try {
-          await logout();
-        } catch (error) {
-          console.error("Error al cerrar sesión:", error);
-        }
-      });
-    }
+    bindLogoutButton("logoutBtnAuthArea");
   } else {
     authArea.innerHTML = `
       <a class="btn btn-ghost" href="login.html">Iniciar sesión</a>
@@ -67,31 +74,23 @@ function renderAuthArea(user) {
 function renderUserMenu(user) {
   const userMenu = document.getElementById("userMenu");
   const userDropdown = document.getElementById("userDropdown");
+
   if (!userMenu || !userDropdown) return;
 
   if (user) {
-    userMenu.innerHTML = `${user.name || "Mi cuenta"}`;
+    userMenu.textContent = user.name || "Mi cuenta";
 
     userDropdown.innerHTML = `
+      <a href="mi-cuenta.html">Mi cuenta</a>
       <a href="mis-reservas.html">Mis reservas</a>
       <a href="publicar.html">Publicar alojamiento</a>
       <a href="panel-anfitrion.html">Panel anfitrión</a>
       <a href="#" id="logoutBtn">Cerrar sesión</a>
     `;
 
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", async (e) => {
-        e.preventDefault();
-        try {
-          await logout();
-        } catch (error) {
-          console.error("Error al cerrar sesión:", error);
-        }
-      });
-    }
+    bindLogoutButton("logoutBtn");
   } else {
-    userMenu.innerHTML = `Cuenta`;
+    userMenu.textContent = "Cuenta";
 
     userDropdown.innerHTML = `
       <a href="login.html">Iniciar sesión</a>
