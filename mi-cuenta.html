@@ -37,8 +37,11 @@
   let firebaseUid = "";
 
   function loadUsers() {
-    try { return JSON.parse(localStorage.getItem(usersKey) || "[]"); }
-    catch { return []; }
+    try {
+      return JSON.parse(localStorage.getItem(usersKey) || "[]");
+    } catch {
+      return [];
+    }
   }
 
   function saveUsers(u) {
@@ -75,6 +78,8 @@
   }
 
   async function renderNotifications(uid) {
+    if (!notifList || !notifCount) return;
+
     const list = await loadNotifications(uid);
     const unread = list.filter(n => !n.leida).length;
 
@@ -103,10 +108,11 @@
 
   function setEditMode(state) {
     editMode = state;
-    if (nameEl) nameEl.disabled = !state;
-   if (btnEdit) btnEdit.textContent = state ? "Cancelar" : "Modificar";
 
-    if (!state) {
+    if (nameEl) nameEl.disabled = !state;
+    if (btnEdit) btnEdit.textContent = state ? "Cancelar" : "Modificar";
+
+    if (!state && nameEl) {
       const users = loadUsers();
       const user = users.find(u => (u.email || "").toLowerCase() === myEmail);
       nameEl.value = user?.name || userObj?.name || "";
@@ -115,23 +121,35 @@
 
   function setPassMode(state) {
     passOpen = state;
-    if (passwordFields) passwordFields.classList.toggle("open", state);
-    btnTogglePass.textContent = state ? "Cancelar cambio" : "Modificar contraseña";
+
+    if (passwordFields) {
+      passwordFields.classList.toggle("open", state);
+    }
+
+    if (btnTogglePass) {
+      btnTogglePass.textContent = state ? "Cancelar cambio" : "Modificar contraseña";
+    }
 
     if (!state) {
-      document.getElementById("pass1").value = "";
-      document.getElementById("pass2").value = "";
-      err.style.display = "none";
-      ok.style.display = "none";
+      const pass1 = document.getElementById("pass1");
+      const pass2 = document.getElementById("pass2");
+
+      if (pass1) pass1.value = "";
+      if (pass2) pass2.value = "";
+      if (err) err.style.display = "none";
+      if (ok) ok.style.display = "none";
     }
   }
 
   function updateGreeting(name) {
     const cleanName = (name || "").trim();
     const first = cleanName ? cleanName.split(" ")[0] : "Usuario";
-    welcomeTitle.textContent = `Hola, ${first} 👋`;
 
-    if (!avatar.querySelector("img")) {
+    if (welcomeTitle) {
+      welcomeTitle.textContent = `Hola, ${first} 👋`;
+    }
+
+    if (avatar && !avatar.querySelector("img")) {
       avatar.textContent = first.charAt(0).toUpperCase();
     }
   }
@@ -141,11 +159,14 @@
   }
 
   function renderPhoto() {
+    if (!avatar) return;
+
     const saved = localStorage.getItem(getPhotoKey());
+
     if (saved) {
       avatar.innerHTML = `<img src="${saved}" alt="Foto de perfil">`;
     } else {
-      const currentName = nameEl.value.trim() || "U";
+      const currentName = nameEl?.value?.trim() || "U";
       avatar.innerHTML = currentName.charAt(0).toUpperCase();
     }
   }
@@ -159,8 +180,8 @@
     });
   }
 
-  (function init(){
-    emailEl.value = myEmail || "";
+  try {
+    if (emailEl) emailEl.value = myEmail || "";
 
     const users = loadUsers();
     const user = users.find(u => (u.email || "").toLowerCase() === myEmail);
@@ -171,141 +192,193 @@
     renderPhoto();
     setEditMode(false);
     setPassMode(false);
-  })();
+  } catch (e) {
+    console.error("Error en init:", e);
+  }
 
   onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      notifList.innerHTML = `<div class="notif-empty">No tenés notificaciones por ahora.</div>`;
-      notifCount.style.display = "none";
-      return;
-    }
-
-    firebaseUid = user.uid;
-    if (emailEl) emailEl.value = user.email || myEmail || "";
-    await renderNotifications(firebaseUid);
-  });
-
-  btnEdit.addEventListener("click", () => {
-    msg.style.display = "none";
-
-    if (!editMode) {
-      setEditMode(true);
-      nameEl.focus();
-      return;
-    }
-
-    setEditMode(false);
-  });
-
-  btnTogglePass.addEventListener("click", () => {
-    setPassMode(!passOpen);
-  });
-
-  document.getElementById("btnSave").addEventListener("click", () => {
-    msg.style.display = "none";
-    const name = nameEl.value.trim();
-
-    if (!name) {
-      msg.textContent = "Escribí un nombre antes de guardar.";
-      msg.style.display = "block";
-      return;
-    }
-
-    const users = loadUsers();
-    const idx = users.findIndex(u => (u.email || "").toLowerCase() === myEmail);
-    if (idx === -1) return;
-
-    users[idx].name = name;
-    saveUsers(users);
-
-    const raw = localStorage.getItem("tualoja_user");
     try {
-      const u = raw ? JSON.parse(raw) : null;
-      if (u) {
-        u.name = name;
-        localStorage.setItem("tualoja_user", JSON.stringify(u));
+      if (!user) {
+        if (notifList) {
+          notifList.innerHTML = `<div class="notif-empty">No tenés notificaciones por ahora.</div>`;
+        }
+        if (notifCount) {
+          notifCount.style.display = "none";
+        }
+        return;
       }
-    } catch {}
 
-    updateGreeting(name);
-    renderPhoto();
-    setEditMode(false);
+      firebaseUid = user.uid;
 
-    msg.textContent = "✅ Datos guardados.";
-    msg.style.display = "block";
-  });
+      if (emailEl) {
+        emailEl.value = user.email || myEmail || "";
+      }
 
-  document.getElementById("btnPass").addEventListener("click", () => {
-    err.style.display = "none";
-    ok.style.display = "none";
-
-    const p1 = document.getElementById("pass1").value;
-    const p2 = document.getElementById("pass2").value;
-
-    if (p1.length < 4) {
-      err.textContent = "La contraseña debe tener al menos 4 caracteres.";
-      err.style.display = "block";
-      return;
-    }
-
-    if (p1 !== p2) {
-      err.textContent = "Las contraseñas no coinciden.";
-      err.style.display = "block";
-      return;
-    }
-
-    const users = loadUsers();
-    const idx = users.findIndex(u => (u.email || "").toLowerCase() === myEmail);
-    if (idx === -1) return;
-
-    users[idx].password = p1;
-    saveUsers(users);
-
-    ok.textContent = "✅ Contraseña actualizada.";
-    ok.style.display = "block";
-
-    setPassMode(false);
-  });
-
- if (profilePhotoInput) profilePhotoInput.addEventListener("change", async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const b64 = await fileToBase64(file);
-      localStorage.setItem(getPhotoKey(), b64);
-      renderPhoto();
-      msg.textContent = "✅ Foto de perfil actualizada.";
-      msg.style.display = "block";
-    } catch {
-      msg.textContent = "No se pudo subir la foto.";
-      msg.style.display = "block";
-    }
-
-    profilePhotoInput.value = "";
-  });
-
-  notifBtn.addEventListener("click", async (e) => {
-    e.stopPropagation();
-    notifDropdown.classList.toggle("open");
-
-    if (firebaseUid && notifDropdown.classList.contains("open")) {
       await renderNotifications(firebaseUid);
+    } catch (e) {
+      console.error("Error auth/notificaciones:", e);
     }
   });
+
+  if (btnEdit) {
+    btnEdit.addEventListener("click", () => {
+      if (msg) msg.style.display = "none";
+
+      if (!editMode) {
+        setEditMode(true);
+        if (nameEl) nameEl.focus();
+        return;
+      }
+
+      setEditMode(false);
+    });
+  }
+
+  if (btnTogglePass) {
+    btnTogglePass.addEventListener("click", () => {
+      setPassMode(!passOpen);
+    });
+  }
+
+  const btnSave = document.getElementById("btnSave");
+  if (btnSave) {
+    btnSave.addEventListener("click", () => {
+      if (msg) msg.style.display = "none";
+      const name = nameEl?.value?.trim() || "";
+
+      if (!name) {
+        if (msg) {
+          msg.textContent = "Escribí un nombre antes de guardar.";
+          msg.style.display = "block";
+        }
+        return;
+      }
+
+      const users = loadUsers();
+      const idx = users.findIndex(u => (u.email || "").toLowerCase() === myEmail);
+      if (idx === -1) return;
+
+      users[idx].name = name;
+      saveUsers(users);
+
+      const raw = localStorage.getItem("tualoja_user");
+      try {
+        const u = raw ? JSON.parse(raw) : null;
+        if (u) {
+          u.name = name;
+          localStorage.setItem("tualoja_user", JSON.stringify(u));
+        }
+      } catch {}
+
+      updateGreeting(name);
+      renderPhoto();
+      setEditMode(false);
+
+      if (msg) {
+        msg.textContent = "✅ Datos guardados.";
+        msg.style.display = "block";
+      }
+    });
+  }
+
+  const btnPass = document.getElementById("btnPass");
+  if (btnPass) {
+    btnPass.addEventListener("click", () => {
+      if (err) err.style.display = "none";
+      if (ok) ok.style.display = "none";
+
+      const p1 = document.getElementById("pass1")?.value || "";
+      const p2 = document.getElementById("pass2")?.value || "";
+
+      if (p1.length < 4) {
+        if (err) {
+          err.textContent = "La contraseña debe tener al menos 4 caracteres.";
+          err.style.display = "block";
+        }
+        return;
+      }
+
+      if (p1 !== p2) {
+        if (err) {
+          err.textContent = "Las contraseñas no coinciden.";
+          err.style.display = "block";
+        }
+        return;
+      }
+
+      const users = loadUsers();
+      const idx = users.findIndex(u => (u.email || "").toLowerCase() === myEmail);
+      if (idx === -1) return;
+
+      users[idx].password = p1;
+      saveUsers(users);
+
+      if (ok) {
+        ok.textContent = "✅ Contraseña actualizada.";
+        ok.style.display = "block";
+      }
+
+      setPassMode(false);
+    });
+  }
+
+  if (profilePhotoInput) {
+    profilePhotoInput.addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      try {
+        const b64 = await fileToBase64(file);
+        localStorage.setItem(getPhotoKey(), b64);
+        renderPhoto();
+
+        if (msg) {
+          msg.textContent = "✅ Foto de perfil actualizada.";
+          msg.style.display = "block";
+        }
+      } catch {
+        if (msg) {
+          msg.textContent = "No se pudo subir la foto.";
+          msg.style.display = "block";
+        }
+      }
+
+      profilePhotoInput.value = "";
+    });
+  }
+
+  if (notifBtn && notifDropdown) {
+    notifBtn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      notifDropdown.classList.toggle("open");
+
+      if (firebaseUid && notifDropdown.classList.contains("open")) {
+        await renderNotifications(firebaseUid);
+      }
+    });
+  }
 
   document.addEventListener("click", (e) => {
-    if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
+    if (
+      notifBtn &&
+      notifDropdown &&
+      !notifBtn.contains(e.target) &&
+      !notifDropdown.contains(e.target)
+    ) {
       notifDropdown.classList.remove("open");
     }
   });
 
-  markReadBtn.addEventListener("click", () => {
-    alert("Después te hago marcar como leídas en Firebase 😉");
-  });
+  if (markReadBtn) {
+    markReadBtn.addEventListener("click", () => {
+      alert("Después te hago marcar como leídas en Firebase 😉");
+    });
+  }
 
-  logoutLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    logout();
-  });
+  if (logoutLink) {
+    logoutLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+    });
+  }
 </script>
