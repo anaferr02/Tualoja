@@ -510,6 +510,32 @@
                 </div>
               </div>
             </div>
+            <section style="margin-top:30px;">
+  <h3>Reseñas de huéspedes</h3>
+
+  <div id="resenasResumen" style="margin-bottom:10px; font-weight:700;"></div>
+  <div id="listaResenas"></div>
+
+  <div id="boxDejarResena" style="display:none; margin-top:20px;">
+    <h4>Dejar reseña</h4>
+
+    <form id="formResena">
+      <select id="puntaje" required>
+        <option value="">Puntaje</option>
+        <option value="5">5 - Excelente</option>
+        <option value="4">4 - Muy bueno</option>
+        <option value="3">3 - Bueno</option>
+        <option value="2">2 - Regular</option>
+        <option value="1">1 - Malo</option>
+      </select>
+
+      <textarea id="comentario" placeholder="Contá tu experiencia..." required></textarea>
+
+      <button type="submit">Enviar reseña</button>
+      <p id="msgResena"></p>
+    </form>
+  </div>
+</section>
           </section>
         `;
 
@@ -594,6 +620,100 @@
     }
 
     cargarDetalle();
+    import {
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const listaResenas = document.getElementById("listaResenas");
+const resenasResumen = document.getElementById("resenasResumen");
+const formResena = document.getElementById("formResena");
+const msgResena = document.getElementById("msgResena");
+const boxDejarResena = document.getElementById("boxDejarResena");
+
+let user = JSON.parse(localStorage.getItem("tualoja_user") || "null");
+
+function estrellas(n) {
+  return "★".repeat(n) + "☆".repeat(5 - n);
+}
+
+async function cargarResenas() {
+  const q = query(
+    collection(db, "resenas"),
+    where("alojamientoId", "==", id),
+    orderBy("createdAt", "desc")
+  );
+
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    resenasResumen.innerHTML = "Sin reseñas todavía";
+    return;
+  }
+
+  let total = 0;
+  let cantidad = snap.size;
+
+  let html = "";
+
+  snap.forEach(doc => {
+    const r = doc.data();
+    total += r.puntaje;
+
+    html += `
+      <div style="border:1px solid #eee; padding:12px; border-radius:12px; margin-bottom:10px;">
+        <strong>${r.nombre || "Huésped"}</strong><br>
+        ${estrellas(r.puntaje)}<br>
+        ${r.comentario}
+      </div>
+    `;
+  });
+
+  const promedio = (total / cantidad).toFixed(1);
+
+  resenasResumen.innerHTML = `⭐ ${promedio} (${cantidad} reseñas)`;
+  listaResenas.innerHTML = html;
+}
+
+cargarResenas();
+
+if (user) {
+  boxDejarResena.style.display = "block";
+}
+
+formResena?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  if (!user) {
+    msgResena.textContent = "Iniciá sesión";
+    return;
+  }
+
+  const puntaje = Number(document.getElementById("puntaje").value);
+  const comentario = document.getElementById("comentario").value.trim();
+
+  if (!puntaje || comentario.length < 5) {
+    msgResena.textContent = "Completá bien";
+    return;
+  }
+
+  await addDoc(collection(db, "resenas"), {
+    alojamientoId: id,
+    puntaje,
+    comentario,
+    nombre: user.email || "Huésped",
+    createdAt: serverTimestamp()
+  });
+
+  msgResena.textContent = "✅ Reseña enviada";
+  formResena.reset();
+  cargarResenas();
+});
   </script>
 </body>
 </html>
