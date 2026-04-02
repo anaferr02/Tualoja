@@ -7,6 +7,15 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:#f5f6fb;
+      color:#1f2450;
+    }
+
     .header{
       position:sticky;
       top:0;
@@ -34,6 +43,7 @@
       align-items:center;
       gap:10px;
       flex-wrap:wrap;
+      margin-left:auto;
     }
 
     .top-btn{
@@ -46,6 +56,7 @@
       font-weight:700;
       font-size:14px;
       cursor:pointer;
+      transition:.2s ease;
     }
 
     .top-btn:hover{
@@ -53,16 +64,16 @@
     }
 
     .page-wrap{
-      max-width:1040px;
+      max-width:1100px;
       margin:24px auto 40px;
       padding:0 16px;
     }
 
     .card{
-      background:rgba(255,255,255,.92);
+      background:rgba(255,255,255,.95);
       border:1px solid rgba(0,0,0,.08);
       border-radius:22px;
-      box-shadow:0 18px 40px rgba(0,0,0,.12);
+      box-shadow:0 18px 40px rgba(0,0,0,.08);
       padding:18px;
     }
 
@@ -76,7 +87,7 @@
     }
 
     .top h1{ margin:0; }
-    .muted{ opacity:.85; }
+    .muted{ opacity:.85; color:#5e6587; }
 
     .stats{
       display:grid;
@@ -86,7 +97,7 @@
     }
 
     .stat-card{
-      background:rgba(255,255,255,.78);
+      background:#fff;
       border:1px solid rgba(0,0,0,.06);
       border-radius:18px;
       padding:14px;
@@ -131,7 +142,7 @@
     }
 
     .panel-note{
-      background:rgba(255,255,255,.62);
+      background:#f7f8ff;
       border:1px solid rgba(0,0,0,.06);
       border-radius:16px;
       padding:12px 14px;
@@ -145,7 +156,7 @@
     }
 
     .item{
-      background:rgba(255,255,255,.7);
+      background:#fff;
       border:1px solid rgba(0,0,0,.06);
       border-radius:18px;
       padding:14px;
@@ -162,6 +173,11 @@
       overflow:hidden;
       background:rgba(0,0,0,.06);
       border:1px solid rgba(0,0,0,.08);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#687193;
+      font-weight:700;
     }
 
     .thumb img{
@@ -169,6 +185,13 @@
       height:100%;
       object-fit:cover;
       display:block;
+    }
+
+    .item h3{
+      margin:0 0 8px;
+      color:#272d7d;
+      font-family:Georgia, "Times New Roman", serif;
+      font-size:24px;
     }
 
     .chips{
@@ -208,6 +231,13 @@
       font-weight:800;
     }
 
+    .chip-warn{
+      background:#fff3d9;
+      border-color:#f2dd9a;
+      color:#8a6a00;
+      font-weight:800;
+    }
+
     .actions{
       display:flex;
       gap:10px;
@@ -241,13 +271,20 @@
       font-weight:700;
     }
 
+    .mini-btn.primary{
+      background:#eef1ff;
+      color:#1b167f;
+      font-weight:700;
+      border:1px solid #dfe4ff;
+    }
+
     .calendar-grid{
       display:grid;
       gap:12px;
     }
 
     .calendar-row{
-      background:rgba(255,255,255,.7);
+      background:#fff;
       border:1px solid rgba(0,0,0,.06);
       border-radius:18px;
       padding:14px;
@@ -346,6 +383,7 @@
       border:1px solid rgba(0,0,0,.12);
       background:#fff;
       outline:none;
+      font-family:inherit;
     }
 
     .modal-actions{
@@ -652,361 +690,369 @@
       ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
 
       const uids = [
-        x.hostId, x.hostUid, x.anfitrionId, x.ownerId, x.ownerUid, x.uid
+        x.anfitrionId, x.hostId, x.ownerId, x.ownerUid, x.uid, x.userUid, x.userId
       ].map(v => String(v || "").trim()).filter(Boolean);
 
       return emails.includes(myEmail) || (myUid && uids.includes(myUid));
     }
 
-    function actualizarStats() {
-      const totalAlojamientos = listingsCache.length;
-      const totalReservas = bookingsCache.length;
-      const totalConfirmadas = bookingsCache.filter(b =>
-        b.status === "aceptada" || b.status === "confirmada"
-      ).length;
+    function estadoChip(estado) {
+      const e = String(estado || "pendiente").toLowerCase();
 
-      const totalIngresos = bookingsCache
-        .filter(b => b.status === "aceptada" || b.status === "confirmada")
-        .reduce((acc, b) => acc + Number(b.total || 0), 0);
+      if (e === "aceptada" || e === "confirmada") {
+        return `<span class="chip chip-ok">Aceptada</span>`;
+      }
 
-      statAlojamientos.textContent = String(totalAlojamientos);
-      statReservas.textContent = String(totalReservas);
-      statConfirmadas.textContent = String(totalConfirmadas);
-      statIngresos.textContent = `$${formatARS(totalIngresos)}`;
+      if (e === "cancelada" || e === "rechazada") {
+        return `<span class="chip chip-bad">${escapeHTML(e)}</span>`;
+      }
+
+      return `<span class="chip chip-warn">Pendiente</span>`;
     }
 
-    function abrirEdicion(x) {
-      currentEditDocId = x._docId;
-      editForm.titulo.value = x.titulo || "";
-      editForm.precio.value = Number(x.precio || 0);
-      editForm.maxNoches.value = Number(x.maxNoches || 30);
-      editForm.descripcion.value = x.descripcion || "";
+    function updateStats() {
+      const confirmadas = bookingsCache.filter(x => {
+        const e = String(x.status || "").toLowerCase();
+        return e === "aceptada" || e === "confirmada";
+      });
+
+      const ingresos = confirmadas.reduce((acc, x) => acc + Number(x.total || 0), 0);
+
+      statAlojamientos.textContent = String(listingsCache.length);
+      statReservas.textContent = String(bookingsCache.length);
+      statConfirmadas.textContent = String(confirmadas.length);
+      statIngresos.textContent = `$${formatARS(ingresos)}`;
+    }
+
+    function openEditModal(item) {
+      currentEditDocId = item._docId;
+      document.getElementById("editTitulo").value = item.titulo || "";
+      document.getElementById("editPrecio").value = Number(item.precio || 0);
+      document.getElementById("editMaxNoches").value = item.maxNoches ? Number(item.maxNoches) : "";
+      document.getElementById("editDescripcion").value = item.descripcion || "";
       editBackdrop.style.display = "flex";
     }
 
-    function cerrarEdicion() {
+    function closeModal() {
       editBackdrop.style.display = "none";
       currentEditDocId = null;
       editForm.reset();
     }
 
-    async function cargarListingsCache() {
-      const snap = await getDocs(collection(db, "alojamientos"));
-      const all = [];
-      snap.forEach(d => all.push({ ...d.data(), _docId: d.id }));
-      listingsCache = all.filter(x => esMioAlojamiento(x, currentUser));
-      actualizarStats();
-    }
-
-    async function cargarBookingsCache() {
-      const snap = await getDocs(collection(db, "reservas"));
-      const all = [];
-      snap.forEach(d => all.push({ ...d.data(), _docId: d.id }));
-      bookingsCache = all.filter(x => esMiReserva(x, currentUser));
-      actualizarStats();
-    }
-
-    function puedeCancelarComoAnfitrion(b) {
-      const estado = String(b.status || "pendiente").toLowerCase();
-
-      if (!["pendiente", "aceptada", "confirmada"].includes(estado)) return false;
-      if (b.chatIniciado === true) return false;
-      if (b.puedeCancelarAnfitrion === false) return false;
-
-      return true;
-    }
-
-    async function renderListings() {
-      list.innerHTML = "";
-      empty.style.display = "none";
-
-      await cargarListingsCache();
-      summary.textContent = `Publicaciones: ${listingsCache.length}`;
+    function renderListings() {
+      summary.textContent = listingsCache.length
+        ? `Tenés ${listingsCache.length} alojamiento(s) publicado(s).`
+        : "";
 
       if (!listingsCache.length) {
+        list.innerHTML = "";
         empty.style.display = "block";
         return;
       }
 
-      listingsCache.forEach(x => {
-        const item = document.createElement("div");
-        item.className = "item";
+      empty.style.display = "none";
 
-        const imgWrap = document.createElement("div");
-        imgWrap.className = "thumb";
-        const cover = coverFromFotos(x);
-        if (cover) {
-          imgWrap.innerHTML = `<img src="${cover}" alt="${escapeHTML(x.titulo || "Alojamiento")}">`;
-        }
+      list.innerHTML = listingsCache.map((item) => {
+        const foto = coverFromFotos(item);
 
-        const meta = document.createElement("div");
-        meta.innerHTML = `
-          <h3>${escapeHTML(x.titulo || "Sin título")}</h3>
-          <p><b>${escapeHTML(x.ciudad || "-")}</b>, ${escapeHTML(x.provincia || "-")}</p>
-          <div class="chips">
-            <span class="chip chip-strong">${escapeHTML(x.status || "activo")}</span>
-            <span class="chip">ARS $${formatARS(x.precio)}</span>
-            <span class="chip">Máx. noches: ${x.maxNoches ?? 30}</span>
-            <span class="chip">ID: ${escapeHTML(x.id || x._docId || "")}</span>
-          </div>
+        return `
+          <article class="item">
+            <div class="thumb">
+              ${foto ? `<img src="${escapeHTML(foto)}" alt="${escapeHTML(item.titulo || "Alojamiento")}">` : `Sin imagen`}
+            </div>
+
+            <div>
+              <h3>${escapeHTML(item.titulo || "Alojamiento")}</h3>
+              <div class="muted">${escapeHTML(item.ciudad || "")}${item.provincia ? " - " + escapeHTML(item.provincia) : ""}</div>
+
+              <div class="chips">
+                <span class="chip chip-strong">$${formatARS(item.precio)} / noche</span>
+                <span class="chip">${escapeHTML(item.tipo || "Sin tipo")}</span>
+                <span class="chip">${Number(item.capacidad || item.huespedes || 1)} huésped(es)</span>
+                <span class="chip">Máx. noches: ${Number(item.maxNoches || 30)}</span>
+              </div>
+
+              <div class="actions">
+                <a class="mini-btn primary" href="detalle.html?id=${encodeURIComponent(item._docId)}">Ver</a>
+                <button class="mini-btn" type="button" data-edit="${item._docId}">Editar</button>
+                <button class="mini-btn danger" type="button" data-delete="${item._docId}">Eliminar</button>
+              </div>
+            </div>
+          </article>
         `;
+      }).join("");
 
-        const actions = document.createElement("div");
-        actions.className = "actions";
+      list.querySelectorAll("[data-edit]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const item = listingsCache.find(x => x._docId === btn.getAttribute("data-edit"));
+          if (item) openEditModal(item);
+        });
+      });
 
-        const btnEdit = document.createElement("button");
-        btnEdit.type = "button";
-        btnEdit.className = "mini-btn";
-        btnEdit.textContent = "Editar";
-        btnEdit.onclick = () => abrirEdicion(x);
-
-        const btnDelete = document.createElement("button");
-        btnDelete.type = "button";
-        btnDelete.className = "mini-btn danger";
-        btnDelete.textContent = "Eliminar";
-        btnDelete.onclick = async () => {
-          const ok = confirm("¿Eliminar este alojamiento?");
+      list.querySelectorAll("[data-delete]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-delete");
+          const ok = confirm("¿Querés eliminar esta publicación?");
           if (!ok) return;
-          await deleteDoc(doc(db, "alojamientos", x._docId));
-          await renderListings();
-          await renderBookings();
-          await renderCalendar();
-        };
 
-        actions.appendChild(btnEdit);
-        actions.appendChild(btnDelete);
-
-        meta.appendChild(actions);
-        item.appendChild(imgWrap);
-        item.appendChild(meta);
-        list.appendChild(item);
+          try {
+            await deleteDoc(doc(db, "alojamientos", id));
+            listingsCache = listingsCache.filter(x => x._docId !== id);
+            renderListings();
+            updateStats();
+          } catch (error) {
+            console.error(error);
+            alert("No se pudo eliminar la publicación.");
+          }
+        });
       });
     }
 
-    async function renderBookings() {
-      bookList.innerHTML = "";
-      bookEmpty.style.display = "none";
-
-      await cargarBookingsCache();
-      bookSummary.textContent = `Reservas recibidas: ${bookingsCache.length}`;
+    function renderBookings() {
+      bookSummary.textContent = bookingsCache.length
+        ? `Recibiste ${bookingsCache.length} reserva(s).`
+        : "";
 
       if (!bookingsCache.length) {
+        bookList.innerHTML = "";
         bookEmpty.style.display = "block";
         return;
       }
 
-      bookingsCache.forEach(b => {
-        const noches = calcularNoches(b.checkin, b.checkout);
-        const stateClass =
-          b.status === "aceptada" || b.status === "confirmada" ? "chip-ok" :
-          b.status === "rechazada" ? "chip-bad" : "chip-strong";
+      bookEmpty.style.display = "none";
 
-        const estadoTexto = b.status === "confirmada" ? "confirmada" : (b.status || "pendiente");
+      bookList.innerHTML = bookingsCache.map((r) => {
+        const foto = r.foto || r.alojamientoFoto || "https://via.placeholder.com/400x300?text=Reserva";
+        const noches = calcularNoches(r.checkin, r.checkout);
+        const total = Number(r.total || 0);
+        const estado = String(r.status || "pendiente").toLowerCase();
+        const puedeAceptar = estado === "pendiente";
+        const puedeRechazar = estado === "pendiente";
+        const puedeChat = ["aceptada", "confirmada"].includes(estado);
 
-        const item = document.createElement("div");
-        item.className = "item";
-
-        item.innerHTML = `
-          <div class="thumb">
-            <div style="padding:10px; font-size:12px; color:#333;">
-              <b>${escapeHTML(b.title || b.titulo || "Reserva")}</b><br>
-              Código: ${escapeHTML(b.code || b._docId || "")}
-            </div>
-          </div>
-          <div>
-            <h3>${escapeHTML(b.guestName || b.huespedNombre || "Huésped")}</h3>
-            <p><b>${escapeHTML(b.guestEmail || b.huespedEmail || "-")}</b></p>
-            <div class="chips">
-              <span class="chip ${stateClass}">Estado: ${escapeHTML(estadoTexto)}</span>
-              <span class="chip">Check-in: ${escapeHTML(formatDate(b.checkin))}</span>
-              <span class="chip">Check-out: ${escapeHTML(formatDate(b.checkout))}</span>
-              ${noches ? `<span class="chip">Noches: ${escapeHTML(String(noches))}</span>` : ""}
-              <span class="chip">Huéspedes: ${escapeHTML(String(b.guests ?? "-"))}</span>
-              <span class="chip">Total: ARS $${formatARS(b.total)}</span>
-              ${
-                b.chatIniciado
-                  ? `<span class="chip chip-bad">Chat iniciado: ya no se puede cancelar online</span>`
-                  : ""
-              }
+        return `
+          <article class="item">
+            <div class="thumb">
+              <img src="${escapeHTML(foto)}" alt="${escapeHTML(r.titulo || "Reserva")}">
             </div>
 
-            ${
-              b.noLeidoAnfitrion
-                ? `<div style="color:#d93025; font-weight:700; margin-top:8px;">🔴 Nuevo mensaje</div>`
-                : ""
-            }
+            <div>
+              <h3>${escapeHTML(r.titulo || r.alojamientoTitulo || "Reserva")}</h3>
+              <div class="muted">
+                Huésped: <strong>${escapeHTML(r.huespedNombre || r.guestName || r.huespedEmail || "Sin nombre")}</strong>
+              </div>
 
-            ${
-              b.ultimoMensaje
-                ? `<div style="font-size:13px; color:#555; margin-top:4px;">💬 ${escapeHTML(b.ultimoMensaje)}</div>`
-                : ""
-            }
-          </div>
+              <div class="chips">
+                ${estadoChip(r.status)}
+                <span class="chip">${formatDate(r.checkin)} → ${formatDate(r.checkout)}</span>
+                <span class="chip">${Number(r.guests || 1)} huésped(es)</span>
+                <span class="chip">${noches || "-"} noche(s)</span>
+                <span class="chip chip-strong">Total: $${formatARS(total)}</span>
+                ${r.noLeidoAnfitrion ? `<span class="chip chip-bad">Nuevo mensaje</span>` : ""}
+              </div>
+
+              ${r.mensaje ? `<p style="margin:12px 0 0; color:#4d5678;"><strong>Mensaje:</strong> ${escapeHTML(r.mensaje)}</p>` : ""}
+
+              <div class="actions">
+                ${puedeAceptar ? `<button class="mini-btn success" type="button" data-accept="${r._docId}">Aceptar</button>` : ""}
+                ${puedeRechazar ? `<button class="mini-btn danger" type="button" data-reject="${r._docId}">Rechazar</button>` : ""}
+                <a class="mini-btn primary" href="detalle.html?id=${encodeURIComponent(r.alojamientoId || "")}">Ver alojamiento</a>
+                ${puedeChat ? `<a class="mini-btn" href="chat.html?reserva=${encodeURIComponent(r._docId)}">Abrir chat</a>` : ""}
+              </div>
+            </div>
+          </article>
         `;
+      }).join("");
 
-        const right = item.children[1];
-        const actions = document.createElement("div");
-        actions.className = "actions";
-
-        if (b.status !== "aceptada" && b.status !== "confirmada") {
-          const btnAccept = document.createElement("button");
-          btnAccept.type = "button";
-          btnAccept.className = "mini-btn success";
-          btnAccept.textContent = "Aceptar";
-          btnAccept.onclick = async () => {
-            await updateDoc(doc(db, "reservas", b._docId), {
-              status: "confirmada",
-              chatHabilitado: true,
-              puedeCancelarHuesped: true,
-              puedeCancelarAnfitrion: true
+      bookList.querySelectorAll("[data-accept]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-accept");
+          try {
+            await updateDoc(doc(db, "reservas", id), {
+              status: "aceptada",
+              chatHabilitado: true
             });
-            await renderBookings();
-            await renderCalendar();
-          };
-          actions.appendChild(btnAccept);
-        }
 
-        if (b.status !== "rechazada") {
-          const btnReject = document.createElement("button");
-          btnReject.type = "button";
-          btnReject.className = "mini-btn danger";
-          btnReject.textContent = "Rechazar";
-          btnReject.onclick = async () => {
-            if (!puedeCancelarComoAnfitrion(b)) {
-              alert("Esta reserva ya no se puede cancelar online.");
-              return;
+            const item = bookingsCache.find(x => x._docId === id);
+            if (item) {
+              item.status = "aceptada";
+              item.chatHabilitado = true;
             }
 
-            await updateDoc(doc(db, "reservas", b._docId), { status: "rechazada" });
-            await renderBookings();
-            await renderCalendar();
-          };
-          actions.appendChild(btnReject);
-        }
+            renderBookings();
+            renderCalendar();
+            updateStats();
+          } catch (error) {
+            console.error(error);
+            alert("No se pudo aceptar la reserva.");
+          }
+        });
+      });
 
-        if ((b.status === "aceptada" || b.status === "confirmada") && b.chatHabilitado === true) {
-          const btnChat = document.createElement("a");
-          btnChat.className = "mini-btn";
-          btnChat.href = `chat.html?reserva=${encodeURIComponent(b._docId)}`;
-          btnChat.textContent = "Abrir chat";
-          actions.appendChild(btnChat);
-        }
+      bookList.querySelectorAll("[data-reject]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-reject");
+          try {
+            await updateDoc(doc(db, "reservas", id), {
+              status: "rechazada",
+              chatHabilitado: false
+            });
 
-        right.appendChild(actions);
-        bookList.appendChild(item);
+            const item = bookingsCache.find(x => x._docId === id);
+            if (item) {
+              item.status = "rechazada";
+              item.chatHabilitado = false;
+            }
+
+            renderBookings();
+            renderCalendar();
+            updateStats();
+          } catch (error) {
+            console.error(error);
+            alert("No se pudo rechazar la reserva.");
+          }
+        });
       });
     }
 
-    async function renderCalendar() {
-      calList.innerHTML = "";
-      calEmpty.style.display = "none";
+    function renderCalendar() {
+      const activas = bookingsCache.filter((r) => {
+        const e = String(r.status || "").toLowerCase();
+        return e === "aceptada" || e === "confirmada";
+      });
 
-      await cargarBookingsCache();
-
-      const mine = bookingsCache
-        .filter(x => x.status !== "rechazada")
-        .sort((a, b) => String(a.checkin || "").localeCompare(String(b.checkin || "")));
-
-      if (!mine.length) {
+      if (!activas.length) {
+        calList.innerHTML = "";
         calEmpty.style.display = "block";
         return;
       }
 
-      mine.forEach(b => {
-        const noches = calcularNoches(b.checkin, b.checkout);
-        const estadoTexto = b.status === "confirmada" ? "confirmada" : (b.status || "pendiente");
+      calEmpty.style.display = "none";
 
-        const row = document.createElement("div");
-        row.className = "calendar-row";
-        row.innerHTML = `
+      calList.innerHTML = activas.map((r) => `
+        <article class="calendar-row">
           <div class="calendar-head">
             <div>
-              <div class="calendar-range">
-                ${escapeHTML(formatDate(b.checkin))} → ${escapeHTML(formatDate(b.checkout))}
-              </div>
+              <h3 style="margin:0 0 8px; color:#272d7d;">${escapeHTML(r.titulo || r.alojamientoTitulo || "Reserva")}</h3>
+              <div class="muted">Huésped: ${escapeHTML(r.huespedNombre || r.guestName || r.huespedEmail || "Sin nombre")}</div>
             </div>
-            <div class="chips">
-              <span class="chip chip-strong">${escapeHTML(estadoTexto)}</span>
-              ${noches ? `<span class="chip">${escapeHTML(String(noches))} noches</span>` : ""}
+
+            <div class="calendar-range">
+              ${formatDate(r.checkin)} → ${formatDate(r.checkout)}
             </div>
           </div>
-
-          <h3 style="margin:6px 0 6px;">${escapeHTML(b.title || b.titulo || "Alojamiento")}</h3>
-
-          <div class="chips">
-            <span class="chip">Código: ${escapeHTML(b.code || b._docId || "")}</span>
-            <span class="chip">Huésped: ${escapeHTML(b.guestName || b.huespedNombre || "-")}</span>
-            <span class="chip">Email: ${escapeHTML(b.guestEmail || b.huespedEmail || "-")}</span>
-            <span class="chip">Huéspedes: ${escapeHTML(String(b.guests ?? "-"))}</span>
-            <span class="chip">Total: ARS $${formatARS(b.total)}</span>
-          </div>
-        `;
-
-        calList.appendChild(row);
-      });
+        </article>
+      `).join("");
     }
 
-    tabListings.addEventListener("click", async () => {
-      showTab("listings");
-      await renderListings();
-    });
+    async function loadAll(user) {
+      listingsCache = [];
+      bookingsCache = [];
 
-    tabBookings.addEventListener("click", async () => {
-      showTab("bookings");
-      await renderBookings();
-    });
+      const alojSnap = await getDocs(collection(db, "alojamientos"));
+      alojSnap.forEach((d) => {
+        const data = d.data();
+        if (esMioAlojamiento(data, user)) {
+          listingsCache.push({ ...data, _docId: d.id });
+        }
+      });
 
-    tabCalendar.addEventListener("click", async () => {
-      showTab("calendar");
-      await renderCalendar();
-    });
+      const reservasSnap = await getDocs(collection(db, "reservas"));
+      reservasSnap.forEach((d) => {
+        const data = d.data();
+        if (esMiReserva(data, user)) {
+          bookingsCache.push({ ...data, _docId: d.id });
+        }
+      });
 
-    btnLogoutTop.addEventListener("click", async () => {
-      await signOut(auth);
-      window.location.href = "login.html";
-    });
+      bookingsCache.sort((a, b) => {
+        const sa = a.creadaEn?.seconds || 0;
+        const sb = b.creadaEn?.seconds || 0;
+        return sb - sa;
+      });
+
+      renderListings();
+      renderBookings();
+      renderCalendar();
+      updateStats();
+    }
 
     hamburgerBtn?.addEventListener("click", () => {
       headerActions?.classList.toggle("nav-open");
     });
 
-    closeEditModal.addEventListener("click", cerrarEdicion);
-    cancelEditModal.addEventListener("click", cerrarEdicion);
-    editBackdrop.addEventListener("click", (e) => {
-      if (e.target === editBackdrop) cerrarEdicion();
+    document.addEventListener("click", (e) => {
+      if (!headerActions?.contains(e.target) && !hamburgerBtn?.contains(e.target)) {
+        headerActions?.classList.remove("nav-open");
+      }
     });
 
-    editForm.addEventListener("submit", async (e) => {
+    tabListings.addEventListener("click", () => showTab("listings"));
+    tabBookings.addEventListener("click", () => showTab("bookings"));
+    tabCalendar.addEventListener("click", () => showTab("calendar"));
+
+    btnLogoutTop?.addEventListener("click", async () => {
+      await signOut(auth);
+      localStorage.removeItem("tualoja_user");
+      localStorage.removeItem("tualoja_logged");
+      location.href = "index.html";
+    });
+
+    closeEditModal?.addEventListener("click", closeModal);
+    cancelEditModal?.addEventListener("click", closeModal);
+
+    editBackdrop?.addEventListener("click", (e) => {
+      if (e.target === editBackdrop) closeModal();
+    });
+
+    editForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!currentEditDocId) return;
 
-      let maxNoches = parseInt(editForm.maxNoches.value || "30", 10);
-      if (Number.isNaN(maxNoches)) maxNoches = 30;
-      if (maxNoches < 1) maxNoches = 1;
-      if (maxNoches > 365) maxNoches = 365;
+      const titulo = document.getElementById("editTitulo").value.trim();
+      const precio = Number(document.getElementById("editPrecio").value || 0);
+      const maxNoches = Number(document.getElementById("editMaxNoches").value || 30);
+      const descripcion = document.getElementById("editDescripcion").value.trim();
 
-      await updateDoc(doc(db, "alojamientos", currentEditDocId), {
-        titulo: editForm.titulo.value.trim(),
-        precio: Number(editForm.precio.value || 0),
-        maxNoches,
-        descripcion: editForm.descripcion.value.trim()
-      });
+      try {
+        await updateDoc(doc(db, "alojamientos", currentEditDocId), {
+          titulo,
+          precio,
+          maxNoches,
+          descripcion
+        });
 
-      cerrarEdicion();
-      await renderListings();
+        const item = listingsCache.find(x => x._docId === currentEditDocId);
+        if (item) {
+          item.titulo = titulo;
+          item.precio = precio;
+          item.maxNoches = maxNoches;
+          item.descripcion = descripcion;
+        }
+
+        renderListings();
+        closeModal();
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo guardar la edición.");
+      }
     });
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        window.location.href = "login.html";
+        alert("Iniciá sesión para entrar al panel anfitrión.");
+        location.href = "login.html";
         return;
       }
 
       currentUser = user;
-      await cargarListingsCache();
-      await cargarBookingsCache();
-      showTab("listings");
-      await renderListings();
+
+      try {
+        await loadAll(user);
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo cargar el panel anfitrión.");
+      }
     });
   </script>
 </body>
