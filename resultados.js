@@ -299,7 +299,7 @@ async function cargarResultados() {
     if (emptyResultados) {
       if (encontrados === 0) {
         emptyResultados.style.display = "block";
-        emptyResultados.textContent = "No se encontraron alojamientos con esos filtros.";
+        emptyResultados.textContent = "Todavía no hay alojamientos disponibles para ese destino. Probá con otra ciudad o cambiá los filtros.";
       } else {
         emptyResultados.style.display = "none";
         emptyResultados.textContent = "";
