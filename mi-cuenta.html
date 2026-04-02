@@ -898,8 +898,8 @@
         });
 
         list.sort((a, b) => {
-          const ta = a.fecha?.seconds || 0;
-          const tb = b.fecha?.seconds || 0;
+          const ta = a.createdAt?.seconds || 0;
+          const tb = b.createdAt?.seconds || 0;
           return tb - ta;
         });
 
