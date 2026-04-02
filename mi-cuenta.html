@@ -7,21 +7,90 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    .page-wrap{ max-width: 980px; margin: 24px auto 40px; padding: 0 16px; }
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:#f5f6fb;
+      color:#1f2450;
+    }
+
+    .header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:#fff;
+      border-bottom:1px solid #e6e8f2;
+      padding:16px 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .logo{
+      text-decoration:none;
+      font-size:28px;
+      font-weight:800;
+      color:#272d7d;
+      font-family:Georgia, "Times New Roman", serif;
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-left:auto;
+      position:relative;
+    }
+
+    .nav a{
+      text-decoration:none;
+      border:1px solid #d8dcef;
+      background:#fff;
+      color:#272d7d;
+      padding:10px 16px;
+      border-radius:14px;
+      font-weight:700;
+      font-size:14px;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+
+    .nav a:hover{
+      background:#f7f8ff;
+    }
+
+    .hamburger{
+      display:none;
+      font-size:20px;
+      background:none;
+      border:none;
+      cursor:pointer;
+    }
+
+    .page-wrap{
+      max-width:980px;
+      margin:24px auto 40px;
+      padding:0 16px;
+    }
 
     .card{
-      background: rgba(255,255,255,.92);
-      border: 1px solid rgba(0,0,0,.08);
-      border-radius: 24px;
-      box-shadow: 0 18px 40px rgba(0,0,0,.12);
-      padding: 18px;
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:24px;
+      box-shadow:0 18px 40px rgba(0,0,0,.12);
+      padding:18px;
     }
 
     .hero{
       display:flex;
       align-items:center;
       gap:18px;
-      margin-bottom: 14px;
+      margin-bottom:14px;
       flex-wrap:wrap;
     }
 
@@ -36,14 +105,14 @@
       width:84px;
       height:84px;
       border-radius:50%;
-      background: linear-gradient(180deg, #d9e5ff, #b8cbf3);
+      background:linear-gradient(180deg, #d9e5ff, #b8cbf3);
       display:flex;
       align-items:center;
       justify-content:center;
       font-size:34px;
       color:#1b167f;
       font-weight:800;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
       overflow:hidden;
       flex-shrink:0;
     }
@@ -72,7 +141,7 @@
 
     .hero-text h1{
       margin:0;
-      font-size: 28px;
+      font-size:28px;
       color:#15123d;
     }
 
@@ -81,40 +150,56 @@
     }
 
     .top{
-      display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
-      margin-bottom: 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
     }
 
-    .muted{ opacity:.85; color:#444; }
+    .muted{
+      opacity:.85;
+      color:#444;
+    }
 
-    .grid-2{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-    @media (max-width: 720px){ .grid-2{ grid-template-columns: 1fr; } }
+    .grid-2{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+
+    @media (max-width:720px){
+      .grid-2{ grid-template-columns:1fr; }
+    }
 
     .box{
-      background: rgba(255,255,255,.74);
-      border: 1px solid rgba(0,0,0,.06);
-      border-radius: 20px;
-      padding: 14px;
-      margin-top: 12px;
+      background:rgba(255,255,255,.74);
+      border:1px solid rgba(0,0,0,.06);
+      border-radius:20px;
+      padding:14px;
+      margin-top:12px;
     }
 
     .box h3{
       margin:0 0 10px;
       color:#15123d;
-      font-size: 17px;
+      font-size:17px;
     }
 
     .row{
-      display:flex; gap:10px; flex-wrap:wrap;
-      margin-top: 10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
     }
 
     .mini-btn{
       border:0;
       cursor:pointer;
-      padding: 11px 14px;
-      border-radius: 14px;
-      background: rgba(0,0,0,.08);
+      padding:11px 14px;
+      border-radius:14px;
+      background:rgba(0,0,0,.08);
       text-decoration:none;
       color:inherit;
       display:inline-flex;
@@ -125,14 +210,14 @@
     }
 
     .mini-btn:hover{
-      background: rgba(0,0,0,.12);
+      background:rgba(0,0,0,.12);
     }
 
     .mini-btn.primary{
       background:#1b167f;
       color:#fff;
-      font-weight: 800;
-      box-shadow: 0 8px 18px rgba(27,22,127,.18);
+      font-weight:800;
+      box-shadow:0 8px 18px rgba(27,22,127,.18);
     }
 
     .mini-btn.primary:hover{
@@ -146,33 +231,33 @@
     }
 
     .mini-btn.danger{
-      background: rgba(176,0,32,.10);
+      background:rgba(176,0,32,.10);
       color:#b00020;
-      font-weight: 800;
+      font-weight:800;
     }
 
     label{
       display:block;
-      font-weight: 700;
-      margin-top: 10px;
+      font-weight:700;
+      margin-top:10px;
       color:#222;
     }
 
     input{
       width:100%;
       box-sizing:border-box;
-      margin-top: 6px;
-      padding: 12px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(0,0,0,.12);
-      background: #fff;
-      outline: none;
-      transition: .18s ease;
+      margin-top:6px;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+      outline:none;
+      transition:.18s ease;
     }
 
     input:focus{
       border-color:#4a49b7;
-      box-shadow: 0 0 0 3px rgba(74,73,183,.10);
+      box-shadow:0 0 0 3px rgba(74,73,183,.10);
     }
 
     input[disabled]{
@@ -182,32 +267,30 @@
     }
 
     .msg{
-      margin-top: 10px;
-      font-size: 13px;
-      font-weight: 700;
+      margin-top:10px;
+      font-size:13px;
+      font-weight:700;
       color:#1b167f;
       display:none;
     }
 
     .err{
-      margin-top: 10px;
-      font-size: 13px;
-      font-weight: 700;
+      margin-top:10px;
+      font-size:13px;
+      font-weight:700;
       color:#b00020;
       display:none;
     }
 
     .quick-links{
       display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
+      grid-template-columns:repeat(3, minmax(0,1fr));
       gap:12px;
-      margin-top: 8px;
+      margin-top:8px;
     }
 
-    @media (max-width: 820px){
-      .quick-links{
-        grid-template-columns: 1fr;
-      }
+    @media (max-width:820px){
+      .quick-links{ grid-template-columns:1fr; }
     }
 
     .quick-card{
@@ -225,15 +308,15 @@
     }
 
     .quick-card:hover{
-      transform: translateY(-1px);
+      transform:translateY(-1px);
       background:#eef1ff;
     }
 
     .quick-card.primary{
-      background: linear-gradient(135deg, #261f9e, #6c4fd8);
+      background:linear-gradient(135deg, #261f9e, #6c4fd8);
       color:#fff;
       border:none;
-      box-shadow: 0 10px 22px rgba(40,33,145,.20);
+      box-shadow:0 10px 22px rgba(40,33,145,.20);
     }
 
     .quick-icon{
@@ -243,19 +326,19 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      background: rgba(255,255,255,.65);
+      background:rgba(255,255,255,.65);
       font-size:18px;
-      flex: 0 0 38px;
+      flex:0 0 38px;
     }
 
     .quick-card.primary .quick-icon{
-      background: rgba(255,255,255,.16);
+      background:rgba(255,255,255,.16);
       color:#fff;
     }
 
     .tip{
-      margin: 12px 0 0;
-      font-size: 13px;
+      margin:12px 0 0;
+      font-size:13px;
       color:#555;
     }
 
@@ -309,6 +392,7 @@
       transition:.18s ease;
       margin:0 4px;
       border:1px solid rgba(27,22,127,.08);
+      flex:0 0 42px;
     }
 
     .notif-wrap:hover{
@@ -338,7 +422,7 @@
       position:absolute;
       right:0;
       top:52px;
-      width:300px;
+      width:320px;
       max-width:calc(100vw - 32px);
       background:#fff;
       border:1px solid rgba(0,0,0,.08);
@@ -381,6 +465,8 @@
       display:flex;
       flex-direction:column;
       gap:6px;
+      max-height:340px;
+      overflow:auto;
     }
 
     .notif-item{
@@ -426,7 +512,7 @@
       color:#666;
     }
 
-    @media (max-width: 780px){
+    @media (max-width:780px){
       .notif-wrap{
         width:40px;
         height:40px;
@@ -434,6 +520,36 @@
 
       .notif-dropdown{
         right:-20px;
+      }
+    }
+
+    @media (max-width:900px){
+      .hamburger{ display:block; }
+
+      .nav{
+        display:none;
+        position:absolute;
+        right:16px;
+        top:72px;
+        background:white;
+        padding:14px;
+        border-radius:14px;
+        box-shadow:0 10px 30px rgba(0,0,0,.15);
+        flex-direction:column;
+        align-items:stretch;
+        min-width:240px;
+      }
+
+      .nav.nav-open{
+        display:flex;
+      }
+
+      .nav a{
+        text-align:center;
+      }
+
+      .notif-wrap{
+        align-self:center;
       }
     }
   </style>
@@ -538,7 +654,7 @@
         </div>
 
         <p class="tip">
-          Tip: si publicás desde otro celular o navegador, en MVP no se ve porque se guarda localmente.
+          Tip: tu campanita ahora muestra reservas nuevas y mensajes nuevos.
         </p>
       </section>
 
@@ -615,6 +731,8 @@
     const btnTogglePass = document.getElementById("btnTogglePass");
     const passwordFields = document.getElementById("passwordFields");
     const profilePhotoInput = document.getElementById("profilePhoto");
+    const btnSave = document.getElementById("btnSave");
+    const btnPass = document.getElementById("btnPass");
 
     const notifBtn = document.getElementById("notifBtn");
     const notifDropdown = document.getElementById("notifDropdown");
@@ -622,6 +740,9 @@
     const notifList = document.getElementById("notifList");
     const markReadBtn = document.getElementById("markReadBtn");
     const logoutLink = document.getElementById("logoutLink");
+
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const mainNav = document.getElementById("mainNav");
 
     let editMode = false;
     let passOpen = false;
@@ -696,6 +817,27 @@
       });
     }
 
+    function escapeHtml(texto = "") {
+      return String(texto)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function notifUrl(n) {
+      if (n.tipo === "reserva") return "panel-anfitrion.html";
+      if (n.tipo === "mensaje" && n.reservaId) return "chat.html?reserva=" + encodeURIComponent(n.reservaId);
+      return "mi-cuenta.html";
+    }
+
+    function notifTitulo(n) {
+      if (n.tipo === "reserva") return "Nueva reserva";
+      if (n.tipo === "mensaje") return "Nuevo mensaje";
+      return "Notificación";
+    }
+
     function renderNotifications(list) {
       notificacionesActuales = [...list];
 
@@ -708,19 +850,13 @@
         return;
       }
 
-      notifList.innerHTML = list.map((n) => {
-        const url = n.tipo === "reserva"
-          ? "mis-reservas.html"
-          : "chat.html?reserva=" + (n.reservaId || "");
-
-        return `
-          <a href="${url}" class="notif-item" data-id="${n.id}">
-            <strong>${n.tipo === "reserva" ? "Nueva reserva" : "Nuevo mensaje"}</strong>
-            <p>${n.mensaje || ""}</p>
-            <small>${n.leida ? "Leída" : "Nueva"}</small>
-          </a>
-        `;
-      }).join("");
+      notifList.innerHTML = list.map((n) => `
+        <a href="${notifUrl(n)}" class="notif-item" data-id="${n.id}">
+          <strong>${notifTitulo(n)}</strong>
+          <p>${escapeHtml(n.mensaje || "")}</p>
+          <small>${n.leida ? "Leída" : "Nueva"}</small>
+        </a>
+      `).join("");
 
       notifList.querySelectorAll(".notif-item").forEach((item) => {
         item.addEventListener("click", async () => {
@@ -773,6 +909,14 @@
       });
     }
 
+    function closeNotifDropdown() {
+      notifDropdown.classList.remove("open");
+    }
+
+    function toggleMobileNav() {
+      mainNav.classList.toggle("nav-open");
+    }
+
     (function init(){
       emailEl.value = myEmail || "";
 
@@ -815,7 +959,7 @@
       setPassMode(!passOpen);
     });
 
-    document.getElementById("btnSave").addEventListener("click", () => {
+    btnSave.addEventListener("click", () => {
       msg.style.display = "none";
       const name = nameEl.value.trim();
 
@@ -849,7 +993,7 @@
       msg.style.display = "block";
     });
 
-    document.getElementById("btnPass").addEventListener("click", () => {
+    btnPass.addEventListener("click", () => {
       err.style.display = "none";
       ok.style.display = "none";
 
@@ -904,12 +1048,6 @@
       notifDropdown.classList.toggle("open");
     });
 
-    document.addEventListener("click", (e) => {
-      if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
-        notifDropdown.classList.remove("open");
-      }
-    });
-
     markReadBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
 
@@ -933,9 +1071,30 @@
       }
     });
 
-    logoutLink.addEventListener("click", (e) => {
+    document.addEventListener("click", (e) => {
+      const clickedNotif = notifBtn.contains(e.target) || notifDropdown.contains(e.target);
+      if (!clickedNotif) {
+        closeNotifDropdown();
+      }
+
+      const clickedMenu = mainNav.contains(e.target) || hamburgerBtn.contains(e.target);
+      if (!clickedMenu && window.innerWidth <= 900) {
+        mainNav.classList.remove("nav-open");
+      }
+    });
+
+    hamburgerBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleMobileNav();
+    });
+
+    logoutLink.addEventListener("click", async (e) => {
       e.preventDefault();
-      logout();
+      try {
+        await logout();
+      } catch (error) {
+        console.error("Error al cerrar sesión:", error);
+      }
     });
   </script>
 
