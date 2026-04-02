@@ -7,12 +7,14 @@
 
   <style>
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
       background:#f5f6fb;
       color:#1f2450;
     }
+
     .header{
       position:sticky;
       top:0;
@@ -26,6 +28,7 @@
       gap:16px;
       flex-wrap:wrap;
     }
+
     .logo{
       text-decoration:none;
       font-size:28px;
@@ -33,6 +36,15 @@
       color:#272d7d;
       font-family:Georgia, "Times New Roman", serif;
     }
+
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-left:auto;
+    }
+
     .top-btn{
       text-decoration:none;
       border:1px solid #d8dcef;
@@ -43,391 +55,566 @@
       font-weight:700;
       font-size:14px;
       cursor:pointer;
+      transition:.2s ease;
     }
+
+    .top-btn:hover{
+      background:#f7f8ff;
+    }
+
+    .hamburger{
+      display:none;
+      font-size:20px;
+      background:none;
+      border:none;
+      cursor:pointer;
+    }
+
     .page{
       max-width:1100px;
       margin:0 auto;
-      padding:24px 16px 40px;
+      padding:24px 16px 50px;
     }
-    .chat-card{
+
+    .chat-wrap{
       background:#fff;
       border:1px solid #dde3f2;
       border-radius:24px;
+      box-shadow:0 10px 26px rgba(0,0,0,.05);
       overflow:hidden;
-      box-shadow:0 8px 24px rgba(0,0,0,.04);
     }
+
     .chat-top{
-      padding:20px;
-      border-bottom:1px solid #edf0f8;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:18px;
+      border-bottom:1px solid #eceff6;
       background:#fcfcff;
+      flex-wrap:wrap;
     }
-    .chat-top h1{
-      margin:0 0 8px;
-      font-size:30px;
+
+    .chat-title h1{
+      margin:0 0 6px;
+      font-size:28px;
       color:#272d7d;
       font-family:Georgia, "Times New Roman", serif;
     }
-    .chat-top p{
+
+    .chat-title p{
       margin:0;
-      color:#5f678d;
-    }
-    .bloqueo{
-      margin-top:12px;
-      background:#fff2e8;
-      border:1px solid #ffd7bc;
-      color:#8a4d12;
-      padding:12px 14px;
-      border-radius:16px;
+      color:#687193;
       font-size:14px;
-      font-weight:700;
     }
-    .mensajes{
-      height:55vh;
-      min-height:350px;
+
+    .chat-status{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:#eef3ff;
+      color:#2f4f9f;
+      font-weight:700;
+      font-size:14px;
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background:#31a24c;
+      display:inline-block;
+    }
+
+    .chat-body{
+      height:460px;
       overflow:auto;
       padding:18px;
-      background:#f7f8fc;
+      background:linear-gradient(180deg,#f9fbff 0%, #f3f6ff 100%);
       display:flex;
       flex-direction:column;
       gap:12px;
     }
-    .msg{
-      max-width:75%;
-      padding:12px 14px;
+
+    .empty-chat{
+      margin:auto;
+      text-align:center;
+      color:#6b7394;
+      background:#fff;
+      border:1px dashed #d6dced;
       border-radius:18px;
+      padding:30px 20px;
+      max-width:420px;
+      width:100%;
+    }
+
+    .msg-row{
+      display:flex;
+    }
+
+    .msg-row.me{
+      justify-content:flex-end;
+    }
+
+    .msg-row.other{
+      justify-content:flex-start;
+    }
+
+    .msg-bubble{
+      max-width:min(78%, 620px);
+      border-radius:18px;
+      padding:12px 14px;
+      box-shadow:0 6px 18px rgba(0,0,0,.05);
       line-height:1.45;
-      font-size:15px;
-      box-shadow:0 4px 12px rgba(0,0,0,.04);
-      white-space:pre-wrap;
       word-break:break-word;
     }
-    .msg.mine{
-      align-self:flex-end;
-      background:#4f3dbb;
+
+    .msg-row.me .msg-bubble{
+      background:#31368d;
       color:#fff;
-      border-bottom-right-radius:6px;
+      border-bottom-right-radius:8px;
     }
-    .msg.other{
-      align-self:flex-start;
+
+    .msg-row.other .msg-bubble{
       background:#fff;
-      color:#253056;
+      color:#26304d;
       border:1px solid #e1e6f3;
-      border-bottom-left-radius:6px;
+      border-bottom-left-radius:8px;
     }
+
     .msg-meta{
-      margin-top:6px;
+      margin-top:8px;
       font-size:12px;
       opacity:.8;
     }
-    .chat-form{
-      border-top:1px solid #edf0f8;
+
+    .chat-compose{
+      border-top:1px solid #eceff6;
       padding:16px;
       background:#fff;
+    }
+
+    .compose-box{
       display:grid;
       grid-template-columns:1fr auto;
       gap:12px;
       align-items:end;
     }
-    .chat-form textarea{
-      min-height:60px;
-      max-height:150px;
+
+    .compose-box textarea{
+      width:100%;
+      min-height:58px;
+      max-height:160px;
       resize:vertical;
-      border:1px solid #d8deef;
-      border-radius:16px;
       padding:14px;
+      border-radius:16px;
+      border:1px solid #d7deef;
       font-family:inherit;
       font-size:15px;
       outline:none;
     }
-    .chat-form button{
+
+    .compose-box textarea:focus{
+      border-color:#5864d9;
+      box-shadow:0 0 0 4px rgba(88,100,217,.10);
+    }
+
+    .send-btn{
+      height:54px;
+      padding:0 20px;
       border:none;
-      background:#4f3dbb;
-      color:#fff;
       border-radius:16px;
-      padding:14px 18px;
+      background:linear-gradient(180deg,#4b54d4,#31368d);
+      color:#fff;
       font-weight:800;
+      font-size:15px;
       cursor:pointer;
-      min-width:120px;
-      height:52px;
     }
-    .empty{
-      text-align:center;
-      color:#6a7195;
-      padding:40px 20px;
+
+    .send-btn:disabled{
+      opacity:.6;
+      cursor:not-allowed;
     }
-    @media (max-width:700px){
-      .chat-form{ grid-template-columns:1fr; }
-      .msg{ max-width:88%; }
-      .header{ padding:14px 12px; }
-      .logo{ font-size:22px; }
+
+    .chat-note{
+      margin-top:10px;
+      color:#6b7394;
+      font-size:13px;
+    }
+
+    .error-box{
+      margin-top:14px;
+      padding:14px;
+      border-radius:16px;
+      background:#fff3f3;
+      color:#8c2e2e;
+      border:1px solid #f0d0d0;
+      font-weight:700;
+    }
+
+    @media (max-width: 800px){
+      .hamburger{ display:block; }
+
+      .header-actions{
+        display:none;
+        position:absolute;
+        right:16px;
+        top:72px;
+        background:white;
+        padding:14px;
+        border-radius:14px;
+        box-shadow:0 10px 30px rgba(0,0,0,.15);
+        flex-direction:column;
+        align-items:stretch;
+        min-width:220px;
+      }
+
+      .header-actions.nav-open{ display:flex; }
+
+      .top-btn{ text-align:center; }
+
+      .compose-box{
+        grid-template-columns:1fr;
+      }
+
+      .send-btn{
+        width:100%;
+      }
+
+      .chat-body{
+        height:420px;
+      }
     }
   </style>
 </head>
 <body>
   <header class="header">
     <a class="logo" href="index.html">TuAloja.com</a>
-    <a class="top-btn" href="mis-reservas.html">Volver</a>
+
+    <div id="headerActions" class="header-actions">
+      <a class="top-btn" href="mis-reservas.html">Mis reservas</a>
+      <a class="top-btn" href="panel-anfitrion.html">Panel anfitrión</a>
+      <a class="top-btn" href="mi-cuenta.html">Mi cuenta</a>
+      <button class="top-btn" id="logoutBtn" type="button">Cerrar sesión</button>
+    </div>
+
+    <button id="hamburgerBtn" class="hamburger" type="button">☰</button>
   </header>
 
   <main class="page">
-    <div class="chat-card">
+    <div class="chat-wrap">
       <div class="chat-top">
-        <h1>Chat interno</h1>
-        <p id="chatInfo">Cargando conversación...</p>
-        <div id="bloqueoInfo" class="bloqueo" style="display:none;"></div>
+        <div class="chat-title">
+          <h1 id="chatTitle">Chat de reserva</h1>
+          <p id="chatSubtitle">Cargando conversación…</p>
+        </div>
+
+        <div class="chat-status">
+          <span class="dot"></span>
+          <span id="chatStatusText">Reserva aceptada</span>
+        </div>
       </div>
 
-      <div id="mensajes" class="mensajes">
-        <div class="empty">Cargando mensajes...</div>
+      <div id="chatBody" class="chat-body">
+        <div class="empty-chat">Cargando mensajes…</div>
       </div>
 
-      <form id="chatForm" class="chat-form">
-        <textarea id="texto" placeholder="Escribí tu mensaje..." required></textarea>
-        <button type="submit">Enviar</button>
-      </form>
+      <div class="chat-compose">
+        <form id="chatForm">
+          <div class="compose-box">
+            <textarea id="chatInput" placeholder="Escribí un mensaje…" required></textarea>
+            <button id="sendBtn" class="send-btn" type="submit">Enviar</button>
+          </div>
+        </form>
+        <div class="chat-note">
+          El chat queda habilitado cuando la reserva está aceptada. Una vez iniciado, ya no se puede cancelar online.
+        </div>
+        <div id="chatError" class="error-box" style="display:none;"></div>
+      </div>
     </div>
   </main>
 
   <script type="module">
     import { db, auth } from "./firebase-config.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
     import {
-      doc,
-      getDoc,
-      updateDoc,
       collection,
       addDoc,
-      serverTimestamp,
-      query,
+      doc,
+      getDoc,
+      onSnapshot,
       orderBy,
-      onSnapshot
+      query,
+      serverTimestamp,
+      updateDoc
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-    const params = new URLSearchParams(window.location.search);
+    import {
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-    const reservaId =
-      params.get("reserva") ||
-      params.get("reservaId") ||
-      params.get("id");
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const headerActions = document.getElementById("headerActions");
+    const logoutBtn = document.getElementById("logoutBtn");
 
-    const chatInfo = document.getElementById("chatInfo");
-    const bloqueoInfo = document.getElementById("bloqueoInfo");
-    const mensajesEl = document.getElementById("mensajes");
+    const chatTitle = document.getElementById("chatTitle");
+    const chatSubtitle = document.getElementById("chatSubtitle");
+    const chatStatusText = document.getElementById("chatStatusText");
+    const chatBody = document.getElementById("chatBody");
     const chatForm = document.getElementById("chatForm");
-    const texto = document.getElementById("texto");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const chatError = document.getElementById("chatError");
 
-    let usuarioActual = null;
-    let reservaActual = null;
+    const params = new URLSearchParams(window.location.search);
+    const reservaId = params.get("reserva") || "";
 
-    function escapeHTML(str) {
-      return String(str || "")
+    let currentUser = null;
+    let currentReserva = null;
+    let unsubscribeMsgs = null;
+
+    hamburgerBtn?.addEventListener("click", () => {
+      headerActions?.classList.toggle("nav-open");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!headerActions?.contains(e.target) && !hamburgerBtn?.contains(e.target)) {
+        headerActions?.classList.remove("nav-open");
+      }
+    });
+
+    logoutBtn?.addEventListener("click", async () => {
+      await signOut(auth);
+      localStorage.removeItem("tualoja_user");
+      localStorage.removeItem("tualoja_logged");
+      location.href = "index.html";
+    });
+
+    function escapeHtml(texto = "") {
+      return String(texto)
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replaceAll("'", "&#39;");
     }
 
-    function esParticipante(reserva, user) {
-      const uid = String(user?.uid || "");
-      const email = String(user?.email || "").toLowerCase();
+    function formatDateTime(value) {
+      if (!value) return "";
+      try {
+        const date = value?.toDate ? value.toDate() : new Date(value);
+        return date.toLocaleString("es-AR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      } catch {
+        return "";
+      }
+    }
 
-      const posiblesUids = [
-        reserva?.huespedId,
+    function userIsHost(reserva, user) {
+      const hostIds = [
         reserva?.anfitrionId,
         reserva?.hostId,
         reserva?.ownerId
-      ].map(x => String(x || "")).filter(Boolean);
+      ].map(x => String(x || "").trim()).filter(Boolean);
 
-      const posiblesEmails = [
-        reserva?.huespedEmail,
-        reserva?.guestEmail,
+      const hostEmails = [
         reserva?.anfitrionEmail,
         reserva?.hostEmail,
         reserva?.ownerEmail
-      ].map(x => String(x || "").toLowerCase()).filter(Boolean);
+      ].map(x => String(x || "").toLowerCase().trim()).filter(Boolean);
 
-      return posiblesUids.includes(uid) || posiblesEmails.includes(email);
+      const uid = String(user?.uid || "").trim();
+      const email = String(user?.email || "").toLowerCase().trim();
+
+      return hostIds.includes(uid) || hostEmails.includes(email);
     }
 
-    async function cargarReserva() {
+    function canUseChat(reserva) {
+      const estado = String(reserva?.status || "").toLowerCase();
+      return estado === "aceptada" || estado === "confirmada" || reserva?.chatHabilitado === true;
+    }
+
+    function renderMessages(messages = []) {
+      if (!messages.length) {
+        chatBody.innerHTML = `
+          <div class="empty-chat">
+            Todavía no hay mensajes.<br>
+            Podés iniciar la conversación desde acá.
+          </div>
+        `;
+        return;
+      }
+
+      chatBody.innerHTML = messages.map((m) => {
+        const mine = String(m.senderId || "") === String(currentUser?.uid || "");
+        const rol = mine ? "me" : "other";
+        return `
+          <div class="msg-row ${rol}">
+            <div class="msg-bubble">
+              <div>${escapeHtml(m.texto || "")}</div>
+              <div class="msg-meta">${escapeHtml(m.senderName || "Usuario")} · ${formatDateTime(m.creadoEn)}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function setError(msg = "") {
+      if (!msg) {
+        chatError.style.display = "none";
+        chatError.textContent = "";
+        return;
+      }
+      chatError.style.display = "block";
+      chatError.textContent = msg;
+    }
+
+    async function marcarLeidoSegunRol(reserva, isHost) {
+      const updates = isHost
+        ? { noLeidoAnfitrion: false }
+        : { noLeidoHuesped: false };
+
+      try {
+        await updateDoc(doc(db, "reservas", reservaId), updates);
+      } catch (e) {
+        console.warn("No se pudo marcar leído:", e);
+      }
+    }
+
+    async function cargarReservaYMensajes(user) {
       if (!reservaId) {
-        alert("Falta el id de la reserva.");
-        location.href = "mis-reservas.html";
-        return false;
+        setError("Falta el id de la reserva.");
+        chatBody.innerHTML = `<div class="empty-chat">No se encontró la reserva.</div>`;
+        sendBtn.disabled = true;
+        chatInput.disabled = true;
+        return;
       }
 
       const snap = await getDoc(doc(db, "reservas", reservaId));
 
       if (!snap.exists()) {
-        alert("La reserva no existe.");
-        location.href = "mis-reservas.html";
-        return false;
+        setError("La reserva no existe.");
+        chatBody.innerHTML = `<div class="empty-chat">La reserva no existe.</div>`;
+        sendBtn.disabled = true;
+        chatInput.disabled = true;
+        return;
       }
 
-      reservaActual = { ...snap.data(), _docId: snap.id };
+      currentReserva = { id: snap.id, ...snap.data() };
 
-      if (!esParticipante(reservaActual, usuarioActual)) {
-        alert("No tenés permiso para entrar a este chat.");
-        location.href = "mis-reservas.html";
-        return false;
+      const isHost = userIsHost(currentReserva, user);
+      const userUid = String(user?.uid || "").trim();
+      const userEmail = String(user?.email || "").toLowerCase().trim();
+      const guestUid = String(currentReserva?.huespedId || "").trim();
+      const guestEmail = String(currentReserva?.huespedEmail || currentReserva?.guestEmail || "").toLowerCase().trim();
+
+      const permitido = isHost || userUid === guestUid || userEmail === guestEmail;
+
+      if (!permitido) {
+        setError("No tenés permiso para ver este chat.");
+        chatBody.innerHTML = `<div class="empty-chat">No tenés permiso para ver esta conversación.</div>`;
+        sendBtn.disabled = true;
+        chatInput.disabled = true;
+        return;
       }
 
-      const estado = String(reservaActual.status || "").toLowerCase();
+      chatTitle.textContent = currentReserva?.titulo || currentReserva?.alojamientoTitulo || "Chat de reserva";
+      chatSubtitle.textContent = `${currentReserva?.checkin || "-"} → ${currentReserva?.checkout || "-"} · ${currentReserva?.guests || 1} huésped(es)`;
 
-      if (!["aceptada", "confirmada"].includes(estado) || reservaActual.chatHabilitado !== true) {
-        alert("El chat todavía no está habilitado para esta reserva.");
-        location.href = "mis-reservas.html";
-        return false;
-      }
-
-      const titulo = reservaActual.alojamientoTitulo || reservaActual.title || reservaActual.titulo || "Reserva";
-      chatInfo.textContent = `${titulo} · ${reservaActual.checkin || "-"} → ${reservaActual.checkout || "-"}`;
-
-      bloqueoInfo.style.display = "block";
-      bloqueoInfo.textContent = reservaActual.chatIniciado
-        ? "El chat ya fue iniciado. La reserva ya no puede cancelarse online salvo fuerza mayor o gestión por ayuda."
-        : "Cuando se envía el primer mensaje, la cancelación online queda bloqueada para ambas partes.";
-
-      if (usuarioActual.uid === reservaActual.huespedId) {
-        await updateDoc(doc(db, "reservas", reservaId), {
-          noLeidoHuesped: false
-        });
-        reservaActual.noLeidoHuesped = false;
+      if (!canUseChat(currentReserva)) {
+        chatStatusText.textContent = "Chat no habilitado";
+        setError("El chat se habilita cuando la reserva está aceptada.");
+        sendBtn.disabled = true;
+        chatInput.disabled = true;
       } else {
-        await updateDoc(doc(db, "reservas", reservaId), {
-          noLeidoAnfitrion: false
-        });
-        reservaActual.noLeidoAnfitrion = false;
+        chatStatusText.textContent = "Reserva aceptada";
+        setError("");
       }
 
-      return true;
+      await marcarLeidoSegunRol(currentReserva, isHost);
+
+      const msgsRef = collection(db, "reservas", reservaId, "mensajes");
+      const q = query(msgsRef, orderBy("creadoEn", "asc"));
+
+      if (unsubscribeMsgs) unsubscribeMsgs();
+
+      unsubscribeMsgs = onSnapshot(q, async (snapMsgs) => {
+        const data = snapMsgs.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderMessages(data);
+
+        try {
+          await marcarLeidoSegunRol(currentReserva, isHost);
+        } catch {}
+      });
     }
 
-    function escucharMensajes() {
-      const q = query(
-        collection(db, "reservas", reservaId, "mensajes"),
-        orderBy("creadoEn", "asc")
-      );
-
-      onSnapshot(
-        q,
-        (snap) => {
-          if (snap.empty) {
-            mensajesEl.innerHTML = `<div class="empty">Todavía no hay mensajes.</div>`;
-            return;
-          }
-
-          let html = "";
-
-          snap.forEach((d) => {
-            const m = d.data();
-            const mine = String(m.remitenteId || "") === String(usuarioActual.uid || "");
-            const fecha = m.creadoEn?.toDate ? m.creadoEn.toDate() : null;
-
-            html += `
-              <div class="msg ${mine ? "mine" : "other"}">
-                <div>${escapeHTML(m.texto || "")}</div>
-                <div class="msg-meta">
-                  ${escapeHTML(m.remitenteNombre || "Usuario")}
-                  ${fecha ? " · " + fecha.toLocaleString("es-AR") : ""}
-                </div>
-              </div>
-            `;
-          });
-
-          mensajesEl.innerHTML = html;
-          mensajesEl.scrollTop = mensajesEl.scrollHeight;
-        },
-        (error) => {
-          console.error("Error al cargar mensajes:", error);
-          mensajesEl.innerHTML = `
-            <div class="empty">
-              No se pudieron cargar los mensajes.<br><br>
-              Revisá las reglas de Firestore o los permisos del chat.
-            </div>
-          `;
-        }
-      );
-    }
-
-    async function enviarMensaje(e) {
+    chatForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const contenido = texto.value.trim();
-      if (!contenido) return;
-      if (!reservaActual) return;
+      if (!currentUser || !currentReserva) return;
+      if (!canUseChat(currentReserva)) {
+        setError("El chat no está habilitado para esta reserva.");
+        return;
+      }
 
-      const esHuesped = String(usuarioActual.uid || "") === String(reservaActual.huespedId || "");
+      const texto = chatInput.value.trim();
+      if (!texto) return;
+
+      sendBtn.disabled = true;
+      setError("");
 
       try {
+        const isHost = userIsHost(currentReserva, currentUser);
+        const nombre =
+          currentUser.displayName ||
+          (isHost ? "Anfitrión" : currentReserva?.huespedNombre || "Huésped");
+
         await addDoc(collection(db, "reservas", reservaId, "mensajes"), {
-          texto: contenido,
-          remitenteId: usuarioActual.uid,
-          remitenteEmail: usuarioActual.email || "",
-          remitenteNombre: usuarioActual.displayName || usuarioActual.email || "Usuario",
+          texto,
+          senderId: currentUser.uid,
+          senderEmail: currentUser.email || "",
+          senderName: nombre,
+          senderRole: isHost ? "host" : "guest",
           creadoEn: serverTimestamp()
         });
 
         await updateDoc(doc(db, "reservas", reservaId), {
-          ultimoMensaje: contenido,
-          ultimoMensajeDe: usuarioActual.uid,
-          ultimoMensajeAt: serverTimestamp(),
-          noLeidoHuesped: esHuesped ? false : true,
-          noLeidoAnfitrion: esHuesped ? true : false,
           chatIniciado: true,
-          puedeCancelarHuesped: false,
-          puedeCancelarAnfitrion: false
+          chatHabilitado: true,
+          ultimoMensaje: texto,
+          ultimoMensajeEn: serverTimestamp(),
+          noLeidoAnfitrion: !isHost,
+          noLeidoHuesped: isHost
         });
 
-        const receptorId = esHuesped
-          ? (reservaActual.anfitrionId || reservaActual.hostId || reservaActual.ownerId || "")
-          : (reservaActual.huespedId || "");
-
-       if (receptorId) {
-  try {
-    await addDoc(collection(db, "notificaciones"), {
-  userId: receptorId,
-  tipo: "mensaje",
-  mensaje: `${usuarioActual.email} te escribió: "${contenido.slice(0, 40)}${contenido.length > 40 ? "..." : ""}"`,
-  leida: false,
-  reservaId: reservaId,
-  fecha: serverTimestamp()
-});
-  } catch (notifError) {
-    console.error("No se pudo guardar la notificación:", notifError);
-  }
-}
-
-        reservaActual.ultimoMensaje = contenido;
-        reservaActual.ultimoMensajeDe = usuarioActual.uid;
-        reservaActual.chatIniciado = true;
-        reservaActual.noLeidoHuesped = esHuesped ? false : true;
-        reservaActual.noLeidoAnfitrion = esHuesped ? true : false;
-
-        bloqueoInfo.textContent = "El chat ya fue iniciado. La reserva ya no puede cancelarse online salvo fuerza mayor o gestión por ayuda.";
-
-        texto.value = "";
-        texto.focus();
+        chatInput.value = "";
       } catch (error) {
-        console.error("Error al enviar mensaje:", error);
-        alert("No se pudo enviar el mensaje.");
+        console.error(error);
+        setError("No se pudo enviar el mensaje.");
+      } finally {
+        sendBtn.disabled = false;
       }
-    }
+    });
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
+        alert("Iniciá sesión para entrar al chat.");
         location.href = "login.html";
         return;
       }
 
-      usuarioActual = user;
-      const ok = await cargarReserva();
-      if (!ok) return;
-      escucharMensajes();
+      currentUser = user;
+      await cargarReservaYMensajes(user);
     });
-
-    chatForm.addEventListener("submit", enviarMensaje);
   </script>
 </body>
 </html>
