@@ -833,10 +833,11 @@
     }
 
     function notifTitulo(n) {
-      if (n.tipo === "reserva") return "Nueva reserva";
-      if (n.tipo === "mensaje") return "Nuevo mensaje";
-      return "Notificación";
-    }
+  if (n.tipo === "reserva") return "Nueva reserva";
+  if (n.tipo === "mensaje") return "Nuevo mensaje";
+  if (n.tipo === "cancelacion") return "Solicitud de cancelación";
+  return "Notificación";
+}
 
     function renderNotifications(list) {
       notificacionesActuales = [...list];
