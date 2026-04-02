@@ -1021,10 +1021,10 @@
     if (destino) params.set("destino", destino);
     if (checkin) params.set("checkin", checkin);
     if (checkout) params.set("checkout", checkout);
-    if (guests) params.set("guests", String(guests));
-    if (adultos) params.set("adultos", String(adultos));
-    if (ninos >= 0) params.set("ninos", String(ninos));
-    if (habitaciones) params.set("habitaciones", String(habitaciones));
+    params.set("guests", String(guests));
+    params.set("adultos", String(adultos));
+    params.set("ninos", String(ninos));
+    params.set("habitaciones", String(habitaciones));
 
     window.location.href = `resultados.html?${params.toString()}`;
   }
@@ -1047,18 +1047,19 @@
       }
     });
 
-    const btn = document.getElementById("guestsBtn");
-    const panel = document.getElementById("guestsPanel");
-    const done = document.getElementById("guestsDone");
-    const summary = document.getElementById("guestsSummary");
-
-    const adultsH = document.getElementById("adultos");
-    const kidsH = document.getElementById("ninos");
-    const roomsH = document.getElementById("habitaciones");
+    const guestsBtn = document.getElementById("guestsBtn");
+    const guestsPanel = document.getElementById("guestsPanel");
+    const guestsDone = document.getElementById("guestsDone");
 
     const adultsCount = document.getElementById("adultsCount");
     const kidsCount = document.getElementById("kidsCount");
     const roomsCount = document.getElementById("roomsCount");
+    const guestsSummary = document.getElementById("guestsSummary");
+    const kidsAges = document.getElementById("kidsAges");
+
+    const adultosInput = document.getElementById("adultos");
+    const ninosInput = document.getElementById("ninos");
+    const habitacionesInput = document.getElementById("habitaciones");
 
     const adultsMinus = document.getElementById("adultsMinus");
     const adultsPlus = document.getElementById("adultsPlus");
@@ -1067,241 +1068,109 @@
     const roomsMinus = document.getElementById("roomsMinus");
     const roomsPlus = document.getElementById("roomsPlus");
 
-    const kidsAges = document.getElementById("kidsAges");
-    
-
-    let adults = 1, kids = 0, rooms = 1;
+    let adults = Number(adultosInput?.value || 1);
+    let kids = Number(ninosInput?.value || 0);
+    let rooms = Number(habitacionesInput?.value || 1);
 
     function updateSummary() {
-      summary.textContent =
-        `${adults} adulto${adults > 1 ? "s" : ""} · ${kids} niño${kids !== 1 ? "s" : ""} · ${rooms} habitación${rooms > 1 ? "es" : ""}`;
+      if (adultsCount) adultsCount.textContent = adults;
+      if (kidsCount) kidsCount.textContent = kids;
+      if (roomsCount) roomsCount.textContent = rooms;
 
-      adultsH.value = String(adults);
-      kidsH.value = String(kids);
-      roomsH.value = String(rooms);
+      if (adultosInput) adultosInput.value = adults;
+      if (ninosInput) ninosInput.value = kids;
+      if (habitacionesInput) habitacionesInput.value = rooms;
 
-      adultsCount.textContent = adults;
-      kidsCount.textContent = kids;
-      roomsCount.textContent = rooms;
+      if (guestsSummary) {
+        guestsSummary.textContent = `${adults} adulto${adults !== 1 ? "s" : ""} · ${kids} niño${kids !== 1 ? "s" : ""} · ${rooms} habitación${rooms !== 1 ? "es" : ""}`;
+      }
 
-      adultsMinus.disabled = adults <= 1;
-      kidsMinus.disabled = kids <= 0;
-      roomsMinus.disabled = rooms <= 1;
+      if (adultsMinus) adultsMinus.disabled = adults <= 1;
+      if (kidsMinus) kidsMinus.disabled = kids <= 0;
+      if (roomsMinus) roomsMinus.disabled = rooms <= 1;
     }
 
     function renderKidsAges() {
+      if (!kidsAges) return;
       kidsAges.innerHTML = "";
-      for (let i = 1; i <= kids; i++) {
-        const sel = document.createElement("select");
-        sel.name = `edad-nino-${i}`;
-        sel.dataset.index = String(i);
 
-        const placeholder = document.createElement("option");
-        placeholder.value = "";
-        placeholder.textContent = `Edad niño ${i}`;
-        placeholder.disabled = true;
-        placeholder.selected = true;
-        sel.appendChild(placeholder);
-
-        for (let age = 0; age <= 17; age++) {
-          const opt = document.createElement("option");
-          opt.value = String(age);
-          opt.textContent = `${age} año${age !== 1 ? "s" : ""}`;
-          sel.appendChild(opt);
-        }
-        kidsAges.appendChild(sel);
+      for (let i = 0; i < kids; i++) {
+        const select = document.createElement("select");
+        select.innerHTML = `
+          <option value="">Edad del niño ${i + 1}</option>
+          ${Array.from({ length: 13 }, (_, age) => `<option value="${age}">${age} años</option>`).join("")}
+        `;
+        kidsAges.appendChild(select);
       }
     }
 
-    function openPanel() {
-      panel.classList.add("open");
-      btn.setAttribute("aria-expanded", "true");
-      panel.setAttribute("aria-hidden", "false");
+    function openGuests() {
+      guestsPanel?.classList.add("open");
+      guestsBtn?.setAttribute("aria-expanded", "true");
+      guestsPanel?.setAttribute("aria-hidden", "false");
     }
 
-    function closePanel() {
-      panel.classList.remove("open");
-      btn.setAttribute("aria-expanded", "false");
-      panel.setAttribute("aria-hidden", "true");
+    function closeGuests() {
+      guestsPanel?.classList.remove("open");
+      guestsBtn?.setAttribute("aria-expanded", "false");
+      guestsPanel?.setAttribute("aria-hidden", "true");
     }
 
-    btn?.addEventListener("click", (e) => {
-      e.preventDefault();
-      panel.classList.contains("open") ? closePanel() : openPanel();
+    guestsBtn?.addEventListener("click", () => {
+      if (guestsPanel?.classList.contains("open")) {
+        closeGuests();
+      } else {
+        openGuests();
+      }
     });
 
-    done?.addEventListener("click", closePanel);
+    guestsDone?.addEventListener("click", closeGuests);
 
     document.addEventListener("click", (e) => {
-      if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
-        closePanel();
+      if (!guestsPanel || !guestsBtn) return;
+      if (!guestsPanel.contains(e.target) && !guestsBtn.contains(e.target)) {
+        closeGuests();
       }
     });
 
-    adultsMinus?.addEventListener("click", () => { adults = Math.max(1, adults - 1); updateSummary(); });
-    adultsPlus?.addEventListener("click", () => { adults = adults + 1; updateSummary(); });
+    adultsMinus?.addEventListener("click", () => {
+      adults = Math.max(1, adults - 1);
+      updateSummary();
+    });
 
-    kidsMinus?.addEventListener("click", () => { kids = Math.max(0, kids - 1); renderKidsAges(); updateSummary(); });
-    kidsPlus?.addEventListener("click", () => { kids = kids + 1; renderKidsAges(); updateSummary(); });
+    adultsPlus?.addEventListener("click", () => {
+      adults += 1;
+      updateSummary();
+    });
 
-    roomsMinus?.addEventListener("click", () => { rooms = Math.max(1, rooms - 1); updateSummary(); });
-    roomsPlus?.addEventListener("click", () => { rooms = rooms + 1; updateSummary(); });
+    kidsMinus?.addEventListener("click", () => {
+      kids = Math.max(0, kids - 1);
+      renderKidsAges();
+      updateSummary();
+    });
 
+    kidsPlus?.addEventListener("click", () => {
+      kids += 1;
+      renderKidsAges();
+      updateSummary();
+    });
 
+    roomsMinus?.addEventListener("click", () => {
+      rooms = Math.max(1, rooms - 1);
+      updateSummary();
+    });
+
+    roomsPlus?.addEventListener("click", () => {
+      rooms += 1;
+      updateSummary();
+    });
 
     updateSummary();
     renderKidsAges();
   })();
-  
-  async function cargarHome() {
-  try {
-    const res = await fetch("/buscar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ destino: "" }) // trae todos
-    });
-
-    const data = await res.json();
-
-    const cont = document.getElementById("homeAlojamientos");
-
-    if (!cont) return;
-
-    cont.innerHTML = "";
-
-    data.forEach(a => {
-      cont.innerHTML += `
-        <div style="border:1px solid #eee;border-radius:16px;overflow:hidden;background:#fff;">
-          <img src="${a.imagen || 'https://via.placeholder.com/300'}"
-               style="width:100%;height:160px;object-fit:cover;">
-          <div style="padding:10px;">
-            <strong>${a.titulo || "Alojamiento"}</strong><br>
-            ${a.ubicacion || ""}<br>
-            <b>$${a.precio || ""}</b>
-          </div>
-        </div>
-      `;
-    });
-
-  } catch (e) {
-    console.error("Error cargando alojamientos:", e);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", cargarHome);
-  <script type="module">
-import { db } from "./firebase-config.js";
-import {
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-
-function hoyLocal() {
-  const hoy = new Date();
-  const anio = hoy.getFullYear();
-  const mes = String(hoy.getMonth() + 1).padStart(2, "0");
-  const dia = String(hoy.getDate()).padStart(2, "0");
-  return `${anio}-${mes}-${dia}`;
-}
-
-window.buscar = function () {
-  const destino = document.getElementById("destino")?.value?.trim() || "";
-  const entradaInput = document.getElementById("entrada");
-  const salidaInput = document.getElementById("salida");
-
-  const checkin = entradaInput?.value || "";
-  const checkout = salidaInput?.value || "";
-  const hoy = hoyLocal();
-
-  if (entradaInput) entradaInput.min = hoy;
-  if (salidaInput) salidaInput.min = checkin || hoy;
-
-  if (checkin && checkin < hoy) {
-    alert("No podés elegir una fecha de entrada anterior a hoy.");
-    return;
-  }
-
-  if (checkout && checkout <= checkin) {
-    alert("La fecha de salida debe ser posterior a la fecha de entrada.");
-    return;
-  }
-
-  localStorage.setItem("searchDestino", destino);
-  localStorage.setItem("searchCheckin", checkin);
-  localStorage.setItem("searchCheckout", checkout);
-
-  window.location.href = "resultados.html";
-};
-
-async function cargarAlojamientosHome() {
-  const cont = document.getElementById("homeAlojamientos");
-  const debug = document.getElementById("debugHome");
-
-  if (!cont) return;
-
-  cont.innerHTML = "<p style='text-align:center;'>Cargando alojamientos...</p>";
-  if (debug) debug.textContent = "";
-
-  try {
-    const snap = await getDocs(collection(db, "alojamientos"));
-
-    if (debug) debug.textContent = `Docs encontrados: ${snap.size}`;
-
-    if (snap.empty) {
-      cont.innerHTML = "<p style='text-align:center;'>No hay alojamientos cargados en Firestore.</p>";
-      return;
-    }
-
-    let html = "";
-
-    snap.forEach((docu) => {
-      const a = docu.data();
-
-      html += `
-        <article style="
-          background:#fff;
-          border-radius:20px;
-          overflow:hidden;
-          box-shadow:0 10px 25px rgba(0,0,0,0.08);
-        ">
-          <a href="detalle.html?id=${docu.id}" style="text-decoration:none;color:inherit;">
-            <img
-              src="${a.fotos?.[0] || "https://via.placeholder.com/600x400?text=TuAloja"}"
-              alt="${a.titulo || "Alojamiento"}"
-              style="width:100%;height:180px;object-fit:cover;display:block;"
-            >
-            <div style="padding:12px;">
-              <h3 style="margin:0 0 6px;color:#1b167f;font-size:20px;">
-                ${a.titulo || "Alojamiento"}
-              </h3>
-
-              <p style="margin:0 0 6px;color:#555;">
-                ${a.ciudad || ""}${a.ciudad && a.provincia ? " - " : ""}${a.provincia || ""}
-              </p>
-
-              <p style="margin:0;font-weight:800;color:#111;">
-                $${Number(a.precio || 0).toLocaleString("es-AR")} por noche
-              </p>
-            </div>
-          </a>
-        </article>
-      `;
-    });
-
-    cont.innerHTML = html;
-
-  } catch (error) {
-    console.error("HOME FIREBASE ERROR:", error);
-    cont.innerHTML = "<p style='text-align:center;'>Error cargando alojamientos.</p>";
-    if (debug) debug.textContent = "Error: " + error.message;
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  cargarAlojamientosHome();
-});
 </script>
-</script>
+
+
   
 
 <script type="module" src="script.js"></script>
