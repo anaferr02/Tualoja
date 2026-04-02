@@ -1201,7 +1201,47 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 // ==========================
-// CARGAR ALOJAMIENTOS DESDE FIREBASE
+// FUNCIONES QUE YA TENÍAS
+// ==========================
+function hoyLocal() {
+  const hoy = new Date();
+  const anio = hoy.getFullYear();
+  const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+  const dia = String(hoy.getDate()).padStart(2, "0");
+  return `${anio}-${mes}-${dia}`;
+}
+
+window.buscar = function () {
+  const destino = document.getElementById("destino")?.value?.trim() || "";
+  const entradaInput = document.getElementById("entrada");
+  const salidaInput = document.getElementById("salida");
+
+  const checkin = entradaInput?.value || "";
+  const checkout = salidaInput?.value || "";
+  const hoy = hoyLocal();
+
+  if (entradaInput) entradaInput.min = hoy;
+  if (salidaInput) salidaInput.min = checkin || hoy;
+
+  if (checkin && checkin < hoy) {
+    alert("Fecha inválida");
+    return;
+  }
+
+  if (checkout && checkout <= checkin) {
+    alert("Salida inválida");
+    return;
+  }
+
+  localStorage.setItem("searchDestino", destino);
+  localStorage.setItem("searchCheckin", checkin);
+  localStorage.setItem("searchCheckout", checkout);
+
+  window.location.href = "resultados.html";
+};
+
+// ==========================
+// 🔥 CARGAR ALOJAMIENTOS (LO QUE TE FALTABA)
 // ==========================
 async function cargarAlojamientosHome() {
   const cont = document.getElementById("homeAlojamientos");
@@ -1213,11 +1253,7 @@ async function cargarAlojamientosHome() {
     const snap = await getDocs(collection(db, "alojamientos"));
 
     if (snap.empty) {
-      cont.innerHTML = `
-        <div style="text-align:center;padding:20px;">
-          Todavía no hay alojamientos publicados
-        </div>
-      `;
+      cont.innerHTML = "No hay alojamientos cargados";
       return;
     }
 
@@ -1247,9 +1283,7 @@ async function cargarAlojamientosHome() {
               ${a.ciudad || ""} ${a.provincia || ""}
             </p>
 
-            <b style="color:#000;">
-              $${a.precio || ""}
-            </b>
+            <b>$${a.precio || ""}</b>
           </div>
         </div>
       `;
