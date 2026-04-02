@@ -586,6 +586,15 @@
   remitenteRol: isHost ? "host" : "guest",
   creadoEn: serverTimestamp()
 });
+        // 🔔 crear notificación
+await addDoc(collection(db, "notificaciones"), {
+  userId: isHost ? currentReserva.huespedId : currentReserva.anfitrionId,
+  texto: "Tenés un nuevo mensaje",
+  tipo: "mensaje",
+  reservaId: reservaId,
+  leida: false,
+  createdAt: serverTimestamp()
+});
 
         await updateDoc(doc(db, "reservas", reservaId), {
           chatIniciado: true,
