@@ -395,7 +395,9 @@ import {
   doc,
   query,
   where,
-  getDoc
+  getDoc,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 import {
@@ -460,6 +462,53 @@ function puedeCancelar(r) {
 
   return true;
 }
+  async function solicitarCancelacion(reserva) {
+  try {
+    const motivo = prompt(
+      "Contanos brevemente el motivo de la cancelación por fuerza mayor:"
+    );
+
+    if (motivo === null) return;
+
+    const motivoLimpio = motivo.trim();
+
+    if (!motivoLimpio) {
+      alert("Tenés que escribir un motivo.");
+      return;
+    }
+
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Iniciá sesión nuevamente.");
+      return;
+    }
+
+    await addDoc(collection(db, "solicitudes_cancelacion"), {
+      reservaId: reserva._docId,
+      alojamientoId: reserva.alojamientoId || "",
+      alojamientoTitulo: reserva.alojamientoTitulo || reserva.title || reserva.titulo || "Reserva",
+      userId: user.uid,
+      userEmail: user.email || "",
+      motivo: motivoLimpio,
+      estado: "pendiente",
+      createdAt: serverTimestamp()
+    });
+
+    await addDoc(collection(db, "notificaciones"), {
+      userId: reserva.anfitrionId || reserva.hostId || reserva.ownerId || "",
+      texto: `El huésped solicitó cancelar la reserva "${reserva.alojamientoTitulo || reserva.title || "Reserva"}".`,
+      tipo: "cancelacion",
+      reservaId: reserva._docId,
+      leida: false,
+      createdAt: serverTimestamp()
+    });
+
+    alert("Tu solicitud de cancelación fue enviada. Te responderemos a la brevedad.");
+  } catch (error) {
+    console.error("Error al solicitar cancelación:", error);
+    alert("No se pudo enviar la solicitud de cancelación.");
+  }
+}
 
 function renderReservas() {
   const lista = document.getElementById("listaReservas");
@@ -522,15 +571,20 @@ function renderReservas() {
               : ""
           }
 
-         ${
+       ${
   (r.chatIniciado || ["aceptada","confirmada"].includes(String(r.status || "").toLowerCase()))
-    ? `<p style="margin-top:10px; color:#b00020; font-weight:700;">
-        Esta reserva ya no se puede cancelar online.<br>
-        Si necesitás cancelarla por fuerza mayor, escribinos a 
-        <a href="mailto:alojamientos@tualoja.com" style="color:#b00020;">
-          alojamientos@tualoja.com
-        </a>
-      </p>`
+    ? `<div style="margin-top:10px;">
+        <p style="margin:0 0 10px; color:#b00020; font-weight:700;">
+          Esta reserva ya no se puede cancelar online.
+        </p>
+        <button class="btn-outline" data-solicitar-cancel="${r._docId}" type="button">
+          Solicitar cancelación por fuerza mayor
+        </button>
+        <p style="margin-top:8px; color:#6a7195; font-size:14px;">
+          También podés escribirnos a
+          <a href="mailto:alojamientos@tualoja.com">alojamientos@tualoja.com</a>
+        </p>
+      </div>`
     : ""
 }
         </div>
@@ -567,6 +621,7 @@ function renderReservas() {
         alert("Esta reserva ya no se puede cancelar online.");
         return;
       }
+       
 
       const ok = confirm("¿Querés cancelar esta reserva?");
       if (!ok) return;
@@ -586,6 +641,15 @@ function renderReservas() {
         console.error("Error al cancelar reserva:", error);
         alert("No se pudo cancelar la reserva.");
       }
+        lista.querySelectorAll("[data-solicitar-cancel]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-solicitar-cancel");
+      const reserva = reservasCache.find((r) => r._docId === id);
+      if (!reserva) return;
+
+      await solicitarCancelacion(reserva);
+    });
+  });
     });
   });
 }
