@@ -453,13 +453,13 @@
       }
 
       chatBody.innerHTML = messages.map((m) => {
-        const mine = String(m.senderId || "") === String(currentUser?.uid || "");
+        const mine = String(m.remitenteId || "") === String(currentUser?.uid || "");
         const rol = mine ? "me" : "other";
         return `
           <div class="msg-row ${rol}">
             <div class="msg-bubble">
               <div>${escapeHtml(m.texto || "")}</div>
-              <div class="msg-meta">${escapeHtml(m.senderName || "Usuario")} · ${formatDateTime(m.creadoEn)}</div>
+              <div class="msg-meta">${escapeHtml(m.remitenteNombre || "Usuario")} · ${formatDateTime(m.creadoEn)}</div>
             </div>
           </div>
         `;
@@ -578,14 +578,14 @@
           currentUser.displayName ||
           (isHost ? "Anfitrión" : currentReserva?.huespedNombre || "Huésped");
 
-        await addDoc(collection(db, "reservas", reservaId, "mensajes"), {
-          texto,
-          senderId: currentUser.uid,
-          senderEmail: currentUser.email || "",
-          senderName: nombre,
-          senderRole: isHost ? "host" : "guest",
-          creadoEn: serverTimestamp()
-        });
+       await addDoc(collection(db, "reservas", reservaId, "mensajes"), {
+  texto,
+  remitenteId: currentUser.uid,
+  remitenteEmail: currentUser.email || "",
+  remitenteNombre: nombre,
+  remitenteRol: isHost ? "host" : "guest",
+  creadoEn: serverTimestamp()
+});
 
         await updateDoc(doc(db, "reservas", reservaId), {
           chatIniciado: true,
