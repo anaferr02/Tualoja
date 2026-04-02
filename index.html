@@ -1193,6 +1193,79 @@
 }
 
 document.addEventListener("DOMContentLoaded", cargarHome);
+  <script type="module">
+import { db } from "./firebase-config.js";
+import {
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+// ==========================
+// CARGAR ALOJAMIENTOS DESDE FIREBASE
+// ==========================
+async function cargarAlojamientosHome() {
+  const cont = document.getElementById("homeAlojamientos");
+  if (!cont) return;
+
+  cont.innerHTML = "Cargando alojamientos...";
+
+  try {
+    const snap = await getDocs(collection(db, "alojamientos"));
+
+    if (snap.empty) {
+      cont.innerHTML = `
+        <div style="text-align:center;padding:20px;">
+          Todavía no hay alojamientos publicados
+        </div>
+      `;
+      return;
+    }
+
+    cont.innerHTML = "";
+
+    snap.forEach(doc => {
+      const a = doc.data();
+
+      cont.innerHTML += `
+        <div style="
+          background:#fff;
+          border-radius:20px;
+          overflow:hidden;
+          box-shadow:0 10px 25px rgba(0,0,0,0.08);
+        ">
+          <img 
+            src="${a.fotos?.[0] || 'https://via.placeholder.com/400'}"
+            style="width:100%;height:180px;object-fit:cover;"
+          >
+
+          <div style="padding:12px;">
+            <h3 style="margin:0;color:#1b167f;">
+              ${a.titulo || "Alojamiento"}
+            </h3>
+
+            <p style="margin:4px 0;color:#555;">
+              ${a.ciudad || ""} ${a.provincia || ""}
+            </p>
+
+            <b style="color:#000;">
+              $${a.precio || ""}
+            </b>
+          </div>
+        </div>
+      `;
+    });
+
+  } catch (error) {
+    console.error(error);
+    cont.innerHTML = "Error cargando alojamientos";
+  }
+}
+
+// ejecutar
+document.addEventListener("DOMContentLoaded", () => {
+  cargarAlojamientosHome();
+});
+</script>
 </script>
   
 
