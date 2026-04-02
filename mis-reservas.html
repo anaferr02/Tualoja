@@ -522,11 +522,17 @@ function renderReservas() {
               : ""
           }
 
-          ${
-            r.chatIniciado
-              ? `<p style="margin-top:8px; color:#8c2e2e;"><strong>Chat activo:</strong> ya no podés cancelar online. Si hubo fuerza mayor, hacelo desde Ayuda.</p>`
-              : ""
-          }
+         ${
+  (r.chatIniciado || ["aceptada","confirmada"].includes(String(r.status || "").toLowerCase()))
+    ? `<p style="margin-top:10px; color:#b00020; font-weight:700;">
+        Esta reserva ya no se puede cancelar online.<br>
+        Si necesitás cancelarla por fuerza mayor, escribinos a 
+        <a href="mailto:alojamientos@tualoja.com" style="color:#b00020;">
+          alojamientos@tualoja.com
+        </a>
+      </p>`
+    : ""
+}
         </div>
 
         <div class="reserva-side">
