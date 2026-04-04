@@ -345,8 +345,18 @@ border-radius:12px;
 
 .grid-alojamientos {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, 260px); /* ancho fijo */
+  justify-content: center; /* centra las cards */
   gap: 20px;
+}
+
+.card-alojamiento {
+  width: 260px;
+}
+.card-alojamiento img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
 }
 
 .card-alojamiento {
@@ -361,11 +371,7 @@ border-radius:12px;
   transform: translateY(-5px);
 }
 
-.card-alojamiento img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-}
+
 
 .card-alojamiento h3 {
   font-size: 16px;
@@ -391,14 +397,18 @@ border-radius:12px;
   margin: 10px;
   font-style: italic;
 }
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .grid-alojamientos {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 260px);
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .grid-alojamientos {
     grid-template-columns: 1fr;
+  }
+
+  .card-alojamiento {
+    width: 100%;
   }
 }
