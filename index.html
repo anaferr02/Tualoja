@@ -1268,6 +1268,59 @@
     renderKidsAges();
   })();
 </script>
+  <script>
+const traducciones = {
+  es: {
+    publicar: "Publicar alojamiento",
+    ayuda: "Ayuda",
+    iniciar: "Iniciar sesión",
+    cuenta: "Hazte una cuenta",
+    badge: "Plataforma argentina para hospedajes temporarios",
+    titulo: "Encontrá el lugar ideal para tu próxima estadía",
+    subtitulo: "Casas, departamentos y cabañas en una plataforma simple, directa y pensada para Argentina.",
+    trust: "Publicá gratis · Buscá fácil · Contactá al anfitrión"
+  },
+  en: {
+    publicar: "List your property",
+    ayuda: "Help",
+    iniciar: "Log in",
+    cuenta: "Create an account",
+    badge: "Argentine platform for temporary stays",
+    titulo: "Find the ideal place for your next stay",
+    subtitulo: "Houses, apartments, and cabins on a simple, direct platform designed for Argentina.",
+    trust: "List for free · Search easily · Contact the host"
+  },
+  pt: {
+    publicar: "Publicar hospedagem",
+    ayuda: "Ajuda",
+    iniciar: "Entrar",
+    cuenta: "Criar conta",
+    badge: "Plataforma argentina para hospedagens temporárias",
+    titulo: "Encontre o lugar ideal para sua próxima estadia",
+    subtitulo: "Casas, apartamentos e cabanas em uma plataforma simples, direta e pensada para a Argentina.",
+    trust: "Publique grátis · Busque fácil · Contate o anfitrião"
+  }
+};
+
+const idiomaSelect = document.getElementById("idioma");
+
+function cambiarIdioma(lang) {
+  document.querySelector('.nav-link[href="publicar.html"]').textContent = traducciones[lang].publicar;
+  document.querySelector('.nav-link[href="ayuda.html"]').textContent = traducciones[lang].ayuda;
+  document.querySelector('.btn.btn-ghost').textContent = traducciones[lang].iniciar;
+  document.querySelector('.btn.btn-primary').textContent = traducciones[lang].cuenta;
+  document.querySelector('.hero-badge').textContent = traducciones[lang].badge;
+  document.querySelector('.hero h1').textContent = traducciones[lang].titulo;
+  document.querySelector('.hero-sub').textContent = traducciones[lang].subtitulo;
+  document.querySelector('.hero-trust').textContent = traducciones[lang].trust;
+}
+
+idiomaSelect.addEventListener("change", (e) => {
+  cambiarIdioma(e.target.value);
+});
+
+cambiarIdioma(idiomaSelect.value);
+</script>
 
 
   
