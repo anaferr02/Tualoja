@@ -43,6 +43,28 @@
       outline:none;
       font-size:14px;
     }
+
+    .password-wrap{
+      position:relative;
+    }
+
+    .password-wrap input{
+      padding-right:48px;
+    }
+
+    .toggle-password{
+      position:absolute;
+      right:12px;
+      top:50%;
+      transform:translateY(-50%);
+      background:none;
+      border:none;
+      cursor:pointer;
+      font-size:18px;
+      line-height:1;
+      padding:0;
+    }
+
     .btn{
       width:100%;
       border:none;
@@ -70,6 +92,28 @@
     }
     .hint{font-size:12px; color:#666; margin-top:10px;}
 
+    .password-rules{
+      margin-top:8px;
+      font-size:12px;
+      color:#666;
+      line-height:1.5;
+    }
+
+    .password-status{
+      font-size:12px;
+      margin-top:8px;
+      min-height:18px;
+      font-weight:bold;
+    }
+
+    .password-status.ok{
+      color:green;
+    }
+
+    .password-status.error{
+      color:#c62828;
+    }
+
     footer{
       text-align:center;
       padding:18px 12px;
@@ -96,10 +140,35 @@
         <input type="email" name="email" required placeholder="tuemail@ejemplo.com" />
 
         <label>Contraseña</label>
-        <input type="password" name="password" required minlength="6" placeholder="Mínimo 6 caracteres" />
+        <div class="password-wrap">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            minlength="8"
+            placeholder="Mínimo 8 caracteres"
+          />
+          <button type="button" class="toggle-password" data-target="password" aria-label="Mostrar u ocultar contraseña">👁️</button>
+        </div>
+
+        <div class="password-rules">
+          Debe tener al menos 8 caracteres, 1 mayúscula y 1 signo.
+        </div>
+        <div id="passwordStatus" class="password-status"></div>
 
         <label>Confirmar contraseña</label>
-        <input type="password" name="password2" required minlength="6" placeholder="Repetí la contraseña" />
+        <div class="password-wrap">
+          <input
+            type="password"
+            id="password2"
+            name="password2"
+            required
+            minlength="8"
+            placeholder="Repetí la contraseña"
+          />
+          <button type="button" class="toggle-password" data-target="password2" aria-label="Mostrar u ocultar contraseña">👁️</button>
+        </div>
 
         <button class="btn" type="submit">Crear cuenta y continuar</button>
 
@@ -119,39 +188,90 @@
     </div>
   </footer>
 
-  <!-- 🔥 NUEVO SCRIPT (FIREBASE) -->
   <script type="module">
-  import { register } from "./public/js/auth.js";
+    import { register } from "./public/js/auth.js";
 
-  document.getElementById("registerForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+    const form = document.getElementById("registerForm");
+    const passwordInput = document.getElementById("password");
+    const password2Input = document.getElementById("password2");
+    const passwordStatus = document.getElementById("passwordStatus");
+    const toggleButtons = document.querySelectorAll(".toggle-password");
 
-    const form = e.currentTarget;
-    const email = form.email.value.trim().toLowerCase();
-    const password = form.password.value;
-    const password2 = form.password2.value;
-
-    if (password !== password2) {
-      alert("Las contraseñas no coinciden.");
-      return;
+    function validarPassword(password) {
+      const regex = /^(?=.*[A-Z])(?=.*[^\w\s]).{8,}$/;
+      return regex.test(password);
     }
 
-    try {
-      await register("", email, password);
+    function actualizarEstadoPassword() {
+      const password = passwordInput.value;
 
-      const redirect = localStorage.getItem("redirectAfterLogin");
-
-      if (redirect) {
-        localStorage.removeItem("redirectAfterLogin");
-        window.location.href = redirect;
-      } else {
-        window.location.href = "publicar.html";
+      if (!password) {
+        passwordStatus.textContent = "";
+        passwordStatus.className = "password-status";
+        return;
       }
-    } catch (error) {
-      console.error(error);
-      alert("No se pudo crear la cuenta.");
+
+      if (validarPassword(password)) {
+        passwordStatus.textContent = "Contraseña segura ✅";
+        passwordStatus.className = "password-status ok";
+      } else {
+        passwordStatus.textContent = "Debe tener mínimo 8 caracteres, 1 mayúscula y 1 signo ❌";
+        passwordStatus.className = "password-status error";
+      }
     }
-  });
-</script>
+
+    toggleButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const targetId = btn.getAttribute("data-target");
+        const input = document.getElementById(targetId);
+
+        if (input.type === "password") {
+          input.type = "text";
+          btn.textContent = "🙈";
+        } else {
+          input.type = "password";
+          btn.textContent = "👁️";
+        }
+      });
+    });
+
+    passwordInput.addEventListener("input", actualizarEstadoPassword);
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = form.email.value.trim().toLowerCase();
+      const password = passwordInput.value;
+      const password2 = password2Input.value;
+
+      if (!validarPassword(password)) {
+        alert("La contraseña debe tener mínimo 8 caracteres, al menos 1 mayúscula y 1 signo.");
+        passwordInput.focus();
+        return;
+      }
+
+      if (password !== password2) {
+        alert("Las contraseñas no coinciden.");
+        password2Input.focus();
+        return;
+      }
+
+      try {
+        await register("", email, password);
+
+        const redirect = localStorage.getItem("redirectAfterLogin");
+
+        if (redirect) {
+          localStorage.removeItem("redirectAfterLogin");
+          window.location.href = redirect;
+        } else {
+          window.location.href = "publicar.html";
+        }
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo crear la cuenta.");
+      }
+    });
+  </script>
 </body>
 </html>
