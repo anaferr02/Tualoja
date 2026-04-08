@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Crear cuenta - TuAloja</title>
   <style>
+    * {
+  box-sizing: border-box;
+}
     body{
       font-family: Arial, sans-serif;
       margin:0;
@@ -45,25 +48,26 @@
     }
 
     .password-wrap{
-      position:relative;
-    }
+  position: relative;
+  width: 100%;
+}
 
-    .password-wrap input{
-      padding-right:48px;
-    }
+.password-wrap input{
+  width: 100%;
+  padding-right: 45px;
+}
 
     .toggle-password{
-      position:absolute;
-      right:12px;
-      top:50%;
-      transform:translateY(-50%);
-      background:none;
-      border:none;
-      cursor:pointer;
-      font-size:18px;
-      line-height:1;
-      padding:0;
-    }
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+}
 
     .btn{
       width:100%;
