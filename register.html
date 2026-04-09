@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Crear cuenta - TuAloja</title>
   <style>
-    .password-status{
-  margin-bottom: 18px;
-}
-    * {
-  box-sizing: border-box;
-}
+    *{
+      box-sizing: border-box;
+    }
+
     body{
       font-family: Arial, sans-serif;
       margin:0;
@@ -23,6 +21,7 @@
       display:flex;
       flex-direction:column;
     }
+
     .auth-main{
       flex:1;
       display:flex;
@@ -38,9 +37,29 @@
       padding:26px;
       box-shadow:0 10px 30px rgba(0,0,0,.12);
     }
-    h1{margin:0 0 8px; color:#1b167f; font-size:34px;}
-    p{margin:0 0 18px; color:#444;}
-    label{display:block; font-size:14px; margin:12px 0 6px; color:#222;}
+
+    h1{
+      margin:0 0 8px;
+      color:#1b167f;
+      font-size:34px;
+    }
+
+    p{
+      margin:0 0 18px;
+      color:#444;
+    }
+
+    .field-group{
+      margin-bottom:18px;
+    }
+
+    label{
+      display:block;
+      font-size:14px;
+      margin:0 0 6px;
+      color:#222;
+    }
+
     input{
       width:100%;
       padding:12px;
@@ -51,53 +70,26 @@
     }
 
     .password-wrap{
-  position: relative;
-  width: 100%;
-}
+      position:relative;
+      width:100%;
+    }
 
-.password-wrap input{
-  width: 100%;
-  padding-right: 45px;
-}
+    .password-wrap input{
+      width:100%;
+      padding-right:45px;
+    }
 
     .toggle-password{
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  padding: 0;
-}
-
-    .btn{
-      width:100%;
+      position:absolute;
+      right:12px;
+      top:50%;
+      transform:translateY(-50%);
+      background:transparent;
       border:none;
-      border-radius:14px;
-      padding:14px;
-      background:#1b167f;
-      color:#fff;
-      font-weight:bold;
       cursor:pointer;
-      margin-top:16px;
-      font-size:14px;
-      box-shadow: 0 8px 20px rgba(27,22,127,.35);
-      transition: transform .15s ease, box-shadow .15s ease;
+      font-size:16px;
+      padding:0;
     }
-    .btn:hover{
-      transform: translateY(-2px);
-      box-shadow: 0 12px 28px rgba(27,22,127,.45);
-    }
-    .link{
-      display:inline-block;
-      margin-top:12px;
-      color:#1b167f;
-      text-decoration: underline;
-      font-size:14px;
-    }
-    .hint{font-size:12px; color:#666; margin-top:10px;}
 
     .password-rules{
       margin-top:8px;
@@ -110,6 +102,7 @@
       font-size:12px;
       margin-top:8px;
       min-height:18px;
+      display:block;
       font-weight:bold;
     }
 
@@ -121,15 +114,50 @@
       color:#c62828;
     }
 
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:14px;
+      background:#1b167f;
+      color:#fff;
+      font-weight:bold;
+      cursor:pointer;
+      margin-top:6px;
+      font-size:14px;
+      box-shadow:0 8px 20px rgba(27,22,127,.35);
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 12px 28px rgba(27,22,127,.45);
+    }
+
+    .link{
+      display:inline-block;
+      margin-top:12px;
+      color:#1b167f;
+      text-decoration:underline;
+      font-size:14px;
+    }
+
+    .hint{
+      font-size:12px;
+      color:#666;
+      margin-top:10px;
+    }
+
     footer{
       text-align:center;
       padding:18px 12px;
       font-size:12px;
       color:#1b167f;
     }
+
     .footer-legal a{
       color:#1b167f;
-      text-decoration: underline;
+      text-decoration:underline;
       margin:0 4px;
       font-size:12px;
     }
@@ -143,38 +171,45 @@
       <p>Registrate con email y contraseña.</p>
 
       <form id="registerForm" autocomplete="on">
-        <label>Email</label>
-        <input type="email" name="email" required placeholder="tuemail@ejemplo.com" />
-
-        <label>Contraseña</label>
-        <div class="password-wrap">
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            minlength="8"
-            placeholder="Mínimo 8 caracteres"
-          />
-          <button type="button" class="toggle-password" data-target="password" aria-label="Mostrar u ocultar contraseña">👁️</button>
+        <div class="field-group">
+          <label>Email</label>
+          <input type="email" name="email" required placeholder="tuemail@ejemplo.com" />
         </div>
 
-        <div class="password-rules">
-          Debe tener al menos 8 caracteres, 1 mayúscula y 1 signo.
-        </div>
-        <div id="passwordStatus" class="password-status"></div>
+        <div class="field-group">
+          <label>Contraseña</label>
+          <div class="password-wrap">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              minlength="8"
+              placeholder="Mínimo 8 caracteres"
+            />
+            <button type="button" class="toggle-password" data-target="password" aria-label="Mostrar u ocultar contraseña">👁️</button>
+          </div>
 
-        <label>Confirmar contraseña</label>
-        <div class="password-wrap">
-          <input
-            type="password"
-            id="password2"
-            name="password2"
-            required
-            minlength="8"
-            placeholder="Repetí la contraseña"
-          />
-          <button type="button" class="toggle-password" data-target="password2" aria-label="Mostrar u ocultar contraseña">👁️</button>
+          <div class="password-rules">
+            Debe tener al menos 8 caracteres, 1 mayúscula y 1 signo.
+          </div>
+
+          <div id="passwordStatus" class="password-status"></div>
+        </div>
+
+        <div class="field-group">
+          <label>Confirmar contraseña</label>
+          <div class="password-wrap">
+            <input
+              type="password"
+              id="password2"
+              name="password2"
+              required
+              minlength="8"
+              placeholder="Repetí la contraseña"
+            />
+            <button type="button" class="toggle-password" data-target="password2" aria-label="Mostrar u ocultar contraseña">👁️</button>
+          </div>
         </div>
 
         <button class="btn" type="submit">Crear cuenta y continuar</button>
