@@ -114,6 +114,50 @@
       color:#c62828;
     }
 
+    .divider{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin:18px 0 10px;
+      color:#666;
+      font-size:13px;
+    }
+
+    .divider::before,
+    .divider::after{
+      content:"";
+      flex:1;
+      height:1px;
+      background:#ddd;
+    }
+
+    .social-btn{
+      width:100%;
+      border:1px solid #d6d6d6;
+      border-radius:14px;
+      padding:14px;
+      background:#fff;
+      color:#222;
+      font-weight:bold;
+      cursor:pointer;
+      font-size:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition:all .15s ease;
+    }
+
+    .social-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 8px 20px rgba(0,0,0,.08);
+    }
+
+    .google-icon{
+      font-size:18px;
+      line-height:1;
+    }
+
     .btn{
       width:100%;
       border:none;
@@ -214,6 +258,13 @@
 
         <button class="btn" type="submit">Crear cuenta y continuar</button>
 
+        <div class="divider">o</div>
+
+        <button class="social-btn" type="button" id="googleBtn">
+          <span class="google-icon">G</span>
+          Continuar con Google
+        </button>
+
         <a class="link" href="login.html">Ya tengo cuenta → Iniciar sesión</a>
         <div class="hint">Después de crear la cuenta, te llevamos a publicar tu alojamiento.</div>
       </form>
@@ -231,13 +282,14 @@
   </footer>
 
   <script type="module">
-    import { register } from "./public/js/auth.js";
+    import { register, loginWithGoogle } from "./public/js/auth.js";
 
     const form = document.getElementById("registerForm");
     const passwordInput = document.getElementById("password");
     const password2Input = document.getElementById("password2");
     const passwordStatus = document.getElementById("passwordStatus");
     const toggleButtons = document.querySelectorAll(".toggle-password");
+    const googleBtn = document.getElementById("googleBtn");
 
     function validarPassword(password) {
       const regex = /^(?=.*[A-Z])(?=.*[^\w\s]).{8,}$/;
@@ -312,6 +364,24 @@
       } catch (error) {
         console.error(error);
         alert("No se pudo crear la cuenta.");
+      }
+    });
+
+    googleBtn.addEventListener("click", async () => {
+      try {
+        await loginWithGoogle();
+
+        const redirect = localStorage.getItem("redirectAfterLogin");
+
+        if (redirect) {
+          localStorage.removeItem("redirectAfterLogin");
+          window.location.href = redirect;
+        } else {
+          window.location.href = "publicar.html";
+        }
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo iniciar con Google.");
       }
     });
   </script>
