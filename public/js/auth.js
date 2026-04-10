@@ -5,11 +5,16 @@ import {
   sendPasswordResetEmail,
   signOut,
   updateProfile,
-  onAuthStateChanged
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
 const USER_KEY = "tualoja_user";
 const LOGGED_KEY = "tualoja_logged";
+
+// 🔥 NUEVO: proveedor Google
+const googleProvider = new GoogleAuthProvider();
 
 function saveUser(user) {
   const data = {
@@ -63,6 +68,12 @@ export async function register(name, email, password) {
 export async function login(email, password) {
   const cleanEmail = email.trim().toLowerCase();
   const cred = await signInWithEmailAndPassword(auth, cleanEmail, password);
+  return saveUser(cred.user);
+}
+
+// 🔥 NUEVO: LOGIN CON GOOGLE
+export async function loginWithGoogle() {
+  const cred = await signInWithPopup(auth, googleProvider);
   return saveUser(cred.user);
 }
 
