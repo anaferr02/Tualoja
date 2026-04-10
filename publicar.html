@@ -528,32 +528,70 @@
           </div>
         </section>
 
-        <section class="publish-section">
-          <h3>Datos del anfitrión</h3>
+      <section class="publish-section">
+  <h3>Datos del anfitrión y facturación</h3>
+  <p class="section-note">
+    Estos datos se usarán para contacto, pagos y para facturar la comisión de TuAloja.
+  </p>
 
-          <div class="grid-2">
-            <div>
-              <label>Nombre del anfitrión *</label>
-              <input name="anfitrion" required placeholder="Ej: Ana Laura" />
-            </div>
-            <div>
-              <label>CUIT / CUIL (opcional)</label>
-              <input name="cuit" placeholder="Ej: 20-12345678-9">
-            </div>
-            
-            <div>
-              <label>Dirección fiscal (opcional)</label>
-              <input name="direccionFiscal">
-            </div>
-            <div>
-              <label>Teléfono (opcional)</label>
-              <input name="telefono" placeholder="Ej: +54 9 3447..." />
-            </div>
-          </div>
+  <div class="grid-2">
+    <div>
+      <label>Nombre del anfitrión *</label>
+      <input name="anfitrion" required placeholder="Ej: Ana Laura" />
+    </div>
+    <div>
+      <label>Razón social o nombre fiscal *</label>
+      <input name="razonSocial" required placeholder="Ej: Ana Laura Fernández" />
+    </div>
 
-          <label>Email de contacto *</label>
-          <input name="email" type="email" required placeholder="Ej: contacto@tualoja.com" />
-        </section>
+    <div>
+      <label>CUIT / CUIL *</label>
+      <input name="cuit" required placeholder="Ej: 20-12345678-9" />
+    </div>
+    <div>
+      <label>Condición fiscal *</label>
+      <select name="condicionFiscal" required>
+        <option value="">Elegí una opción</option>
+        <option value="Monotributista">Monotributista</option>
+        <option value="Responsable Inscripto">Responsable Inscripto</option>
+        <option value="Consumidor Final">Consumidor Final</option>
+        <option value="Exento">Exento</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Dirección fiscal *</label>
+      <input name="direccionFiscal" required placeholder="Ej: San Martín 123, Entre Ríos" />
+    </div>
+    <div>
+      <label>Tipo de comprobante preferido *</label>
+      <select name="tipoFactura" required>
+        <option value="">Elegí una opción</option>
+        <option value="Factura C">Factura C</option>
+        <option value="Factura A">Factura A</option>
+        <option value="Factura B">Factura B</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Teléfono *</label>
+      <input name="telefono" required placeholder="Ej: +54 9 3447..." />
+    </div>
+    <div>
+      <label>Email de contacto *</label>
+      <input name="email" type="email" required placeholder="Ej: contacto@tualoja.com" />
+    </div>
+
+    <div>
+      <label>Titular de la cuenta (opcional)</label>
+      <input name="titularCuenta" placeholder="Ej: Ana Laura Fernández" />
+    </div>
+    <div>
+      <label>Alias o CBU para pagos (opcional)</label>
+      <input name="aliasCbu" placeholder="Ej: ANA.TUALOJA.2026" />
+    </div>
+  </div>
+</section>
 
         <div class="publish-actions">
           <button class="btn" type="submit">Publicar</button>
@@ -567,7 +605,13 @@
         <input type="hidden" name="_subject" value="TuAloja - Nueva publicación" />
         <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_template" value="table" />
-
+        <input type="hidden" name="Razón social" id="mf_razonsocial" />
+<input type="hidden" name="CUIT / CUIL" id="mf_cuit" />
+<input type="hidden" name="Condición fiscal" id="mf_condicionfiscal" />
+<input type="hidden" name="Dirección fiscal" id="mf_direccionfiscal" />
+<input type="hidden" name="Tipo de comprobante" id="mf_tipofactura" />
+<input type="hidden" name="Titular cuenta" id="mf_titularcuenta" />
+<input type="hidden" name="Alias / CBU" id="mf_aliascbu" />
         <input type="hidden" name="email" id="mf_email_to" value="" />
         <input type="hidden" name="_replyto" id="mf_replyto" value="" />
         <input type="hidden" name="_autoresponse" id="mf_autoresponse" value="" />
@@ -822,6 +866,30 @@
         location.href = "login.html?next=" + encodeURIComponent("publicar.html");
         return;
       }
+      if (!form.razonSocial.value.trim()) {
+  alert("Completá la razón social o nombre fiscal.");
+  return;
+}
+
+if (!form.cuit.value.trim()) {
+  alert("Completá el CUIT o CUIL.");
+  return;
+}
+
+if (!form.condicionFiscal.value) {
+  alert("Elegí la condición fiscal.");
+  return;
+}
+
+if (!form.direccionFiscal.value.trim()) {
+  alert("Completá la dirección fiscal.");
+  return;
+}
+
+if (!form.tipoFactura.value) {
+  alert("Elegí el tipo de comprobante.");
+  return;
+}
 
       if (!form.direccion.value.trim()) {
         alert("La dirección es obligatoria.");
@@ -896,10 +964,25 @@
   moneda: "ARS",
   maxNoches,
 
-  anfitrion: form.anfitrion.value.trim(),
-  telefono: form.telefono.value.trim(),
-  email: form.email.value.trim(),
+// 🔓 DATOS PÚBLICOS
+anfitrion: form.anfitrion.value.trim(),
 
+// 🔒 DATOS PRIVADOS (SOLO TUALOJA)
+datosFiscales: {
+  razonSocial: form.razonSocial.value.trim(),
+  cuit: form.cuit.value.trim(),
+  condicionFiscal: form.condicionFiscal.value,
+  direccionFiscal: form.direccionFiscal.value.trim(),
+  tipoFactura: form.tipoFactura.value,
+  titularCuenta: form.titularCuenta.value.trim(),
+  aliasCbu: form.aliasCbu.value.trim()
+},
+
+// 🔒 CONTACTO INTERNO (NO PÚBLICO)
+contacto: {
+  telefono: form.telefono.value.trim(),
+  email: form.email.value.trim()
+},
   lat: Number(latInput.value),
   lng: Number(lngInput.value),
 
@@ -937,8 +1020,16 @@
         document.getElementById("mf_checkout").value = data.checkoutHasta;
         document.getElementById("mf_cancelacion").value = data.cancelacion;
         document.getElementById("mf_anfitrion").value = data.anfitrion;
-        document.getElementById("mf_telefono").value = data.telefono || "-";
-        document.getElementById("mf_email").value = data.email;
+document.getElementById("mf_telefono").value = data.contacto?.telefono || "-";
+document.getElementById("mf_email").value = data.contacto?.email || "-";
+
+document.getElementById("mf_razonsocial").value = data.datosFiscales?.razonSocial || "-";
+document.getElementById("mf_cuit").value = data.datosFiscales?.cuit || "-";
+document.getElementById("mf_condicionfiscal").value = data.datosFiscales?.condicionFiscal || "-";
+document.getElementById("mf_direccionfiscal").value = data.datosFiscales?.direccionFiscal || "-";
+document.getElementById("mf_tipofactura").value = data.datosFiscales?.tipoFactura || "-";
+document.getElementById("mf_titularcuenta").value = data.datosFiscales?.titularCuenta || "-";
+document.getElementById("mf_aliascbu").value = data.datosFiscales?.aliasCbu || "-";
         document.getElementById("mf_servicios").value = servicios.length ? servicios.join(", ") : "-";
         document.getElementById("mf_reglas").value = reglas.length ? reglas.join(", ") : "-";
         document.getElementById("mf_replyto").value = data.email;
