@@ -1053,8 +1053,18 @@ contacto: {
   telefono: form.telefono.value.trim(),
   email: form.email.value.trim()
 },
-  lat: Number(latInput.value),
-  lng: Number(lngInput.value),
+  const latReal = Number(latInput.value);
+const lngReal = Number(lngInput.value);
+
+const latPublica = latReal + (Math.random() - 0.5) * 0.008;
+const lngPublica = lngReal + (Math.random() - 0.5) * 0.008;
+
+lat: latReal,
+lng: lngReal,
+latReal: latReal,
+lngReal: lngReal,
+latPublica: latPublica,
+lngPublica: lngPublica,
 
   // 🔥 ESTO ES CLAVE (YA LO TENÍAS)
   anfitrionId: currentUser.uid,
