@@ -76,8 +76,8 @@ function obtenerCentroPorDestino(destinoTexto) {
 }
 
 function obtenerCoordenadasAlojamiento(a, docId) {
-  const lat = Number(a.lat);
-  const lng = Number(a.lng);
+  const lat = a.latPublica || a.lat;
+const lng = a.lngPublica || a.lng;
 
   if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0) {
     return [lat, lng];
