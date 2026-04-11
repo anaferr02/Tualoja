@@ -6,6 +6,7 @@
   <title>Publicar alojamiento - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
   <style>
     .publish-wrap{
@@ -417,11 +418,19 @@
             </div>
           </div>
 
-          <div style="margin-top:16px;">
-            <label>Ubicación en el mapa *</label>
-            <div id="mapa"></div>
-            <small class="help">Hacé clic en el mapa para marcar tu alojamiento.</small>
-          </div>
+         <div style="margin-top:16px;">
+  <label>Buscar dirección en el mapa</label>
+  <input
+    id="buscarDireccion"
+    type="text"
+    placeholder="Ej: San Martín 123, Paraná, Entre Ríos"
+  />
+  <small class="help">Escribí la dirección y elegí una opción para ubicar el alojamiento automáticamente.</small>
+
+  <label style="margin-top:14px;">Ubicación en el mapa *</label>
+  <div id="mapa"></div>
+  <small class="help">También podés hacer clic en el mapa para ajustar el punto exacto.</small>
+</div>
 
           <div class="grid-2">
             <div>
@@ -654,8 +663,11 @@
     </div>
   </footer>
 
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
   <script type="module" src="script.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
@@ -703,6 +715,7 @@
     const mailForm = document.getElementById("mailForm");
     const latInput = document.getElementById("lat");
     const lngInput = document.getElementById("lng");
+    const buscarDireccionInput = document.getElementById("buscarDireccion");
 
     let fotos = [];
     let mapa = null;
@@ -747,32 +760,89 @@
     paisSelect?.addEventListener("change", cargarProvincias);
 
     function initMapa() {
-      const mapaEl = document.getElementById("mapa");
-      if (!mapaEl || typeof L === "undefined") return;
+  const mapaEl = document.getElementById("mapa");
+  if (!mapaEl || typeof L === "undefined") return;
 
-      mapa = L.map("mapa").setView([-31.4201, -64.1888], 5);
+  // Paraná como centro inicial
+  mapa = L.map("mapa").setView([-31.73197, -60.5238], 13);
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap"
-      }).addTo(mapa);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap"
+  }).addTo(mapa);
 
-      mapa.on("click", (e) => {
-        const { lat, lng } = e.latlng;
+  function actualizarUbicacion(lat, lng) {
+    latInput.value = Number(lat).toFixed(6);
+    lngInput.value = Number(lng).toFixed(6);
 
-        latInput.value = lat.toFixed(6);
-        lngInput.value = lng.toFixed(6);
+    if (marcador) {
+      marcador.setLatLng([lat, lng]);
+    } else {
+      marcador = L.marker([lat, lng]).addTo(mapa);
+    }
+  }
 
-        if (marcador) {
-          marcador.setLatLng([lat, lng]);
-        } else {
-          marcador = L.marker([lat, lng]).addTo(mapa);
+  // Click manual en el mapa
+  mapa.on("click", (e) => {
+    const { lat, lng } = e.latlng;
+    actualizarUbicacion(lat, lng);
+  });
+
+  // Buscador dentro del mapa
+  const geocoderControl = L.Control.geocoder({
+    defaultMarkGeocode: false,
+    placeholder: "Buscar dirección..."
+  })
+    .on("markgeocode", function (e) {
+      const center = e.geocode.center;
+
+      mapa.setView(center, 17);
+      actualizarUbicacion(center.lat, center.lng);
+
+      // Completar el campo dirección si está vacío
+      if (!form.direccion.value.trim()) {
+        form.direccion.value = e.geocode.name || "";
+      }
+    })
+    .addTo(mapa);
+
+  // Buscador externo por input
+  if (buscarDireccionInput) {
+    buscarDireccionInput.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+
+      const queryBase = buscarDireccionInput.value.trim();
+      if (!queryBase) return;
+
+      const ciudad = form.ciudad?.value?.trim() || "";
+      const provincia = provinciaSelect?.value || "";
+      const pais = paisSelect?.value || "";
+
+      const queryCompleta = [queryBase, ciudad, provincia, pais]
+        .filter(Boolean)
+        .join(", ");
+
+      L.Control.Geocoder.nominatim().geocode(queryCompleta, function (results) {
+        if (!results || !results.length) {
+          alert("No se encontró la dirección. Probá escribiendo más datos, por ejemplo ciudad y provincia.");
+          return;
+        }
+
+        const result = results[0];
+        const center = result.center;
+
+        mapa.setView(center, 17);
+        actualizarUbicacion(center.lat, center.lng);
+
+        if (!form.direccion.value.trim()) {
+          form.direccion.value = queryBase;
         }
       });
+    });
+  }
 
-      setTimeout(() => mapa.invalidateSize(), 300);
-    }
-
-    initMapa();
+  setTimeout(() => mapa.invalidateSize(), 300);
+}
 
     function asegurarPortada() {
       if (!fotos.length) return;
