@@ -663,7 +663,7 @@
     </div>
   </footer>
 
-  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
 
   <script type="module" src="script.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -1144,7 +1144,16 @@ Gracias por confiar en TuAloja 💙
         console.error(error);
         msg.textContent = "❌ No se pudo publicar. Intentá nuevamente.";
       }
-    });
+  
+   window.addEventListener("load", () => {
+  initMapa();
+
+  setTimeout(() => {
+    if (mapa) {
+      mapa.invalidateSize();
+    }
+  }, 300);
+});
   </script>
 </body>
 </html>
