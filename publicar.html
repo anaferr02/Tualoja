@@ -794,23 +794,7 @@
       actualizarUbicacion(lat, lng);
     });
 
-    if (L.Control && typeof L.Control.geocoder === "function") {
-      L.Control.geocoder({
-        defaultMarkGeocode: false,
-        placeholder: "Buscar dirección..."
-      })
-        .on("markgeocode", function (e) {
-          const center = e.geocode.center;
-
-          mapa.setView(center, 17);
-          actualizarUbicacion(center.lat, center.lng);
-
-          if (!form.direccion.value.trim()) {
-            form.direccion.value = e.geocode.name || "";
-          }
-        })
-        .addTo(mapa);
-    }
+   
 
     if (buscarDireccionInput) {
       buscarDireccionInput.addEventListener("keydown", function (e) {
