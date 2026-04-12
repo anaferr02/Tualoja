@@ -614,6 +614,16 @@
     </div>
   </div>
 </section>
+        <label style="display:flex; gap:10px; margin-top:20px;">
+  <input type="checkbox" id="aceptaContrato" required />
+  <span>
+    Acepto los 
+    <a href="terminos-anfitriones.html" target="_blank">
+      Términos para Anfitriones
+    </a>
+  </span>
+</label>
+        
 
         <div class="publish-actions">
           <button class="btn" type="submit">Publicar</button>
@@ -728,6 +738,12 @@
   const lngInput = document.getElementById("lng");
   const buscarDireccionInput = document.getElementById("buscarDireccion");
   const btnBuscarMapa = document.getElementById("btnBuscarMapa");
+  const aceptaContrato = document.getElementById("aceptaContrato");
+
+if (!aceptaContrato.checked) {
+  msg.textContent = "❌ Tenés que aceptar el contrato.";
+  return;
+}
 
   let fotos = [];
   let mapa = null;
