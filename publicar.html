@@ -810,8 +810,9 @@
 
    
 
-    function buscarDireccionEnMapa() {
+    async function buscarDireccionEnMapa() {
   const queryBase = buscarDireccionInput?.value?.trim() || "";
+
   if (!queryBase) {
     alert("Escribí una dirección.");
     return;
@@ -825,29 +826,36 @@
     .filter(Boolean)
     .join(", ");
 
-  if (!L.Control || !L.Control.Geocoder) {
-    alert("El buscador de direcciones todavía no cargó.");
-    return;
-  }
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(queryCompleta)}`;
+    const resp = await fetch(url, {
+      headers: {
+        "Accept": "application/json"
+      }
+    });
 
-  L.Control.Geocoder.nominatim().geocode(queryCompleta, function (results) {
+    const results = await resp.json();
+
     if (!results || !results.length) {
-      alert("No se encontró la dirección. Probá agregando ciudad, provincia o país.");
+      alert("No se encontró la dirección. Probá escribiéndola más completa.");
       return;
     }
 
     const result = results[0];
-    const center = result.center;
+    const lat = Number(result.lat);
+    const lng = Number(result.lon);
 
-    mapa.setView(center, 17);
-    actualizarUbicacion(center.lat, center.lng);
+    mapa.setView([lat, lng], 18);
+    actualizarUbicacion(lat, lng);
 
     if (!form.direccion.value.trim()) {
       form.direccion.value = queryBase;
     }
-  });
+  } catch (error) {
+    console.error("Error buscando dirección:", error);
+    alert("No se pudo buscar la dirección.");
+  }
 }
-
 if (buscarDireccionInput) {
   buscarDireccionInput.addEventListener("keydown", function (e) {
     if (e.key === "Enter") {
