@@ -28,18 +28,24 @@ const coordsLugares = {
   "la plata": [-34.9214, -57.9544],
   "mar del plata": [-38.0055, -57.5426],
   "cordoba": [-31.4201, -64.1888],
+  "córdoba": [-31.4201, -64.1888],
   "villa carlos paz": [-31.4241, -64.4978],
   "salta": [-24.7821, -65.4232],
   "neuquen": [-38.9516, -68.0591],
+  "neuquén": [-38.9516, -68.0591],
   "bariloche": [-41.1335, -71.3103],
   "san carlos de bariloche": [-41.1335, -71.3103],
   "jujuy": [-24.1858, -65.2995],
   "tucuman": [-26.8083, -65.2176],
+  "tucumán": [-26.8083, -65.2176],
   "san miguel de tucuman": [-26.8083, -65.2176],
+  "san miguel de tucumán": [-26.8083, -65.2176],
   "santa fe": [-31.6333, -60.7000],
   "rosario": [-32.9442, -60.6505],
   "entre rios": [-31.7319, -60.5238],
+  "entre ríos": [-31.7319, -60.5238],
   "parana": [-31.7319, -60.5238],
+  "paraná": [-31.7319, -60.5238],
   "misiones": [-27.3621, -55.9009],
   "posadas": [-27.3621, -55.9009],
   "chubut": [-43.3002, -65.1023],
@@ -75,12 +81,28 @@ function obtenerCentroPorDestino(destinoTexto) {
   return coordsLugares[limpio] || null;
 }
 
-function obtenerCoordenadasAlojamiento(a, docId) {
-  const lat = a.latPublica || a.lat;
-const lng = a.lngPublica || a.lng;
+function obtenerCoordenadasAlojamiento(a, docId, modo = "publico") {
+  if (modo === "privado") {
+    const latPriv = Number(a.latReal || a.lat);
+    const lngPriv = Number(a.lngReal || a.lng);
 
-  if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0) {
-    return [lat, lng];
+    if (!Number.isNaN(latPriv) && !Number.isNaN(lngPriv) && latPriv !== 0 && lngPriv !== 0) {
+      return [latPriv, lngPriv];
+    }
+  }
+
+  const latPub = Number(a.latPublica);
+  const lngPub = Number(a.lngPublica);
+
+  if (!Number.isNaN(latPub) && !Number.isNaN(lngPub) && latPub !== 0 && lngPub !== 0) {
+    return [latPub, lngPub];
+  }
+
+  const latVieja = Number(a.lat);
+  const lngVieja = Number(a.lng);
+
+  if (!Number.isNaN(latVieja) && !Number.isNaN(lngVieja) && latVieja !== 0 && lngVieja !== 0) {
+    return [latVieja, lngVieja];
   }
 
   const ciudad = (a.ciudad || "").trim().toLowerCase();
@@ -170,6 +192,7 @@ async function cargarResultados() {
 
     querySnapshot.forEach((docSnap) => {
       const a = docSnap.data();
+      const docId = docSnap.id;
 
       const ciudad = (a.ciudad || "").toLowerCase();
       const provincia = (a.provincia || "").toLowerCase();
@@ -202,25 +225,22 @@ async function cargarResultados() {
       let precioMin = 0;
       let precioMax = Number.MAX_SAFE_INTEGER;
 
-      if (precioMinInput && precioMaxInput) {
-        precioMin = Number(precioMinInput.value || 0);
-        precioMax = Number(precioMaxInput.value || 0);
+      if (precioMinInput) precioMin = Number(precioMinInput.value || 0);
+      if (precioMaxInput) precioMax = Number(precioMaxInput.value || Number.MAX_SAFE_INTEGER);
 
-        if (precioMin > precioMax) {
-          [precioMin, precioMax] = [precioMax, precioMin];
-        }
+      if (precioMin > precioMax) {
+        [precioMin, precioMax] = [precioMax, precioMin];
       }
 
-      const precioAlojamiento = Number(a.precio || 0);
-
-      const coincidePrecio =
-        precioAlojamiento >= precioMin &&
-        precioAlojamiento <= precioMax;
+      const precio = Number(a.precio || 0);
+      const coincidePrecio = precio >= precioMin && precio <= precioMax;
 
       if (coincideDestino && coincideTipo && coincideServicios && coincidePrecio) {
+        encontrados++;
+
         alojamientos.push({
-          ...a,
-          id: docSnap.id
+          id: a.id || docId,
+          ...a
         });
       }
     });
@@ -229,25 +249,26 @@ async function cargarResultados() {
 
     if (orden === "menor") {
       alojamientos.sort((a, b) => Number(a.precio || 0) - Number(b.precio || 0));
-    }
-
-    if (orden === "mayor") {
+    } else if (orden === "mayor") {
       alojamientos.sort((a, b) => Number(b.precio || 0) - Number(a.precio || 0));
     }
 
     alojamientos.forEach((a) => {
-      encontrados++;
-
-      const foto = a.fotos?.[0] || "https://via.placeholder.com/800x500?text=Sin+imagen";
-      const precioNumero = Number(a.precio || 0);
-      const precio = precioNumero.toLocaleString("es-AR");
+      const tituloTexto = a.titulo || "Alojamiento";
       const ubicacionTexto = armarUbicacion(a);
-      const tituloTexto = a.titulo || "Alojamiento sin título";
       const tipoTexto = a.tipo || "Alojamiento";
+      const precio = Number(a.precio || 0).toLocaleString("es-AR");
+      const fotoPrincipal = Array.isArray(a.fotos) && a.fotos.length
+        ? a.fotos[0]
+        : "https://via.placeholder.com/800x500?text=TuAloja";
 
       html += `
         <div class="resultado-card">
-          <img class="resultado-img" src="${foto}" alt="${limpiarHtml(tituloTexto)}">
+          <img
+            class="resultado-img"
+            src="${limpiarHtml(fotoPrincipal)}"
+            alt="${limpiarHtml(tituloTexto)}"
+          />
 
           <div class="resultado-info">
             <h3 class="resultado-titulo">${limpiarHtml(tituloTexto)}</h3>
@@ -273,7 +294,7 @@ async function cargarResultados() {
         </div>
       `;
 
-      const coords = obtenerCoordenadasAlojamiento(a, a.id);
+      const coords = obtenerCoordenadasAlojamiento(a, a.id, "publico");
 
       if (coords && mapa) {
         const marker = L.marker(coords, {
@@ -281,13 +302,15 @@ async function cargarResultados() {
         }).addTo(mapa);
 
         marker.bindPopup(`
-          <strong>${limpiarHtml(tituloTexto)}</strong><br>
-          ${limpiarHtml(ubicacionTexto)}<br>
-          ${limpiarHtml(tipoTexto)}<br>
-          $${precio} por noche<br><br>
-          <a href="detalle.html?id=${a.id}&destino=${encodeURIComponent(destino)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}">
-            Ver alojamiento
-          </a>
+          <div style="min-width:190px">
+            <strong>${limpiarHtml(tituloTexto)}</strong><br>
+            ${limpiarHtml(ubicacionTexto)}<br>
+            <small style="color:#666;">📍 Ubicación aproximada</small><br>
+            <strong style="color:#1b167f;">$${precio}</strong><br><br>
+            <a href="detalle.html?id=${a.id}&destino=${encodeURIComponent(destino)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}">
+              Ver alojamiento
+            </a>
+          </div>
         `);
 
         markers.push(marker);
@@ -311,7 +334,7 @@ async function cargarResultados() {
 
       if (markers.length > 0) {
         const group = L.featureGroup(markers);
-        mapa.fitBounds(group.getBounds(), { padding: [30, 30] });
+        mapa.fitBounds(group.getBounds().pad(0.18));
 
         if (mapa.getZoom() > 14) {
           mapa.setZoom(14);
