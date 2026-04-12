@@ -1058,11 +1058,16 @@ if (btnBuscarMapa) {
           telefono: form.telefono.value.trim(),
           email: form.email.value.trim()
         },
+        aceptaContrato: true,
+fechaAceptacionContrato: new Date().toISOString(),
+versionContrato: "1.0",
 
         anfitrionId: currentUser.uid,
         anfitrionEmail: currentUser.email || "",
         createdAt: serverTimestamp()
       };
+      
+      
 
       const docRef = await addDoc(collection(db, "alojamientos"), data);
 
