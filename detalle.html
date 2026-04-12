@@ -477,53 +477,65 @@
     return null;
   }
 
-  function renderMapaDetalle(alojamiento, reserva, user) {
-    const boxMapa = document.getElementById("mapaDetalle");
-    if (!boxMapa || typeof L === "undefined") return;
+  function renderMapaDetalle(alojamiento, reserva, user, intentos = 0) {
+  const boxMapa = document.getElementById("mapaDetalle");
 
-    const infoMapa = obtenerCoordsDetalle(alojamiento, reserva, user);
-    if (!infoMapa) return;
+  if (!boxMapa) return;
 
-    if (mapaDetalle) {
-      mapaDetalle.remove();
-      mapaDetalle = null;
+  // 🔥 esperar a Leaflet si no cargó todavía
+  if (typeof L === "undefined") {
+    if (intentos < 20) {
+      setTimeout(() => renderMapaDetalle(alojamiento, reserva, user, intentos + 1), 200);
+    } else {
+      console.error("Leaflet no cargó en detalle");
     }
-
-    mapaDetalle = L.map("mapaDetalle").setView(
-      [infoMapa.lat, infoMapa.lng],
-      infoMapa.exacta ? 16 : 13
-    );
-
-    const mapaCalles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap"
-    });
-
-    const mapaSatelite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-      attribution: "Tiles © Esri"
-    });
-
-    mapaCalles.addTo(mapaDetalle);
-
-    L.control.layers(
-      {
-        "🗺️ Mapa": mapaCalles,
-        "🛰️ Satélite": mapaSatelite
-      }
-    ).addTo(mapaDetalle);
-
-    L.marker([infoMapa.lat, infoMapa.lng])
-      .addTo(mapaDetalle)
-      .bindPopup(
-        infoMapa.exacta
-          ? `<b>${alojamiento.titulo || "Alojamiento"}</b><br>${alojamiento.direccion || ""}`
-          : `<b>${alojamiento.titulo || "Alojamiento"}</b><br>📍 Ubicación aproximada`
-      )
-      .openPopup();
-
-    setTimeout(() => {
-      mapaDetalle.invalidateSize();
-    }, 250);
+    return;
   }
+
+  const infoMapa = obtenerCoordsDetalle(alojamiento, reserva, user);
+  if (!infoMapa) return;
+
+  if (mapaDetalle) {
+    mapaDetalle.remove();
+    mapaDetalle = null;
+  }
+
+  mapaDetalle = L.map("mapaDetalle").setView(
+    [infoMapa.lat, infoMapa.lng],
+    infoMapa.exacta ? 16 : 13
+  );
+
+  const mapaCalles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap"
+  });
+
+  const mapaSatelite = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    { attribution: "Tiles © Esri" }
+  );
+
+  mapaCalles.addTo(mapaDetalle);
+
+  L.control.layers(
+    {
+      "🗺️ Mapa": mapaCalles,
+      "🛰️ Satélite": mapaSatelite
+    }
+  ).addTo(mapaDetalle);
+
+  L.marker([infoMapa.lat, infoMapa.lng])
+    .addTo(mapaDetalle)
+    .bindPopup(
+      infoMapa.exacta
+        ? `<b>${alojamiento.titulo}</b><br>${alojamiento.direccion}`
+        : `<b>${alojamiento.titulo}</b><br>📍 Ubicación aproximada`
+    )
+    .openPopup();
+
+  setTimeout(() => {
+    mapaDetalle.invalidateSize();
+  }, 300);
+}
 
   async function buscarReservaVisible(alojamientoId, user) {
     if (!user?.uid || !alojamientoId) return null;
