@@ -651,471 +651,420 @@
   </main>
 
   <footer class="footer-ayuda">
-    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
-    <div class="footer-links">
-      <a href="politica-de-privacidad.html">Política de Privacidad</a>
-      <span>|</span>
-      <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
-      <span>|</span>
-      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
-      <span>|</span>
-      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
-    </div>
-  </footer>
+  <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+  <div class="footer-links">
+    <a href="politica-de-privacidad.html">Política de Privacidad</a>
+    <span>|</span>
+    <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
+    <span>|</span>
+    <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
+    <span>|</span>
+    <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+  </div>
+</footer>
 
+<script type="module" src="script.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
+<script type="module">
+  import { auth, db } from "./firebase-config.js";
+  import {
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+  import {
+    collection,
+    addDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-  <script type="module" src="script.js"></script>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  let currentUser = null;
 
-  <script type="module">
-    import { auth, db } from "./firebase-config.js";
-    import {
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-    import {
-      collection,
-      addDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+  const provinciasPorPais = {
+    Argentina: [
+      "Buenos Aires", "CABA", "Catamarca", "Chaco", "Chubut", "Córdoba",
+      "Corrientes", "Entre Ríos", "Formosa", "Jujuy", "La Pampa",
+      "La Rioja", "Mendoza", "Misiones", "Neuquén", "Río Negro",
+      "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe",
+      "Santiago del Estero", "Tierra del Fuego", "Tucumán"
+    ],
+    Uruguay: [
+      "Artigas", "Canelones", "Cerro Largo", "Colonia", "Durazno",
+      "Flores", "Florida", "Lavalleja", "Maldonado", "Montevideo",
+      "Paysandú", "Río Negro", "Rivera", "Rocha", "Salto",
+      "San José", "Soriano", "Tacuarembó", "Treinta y Tres"
+    ],
+    Chile: [
+      "Arica y Parinacota", "Tarapacá", "Antofagasta", "Atacama", "Coquimbo",
+      "Valparaíso", "Metropolitana", "O’Higgins", "Maule", "Ñuble",
+      "Biobío", "La Araucanía", "Los Ríos", "Los Lagos", "Aysén",
+      "Magallanes"
+    ]
+  };
 
-    let currentUser = null;
+  const paisSelect = document.getElementById("pais");
+  const provinciaSelect = document.getElementById("provincia");
+  const logoutLink = document.getElementById("logoutLink");
+  const fotosInput = document.getElementById("fotos");
+  const preview = document.getElementById("preview");
+  const msg = document.getElementById("msg");
+  const form = document.getElementById("publishForm");
+  const mailForm = document.getElementById("mailForm");
+  const latInput = document.getElementById("lat");
+  const lngInput = document.getElementById("lng");
+  const buscarDireccionInput = document.getElementById("buscarDireccion");
 
-    const provinciasPorPais = {
-      Argentina: [
-        "Buenos Aires", "CABA", "Catamarca", "Chaco", "Chubut", "Córdoba",
-        "Corrientes", "Entre Ríos", "Formosa", "Jujuy", "La Pampa",
-        "La Rioja", "Mendoza", "Misiones", "Neuquén", "Río Negro",
-        "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe",
-        "Santiago del Estero", "Tierra del Fuego", "Tucumán"
-      ],
-      Uruguay: [
-        "Artigas", "Canelones", "Cerro Largo", "Colonia", "Durazno",
-        "Flores", "Florida", "Lavalleja", "Maldonado", "Montevideo",
-        "Paysandú", "Río Negro", "Rivera", "Rocha", "Salto",
-        "San José", "Soriano", "Tacuarembó", "Treinta y Tres"
-      ],
-      Chile: [
-        "Arica y Parinacota", "Tarapacá", "Antofagasta", "Atacama", "Coquimbo",
-        "Valparaíso", "Metropolitana", "O’Higgins", "Maule", "Ñuble",
-        "Biobío", "La Araucanía", "Los Ríos", "Los Lagos", "Aysén",
-        "Magallanes"
-      ]
-    };
+  let fotos = [];
+  let mapa = null;
+  let marcador = null;
 
-    const paisSelect = document.getElementById("pais");
-    const provinciaSelect = document.getElementById("provincia");
-    const logoutLink = document.getElementById("logoutLink");
-    const fotosInput = document.getElementById("fotos");
-    const preview = document.getElementById("preview");
-    const msg = document.getElementById("msg");
-    const form = document.getElementById("publishForm");
-    const mailForm = document.getElementById("mailForm");
-    const latInput = document.getElementById("lat");
-    const lngInput = document.getElementById("lng");
-    const buscarDireccionInput = document.getElementById("buscarDireccion");
-
-    let fotos = [];
-    let mapa = null;
-    let marcador = null;
-
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        location.href = "login.html?next=" + encodeURIComponent("publicar.html");
-        return;
-      }
-      currentUser = user;
-    });
-
-    if (logoutLink) {
-      logoutLink.addEventListener("click", async (e) => {
-        e.preventDefault();
-        await signOut(auth);
-        location.href = "login.html";
-      });
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      location.href = "login.html?next=" + encodeURIComponent("publicar.html");
+      return;
     }
-
-    function cargarProvincias() {
-      const pais = paisSelect.value;
-      const provincias = provinciasPorPais[pais] || [];
-
-      provinciaSelect.innerHTML = "";
-
-      if (!pais) {
-        provinciaSelect.innerHTML = `<option value="">Primero elegí un país</option>`;
-        return;
-      }
-
-      provinciaSelect.innerHTML = `<option value="">Elegí una provincia</option>`;
-      provincias.forEach((prov) => {
-        const option = document.createElement("option");
-        option.value = prov;
-        option.textContent = prov;
-        provinciaSelect.appendChild(option);
-      });
-    }
-
-    paisSelect?.addEventListener("change", cargarProvincias);
-
-    function initMapa() {
-  const mapaEl = document.getElementById("mapa");
-  if (!mapaEl || typeof L === "undefined") return;
-
-  // Paraná como centro inicial
-  mapa = L.map("mapa").setView([-31.73197, -60.5238], 13);
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "© OpenStreetMap"
-  }).addTo(mapa);
-
-  function actualizarUbicacion(lat, lng) {
-    latInput.value = Number(lat).toFixed(6);
-    lngInput.value = Number(lng).toFixed(6);
-
-    if (marcador) {
-      marcador.setLatLng([lat, lng]);
-    } else {
-      marcador = L.marker([lat, lng]).addTo(mapa);
-    }
-  }
-
-  // Click manual en el mapa
-  mapa.on("click", (e) => {
-    const { lat, lng } = e.latlng;
-    actualizarUbicacion(lat, lng);
+    currentUser = user;
   });
 
-  // Buscador dentro del mapa
-  const geocoderControl = L.Control.geocoder({
-    defaultMarkGeocode: false,
-    placeholder: "Buscar dirección..."
-  })
-    .on("markgeocode", function (e) {
-      const center = e.geocode.center;
-
-      mapa.setView(center, 17);
-      actualizarUbicacion(center.lat, center.lng);
-
-      // Completar el campo dirección si está vacío
-      if (!form.direccion.value.trim()) {
-        form.direccion.value = e.geocode.name || "";
-      }
-    })
-    .addTo(mapa);
-
-  // Buscador externo por input
-  if (buscarDireccionInput) {
-    buscarDireccionInput.addEventListener("keydown", function (e) {
-      if (e.key !== "Enter") return;
+  if (logoutLink) {
+    logoutLink.addEventListener("click", async (e) => {
       e.preventDefault();
+      await signOut(auth);
+      location.href = "login.html";
+    });
+  }
 
-      const queryBase = buscarDireccionInput.value.trim();
-      if (!queryBase) return;
+  function cargarProvincias() {
+    const pais = paisSelect.value;
+    const provincias = provinciasPorPais[pais] || [];
 
-      const ciudad = form.ciudad?.value?.trim() || "";
-      const provincia = provinciaSelect?.value || "";
-      const pais = paisSelect?.value || "";
+    provinciaSelect.innerHTML = "";
 
-      const queryCompleta = [queryBase, ciudad, provincia, pais]
-        .filter(Boolean)
-        .join(", ");
+    if (!pais) {
+      provinciaSelect.innerHTML = `<option value="">Primero elegí un país</option>`;
+      return;
+    }
 
-      L.Control.Geocoder.nominatim().geocode(queryCompleta, function (results) {
-        if (!results || !results.length) {
-          alert("No se encontró la dirección. Probá escribiendo más datos, por ejemplo ciudad y provincia.");
+    provinciaSelect.innerHTML = `<option value="">Elegí una provincia</option>`;
+    provincias.forEach((prov) => {
+      const option = document.createElement("option");
+      option.value = prov;
+      option.textContent = prov;
+      provinciaSelect.appendChild(option);
+    });
+  }
+
+  paisSelect?.addEventListener("change", cargarProvincias);
+
+  function initMapa(intentos = 0) {
+    const mapaEl = document.getElementById("mapa");
+    if (!mapaEl) return;
+
+    if (typeof L === "undefined") {
+      if (intentos < 20) {
+        setTimeout(() => initMapa(intentos + 1), 200);
+      } else {
+        console.error("Leaflet no cargó correctamente.");
+      }
+      return;
+    }
+
+    if (mapa) return;
+
+    mapa = L.map("mapa").setView([-31.73197, -60.5238], 13);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap"
+    }).addTo(mapa);
+
+    function actualizarUbicacion(lat, lng) {
+      latInput.value = Number(lat).toFixed(6);
+      lngInput.value = Number(lng).toFixed(6);
+
+      if (marcador) {
+        marcador.setLatLng([lat, lng]);
+      } else {
+        marcador = L.marker([lat, lng]).addTo(mapa);
+      }
+    }
+
+    mapa.on("click", (e) => {
+      const { lat, lng } = e.latlng;
+      actualizarUbicacion(lat, lng);
+    });
+
+    if (L.Control && typeof L.Control.geocoder === "function") {
+      L.Control.geocoder({
+        defaultMarkGeocode: false,
+        placeholder: "Buscar dirección..."
+      })
+        .on("markgeocode", function (e) {
+          const center = e.geocode.center;
+
+          mapa.setView(center, 17);
+          actualizarUbicacion(center.lat, center.lng);
+
+          if (!form.direccion.value.trim()) {
+            form.direccion.value = e.geocode.name || "";
+          }
+        })
+        .addTo(mapa);
+    }
+
+    if (buscarDireccionInput) {
+      buscarDireccionInput.addEventListener("keydown", function (e) {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+
+        const queryBase = buscarDireccionInput.value.trim();
+        if (!queryBase) return;
+
+        const ciudad = form.ciudad?.value?.trim() || "";
+        const provincia = provinciaSelect?.value || "";
+        const pais = paisSelect?.value || "";
+
+        const queryCompleta = [queryBase, ciudad, provincia, pais]
+          .filter(Boolean)
+          .join(", ");
+
+        if (!L.Control || !L.Control.Geocoder) {
+          alert("El buscador de direcciones todavía no cargó.");
           return;
         }
 
-        const result = results[0];
-        const center = result.center;
+        L.Control.Geocoder.nominatim().geocode(queryCompleta, function (results) {
+          if (!results || !results.length) {
+            alert("No se encontró la dirección. Probá escribiendo más datos, por ejemplo ciudad y provincia.");
+            return;
+          }
 
-        mapa.setView(center, 17);
-        actualizarUbicacion(center.lat, center.lng);
+          const result = results[0];
+          const center = result.center;
 
-        if (!form.direccion.value.trim()) {
-          form.direccion.value = queryBase;
-        }
+          mapa.setView(center, 17);
+          actualizarUbicacion(center.lat, center.lng);
+
+          if (!form.direccion.value.trim()) {
+            form.direccion.value = queryBase;
+          }
+        });
       });
+    }
+
+    setTimeout(() => {
+      mapa.invalidateSize();
+    }, 500);
+  }
+
+  function asegurarPortada() {
+    if (!fotos.length) return;
+    if (!fotos.some((x) => x.isCover)) fotos[0].isCover = true;
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result));
+      r.onerror = reject;
+      r.readAsDataURL(file);
     });
   }
 
-  setTimeout(() => mapa.invalidateSize(), 300);
-}
+  fotosInput?.addEventListener("change", async () => {
+    const files = Array.from(fotosInput.files || []);
+    if (!files.length) return;
 
-    function asegurarPortada() {
-      if (!fotos.length) return;
-      if (!fotos.some((x) => x.isCover)) fotos[0].isCover = true;
+    for (const file of files) {
+      const b64 = await fileToBase64(file);
+      fotos.push({ b64, isCover: false });
     }
 
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const r = new FileReader();
-        r.onload = () => resolve(String(r.result));
-        r.onerror = reject;
-        r.readAsDataURL(file);
-      });
-    }
+    asegurarPortada();
+    fotosInput.value = "";
+    renderFotos();
+  });
 
-    fotosInput?.addEventListener("change", async () => {
-      const files = Array.from(fotosInput.files || []);
-      if (!files.length) return;
+  function renderFotos() {
+    asegurarPortada();
+    preview.innerHTML = "";
 
-      for (const file of files) {
-        const b64 = await fileToBase64(file);
-        fotos.push({ b64, isCover: false });
-      }
+    fotos.forEach((ph, idx) => {
+      const item = document.createElement("div");
+      item.className = "preview-item";
 
-      asegurarPortada();
-      fotosInput.value = "";
-      renderFotos();
+      const img = document.createElement("img");
+      img.src = ph.b64;
+
+      const actions = document.createElement("div");
+      actions.className = "preview-actions";
+
+      const left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.gap = "8px";
+
+      const btnCover = document.createElement("button");
+      btnCover.type = "button";
+      btnCover.className = "mini-btn";
+      btnCover.textContent = "Portada";
+      btnCover.onclick = () => {
+        fotos = fotos.map((x, i) => ({ ...x, isCover: i === idx }));
+        renderFotos();
+      };
+
+      const btnDel = document.createElement("button");
+      btnDel.type = "button";
+      btnDel.className = "mini-btn";
+      btnDel.textContent = "Borrar";
+      btnDel.onclick = () => {
+        const wasCover = fotos[idx]?.isCover;
+        fotos.splice(idx, 1);
+
+        if (wasCover && fotos.length) {
+          fotos = fotos.map((x, i) => ({ ...x, isCover: i === 0 }));
+        }
+        renderFotos();
+      };
+
+      left.appendChild(btnCover);
+      left.appendChild(btnDel);
+
+      const badge = document.createElement("span");
+      badge.className = "mini-badge";
+      badge.textContent = ph.isCover ? "Portada" : `${idx + 1}/${fotos.length}`;
+
+      actions.appendChild(left);
+      actions.appendChild(badge);
+
+      item.appendChild(img);
+      item.appendChild(actions);
+      preview.appendChild(item);
     });
+  }
 
-    function renderFotos() {
-      asegurarPortada();
-      preview.innerHTML = "";
+  function generarUbicacionAproximada(lat, lng) {
+    const maxOffset = 0.008;
+    return {
+      lat: lat + (Math.random() - 0.5) * maxOffset,
+      lng: lng + (Math.random() - 0.5) * maxOffset
+    };
+  }
 
-      fotos.forEach((ph, idx) => {
-        const item = document.createElement("div");
-        item.className = "preview-item";
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-        const img = document.createElement("img");
-        img.src = ph.b64;
-
-        const actions = document.createElement("div");
-        actions.className = "preview-actions";
-
-        const left = document.createElement("div");
-        left.style.display = "flex";
-        left.style.gap = "8px";
-
-        const btnCover = document.createElement("button");
-        btnCover.type = "button";
-        btnCover.className = "mini-btn";
-        btnCover.textContent = "Portada";
-        btnCover.onclick = () => {
-          fotos = fotos.map((x, i) => ({ ...x, isCover: i === idx }));
-          renderFotos();
-        };
-
-        const btnDel = document.createElement("button");
-        btnDel.type = "button";
-        btnDel.className = "mini-btn";
-        btnDel.textContent = "Borrar";
-        btnDel.onclick = () => {
-          const wasCover = fotos[idx]?.isCover;
-          fotos.splice(idx, 1);
-
-          if (wasCover && fotos.length) {
-            fotos = fotos.map((x, i) => ({ ...x, isCover: i === 0 }));
-          }
-          renderFotos();
-        };
-
-        left.appendChild(btnCover);
-        left.appendChild(btnDel);
-
-        const badge = document.createElement("span");
-        badge.className = "mini-badge";
-        badge.textContent = ph.isCover ? "Portada" : `${idx + 1}/${fotos.length}`;
-
-        actions.appendChild(left);
-        actions.appendChild(badge);
-
-        item.appendChild(img);
-        item.appendChild(actions);
-        preview.appendChild(item);
-      });
+    if (!currentUser) {
+      msg.textContent = "❌ Tenés que iniciar sesión.";
+      return;
     }
 
-    form?.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    if (!latInput.value || !lngInput.value) {
+      msg.textContent = "❌ Marcá la ubicación en el mapa.";
+      return;
+    }
 
-      if (!currentUser) {
-        location.href = "login.html?next=" + encodeURIComponent("publicar.html");
-        return;
-      }
-      if (!form.razonSocial.value.trim()) {
-  alert("Completá la razón social o nombre fiscal.");
-  return;
-}
+    msg.textContent = "Publicando...";
 
-if (!form.cuit.value.trim()) {
-  alert("Completá el CUIT o CUIL.");
-  return;
-}
+    try {
+      const servicios = Array.from(form.querySelectorAll('input[name="servicios"]:checked')).map(el => el.value);
+      const reglas = Array.from(form.querySelectorAll('input[name="reglas"]:checked')).map(el => el.value);
+      const fotosOrdenadas = [...fotos].sort((a, b) => Number(b.isCover) - Number(a.isCover));
 
-if (!form.condicionFiscal.value) {
-  alert("Elegí la condición fiscal.");
-  return;
-}
-
-if (!form.direccionFiscal.value.trim()) {
-  alert("Completá la dirección fiscal.");
-  return;
-}
-
-if (!form.tipoFactura.value) {
-  alert("Elegí el tipo de comprobante.");
-  return;
-}
-
-      if (!form.direccion.value.trim()) {
-        alert("La dirección es obligatoria.");
-        form.direccion.focus();
-        return;
-      }
-
-      if (!paisSelect.value) {
-        alert("Elegí un país.");
-        paisSelect.focus();
-        return;
-      }
-
-      if (!provinciaSelect.value) {
-        alert("Elegí una provincia.");
-        provinciaSelect.focus();
-        return;
-      }
-
-      if (!latInput.value || !lngInput.value) {
-        alert("Marcá la ubicación en el mapa.");
-        return;
-      }
-
-      let maxNoches = parseInt(form.maxNoches.value || "30", 10);
-      if (Number.isNaN(maxNoches)) maxNoches = 30;
-      if (maxNoches < 1) maxNoches = 1;
-      if (maxNoches > 365) maxNoches = 365;
-
-      asegurarPortada();
-
-      const servicios = Array.from(
-        form.querySelectorAll('input[name="servicios"]:checked')
-      ).map(i => i.value);
-
-      const reglas = Array.from(
-        form.querySelectorAll('input[name="reglas"]:checked')
-      ).map(i => i.value);
-
-      const fotosOrdenadas = [...fotos].sort((a, b) => (b.isCover ? 1 : 0) - (a.isCover ? 1 : 0));
-      const fotosBase64 = fotosOrdenadas.map(x => x.b64);
+      const latReal = Number(latInput.value);
+      const lngReal = Number(lngInput.value);
+      const ubicacionPublica = generarUbicacionAproximada(latReal, lngReal);
 
       const data = {
-  id: crypto.randomUUID(),
+        titulo: form.titulo.value.trim(),
+        tipo: form.tipo.value,
+        capacidad: Number(form.capacidad.value),
+        habitaciones: Number(form.habitaciones.value),
+        camas: Number(form.camas.value),
+        banos: Number(form.banos.value),
+        descripcion: form.descripcion.value.trim(),
 
-  titulo: form.titulo.value.trim(),
-  tipo: form.tipo.value,
-  capacidad: Number(form.capacidad.value),
-  habitaciones: Number(form.habitaciones.value),
-  camas: Number(form.camas.value),
-  banos: Number(form.banos.value),
-  descripcion: form.descripcion.value.trim(),
+        pais: form.pais.value,
+        provincia: form.provincia.value,
+        ciudad: form.ciudad.value.trim(),
+        direccion: form.direccion.value.trim(),
+        cp: form.cp.value.trim(),
+        referencia: form.referencia.value.trim(),
 
-  pais: paisSelect.value,
-  provincia: provinciaSelect.value,
-  ciudad: form.ciudad.value.trim(),
-  direccion: form.direccion.value.trim(),
-  cp: form.cp.value.trim(),
-  referencia: form.referencia.value.trim(),
+        lat: latReal,
+        lng: lngReal,
+        latReal,
+        lngReal,
+        latPublica: ubicacionPublica.lat,
+        lngPublica: ubicacionPublica.lng,
 
-  servicios,
-  reglas,
-  reglasExtra: form.reglasExtra.value.trim(),
+        servicios,
+        reglas,
+        reglasExtra: form.reglasExtra.value.trim(),
 
-  cancelacion: form.cancelacion.value,
-  checkinDesde: form.checkinDesde.value,
-  checkoutHasta: form.checkoutHasta.value,
+        checkinDesde: form.checkinDesde.value,
+        checkoutHasta: form.checkoutHasta.value,
+        cancelacion: form.cancelacion.value,
 
-  fotos: fotosBase64,
+        precio: Number(form.precio.value),
+        maxNoches: Number(form.maxNoches.value || 30),
 
-  precio: Number(form.precio.value),
-  moneda: "ARS",
-  maxNoches,
+        fotos: fotosOrdenadas,
+        anfitrion: form.anfitrion.value.trim(),
 
-// 🔓 DATOS PÚBLICOS
-anfitrion: form.anfitrion.value.trim(),
+        datosFiscales: {
+          razonSocial: form.razonSocial.value.trim(),
+          cuit: form.cuit.value.trim(),
+          condicionFiscal: form.condicionFiscal.value,
+          direccionFiscal: form.direccionFiscal.value.trim(),
+          tipoFactura: form.tipoFactura.value,
+          titularCuenta: form.titularCuenta.value.trim(),
+          aliasCbu: form.aliasCbu.value.trim()
+        },
 
-// 🔒 DATOS PRIVADOS (SOLO TUALOJA)
-datosFiscales: {
-  razonSocial: form.razonSocial.value.trim(),
-  cuit: form.cuit.value.trim(),
-  condicionFiscal: form.condicionFiscal.value,
-  direccionFiscal: form.direccionFiscal.value.trim(),
-  tipoFactura: form.tipoFactura.value,
-  titularCuenta: form.titularCuenta.value.trim(),
-  aliasCbu: form.aliasCbu.value.trim()
-},
+        contacto: {
+          telefono: form.telefono.value.trim(),
+          email: form.email.value.trim()
+        },
 
-// 🔒 CONTACTO INTERNO (NO PÚBLICO)
-contacto: {
-  telefono: form.telefono.value.trim(),
-  email: form.email.value.trim()
-},
-  const latReal = Number(latInput.value);
-const lngReal = Number(lngInput.value);
+        anfitrionId: currentUser.uid,
+        anfitrionEmail: currentUser.email || "",
+        createdAt: serverTimestamp()
+      };
 
-const latPublica = latReal + (Math.random() - 0.5) * 0.008;
-const lngPublica = lngReal + (Math.random() - 0.5) * 0.008;
+      const docRef = await addDoc(collection(db, "alojamientos"), data);
 
-lat: latReal,
-lng: lngReal,
-latReal: latReal,
-lngReal: lngReal,
-latPublica: latPublica,
-lngPublica: lngPublica,
+      document.getElementById("mf_id").value = docRef.id;
+      document.getElementById("mf_titulo").value = data.titulo;
+      document.getElementById("mf_tipo").value = data.tipo;
+      document.getElementById("mf_capacidad").value = String(data.capacidad);
+      document.getElementById("mf_habitaciones").value = String(data.habitaciones);
+      document.getElementById("mf_camas").value = String(data.camas);
+      document.getElementById("mf_banos").value = String(data.banos);
+      document.getElementById("mf_provincia").value = data.provincia;
+      document.getElementById("mf_ciudad").value = data.ciudad;
+      document.getElementById("mf_direccion").value = data.direccion;
+      document.getElementById("mf_precio").value = String(data.precio);
+      document.getElementById("mf_maxnoches").value = String(data.maxNoches);
+      document.getElementById("mf_checkin").value = data.checkinDesde;
+      document.getElementById("mf_checkout").value = data.checkoutHasta;
+      document.getElementById("mf_cancelacion").value = data.cancelacion;
+      document.getElementById("mf_anfitrion").value = data.anfitrion;
+      document.getElementById("mf_telefono").value = data.contacto?.telefono || "-";
+      document.getElementById("mf_email").value = data.contacto?.email || "-";
 
-  // 🔥 ESTO ES CLAVE (YA LO TENÍAS)
-  anfitrionId: currentUser.uid,
-  anfitrionEmail: (currentUser.email || "").toLowerCase(),
-  ownerEmail: (currentUser.email || "").toLowerCase(),
+      document.getElementById("mf_razonsocial").value = data.datosFiscales?.razonSocial || "-";
+      document.getElementById("mf_cuit").value = data.datosFiscales?.cuit || "-";
+      document.getElementById("mf_condicionfiscal").value = data.datosFiscales?.condicionFiscal || "-";
+      document.getElementById("mf_direccionfiscal").value = data.datosFiscales?.direccionFiscal || "-";
+      document.getElementById("mf_tipofactura").value = data.datosFiscales?.tipoFactura || "-";
+      document.getElementById("mf_titularcuenta").value = data.datosFiscales?.titularCuenta || "-";
+      document.getElementById("mf_aliascbu").value = data.datosFiscales?.aliasCbu || "-";
+      document.getElementById("mf_servicios").value = servicios.length ? servicios.join(", ") : "-";
+      document.getElementById("mf_reglas").value = reglas.length ? reglas.join(", ") : "-";
+      document.getElementById("mf_replyto").value = data.contacto.email;
+      document.getElementById("mf_email_to").value = data.contacto.email;
 
-  // 🔥 NUEVO (IMPORTANTE)
-  createdBy: currentUser.uid,
-  createdEmail: currentUser.email,
-
-  status: "activo",
-  createdAt: serverTimestamp()
-};
-
-      msg.textContent = "✅ Publicando...";
-
-      try {
-        const docRef = await addDoc(collection(db, "alojamientos"), data);
-
-        document.getElementById("mf_id").value = docRef.id;
-        document.getElementById("mf_titulo").value = data.titulo;
-        document.getElementById("mf_tipo").value = data.tipo;
-        document.getElementById("mf_capacidad").value = String(data.capacidad);
-        document.getElementById("mf_habitaciones").value = String(data.habitaciones);
-        document.getElementById("mf_camas").value = String(data.camas);
-        document.getElementById("mf_banos").value = String(data.banos);
-        document.getElementById("mf_provincia").value = `${data.pais} - ${data.provincia}`;
-        document.getElementById("mf_ciudad").value = data.ciudad;
-        document.getElementById("mf_direccion").value = data.direccion;
-        document.getElementById("mf_precio").value = `$${data.precio} ARS`;
-        document.getElementById("mf_maxnoches").value = String(data.maxNoches);
-        document.getElementById("mf_checkin").value = data.checkinDesde;
-        document.getElementById("mf_checkout").value = data.checkoutHasta;
-        document.getElementById("mf_cancelacion").value = data.cancelacion;
-        document.getElementById("mf_anfitrion").value = data.anfitrion;
-document.getElementById("mf_telefono").value = data.contacto?.telefono || "-";
-document.getElementById("mf_email").value = data.contacto?.email || "-";
-
-document.getElementById("mf_razonsocial").value = data.datosFiscales?.razonSocial || "-";
-document.getElementById("mf_cuit").value = data.datosFiscales?.cuit || "-";
-document.getElementById("mf_condicionfiscal").value = data.datosFiscales?.condicionFiscal || "-";
-document.getElementById("mf_direccionfiscal").value = data.datosFiscales?.direccionFiscal || "-";
-document.getElementById("mf_tipofactura").value = data.datosFiscales?.tipoFactura || "-";
-document.getElementById("mf_titularcuenta").value = data.datosFiscales?.titularCuenta || "-";
-document.getElementById("mf_aliascbu").value = data.datosFiscales?.aliasCbu || "-";
-        document.getElementById("mf_servicios").value = servicios.length ? servicios.join(", ") : "-";
-        document.getElementById("mf_reglas").value = reglas.length ? reglas.join(", ") : "-";
-        document.getElementById("mf_replyto").value = data.email;
-        document.getElementById("mf_email_to").value = data.email;
-
-        document.getElementById("mf_autoresponse").value =
+      document.getElementById("mf_autoresponse").value =
 `¡Hola ${data.anfitrion}! 👋
 
 Recibimos correctamente tu publicación en TuAloja.
@@ -1131,29 +1080,25 @@ Recibimos correctamente tu publicación en TuAloja.
 Gracias por confiar en TuAloja 💙
 — Equipo TuAloja`;
 
-        msg.textContent = "✅ Publicado correctamente. Redirigiendo...";
+      msg.textContent = "✅ Publicado correctamente. Redirigiendo...";
 
-        setTimeout(() => {
-          mailForm.submit();
-        }, 300);
+      setTimeout(() => {
+        mailForm.submit();
+      }, 300);
 
-        setTimeout(() => {
-          location.href = "gracias.html";
-        }, 900);
-      } catch (error) {
-        console.error(error);
-        msg.textContent = "❌ No se pudo publicar. Intentá nuevamente.";
-      }
-  
-   window.addEventListener("load", () => {
-  initMapa();
-
-  setTimeout(() => {
-    if (mapa) {
-      mapa.invalidateSize();
+      setTimeout(() => {
+        location.href = "gracias.html";
+      }, 900);
+    } catch (error) {
+      console.error(error);
+      msg.textContent = "❌ No se pudo publicar. Intentá nuevamente.";
     }
-  }, 300);
-});
-  </script>
+  });
+
+  window.addEventListener("load", () => {
+    initMapa();
+  });
+</script>
+
 </body>
 </html>
