@@ -306,6 +306,22 @@
       color:#666;
       font-size:18px;
     }
+    .precio-marker-detalle{
+  background:#fff;
+  color:#111;
+  border:1px solid rgba(0,0,0,.10);
+  border-radius:999px;
+  padding:8px 12px;
+  font-weight:800;
+  font-size:14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.18);
+  white-space:nowrap;
+}
+
+.custom-price-icon-detalle{
+  background:transparent;
+  border:none;
+}
 
     @media(max-width:1050px){
       .detalle-info-grid{grid-template-columns:1fr}
@@ -476,6 +492,15 @@
 
     return null;
   }
+   function crearIconoPrecioDetalle(precioTexto) {
+  return L.divIcon({
+    className: "custom-price-icon-detalle",
+    html: `<div class="precio-marker-detalle">$${precioTexto}</div>`,
+    iconSize: [1, 1],
+    iconAnchor: [24, 20],
+    popupAnchor: [0, -18]
+  });
+}
 
   function renderMapaDetalle(alojamiento, reserva, user, intentos = 0) {
   const boxMapa = document.getElementById("mapaDetalle");
@@ -523,14 +548,18 @@
     }
   ).addTo(mapaDetalle);
 
-  L.marker([infoMapa.lat, infoMapa.lng])
-    .addTo(mapaDetalle)
-    .bindPopup(
-      infoMapa.exacta
-        ? `<b>${alojamiento.titulo}</b><br>${alojamiento.direccion}`
-        : `<b>${alojamiento.titulo}</b><br>📍 Ubicación aproximada`
-    )
-    .openPopup();
+  const precioTexto = Number(alojamiento.precio || 0).toLocaleString("es-AR");
+
+L.marker([infoMapa.lat, infoMapa.lng], {
+  icon: crearIconoPrecioDetalle(precioTexto)
+})
+  .addTo(mapaDetalle)
+  .bindPopup(
+    infoMapa.exacta
+      ? `<b>${alojamiento.titulo || "Alojamiento"}</b><br>${alojamiento.direccion || ""}<br><strong>$${precioTexto} / noche</strong>`
+      : `<b>${alojamiento.titulo || "Alojamiento"}</b><br>📍 Ubicación aproximada<br><strong>$${precioTexto} / noche</strong>`
+  )
+  .openPopup();
 
   setTimeout(() => {
     mapaDetalle.invalidateSize();
