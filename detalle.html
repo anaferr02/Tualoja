@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Detalle - TuAloja</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
   <style>
     *{box-sizing:border-box}
@@ -276,6 +277,31 @@
       pointer-events:none;
     }
 
+    .detalle-mapa-box{
+      margin-top:28px;
+      background:#fff;
+      border:1px solid #e8e9f2;
+      border-radius:22px;
+      padding:20px;
+      box-shadow:0 10px 26px rgba(27,31,53,.06);
+    }
+
+    .detalle-mapa-texto{
+      margin:0 0 12px;
+      color:#475069;
+      line-height:1.6;
+      font-size:15px;
+    }
+
+    #mapaDetalle{
+      width:100%;
+      height:360px;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid #e5e5ef;
+      background:#eef1f6;
+    }
+
     .muted{
       color:#666;
       font-size:18px;
@@ -301,6 +327,7 @@
       .detalle-info-right{padding:22px 18px 24px}
       .detalle-precio-numero{font-size:34px}
       .detalle-btn-reservar{font-size:21px}
+      #mapaDetalle{height:300px}
     }
   </style>
 </head>
@@ -325,6 +352,8 @@
     </p>
   </main>
 
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
  <script type="module">
   import { db } from "./firebase-config.js";
   import {
@@ -348,6 +377,8 @@
   const checkoutParam = params.get("checkout") || "";
   const guestsParam = params.get("guests") || "1";
   const destinoParam = params.get("destino") || "";
+
+  let mapaDetalle = null;
 
   if (checkinParam || checkoutParam || guestsParam || destinoParam) {
     const backParams = new URLSearchParams();
@@ -405,6 +436,136 @@
     return "★".repeat(n) + "☆".repeat(5 - n);
   }
 
+  function puedeVerUbicacionExacta(reserva, user) {
+    if (!reserva || !user) return false;
+
+    const estado = String(reserva.estado || "").toLowerCase();
+
+    const esParticipante =
+      reserva.huespedId === user.uid ||
+      reserva.anfitrionId === user.uid ||
+      reserva.hostId === user.uid;
+
+    return esParticipante && (estado === "aceptada" || estado === "confirmada");
+  }
+
+  function obtenerCoordsDetalle(alojamiento, reserva, user) {
+    if (puedeVerUbicacionExacta(reserva, user)) {
+      const lat = Number(alojamiento.latReal || alojamiento.lat);
+      const lng = Number(alojamiento.lngReal || alojamiento.lng);
+
+      if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0) {
+        return {
+          lat,
+          lng,
+          exacta: true
+        };
+      }
+    }
+
+    const lat = Number(alojamiento.latPublica || alojamiento.lat);
+    const lng = Number(alojamiento.lngPublica || alojamiento.lng);
+
+    if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0) {
+      return {
+        lat,
+        lng,
+        exacta: false
+      };
+    }
+
+    return null;
+  }
+
+  function renderMapaDetalle(alojamiento, reserva, user) {
+    const boxMapa = document.getElementById("mapaDetalle");
+    if (!boxMapa || typeof L === "undefined") return;
+
+    const infoMapa = obtenerCoordsDetalle(alojamiento, reserva, user);
+    if (!infoMapa) return;
+
+    if (mapaDetalle) {
+      mapaDetalle.remove();
+      mapaDetalle = null;
+    }
+
+    mapaDetalle = L.map("mapaDetalle").setView(
+      [infoMapa.lat, infoMapa.lng],
+      infoMapa.exacta ? 16 : 13
+    );
+
+    const mapaCalles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap"
+    });
+
+    const mapaSatelite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+      attribution: "Tiles © Esri"
+    });
+
+    mapaCalles.addTo(mapaDetalle);
+
+    L.control.layers(
+      {
+        "🗺️ Mapa": mapaCalles,
+        "🛰️ Satélite": mapaSatelite
+      }
+    ).addTo(mapaDetalle);
+
+    L.marker([infoMapa.lat, infoMapa.lng])
+      .addTo(mapaDetalle)
+      .bindPopup(
+        infoMapa.exacta
+          ? `<b>${alojamiento.titulo || "Alojamiento"}</b><br>${alojamiento.direccion || ""}`
+          : `<b>${alojamiento.titulo || "Alojamiento"}</b><br>📍 Ubicación aproximada`
+      )
+      .openPopup();
+
+    setTimeout(() => {
+      mapaDetalle.invalidateSize();
+    }, 250);
+  }
+
+  async function buscarReservaVisible(alojamientoId, user) {
+    if (!user?.uid || !alojamientoId) return null;
+
+    try {
+      const consultas = [
+        query(
+          collection(db, "reservas"),
+          where("alojamientoId", "==", alojamientoId),
+          where("huespedId", "==", user.uid)
+        ),
+        query(
+          collection(db, "reservas"),
+          where("alojamientoId", "==", alojamientoId),
+          where("anfitrionId", "==", user.uid)
+        ),
+        query(
+          collection(db, "reservas"),
+          where("alojamientoId", "==", alojamientoId),
+          where("hostId", "==", user.uid)
+        )
+      ];
+
+      for (const qy of consultas) {
+        const snap = await getDocs(qy);
+        if (!snap.empty) {
+          const reservas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+          const preferida =
+            reservas.find(r => ["confirmada", "aceptada"].includes(String(r.estado || "").toLowerCase())) ||
+            reservas[0];
+
+          if (preferida) return preferida;
+        }
+      }
+    } catch (error) {
+      console.error("Error buscando reserva para ubicación exacta:", error);
+    }
+
+    return null;
+  }
+
   async function cargarDetalle() {
     try {
       if (!id) {
@@ -429,22 +590,28 @@
       const ubicacion = provincia ? `${ciudad} - ${provincia}` : ciudad;
       const descripcion = limpiarTexto(a.descripcion, "Sin descripción disponible.");
       const titulo = limpiarTexto(a.titulo, "Alojamiento sin título");
-      const huespedes = Number(a.huespedes || 1);
+      const huespedes = Number(a.capacidad || a.huespedes || 1);
       const tipo = limpiarTexto(a.tipo, "Departamento");
-      const checkinHora = limpiarTexto(a.checkinHora, "14:00");
-      const checkoutHora = limpiarTexto(a.checkoutHora, "10:00");
+      const checkinHora = limpiarTexto(a.checkinDesde || a.checkinHora, "14:00");
+      const checkoutHora = limpiarTexto(a.checkoutHasta || a.checkoutHora, "10:00");
       const cancelacion = limpiarTexto(a.cancelacion, "No reembolsable");
 
       const servicios = convertirLista(a.servicios, ["Wifi", "Aire acondicionado"]);
       const reglas = convertirLista(a.reglas, ["No se permite fumar", "No se permiten fiestas"]);
       const hoy = obtenerHoy();
+      const user = getUserLocal();
+      const reservaVisible = await buscarReservaVisible(id, user);
+      const puedeVerExacta = puedeVerUbicacionExacta(reservaVisible, user);
+      const textoUbicacionMapa = puedeVerExacta
+        ? limpiarTexto(a.direccion, ubicacion)
+        : `${ubicacion} · Ubicación aproximada`;
 
       wrap.innerHTML = `
         <section class="detalle-layout">
           <h1>${titulo}</h1>
 
           <div class="detalle-top-meta">
-            <span><strong>Ubicación:</strong> ${ubicacion}</span>
+            <span><strong>Ubicación:</strong> ${textoUbicacionMapa}</span>
             <span><strong>Capacidad:</strong> ${huespedes} huéspedes</span>
             <span><strong>Tipo:</strong> ${tipo}</span>
           </div>
@@ -470,6 +637,7 @@
                     <div class="detalle-item"><strong>Check-in:</strong> ${checkinHora}</div>
                     <div class="detalle-item"><strong>Check-out:</strong> ${checkoutHora}</div>
                     <div class="detalle-item"><strong>Cancelación:</strong> ${cancelacion}</div>
+                    <div class="detalle-item"><strong>Ubicación:</strong> ${textoUbicacionMapa}</div>
                   </div>
                 </div>
 
@@ -485,6 +653,18 @@
                   <div class="detalle-lista">
                     ${reglas.map(item => `<div class="detalle-item">${item}</div>`).join("")}
                   </div>
+                </div>
+
+                <div class="detalle-mapa-box">
+                  <h3>Ubicación</h3>
+                  <p class="detalle-mapa-texto">
+                    ${
+                      puedeVerExacta
+                        ? "Como esta reserva pertenece a una cuenta con acceso, se muestra la ubicación exacta del alojamiento."
+                        : "Antes de reservar se muestra una ubicación aproximada para proteger al anfitrión."
+                    }
+                  </p>
+                  <div id="mapaDetalle"></div>
                 </div>
               </div>
 
@@ -539,187 +719,3 @@
                   <option value="5">5 - Excelente</option>
                   <option value="4">4 - Muy bueno</option>
                   <option value="3">3 - Bueno</option>
-                  <option value="2">2 - Regular</option>
-                  <option value="1">1 - Malo</option>
-                </select>
-
-                <textarea id="comentario" placeholder="Contá tu experiencia..." required></textarea>
-
-                <button type="submit">Enviar reseña</button>
-                <p id="msgResena"></p>
-              </form>
-            </div>
-          </section>
-        </section>
-      `;
-
-      const listaResenas = document.getElementById("listaResenas");
-      const resenasResumen = document.getElementById("resenasResumen");
-      const formResena = document.getElementById("formResena");
-      const msgResena = document.getElementById("msgResena");
-      const boxDejarResena = document.getElementById("boxDejarResena");
-
-      const user = getUserLocal();
-
-      async function cargarResenas() {
-        const q = query(
-          collection(db, "resenas"),
-          where("alojamientoId", "==", id)
-        );
-
-        const snapResenas = await getDocs(q);
-
-        if (snapResenas.empty) {
-          resenasResumen.innerHTML = "Sin reseñas todavía";
-          listaResenas.innerHTML = "";
-          return;
-        }
-
-        let total = 0;
-        let cantidad = snapResenas.size;
-        let html = "";
-
-        snapResenas.forEach((docSnap) => {
-          const r = docSnap.data();
-          const puntaje = Number(r.puntaje || 0);
-
-          total += puntaje;
-
-          html += `
-            <div style="border:1px solid #eee; padding:12px; border-radius:12px; margin-bottom:10px;">
-              <strong>${r.nombre || "Huésped"}</strong><br>
-              <span style="color:#f5b301;">${estrellas(puntaje)}</span><br>
-              <span>${r.comentario || ""}</span>
-            </div>
-          `;
-        });
-
-        const promedio = (total / cantidad).toFixed(1);
-        resenasResumen.innerHTML = `⭐ ${promedio} (${cantidad} reseñas)`;
-        listaResenas.innerHTML = html;
-      }
-
-      await cargarResenas();
-
-      if (user) {
-        boxDejarResena.style.display = "block";
-      }
-
-      formResena?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        if (!user) {
-          msgResena.textContent = "Iniciá sesión";
-          return;
-        }
-
-        const puntaje = Number(document.getElementById("puntaje").value);
-        const comentario = document.getElementById("comentario").value.trim();
-
-        if (!puntaje || comentario.length < 5) {
-          msgResena.textContent = "Completá bien la reseña";
-          return;
-        }
-
-        try {
-          await addDoc(collection(db, "resenas"), {
-            alojamientoId: id,
-            puntaje,
-            comentario,
-            nombre: user.email || "Huésped",
-            createdAt: serverTimestamp()
-          });
-
-          msgResena.textContent = "✅ Reseña enviada";
-          formResena.reset();
-          await cargarResenas();
-        } catch (error) {
-          console.error("Error al guardar reseña:", error);
-          msgResena.textContent = "Error al guardar reseña";
-        }
-      });
-
-      const checkin = document.getElementById("checkin");
-      const checkout = document.getElementById("checkout");
-      const guests = document.getElementById("guests");
-      const totalBox = document.getElementById("totalBox");
-      const btnReservar = document.getElementById("btnReservar");
-
-      function actualizarTotal() {
-        if (checkin.value) {
-          checkout.min = checkin.value;
-        } else {
-          checkout.min = hoy;
-        }
-
-        const noches = calcularNoches(checkin.value, checkout.value);
-
-        if (noches <= 0) {
-          totalBox.innerHTML = "Seleccioná fechas válidas para calcular el total";
-          btnReservar.classList.add("disabled");
-          return;
-        }
-
-        const total = noches * precio;
-        totalBox.innerHTML = `<strong>${noches} ${noches === 1 ? "noche" : "noches"}</strong> · Total estimado: <strong>$${formatearPrecio(total)}</strong>`;
-        btnReservar.classList.remove("disabled");
-      }
-
-      checkin.addEventListener("change", () => {
-        if (checkout.value && checkout.value <= checkin.value) {
-          checkout.value = "";
-        }
-        actualizarTotal();
-      });
-
-      checkout.addEventListener("change", actualizarTotal);
-
-      const reservaGuardada = JSON.parse(localStorage.getItem("reservaPendiente") || "null");
-      if (reservaGuardada && reservaGuardada.alojamientoId === id) {
-        checkin.value = reservaGuardada.checkin || "";
-        checkout.value = reservaGuardada.checkout || "";
-        guests.value = String(reservaGuardada.guests || guests.value);
-      }
-
-      btnReservar.addEventListener("click", () => {
-        const noches = calcularNoches(checkin.value, checkout.value);
-
-        if (noches <= 0) {
-          alert("Seleccioná fechas válidas.");
-          return;
-        }
-
-        const cantidadHuespedes = Number(guests.value || 1);
-
-        const reserva = {
-          alojamientoId: id,
-          checkin: checkin.value,
-          checkout: checkout.value,
-          guests: cantidadHuespedes
-        };
-
-        localStorage.setItem("reservaPendiente", JSON.stringify(reserva));
-
-        const userActual = getUserLocal();
-
-        if (!userActual) {
-          localStorage.setItem("redirectAfterLogin", "reservar.html");
-          alert("Tenés que iniciar sesión para reservar");
-          window.location.href = "login.html";
-          return;
-        }
-
-        window.location.href = "reservar.html";
-      });
-
-      actualizarTotal();
-    } catch (error) {
-      console.error("Error al cargar detalle:", error);
-      noExiste.style.display = "block";
-    }
-  }
-
-  cargarDetalle();
-</script>
-</body>
-</html>
