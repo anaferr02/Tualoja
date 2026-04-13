@@ -740,10 +740,6 @@
   const btnBuscarMapa = document.getElementById("btnBuscarMapa");
   const aceptaContrato = document.getElementById("aceptaContrato");
 
-if (!aceptaContrato.checked) {
-  msg.textContent = "❌ Tenés que aceptar el contrato.";
-  return;
-}
 
   let fotos = [];
   let mapa = null;
@@ -760,6 +756,10 @@ if (!aceptaContrato.checked) {
   if (logoutLink) {
     logoutLink.addEventListener("click", async (e) => {
       e.preventDefault();
+      if (!aceptaContrato.checked) {
+  msg.textContent = "❌ Tenés que aceptar el contrato.";
+  return;
+}
       await signOut(auth);
       location.href = "login.html";
     });
