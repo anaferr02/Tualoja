@@ -1123,64 +1123,74 @@ function actualizarContador(){
     renderFotos();
   });
 
-  function renderFotos() {
-    asegurarPortada();
-    preview.innerHTML = "";
+ function renderFotos() {
+  asegurarPortada();
+  preview.innerHTML = "";
 
-    fotos.forEach((ph, idx) => {
-      const item = document.createElement("div");
-      item.className = "preview-item";
+  fotos.forEach((ph, idx) => {
+    const item = document.createElement("div");
+    item.className = "preview-item";
 
-      const img = document.createElement("img");
-      img.src = ph.b64;
+    const img = document.createElement("img");
+    img.src = ph.b64;
 
-      const actions = document.createElement("div");
-      actions.className = "preview-actions";
+    // 🔥 CLICK EN IMAGEN = HACER PORTADA
+    img.style.cursor = "pointer";
+    img.title = "Hacé click para poner esta foto como portada";
+    img.onclick = () => {
+      fotos = fotos.map((x, i) => ({ ...x, isCover: i === idx }));
+      renderFotos();
+    };
 
-      const left = document.createElement("div");
-      left.style.display = "flex";
-      left.style.gap = "8px";
+    const actions = document.createElement("div");
+    actions.className = "preview-actions";
 
-      const btnCover = document.createElement("button");
-      btnCover.type = "button";
-      btnCover.className = "mini-btn";
-      btnCover.textContent = "Portada";
-      btnCover.onclick = () => {
-        fotos = fotos.map((x, i) => ({ ...x, isCover: i === idx }));
-        renderFotos();
-      };
+    const left = document.createElement("div");
+    left.style.display = "flex";
+    left.style.gap = "8px";
 
-      const btnDel = document.createElement("button");
-      btnDel.type = "button";
-      btnDel.className = "mini-btn";
-      btnDel.textContent = "Borrar";
-      btnDel.onclick = () => {
-        const wasCover = fotos[idx]?.isCover;
-        fotos.splice(idx, 1);
+    // 👉 SOLO BOTÓN BORRAR
+    const btnDel = document.createElement("button");
+    btnDel.type = "button";
+    btnDel.className = "mini-btn";
+    btnDel.textContent = "Borrar";
+    btnDel.onclick = () => {
+      const wasCover = fotos[idx]?.isCover;
+      fotos.splice(idx, 1);
 
-        if (wasCover && fotos.length) {
-          fotos = fotos.map((x, i) => ({ ...x, isCover: i === 0 }));
-        }
-        renderFotos();
-      };
+      if (wasCover && fotos.length) {
+        fotos = fotos.map((x, i) => ({ ...x, isCover: i === 0 }));
+      }
+      renderFotos();
+    };
 
-      left.appendChild(btnCover);
-      left.appendChild(btnDel);
+    left.appendChild(btnDel);
 
-      const badge = document.createElement("span");
-      badge.className = "mini-badge";
-      badge.textContent = ph.isCover ? "Portada" : `${idx + 1}/${fotos.length}`;
+    const badge = document.createElement("span");
+    badge.className = "mini-badge";
 
-      actions.appendChild(left);
-      actions.appendChild(badge);
+    // 🔥 SOLO UNA PORTADA EN AZUL
+    if (ph.isCover) {
+      badge.textContent = "Portada";
+      badge.style.background = "#4f3dbb";
+      badge.style.color = "#fff";
+    } else {
+      badge.textContent = `${idx + 1}/${fotos.length}`;
+      badge.style.background = "#e5e7eb";
+      badge.style.color = "#333";
+    }
 
-      item.appendChild(img);
-      item.appendChild(actions);
-      preview.appendChild(item);
-    });
-    actualizarContador();
-    
-  }
+    actions.appendChild(left);
+    actions.appendChild(badge);
+
+    item.appendChild(img);
+    item.appendChild(actions);
+    preview.appendChild(item);
+  });
+
+  // 👉 contador
+  actualizarContador();
+}
 
   function generarUbicacionAproximada(lat, lng) {
     const maxOffset = 0.008;
