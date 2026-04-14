@@ -791,9 +791,9 @@
 };
 
   const paisSelect = document.getElementById("pais");
-  const provinciaSelect = document.getElementById("provincia");
-  const ciudadSelect = document.getElementById("ciudadSelect");
-  const ciudadInput = document.getElementById("ciudadInput");
+const provinciaSelect = document.getElementById("provincia");
+const ciudadSelect = document.getElementById("ciudadSelect");
+const ciudadInput = document.getElementById("ciudadInput");
   const logoutLink = document.getElementById("logoutLink");
   const fotosInput = document.getElementById("fotos");
   const preview = document.getElementById("preview");
@@ -831,57 +831,45 @@
     });
   }
 
-  function cargarProvincias() {
-    const pais = paisSelect.value;
-    const provincias = provinciasPorPais[pais] || [];
+  const paisSelect = document.getElementById("pais");
+const provinciaSelect = document.getElementById("provincia");
+const ciudadSelect = document.getElementById("ciudadSelect");
+const ciudadInput = document.getElementById("ciudadInput");
 
-    provinciaSelect.innerHTML = "";
+// 👉 Cargar provincias
+function cargarProvincias() {
+  const pais = paisSelect.value;
+  const provincias = provinciasPorPais[pais] || [];
 
-    if (!pais) {
-      provinciaSelect.innerHTML = `<option value="">Primero elegí un país</option>`;
-      return;
-    }
+  provinciaSelect.innerHTML = "";
 
-    provinciaSelect.innerHTML = `<option value="">Elegí una provincia</option>`;
-    provincias.forEach((prov) => {
-      const option = document.createElement("option");
-      option.value = prov;
-      option.textContent = prov;
-      provinciaSelect.appendChild(option);
-    });
+  if (!pais) {
+    provinciaSelect.innerHTML = `<option value="">Primero elegí un país</option>`;
+    return;
   }
 
-  paisSelect?.addEventListener("change", () => {
-  cargarProvincias();
-  ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
-});
-  
-  provinciaSelect?.addEventListener("change", cargarCiudades);
-  
-  function cargarCiudades() {
+  provinciaSelect.innerHTML = `<option value="">Elegí una provincia</option>`;
+
+  provincias.forEach((prov) => {
+    const option = document.createElement("option");
+    option.value = prov;
+    option.textContent = prov;
+    provinciaSelect.appendChild(option);
+  });
+}
+
+// 👉 Cargar ciudades
+function cargarCiudades() {
   const provincia = provinciaSelect.value;
   const ciudades = ciudadesPorProvincia[provincia] || [];
 
-  ciudadSelect.innerHTML = `<option value="">Elegí una ciudad</option>`;
-    ciudades.forEach((ciudad) => {
-    const option = document.createElement("option");
-    option.value = ciudad;
-    option.textContent = ciudad;
-    ciudadSelect.appendChild(option);
-  });
-}
+  ciudadSelect.innerHTML = `<option value="">Elegí una ciudad (opcional)</option>`;
 
   if (!provincia) {
     ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
     return;
   }
 
-  if (!ciudades.length) {
-    ciudadSelect.innerHTML = `<option value="">Escribí la ciudad manualmente</option>`;
-    return;
-  }
-
-  ciudadSelect.innerHTML = `<option value="">Elegí una ciudad</option>`;
   ciudades.forEach((ciudad) => {
     const option = document.createElement("option");
     option.value = ciudad;
@@ -890,6 +878,19 @@
   });
 }
 
+// 👉 Eventos
+paisSelect?.addEventListener("change", () => {
+  cargarProvincias();
+
+  // resetear ciudades
+  ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
+  ciudadInput.value = "";
+});
+
+provinciaSelect?.addEventListener("change", () => {
+  cargarCiudades();
+  ciudadInput.value = "";
+});
   function initMapa(intentos = 0) {
     const mapaEl = document.getElementById("mapa");
     if (!mapaEl) return;
@@ -1109,6 +1110,14 @@ if (btnBuscarMapa) {
       const latReal = Number(latInput.value);
       const lngReal = Number(lngInput.value);
       const ubicacionPublica = generarUbicacionAproximada(latReal, lngReal);
+     
+      if (!aceptaContrato.checked) {
+  msg.textContent = "❌ Tenés que aceptar el contrato.";
+  return;
+}
+
+// 👉 elegir ciudad automáticamente
+const ciudadFinal = ciudadSelect.value || ciudadInput.value.trim();
 
       const data = {
         titulo: form.titulo.value.trim(),
@@ -1121,7 +1130,7 @@ if (btnBuscarMapa) {
 
         pais: form.pais.value,
         provincia: form.provincia.value,
-        ciudad: form.ciudad.value.trim(),
+        ciudad: ciudadFinal,
         direccion: form.direccion.value.trim(),
         cp: form.cp.value.trim(),
         referencia: form.referencia.value.trim(),
