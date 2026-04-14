@@ -398,20 +398,20 @@
               </select>
             </div>
             <div>
-             <label>Ciudad *</label>
+  <label>Ciudad *</label>
 
-<select id="ciudadSelect">
-  <option value="">Elegí una ciudad (opcional)</option>
-</select>
+  <select id="ciudadSelect">
+    <option value="">Elegí una ciudad</option>
+  </select>
 
-<input 
-  type="text" 
-  id="ciudadInput"
-  placeholder="O escribí la ciudad"
-  required
-  style="margin-top:8px;"
-/>
-            </div>
+  <input
+    type="text"
+    id="ciudadInput"
+    placeholder="O escribí la ciudad"
+    required
+    style="margin-top:8px;"
+  />
+</div>
           </div>
 
           <label>Dirección (obligatoria) *</label>
@@ -736,64 +736,34 @@
       "Magallanes"
     ]
   };
+
   const ciudadesPorProvincia = {
-  "Entre Ríos": [
-    "Paraná",
-    "Concordia",
-    "Gualeguaychú",
-    "Concepción del Uruguay",
-    "Colón",
-    "Villa Elisa",
-    "San José",
-    "Federación",
-    "Chajarí",
-    "Nogoyá",
-    "Victoria",
-    "Diamante",
-    "San Salvador",
-    "Villaguay",
-    "Gualeguay",
-    "La Paz",
-    "Federal",
-    "Crespo"
-  ],
-  "Buenos Aires": [
-    "La Plata",
-    "Mar del Plata",
-    "Bahía Blanca",
-    "Tandil",
-    "Pinamar",
-    "Villa Gesell",
-    "San Bernardo",
-    "Necochea"
-  ],
-  "Córdoba": [
-    "Córdoba",
-    "Villa Carlos Paz",
-    "Villa General Belgrano",
-    "La Falda",
-    "Capilla del Monte",
-    "Mina Clavero",
-    "Alta Gracia"
-  ],
-  "Santa Fe": [
-    "Rosario",
-    "Santa Fe",
-    "Rafaela",
-    "Reconquista"
-  ],
-  "Mendoza": [
-    "Mendoza",
-    "San Rafael",
-    "Maipú",
-    "Luján de Cuyo"
-  ]
-};
+    "Entre Ríos": [
+      "Paraná", "Concordia", "Gualeguaychú", "Concepción del Uruguay",
+      "Colón", "Villa Elisa", "San José", "Federación", "Chajarí",
+      "Nogoyá", "Victoria", "Diamante", "San Salvador", "Villaguay",
+      "Gualeguay", "La Paz", "Federal", "Crespo"
+    ],
+    "Buenos Aires": [
+      "La Plata", "Mar del Plata", "Bahía Blanca", "Tandil",
+      "Pinamar", "Villa Gesell", "San Bernardo", "Necochea"
+    ],
+    "Córdoba": [
+      "Córdoba", "Villa Carlos Paz", "Villa General Belgrano",
+      "La Falda", "Capilla del Monte", "Mina Clavero", "Alta Gracia"
+    ],
+    "Santa Fe": [
+      "Rosario", "Santa Fe", "Rafaela", "Reconquista"
+    ],
+    "Mendoza": [
+      "Mendoza", "San Rafael", "Maipú", "Luján de Cuyo"
+    ]
+  };
 
   const paisSelect = document.getElementById("pais");
-const provinciaSelect = document.getElementById("provincia");
-const ciudadSelect = document.getElementById("ciudadSelect");
-const ciudadInput = document.getElementById("ciudadInput");
+  const provinciaSelect = document.getElementById("provincia");
+  const ciudadSelect = document.getElementById("ciudadSelect");
+  const ciudadInput = document.getElementById("ciudadInput");
   const logoutLink = document.getElementById("logoutLink");
   const fotosInput = document.getElementById("fotos");
   const preview = document.getElementById("preview");
@@ -805,7 +775,6 @@ const ciudadInput = document.getElementById("ciudadInput");
   const buscarDireccionInput = document.getElementById("buscarDireccion");
   const btnBuscarMapa = document.getElementById("btnBuscarMapa");
   const aceptaContrato = document.getElementById("aceptaContrato");
-
 
   let fotos = [];
   let mapa = null;
@@ -822,75 +791,62 @@ const ciudadInput = document.getElementById("ciudadInput");
   if (logoutLink) {
     logoutLink.addEventListener("click", async (e) => {
       e.preventDefault();
-      if (!aceptaContrato.checked) {
-  msg.textContent = "❌ Tenés que aceptar el contrato.";
-  return;
-}
       await signOut(auth);
       location.href = "login.html";
     });
   }
 
-  const paisSelect = document.getElementById("pais");
-const provinciaSelect = document.getElementById("provincia");
-const ciudadSelect = document.getElementById("ciudadSelect");
-const ciudadInput = document.getElementById("ciudadInput");
+  function cargarProvincias() {
+    const pais = paisSelect.value;
+    const provincias = provinciasPorPais[pais] || [];
 
-// 👉 Cargar provincias
-function cargarProvincias() {
-  const pais = paisSelect.value;
-  const provincias = provinciasPorPais[pais] || [];
+    provinciaSelect.innerHTML = "";
 
-  provinciaSelect.innerHTML = "";
+    if (!pais) {
+      provinciaSelect.innerHTML = `<option value="">Primero elegí un país</option>`;
+      return;
+    }
 
-  if (!pais) {
-    provinciaSelect.innerHTML = `<option value="">Primero elegí un país</option>`;
-    return;
+    provinciaSelect.innerHTML = `<option value="">Elegí una provincia</option>`;
+
+    provincias.forEach((prov) => {
+      const option = document.createElement("option");
+      option.value = prov;
+      option.textContent = prov;
+      provinciaSelect.appendChild(option);
+    });
   }
 
-  provinciaSelect.innerHTML = `<option value="">Elegí una provincia</option>`;
+  function cargarCiudades() {
+    const provincia = provinciaSelect.value;
+    const ciudades = ciudadesPorProvincia[provincia] || [];
 
-  provincias.forEach((prov) => {
-    const option = document.createElement("option");
-    option.value = prov;
-    option.textContent = prov;
-    provinciaSelect.appendChild(option);
-  });
-}
+    ciudadSelect.innerHTML = `<option value="">Elegí una ciudad</option>`;
 
-// 👉 Cargar ciudades
-function cargarCiudades() {
-  const provincia = provinciaSelect.value;
-  const ciudades = ciudadesPorProvincia[provincia] || [];
+    if (!provincia) {
+      ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
+      return;
+    }
 
-  ciudadSelect.innerHTML = `<option value="">Elegí una ciudad (opcional)</option>`;
+    ciudades.forEach((ciudad) => {
+      const option = document.createElement("option");
+      option.value = ciudad;
+      option.textContent = ciudad;
+      ciudadSelect.appendChild(option);
+    });
+  }
 
-  if (!provincia) {
+  paisSelect?.addEventListener("change", () => {
+    cargarProvincias();
     ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
-    return;
-  }
-
-  ciudades.forEach((ciudad) => {
-    const option = document.createElement("option");
-    option.value = ciudad;
-    option.textContent = ciudad;
-    ciudadSelect.appendChild(option);
+    ciudadInput.value = "";
   });
-}
 
-// 👉 Eventos
-paisSelect?.addEventListener("change", () => {
-  cargarProvincias();
+  provinciaSelect?.addEventListener("change", () => {
+    cargarCiudades();
+    ciudadInput.value = "";
+  });
 
-  // resetear ciudades
-  ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
-  ciudadInput.value = "";
-});
-
-provinciaSelect?.addEventListener("change", () => {
-  cargarCiudades();
-  ciudadInput.value = "";
-});
   function initMapa(intentos = 0) {
     const mapaEl = document.getElementById("mapa");
     if (!mapaEl) return;
@@ -928,66 +884,65 @@ provinciaSelect?.addEventListener("change", () => {
       actualizarUbicacion(lat, lng);
     });
 
-   
-
     async function buscarDireccionEnMapa() {
-  const queryBase = buscarDireccionInput?.value?.trim() || "";
+      const queryBase = buscarDireccionInput?.value?.trim() || "";
 
-  if (!queryBase) {
-    alert("Escribí una dirección.");
-    return;
-  }
-
-  const ciudad = form.ciudad?.value?.trim() || "";
-  const provincia = provinciaSelect?.value || "";
-  const pais = paisSelect?.value || "";
-
-  const queryCompleta = [queryBase, ciudad, provincia, pais]
-    .filter(Boolean)
-    .join(", ");
-
-  try {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(queryCompleta)}`;
-    const resp = await fetch(url, {
-      headers: {
-        "Accept": "application/json"
+      if (!queryBase) {
+        alert("Escribí una dirección.");
+        return;
       }
-    });
 
-    const results = await resp.json();
+      const ciudadFinal = ciudadSelect.value || ciudadInput.value.trim();
+      const provincia = provinciaSelect?.value || "";
+      const pais = paisSelect?.value || "";
 
-    if (!results || !results.length) {
-      alert("No se encontró la dirección. Probá escribiéndola más completa.");
-      return;
+      const queryCompleta = [queryBase, ciudadFinal, provincia, pais]
+        .filter(Boolean)
+        .join(", ");
+
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(queryCompleta)}`;
+        const resp = await fetch(url, {
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        const results = await resp.json();
+
+        if (!results || !results.length) {
+          alert("No se encontró la dirección. Probá escribiéndola más completa.");
+          return;
+        }
+
+        const result = results[0];
+        const lat = Number(result.lat);
+        const lng = Number(result.lon);
+
+        mapa.setView([lat, lng], 18);
+        actualizarUbicacion(lat, lng);
+
+        if (!form.direccion.value.trim()) {
+          form.direccion.value = queryBase;
+        }
+      } catch (error) {
+        console.error("Error buscando dirección:", error);
+        alert("No se pudo buscar la dirección.");
+      }
     }
 
-    const result = results[0];
-    const lat = Number(result.lat);
-    const lng = Number(result.lon);
-
-    mapa.setView([lat, lng], 18);
-    actualizarUbicacion(lat, lng);
-
-    if (!form.direccion.value.trim()) {
-      form.direccion.value = queryBase;
+    if (buscarDireccionInput) {
+      buscarDireccionInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          buscarDireccionEnMapa();
+        }
+      });
     }
-  } catch (error) {
-    console.error("Error buscando dirección:", error);
-    alert("No se pudo buscar la dirección.");
-  }
-}
-if (buscarDireccionInput) {
-  buscarDireccionInput.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      buscarDireccionEnMapa();
-    }
-  });
-}
 
-if (btnBuscarMapa) {
-  btnBuscarMapa.addEventListener("click", buscarDireccionEnMapa);
-}
+    if (btnBuscarMapa) {
+      btnBuscarMapa.addEventListener("click", buscarDireccionEnMapa);
+    }
 
     setTimeout(() => {
       mapa.invalidateSize();
@@ -1100,6 +1055,18 @@ if (btnBuscarMapa) {
       return;
     }
 
+    if (!aceptaContrato.checked) {
+      msg.textContent = "❌ Tenés que aceptar el contrato.";
+      return;
+    }
+
+    const ciudadFinal = ciudadSelect.value || ciudadInput.value.trim();
+
+    if (!ciudadFinal) {
+      msg.textContent = "❌ Elegí o escribí una ciudad.";
+      return;
+    }
+
     msg.textContent = "Publicando...";
 
     try {
@@ -1110,14 +1077,6 @@ if (btnBuscarMapa) {
       const latReal = Number(latInput.value);
       const lngReal = Number(lngInput.value);
       const ubicacionPublica = generarUbicacionAproximada(latReal, lngReal);
-     
-      if (!aceptaContrato.checked) {
-  msg.textContent = "❌ Tenés que aceptar el contrato.";
-  return;
-}
-
-// 👉 elegir ciudad automáticamente
-const ciudadFinal = ciudadSelect.value || ciudadInput.value.trim();
 
       const data = {
         titulo: form.titulo.value.trim(),
@@ -1170,16 +1129,15 @@ const ciudadFinal = ciudadSelect.value || ciudadInput.value.trim();
           telefono: form.telefono.value.trim(),
           email: form.email.value.trim()
         },
+
         aceptaContrato: true,
-fechaAceptacionContrato: new Date().toISOString(),
-versionContrato: "1.0",
+        fechaAceptacionContrato: new Date().toISOString(),
+        versionContrato: "1.0",
 
         anfitrionId: currentUser.uid,
         anfitrionEmail: currentUser.email || "",
         createdAt: serverTimestamp()
       };
-      
-      
 
       const docRef = await addDoc(collection(db, "alojamientos"), data);
 
@@ -1246,9 +1204,16 @@ Gracias por confiar en TuAloja 💙
   });
 
   window.addEventListener("load", () => {
+    if (paisSelect.value) {
+      cargarProvincias();
+    }
+
+    if (provinciaSelect.value) {
+      cargarCiudades();
+    }
+
     initMapa();
   });
 </script>
-
 </body>
 </html>
