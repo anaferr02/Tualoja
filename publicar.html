@@ -398,10 +398,19 @@
               </select>
             </div>
             <div>
-              <label>Ciudad *</label>
-              <select name="ciudad" id="ciudad" required>
-              <option value="">Primero elegí una provincia</option>
-              </select>
+             <label>Ciudad *</label>
+
+<select id="ciudadSelect">
+  <option value="">Elegí una ciudad (opcional)</option>
+</select>
+
+<input 
+  type="text" 
+  id="ciudadInput"
+  placeholder="O escribí la ciudad"
+  required
+  style="margin-top:8px;"
+/>
             </div>
           </div>
 
@@ -783,7 +792,8 @@
 
   const paisSelect = document.getElementById("pais");
   const provinciaSelect = document.getElementById("provincia");
-  const ciudadSelect = document.getElementById("ciudad");
+  const ciudadSelect = document.getElementById("ciudadSelect");
+  const ciudadInput = document.getElementById("ciudadInput");
   const logoutLink = document.getElementById("logoutLink");
   const fotosInput = document.getElementById("fotos");
   const preview = document.getElementById("preview");
@@ -852,7 +862,14 @@
   const provincia = provinciaSelect.value;
   const ciudades = ciudadesPorProvincia[provincia] || [];
 
-  ciudadSelect.innerHTML = "";
+  ciudadSelect.innerHTML = `<option value="">Elegí una ciudad</option>`;
+    ciudades.forEach((ciudad) => {
+    const option = document.createElement("option");
+    option.value = ciudad;
+    option.textContent = ciudad;
+    ciudadSelect.appendChild(option);
+  });
+}
 
   if (!provincia) {
     ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
