@@ -367,6 +367,26 @@
 .btn-subir-fotos:active{
   transform: translateY(0);
 }
+    .dropzone{
+  border:2px dashed #c7ccff;
+  border-radius:18px;
+  padding:30px;
+  text-align:center;
+  cursor:pointer;
+  background:#f9faff;
+  transition:.2s ease;
+}
+
+.dropzone:hover{
+  background:#eef2ff;
+  border-color:#6f61ea;
+}
+
+.dropzone p{
+  margin:0;
+  font-weight:700;
+  color:#4f3dbb;
+}
   </style>
 </head>
 
@@ -610,20 +630,21 @@
           </select>
         </section>
 
-        <section class="publish-section">
-          <h3>Fotos</h3>
-          <p class="muted" style="margin-top:-6px;">
-            Subí varias. Podés borrar y elegir portada.
-          </p>
+       <section class="publish-section">
+  <h3>Fotos</h3>
+  <p class="muted" style="margin-top:-6px;">
+    Subí varias. Podés arrastrarlas o seleccionarlas.
+  </p>
 
-<input id="fotos" type="file" accept="image/*" multiple hidden />
+  <div class="dropzone" id="dropzone">
+    <p>📸 Arrastrá fotos acá o hacé click para subir</p>
+    <input id="fotos" type="file" accept="image/*" multiple hidden />
+  </div>
 
-<label for="fotos" class="btn-subir-fotos">
-  📸 Subir fotos
-</label>
-          <div id="preview" class="preview-grid"></div>
-          <small class="help">La primera foto destacada será la portada del alojamiento.</small>
-        </section>
+  <p id="contadorFotos" class="help"></p>
+
+  <div id="preview" class="preview-grid"></div>
+</section>
 
         <section class="publish-section">
           <h3>Precio y estadía</h3>
@@ -854,6 +875,52 @@
   const buscarDireccionInput = document.getElementById("buscarDireccion");
   const btnBuscarMapa = document.getElementById("btnBuscarMapa");
   const aceptaContrato = document.getElementById("aceptaContrato");
+  const dropzone = document.getElementById("dropzone");
+const contadorFotos = document.getElementById("contadorFotos");
+
+// 👉 click abre selector
+dropzone.addEventListener("click", () => {
+  fotosInput.click();
+});
+
+// 👉 arrastrar archivos
+dropzone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropzone.style.background = "#eef2ff";
+});
+
+dropzone.addEventListener("dragleave", () => {
+  dropzone.style.background = "#f9faff";
+});
+
+dropzone.addEventListener("drop", async (e) => {
+  e.preventDefault();
+  dropzone.style.background = "#f9faff";
+
+  const files = Array.from(e.dataTransfer.files || []);
+  if (!files.length) return;
+
+  for (const file of files) {
+    const b64 = await fileToBase64(file);
+    fotos.push({ b64, isCover: false });
+  }
+
+  asegurarPortada();
+  renderFotos();
+  actualizarContador();
+});
+
+// 👉 contador
+function actualizarContador(){
+  if (!contadorFotos) return;
+
+  if (!fotos.length) {
+    contadorFotos.textContent = "";
+    return;
+  }
+
+  contadorFotos.textContent = `📷 ${fotos.length} foto${fotos.length > 1 ? "s" : ""} cargada${fotos.length > 1 ? "s" : ""}`;
+}
 
   let fotos = [];
   let mapa = null;
@@ -1111,6 +1178,8 @@
       item.appendChild(actions);
       preview.appendChild(item);
     });
+    actualizarContador();
+    
   }
 
   function generarUbicacionAproximada(lat, lng) {
