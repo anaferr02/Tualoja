@@ -399,7 +399,9 @@
             </div>
             <div>
               <label>Ciudad *</label>
-              <input name="ciudad" required placeholder="Ej: Villa Elisa" />
+              <select name="ciudad" id="ciudad" required>
+              <option value="">Primero elegí una provincia</option>
+              </select>
             </div>
           </div>
 
@@ -725,9 +727,63 @@
       "Magallanes"
     ]
   };
+  const ciudadesPorProvincia = {
+  "Entre Ríos": [
+    "Paraná",
+    "Concordia",
+    "Gualeguaychú",
+    "Concepción del Uruguay",
+    "Colón",
+    "Villa Elisa",
+    "San José",
+    "Federación",
+    "Chajarí",
+    "Nogoyá",
+    "Victoria",
+    "Diamante",
+    "San Salvador",
+    "Villaguay",
+    "Gualeguay",
+    "La Paz",
+    "Federal",
+    "Crespo"
+  ],
+  "Buenos Aires": [
+    "La Plata",
+    "Mar del Plata",
+    "Bahía Blanca",
+    "Tandil",
+    "Pinamar",
+    "Villa Gesell",
+    "San Bernardo",
+    "Necochea"
+  ],
+  "Córdoba": [
+    "Córdoba",
+    "Villa Carlos Paz",
+    "Villa General Belgrano",
+    "La Falda",
+    "Capilla del Monte",
+    "Mina Clavero",
+    "Alta Gracia"
+  ],
+  "Santa Fe": [
+    "Rosario",
+    "Santa Fe",
+    "Rafaela",
+    "Reconquista"
+  ],
+  "Mendoza": [
+    "Mendoza",
+    "San Rafael",
+    "Maipú",
+    "Luján de Cuyo"
+  ]
+};
 
   const paisSelect = document.getElementById("pais");
   const provinciaSelect = document.getElementById("provincia");
+  const ciudadSelect = document.getElementById("ciudad");
   const logoutLink = document.getElementById("logoutLink");
   const fotosInput = document.getElementById("fotos");
   const preview = document.getElementById("preview");
@@ -785,7 +841,37 @@
     });
   }
 
-  paisSelect?.addEventListener("change", cargarProvincias);
+  paisSelect?.addEventListener("change", () => {
+  cargarProvincias();
+  ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
+});
+  
+  provinciaSelect?.addEventListener("change", cargarCiudades);
+  
+  function cargarCiudades() {
+  const provincia = provinciaSelect.value;
+  const ciudades = ciudadesPorProvincia[provincia] || [];
+
+  ciudadSelect.innerHTML = "";
+
+  if (!provincia) {
+    ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
+    return;
+  }
+
+  if (!ciudades.length) {
+    ciudadSelect.innerHTML = `<option value="">Escribí la ciudad manualmente</option>`;
+    return;
+  }
+
+  ciudadSelect.innerHTML = `<option value="">Elegí una ciudad</option>`;
+  ciudades.forEach((ciudad) => {
+    const option = document.createElement("option");
+    option.value = ciudad;
+    option.textContent = ciudad;
+    ciudadSelect.appendChild(option);
+  });
+}
 
   function initMapa(intentos = 0) {
     const mapaEl = document.getElementById("mapa");
