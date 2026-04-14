@@ -289,6 +289,35 @@
       overflow:hidden;
       border:1px solid rgba(27,22,127,.12);
     }
+    .btn-buscar-mapa{
+  min-width: 190px;
+  min-height: 52px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #6f61ea, #4f3dbb);
+  color: #fff !important;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(79, 61, 187, .20);
+  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+}
+
+.btn-buscar-mapa:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(79, 61, 187, .24);
+  opacity: .98;
+}
+
+.btn-buscar-mapa:active{
+  transform: translateY(0);
+}
+
+@media (max-width: 760px){
+  .btn-buscar-mapa{
+    width: 100%;
+  }
+}
   </style>
 </head>
 
@@ -440,13 +469,12 @@
       style="flex:1; min-width:260px;"
     />
     <button
-      type="button"
-      id="btnBuscarMapa"
-      class="btn btn-outline"
-      style="min-width:170px;"
-    >
-      Buscar en mapa
-    </button>
+  type="button"
+  id="btnBuscarMapa"
+  class="btn btn-buscar-mapa"
+>
+  Buscar en mapa
+</button>
   </div>
 
   <small class="help">Escribí la dirección y tocá “Buscar en mapa” para ubicar el alojamiento automáticamente.</small>
