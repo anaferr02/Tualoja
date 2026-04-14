@@ -343,6 +343,30 @@
 .check-contrato a:hover{
   text-decoration:underline;
 }
+    .btn-subir-fotos{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:14px 20px;
+  border-radius:16px;
+  background: linear-gradient(180deg, #6f61ea, #4f3dbb);
+  color:#fff;
+  font-weight:800;
+  font-size:14px;
+  cursor:pointer;
+  box-shadow: 0 10px 24px rgba(79, 61, 187, .20);
+  transition: .2s ease;
+}
+
+.btn-subir-fotos:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(79, 61, 187, .25);
+}
+
+.btn-subir-fotos:active{
+  transform: translateY(0);
+}
   </style>
 </head>
 
@@ -592,7 +616,11 @@
             Subí varias. Podés borrar y elegir portada.
           </p>
 
-          <input id="fotos" type="file" accept="image/*" multiple />
+<input id="fotos" type="file" accept="image/*" multiple hidden />
+
+<label for="fotos" class="btn-subir-fotos">
+  📸 Subir fotos
+</label>
           <div id="preview" class="preview-grid"></div>
           <small class="help">La primera foto destacada será la portada del alojamiento.</small>
         </section>
