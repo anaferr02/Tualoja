@@ -661,10 +661,11 @@
       return noches > 0 ? noches : null;
     }
 
-    function coverFromFotos(item) {
-      return item?.fotos?.[0] || "";
-    }
-
+   function coverFromFotos(item) {
+  return item?.fotos?.find(f => f.isCover)?.url
+      || item?.fotos?.[0]?.url
+      || "";
+}
     function esMioAlojamiento(x, user) {
       const myEmail = String(user?.email || "").toLowerCase().trim();
       const myUid = String(user?.uid || "").trim();
