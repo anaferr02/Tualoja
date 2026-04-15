@@ -64,6 +64,13 @@ const coordsLugares = {
   "corrientes": [-27.4692, -58.8306]
 };
 
+function normalizar(texto) {
+  return (texto || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
 function armarUbicacion(alojamiento) {
   const ciudad = alojamiento.ciudad || "";
   const provincia = alojamiento.provincia || "";
@@ -77,7 +84,7 @@ function armarUbicacion(alojamiento) {
 function obtenerCentroPorDestino(destinoTexto) {
   if (!destinoTexto) return null;
 
-  const limpio = destinoTexto.trim().toLowerCase();
+  const limpio = normalizar(destinoTexto.trim());
   return coordsLugares[limpio] || null;
 }
 
@@ -105,9 +112,9 @@ function obtenerCoordenadasAlojamiento(a, docId, modo = "publico") {
     return [latVieja, lngVieja];
   }
 
-  const ciudad = (a.ciudad || "").trim().toLowerCase();
-  const provincia = (a.provincia || "").trim().toLowerCase();
-  const ubicacion = (a.ubicacion || "").trim().toLowerCase();
+  const ciudad = normalizar((a.ciudad || "").trim());
+  const provincia = normalizar((a.provincia || "").trim());
+  const ubicacion = normalizar((a.ubicacion || "").trim());
 
   let base =
     coordsLugares[ciudad] ||
@@ -190,21 +197,23 @@ async function cargarResultados() {
 
     limpiarMapa(mapa);
 
+    const destinoNormalizado = normalizar(destino);
+
     querySnapshot.forEach((docSnap) => {
       const a = docSnap.data();
       const docId = docSnap.id;
 
-      const ciudad = (a.ciudad || "").toLowerCase();
-      const provincia = (a.provincia || "").toLowerCase();
-      const ubicacion = (a.ubicacion || "").toLowerCase();
-      const titulo = (a.titulo || "").toLowerCase();
+      const ciudad = normalizar(a.ciudad);
+      const provincia = normalizar(a.provincia);
+      const ubicacion = normalizar(a.ubicacion);
+      const titulo = normalizar(a.titulo);
 
       const coincideDestino =
-        !destino ||
-        ciudad.includes(destino) ||
-        provincia.includes(destino) ||
-        ubicacion.includes(destino) ||
-        titulo.includes(destino);
+        !destinoNormalizado ||
+        ciudad.includes(destinoNormalizado) ||
+        provincia.includes(destinoNormalizado) ||
+        ubicacion.includes(destinoNormalizado) ||
+        titulo.includes(destinoNormalizado);
 
       const tiposSeleccionados = Array.from(
         document.querySelectorAll(".filtro-tipo:checked")
@@ -239,7 +248,7 @@ async function cargarResultados() {
         encontrados++;
 
         alojamientos.push({
-          id: a.id || docId,
+          id: docId,
           ...a
         });
       }
@@ -257,9 +266,11 @@ async function cargarResultados() {
       const tituloTexto = a.titulo || "Alojamiento";
       const ubicacionTexto = armarUbicacion(a);
       const tipoTexto = a.tipo || "Alojamiento";
-      const precio = Number(a.precio || 0).toLocaleString("es-AR");
+      const precioNumero = Number(a.precio || 0);
+      const precio = precioNumero.toLocaleString("es-AR");
+
       const fotoPrincipal = Array.isArray(a.fotos) && a.fotos.length
-        ? a.fotos[0]
+        ? (a.fotos.find(f => f.isCover)?.url || a.fotos[0]?.url)
         : "https://via.placeholder.com/800x500?text=TuAloja";
 
       html += `
@@ -286,7 +297,7 @@ async function cargarResultados() {
             </div>
 
             <div class="resultado-acciones">
-              <a href="detalle.html?id=${a.id}&destino=${encodeURIComponent(destino)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}">
+              <a href="detalle.html?id=${encodeURIComponent(a.id)}&destino=${encodeURIComponent(destino)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}">
                 Ver alojamiento
               </a>
             </div>
@@ -307,7 +318,7 @@ async function cargarResultados() {
             ${limpiarHtml(ubicacionTexto)}<br>
             <small style="color:#666;">📍 Ubicación aproximada</small><br>
             <strong style="color:#1b167f;">$${precio}</strong><br><br>
-            <a href="detalle.html?id=${a.id}&destino=${encodeURIComponent(destino)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}">
+            <a href="detalle.html?id=${encodeURIComponent(a.id)}&destino=${encodeURIComponent(destino)}&checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&guests=${encodeURIComponent(guests)}">
               Ver alojamiento
             </a>
           </div>
