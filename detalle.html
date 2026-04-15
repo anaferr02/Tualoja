@@ -306,22 +306,48 @@
       color:#666;
       font-size:18px;
     }
-    .precio-marker-detalle{
-  background:#fff;
-  color:#111;
-  border:1px solid rgba(0,0,0,.10);
-  border-radius:999px;
-  padding:8px 12px;
-  font-weight:800;
-  font-size:14px;
-  box-shadow:0 8px 18px rgba(0,0,0,.18);
-  white-space:nowrap;
-}
 
-.custom-price-icon-detalle{
-  background:transparent;
-  border:none;
-}
+    .precio-marker-detalle{
+      background:#fff;
+      color:#111;
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:999px;
+      padding:8px 12px;
+      font-weight:800;
+      font-size:14px;
+      box-shadow:0 8px 18px rgba(0,0,0,.18);
+      white-space:nowrap;
+    }
+
+    .custom-price-icon-detalle{
+      background:transparent;
+      border:none;
+    }
+
+    .resenas-box{
+      margin-top:30px;
+      background:#fff;
+      border:1px solid #e8e9f2;
+      border-radius:22px;
+      padding:22px;
+      box-shadow:0 10px 26px rgba(27,31,53,.06);
+    }
+
+    .resena-card{
+      border:1px solid #ececf3;
+      border-radius:16px;
+      padding:14px;
+      margin-top:12px;
+      background:#fcfcff;
+    }
+
+    .resena-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
 
     @media(max-width:1050px){
       .detalle-info-grid{grid-template-columns:1fr}
@@ -370,395 +396,554 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
- <script type="module">
-  import { db } from "./firebase-config.js";
-  import {
-    doc,
-    getDoc,
-    collection,
-    addDoc,
-    query,
-    where,
-    getDocs,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      doc,
+      getDoc,
+      collection,
+      addDoc,
+      query,
+      where,
+      getDocs,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-  const wrap = document.getElementById("detalleAlojamiento");
-  const noExiste = document.getElementById("noExiste");
-  const volverResultados = document.getElementById("volverResultados");
+    const wrap = document.getElementById("detalleAlojamiento");
+    const noExiste = document.getElementById("noExiste");
+    const volverResultados = document.getElementById("volverResultados");
 
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
-  const checkinParam = params.get("checkin") || "";
-  const checkoutParam = params.get("checkout") || "";
-  const guestsParam = params.get("guests") || "1";
-  const destinoParam = params.get("destino") || "";
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const checkinParam = params.get("checkin") || "";
+    const checkoutParam = params.get("checkout") || "";
+    const guestsParam = params.get("guests") || "1";
+    const destinoParam = params.get("destino") || "";
 
-  let mapaDetalle = null;
+    let mapaDetalle = null;
 
-  if (checkinParam || checkoutParam || guestsParam || destinoParam) {
-    const backParams = new URLSearchParams();
-    if (destinoParam) backParams.set("destino", destinoParam);
-    if (checkinParam) backParams.set("checkin", checkinParam);
-    if (checkoutParam) backParams.set("checkout", checkoutParam);
-    if (guestsParam) backParams.set("guests", guestsParam);
-    volverResultados.href = `resultados.html?${backParams.toString()}`;
-  }
-
-  function calcularNoches(checkin, checkout) {
-    if (!checkin || !checkout) return 0;
-    const entrada = new Date(checkin + "T00:00:00");
-    const salida = new Date(checkout + "T00:00:00");
-    const diff = salida.getTime() - entrada.getTime();
-    if (isNaN(diff) || diff <= 0) return 0;
-    return Math.round(diff / (1000 * 60 * 60 * 24));
-  }
-
-  function formatearPrecio(valor) {
-    return Number(valor || 0).toLocaleString("es-AR");
-  }
-
-  function obtenerHoy() {
-    const hoy = new Date();
-    const y = hoy.getFullYear();
-    const m = String(hoy.getMonth() + 1).padStart(2, "0");
-    const d = String(hoy.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-  }
-
-  function limpiarTexto(texto, fallback = "") {
-    if (texto === undefined || texto === null) return fallback;
-    return String(texto).trim() || fallback;
-  }
-
-  function convertirLista(valor, fallback = []) {
-    if (Array.isArray(valor)) return valor.filter(Boolean);
-    if (typeof valor === "string" && valor.trim()) {
-      return valor.split(",").map(x => x.trim()).filter(Boolean);
+    if (checkinParam || checkoutParam || guestsParam || destinoParam) {
+      const backParams = new URLSearchParams();
+      if (destinoParam) backParams.set("destino", destinoParam);
+      if (checkinParam) backParams.set("checkin", checkinParam);
+      if (checkoutParam) backParams.set("checkout", checkoutParam);
+      if (guestsParam) backParams.set("guests", guestsParam);
+      volverResultados.href = `resultados.html?${backParams.toString()}`;
     }
-    return fallback;
-  }
 
-  function getUserLocal() {
-    try {
-      const raw = localStorage.getItem("tualoja_user");
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
+    function escapeHTML(str) {
+      return String(str || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
-  }
 
-  function estrellas(n) {
-    return "★".repeat(n) + "☆".repeat(5 - n);
-  }
+    function calcularNoches(checkin, checkout) {
+      if (!checkin || !checkout) return 0;
+      const entrada = new Date(checkin + "T00:00:00");
+      const salida = new Date(checkout + "T00:00:00");
+      const diff = salida.getTime() - entrada.getTime();
+      if (isNaN(diff) || diff <= 0) return 0;
+      return Math.round(diff / (1000 * 60 * 60 * 24));
+    }
 
-  function puedeVerUbicacionExacta(reserva, user) {
-    if (!reserva || !user) return false;
+    function formatearPrecio(valor) {
+      return Number(valor || 0).toLocaleString("es-AR");
+    }
 
-    const estado = String(reserva.estado || "").toLowerCase();
+    function obtenerHoy() {
+      const hoy = new Date();
+      const y = hoy.getFullYear();
+      const m = String(hoy.getMonth() + 1).padStart(2, "0");
+      const d = String(hoy.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
 
-    const esParticipante =
-      reserva.huespedId === user.uid ||
-      reserva.anfitrionId === user.uid ||
-      reserva.hostId === user.uid;
+    function limpiarTexto(texto, fallback = "") {
+      if (texto === undefined || texto === null) return fallback;
+      return String(texto).trim() || fallback;
+    }
 
-    return esParticipante && (estado === "aceptada" || estado === "confirmada");
-  }
+    function convertirLista(valor, fallback = []) {
+      if (Array.isArray(valor)) return valor.filter(Boolean);
+      if (typeof valor === "string" && valor.trim()) {
+        return valor.split(",").map(x => x.trim()).filter(Boolean);
+      }
+      return fallback;
+    }
 
-  function obtenerCoordsDetalle(alojamiento, reserva, user) {
-    if (puedeVerUbicacionExacta(reserva, user)) {
-      const lat = Number(alojamiento.latReal || alojamiento.lat);
-      const lng = Number(alojamiento.lngReal || alojamiento.lng);
-
-      if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0) {
-        return {
-          lat,
-          lng,
-          exacta: true
-        };
+    function getUserLocal() {
+      try {
+        const raw = localStorage.getItem("tualoja_user");
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
       }
     }
 
-    const lat = Number(alojamiento.latPublica || alojamiento.lat);
-    const lng = Number(alojamiento.lngPublica || alojamiento.lng);
-
-    if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0) {
-      return {
-        lat,
-        lng,
-        exacta: false
-      };
+    function estrellas(n) {
+      const num = Math.max(1, Math.min(5, Number(n || 0)));
+      return "★".repeat(num) + "☆".repeat(5 - num);
     }
 
-    return null;
-  }
-   function crearIconoPrecioDetalle(precioTexto) {
-  return L.divIcon({
-    className: "custom-price-icon-detalle",
-    html: `<div class="precio-marker-detalle">$${precioTexto}</div>`,
-    iconSize: [1, 1],
-    iconAnchor: [24, 20],
-    popupAnchor: [0, -18]
-  });
-}
+    function puedeVerUbicacionExacta(reserva, user) {
+      if (!reserva || !user) return false;
 
-  function renderMapaDetalle(alojamiento, reserva, user, intentos = 0) {
-  const boxMapa = document.getElementById("mapaDetalle");
+      const estado = String(reserva.estado || reserva.status || "").toLowerCase();
 
-  if (!boxMapa) return;
+      const esParticipante =
+        reserva.huespedId === user.uid ||
+        reserva.anfitrionId === user.uid ||
+        reserva.hostId === user.uid;
 
-  // 🔥 esperar a Leaflet si no cargó todavía
-  if (typeof L === "undefined") {
-    if (intentos < 20) {
-      setTimeout(() => renderMapaDetalle(alojamiento, reserva, user, intentos + 1), 200);
-    } else {
-      console.error("Leaflet no cargó en detalle");
+      return esParticipante && (estado === "aceptada" || estado === "confirmada");
     }
-    return;
-  }
 
-  const infoMapa = obtenerCoordsDetalle(alojamiento, reserva, user);
-  if (!infoMapa) return;
+    function obtenerCoordsDetalle(alojamiento, reserva, user) {
+      if (puedeVerUbicacionExacta(reserva, user)) {
+        const lat = Number(alojamiento.latReal || alojamiento.lat);
+        const lng = Number(alojamiento.lngReal || alojamiento.lng);
 
-  if (mapaDetalle) {
-    mapaDetalle.remove();
-    mapaDetalle = null;
-  }
-
-  mapaDetalle = L.map("mapaDetalle").setView(
-    [infoMapa.lat, infoMapa.lng],
-    infoMapa.exacta ? 16 : 13
-  );
-
-  const mapaCalles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "© OpenStreetMap"
-  });
-
-  const mapaSatelite = L.tileLayer(
-    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    { attribution: "Tiles © Esri" }
-  );
-
-  mapaCalles.addTo(mapaDetalle);
-
-  L.control.layers(
-    {
-      "🗺️ Mapa": mapaCalles,
-      "🛰️ Satélite": mapaSatelite
-    }
-  ).addTo(mapaDetalle);
-
-  const precioTexto = Number(alojamiento.precio || 0).toLocaleString("es-AR");
-
-L.marker([infoMapa.lat, infoMapa.lng], {
-  icon: crearIconoPrecioDetalle(precioTexto)
-})
-  .addTo(mapaDetalle)
-  .bindPopup(
-    infoMapa.exacta
-      ? `<b>${alojamiento.titulo || "Alojamiento"}</b><br>${alojamiento.direccion || ""}<br><strong>$${precioTexto} / noche</strong>`
-      : `<b>${alojamiento.titulo || "Alojamiento"}</b><br>📍 Ubicación aproximada<br><strong>$${precioTexto} / noche</strong>`
-  )
-  .openPopup();
-
-  setTimeout(() => {
-    mapaDetalle.invalidateSize();
-  }, 300);
-}
-
-  async function buscarReservaVisible(alojamientoId, user) {
-    if (!user?.uid || !alojamientoId) return null;
-
-    try {
-      const consultas = [
-        query(
-          collection(db, "reservas"),
-          where("alojamientoId", "==", alojamientoId),
-          where("huespedId", "==", user.uid)
-        ),
-        query(
-          collection(db, "reservas"),
-          where("alojamientoId", "==", alojamientoId),
-          where("anfitrionId", "==", user.uid)
-        ),
-        query(
-          collection(db, "reservas"),
-          where("alojamientoId", "==", alojamientoId),
-          where("hostId", "==", user.uid)
-        )
-      ];
-
-      for (const qy of consultas) {
-        const snap = await getDocs(qy);
-        if (!snap.empty) {
-          const reservas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-          const preferida =
-            reservas.find(r => ["confirmada", "aceptada"].includes(String(r.estado || "").toLowerCase())) ||
-            reservas[0];
-
-          if (preferida) return preferida;
+        if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0) {
+          return { lat, lng, exacta: true };
         }
       }
-    } catch (error) {
-      console.error("Error buscando reserva para ubicación exacta:", error);
+
+      const lat = Number(alojamiento.latPublica || alojamiento.lat);
+      const lng = Number(alojamiento.lngPublica || alojamiento.lng);
+
+      if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0) {
+        return { lat, lng, exacta: false };
+      }
+
+      return null;
     }
 
-    return null;
-  }
+    function crearIconoPrecioDetalle(precioTexto) {
+      return L.divIcon({
+        className: "custom-price-icon-detalle",
+        html: `<div class="precio-marker-detalle">$${precioTexto}</div>`,
+        iconSize: [1, 1],
+        iconAnchor: [24, 20],
+        popupAnchor: [0, -18]
+      });
+    }
 
-  async function cargarDetalle() {
-    try {
-      if (!id) {
-        noExiste.style.display = "block";
+    function renderMapaDetalle(alojamiento, reserva, user, intentos = 0) {
+      const boxMapa = document.getElementById("mapaDetalle");
+      if (!boxMapa) return;
+
+      if (typeof L === "undefined") {
+        if (intentos < 20) {
+          setTimeout(() => renderMapaDetalle(alojamiento, reserva, user, intentos + 1), 200);
+        } else {
+          console.error("Leaflet no cargó en detalle");
+        }
         return;
       }
 
-      const ref = doc(db, "alojamientos", id);
-      const snap = await getDoc(ref);
+      const infoMapa = obtenerCoordsDetalle(alojamiento, reserva, user);
+      if (!infoMapa) return;
 
-      if (!snap.exists()) {
-        noExiste.style.display = "block";
+      if (mapaDetalle) {
+        mapaDetalle.remove();
+        mapaDetalle = null;
+      }
+
+      mapaDetalle = L.map("mapaDetalle").setView(
+        [infoMapa.lat, infoMapa.lng],
+        infoMapa.exacta ? 16 : 13
+      );
+
+      const mapaCalles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap"
+      });
+
+      const mapaSatelite = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        { attribution: "Tiles © Esri" }
+      );
+
+      mapaCalles.addTo(mapaDetalle);
+
+      L.control.layers(
+        {
+          "🗺️ Mapa": mapaCalles,
+          "🛰️ Satélite": mapaSatelite
+        }
+      ).addTo(mapaDetalle);
+
+      const precioTexto = Number(alojamiento.precio || 0).toLocaleString("es-AR");
+
+      L.marker([infoMapa.lat, infoMapa.lng], {
+        icon: crearIconoPrecioDetalle(precioTexto)
+      })
+        .addTo(mapaDetalle)
+        .bindPopup(
+          infoMapa.exacta
+            ? `<b>${escapeHTML(alojamiento.titulo || "Alojamiento")}</b><br>${escapeHTML(alojamiento.direccion || "")}<br><strong>$${precioTexto} / noche</strong>`
+            : `<b>${escapeHTML(alojamiento.titulo || "Alojamiento")}</b><br>📍 Ubicación aproximada<br><strong>$${precioTexto} / noche</strong>`
+        )
+        .openPopup();
+
+      setTimeout(() => {
+        mapaDetalle.invalidateSize();
+      }, 300);
+    }
+
+    async function buscarReservaVisible(alojamientoId, user) {
+      if (!user?.uid || !alojamientoId) return null;
+
+      try {
+        const consultas = [
+          query(
+            collection(db, "reservas"),
+            where("alojamientoId", "==", alojamientoId),
+            where("huespedId", "==", user.uid)
+          ),
+          query(
+            collection(db, "reservas"),
+            where("alojamientoId", "==", alojamientoId),
+            where("anfitrionId", "==", user.uid)
+          ),
+          query(
+            collection(db, "reservas"),
+            where("alojamientoId", "==", alojamientoId),
+            where("hostId", "==", user.uid)
+          )
+        ];
+
+        for (const qy of consultas) {
+          const snap = await getDocs(qy);
+          if (!snap.empty) {
+            const reservas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            const preferida =
+              reservas.find(r => ["confirmada", "aceptada"].includes(String(r.estado || r.status || "").toLowerCase())) ||
+              reservas[0];
+
+            if (preferida) return preferida;
+          }
+        }
+      } catch (error) {
+        console.error("Error buscando reserva para ubicación exacta:", error);
+      }
+
+      return null;
+    }
+
+    async function cargarResenas(alojamientoId, user) {
+      const resumen = document.getElementById("resenasResumen");
+      const lista = document.getElementById("listaResenas");
+      const boxDejar = document.getElementById("boxDejarResena");
+
+      if (!resumen || !lista) return;
+
+      try {
+        const qy = query(collection(db, "resenas"), where("alojamientoId", "==", alojamientoId));
+        const snap = await getDocs(qy);
+        const resenas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        if (!resenas.length) {
+          resumen.textContent = "Todavía no hay reseñas para este alojamiento.";
+          lista.innerHTML = "";
+          if (boxDejar) boxDejar.style.display = "none";
+          return;
+        }
+
+        const promedio = resenas.reduce((acc, r) => acc + Number(r.puntaje || 0), 0) / resenas.length;
+        resumen.textContent = `${estrellas(Math.round(promedio))} ${promedio.toFixed(1)} · ${resenas.length} reseña(s)`;
+
+        lista.innerHTML = resenas.map(r => {
+          const nombre = escapeHTML(r.huespedNombre || r.userName || "Huésped");
+          const comentario = escapeHTML(r.comentario || "");
+          const puntaje = Number(r.puntaje || 0);
+          return `
+            <article class="resena-card">
+              <div class="resena-head">
+                <strong>${nombre}</strong>
+                <span>${estrellas(puntaje)}</span>
+              </div>
+              <div>${comentario || "Sin comentario."}</div>
+            </article>
+          `;
+        }).join("");
+
+        if (boxDejar) boxDejar.style.display = "none";
+      } catch (error) {
+        console.error("Error cargando reseñas:", error);
+        resumen.textContent = "No se pudieron cargar las reseñas.";
+      }
+    }
+
+    function actualizarBoxTotal(precio) {
+      const checkinEl = document.getElementById("checkin");
+      const checkoutEl = document.getElementById("checkout");
+      const guestsEl = document.getElementById("guests");
+      const totalBox = document.getElementById("totalBox");
+      const btnReservar = document.getElementById("btnReservar");
+
+      if (!checkinEl || !checkoutEl || !guestsEl || !totalBox || !btnReservar) return;
+
+      const checkin = checkinEl.value;
+      const checkout = checkoutEl.value;
+      const guests = Number(guestsEl.value || 1);
+      const noches = calcularNoches(checkin, checkout);
+
+      if (!checkin || !checkout) {
+        totalBox.textContent = "Seleccioná fechas válidas para calcular el total";
+        btnReservar.classList.add("disabled");
         return;
       }
 
-      const a = snap.data();
+      if (noches <= 0) {
+        totalBox.textContent = "La fecha de salida debe ser posterior al check-in";
+        btnReservar.classList.add("disabled");
+        return;
+      }
 
-      const foto = a.fotos?.find(f => f.isCover)?.url 
-           || a.fotos?.[0]?.url 
-           || "https://via.placeholder.com/800x400?text=Sin+imagen";
-      const precio = Number(a.precio || 0);
-      const ciudad = limpiarTexto(a.ciudad, "Ubicación no informada");
-      const provincia = limpiarTexto(a.provincia, "");
-      const ubicacion = provincia ? `${ciudad} - ${provincia}` : ciudad;
-      const descripcion = limpiarTexto(a.descripcion, "Sin descripción disponible.");
-      const titulo = limpiarTexto(a.titulo, "Alojamiento sin título");
-      const huespedes = Number(a.capacidad || a.huespedes || 1);
-      const tipo = limpiarTexto(a.tipo, "Departamento");
-      const checkinHora = limpiarTexto(a.checkinDesde || a.checkinHora, "14:00");
-      const checkoutHora = limpiarTexto(a.checkoutHasta || a.checkoutHora, "10:00");
-      const cancelacion = limpiarTexto(a.cancelacion, "No reembolsable");
+      const total = noches * Number(precio || 0);
+      totalBox.textContent = `${guests} huésped(es) · ${noches} noche(s) · Total: $${formatearPrecio(total)}`;
+      btnReservar.classList.remove("disabled");
+    }
 
-      const servicios = convertirLista(a.servicios, ["Wifi", "Aire acondicionado"]);
-      const reglas = convertirLista(a.reglas, ["No se permite fumar", "No se permiten fiestas"]);
-      const hoy = obtenerHoy();
-      const user = getUserLocal();
-      const reservaVisible = await buscarReservaVisible(id, user);
-      const puedeVerExacta = puedeVerUbicacionExacta(reservaVisible, user);
-      const textoUbicacionMapa = puedeVerExacta
-        ? limpiarTexto(a.direccion, ubicacion)
-        : `${ubicacion} · Ubicación aproximada`;
+    async function cargarDetalle() {
+      try {
+        if (!id) {
+          noExiste.style.display = "block";
+          return;
+        }
 
-      wrap.innerHTML = `
-        <section class="detalle-layout">
-          <h1>${titulo}</h1>
+        const ref = doc(db, "alojamientos", id);
+        const snap = await getDoc(ref);
 
-          <div class="detalle-top-meta">
-            <span><strong>Ubicación:</strong> ${textoUbicacionMapa}</span>
-            <span><strong>Capacidad:</strong> ${huespedes} huéspedes</span>
-            <span><strong>Tipo:</strong> ${tipo}</span>
-          </div>
+        if (!snap.exists()) {
+          noExiste.style.display = "block";
+          return;
+        }
 
-          <p class="detalle-descripcion-top">${descripcion}</p>
+        const a = snap.data();
 
-          <div class="detalle-card">
-            <div class="detalle-galeria">
-              ${
-                foto
-                  ? `<img src="${foto}" alt="${titulo}">`
-                  : `<div class="detalle-galeria-empty">Sin imagen disponible</div>`
-              }
+        const foto = a.fotos?.find(f => f.isCover)?.url
+          || a.fotos?.[0]?.url
+          || "";
+
+        const precio = Number(a.precio || 0);
+        const ciudad = limpiarTexto(a.ciudad, "Ubicación no informada");
+        const provincia = limpiarTexto(a.provincia, "");
+        const ubicacion = provincia ? `${ciudad} - ${provincia}` : ciudad;
+        const descripcion = limpiarTexto(a.descripcion, "Sin descripción disponible.");
+        const titulo = limpiarTexto(a.titulo, "Alojamiento sin título");
+        const huespedes = Number(a.capacidad || a.huespedes || 1);
+        const tipo = limpiarTexto(a.tipo, "Departamento");
+        const checkinHora = limpiarTexto(a.checkinDesde || a.checkinHora, "14:00");
+        const checkoutHora = limpiarTexto(a.checkoutHasta || a.checkoutHora, "10:00");
+        const cancelacion = limpiarTexto(a.cancelacion, "No reembolsable");
+
+        const servicios = convertirLista(a.servicios, ["Wifi", "Aire acondicionado"]);
+        const reglas = convertirLista(a.reglas, ["No se permite fumar", "No se permiten fiestas"]);
+        const hoy = obtenerHoy();
+        const user = getUserLocal();
+        const reservaVisible = await buscarReservaVisible(id, user);
+        const puedeVerExacta = puedeVerUbicacionExacta(reservaVisible, user);
+        const textoUbicacionMapa = puedeVerExacta
+          ? limpiarTexto(a.direccion, ubicacion)
+          : `${ubicacion} · Ubicación aproximada`;
+
+        wrap.innerHTML = `
+          <section class="detalle-layout">
+            <h1>${escapeHTML(titulo)}</h1>
+
+            <div class="detalle-top-meta">
+              <span><strong>Ubicación:</strong> ${escapeHTML(textoUbicacionMapa)}</span>
+              <span><strong>Capacidad:</strong> ${huespedes} huéspedes</span>
+              <span><strong>Tipo:</strong> ${escapeHTML(tipo)}</span>
             </div>
 
-            <div class="detalle-info-grid">
-              <div class="detalle-info-left">
-                <div class="detalle-bloque">
-                  <h3>Información del alojamiento</h3>
-                  <div class="detalle-lista">
-                    <div class="detalle-item"><strong>Tipo:</strong> ${tipo}</div>
-                    <div class="detalle-item"><strong>Capacidad:</strong> ${huespedes} huéspedes</div>
-                    <div class="detalle-item"><strong>Check-in:</strong> ${checkinHora}</div>
-                    <div class="detalle-item"><strong>Check-out:</strong> ${checkoutHora}</div>
-                    <div class="detalle-item"><strong>Cancelación:</strong> ${cancelacion}</div>
-                    <div class="detalle-item"><strong>Ubicación:</strong> ${textoUbicacionMapa}</div>
-                  </div>
-                </div>
+            <p class="detalle-descripcion-top">${escapeHTML(descripcion)}</p>
 
-                <div class="detalle-bloque">
-                  <h3>Servicios</h3>
-                  <div class="chips">
-                    ${servicios.map(item => `<span class="chip">${item}</span>`).join("")}
-                  </div>
-                </div>
-
-                <div class="detalle-bloque">
-                  <h3>Reglas</h3>
-                  <div class="detalle-lista">
-                    ${reglas.map(item => `<div class="detalle-item">${item}</div>`).join("")}
-                  </div>
-                </div>
-
-                <div class="detalle-mapa-box">
-                  <h3>Ubicación</h3>
-                  <p class="detalle-mapa-texto">
-                    ${
-                      puedeVerExacta
-                        ? "Como esta reserva pertenece a una cuenta con acceso, se muestra la ubicación exacta del alojamiento."
-                        : "Antes de reservar se muestra una ubicación aproximada para proteger al anfitrión."
-                    }
-                  </p>
-                  <div id="mapaDetalle"></div>
-                </div>
+            <div class="detalle-card">
+              <div class="detalle-galeria">
+                ${
+                  foto
+                    ? `<img src="${escapeHTML(foto)}" alt="${escapeHTML(titulo)}">`
+                    : `<div class="detalle-galeria-empty">Sin imagen disponible</div>`
+                }
               </div>
 
-              <div class="detalle-info-right">
-                <div class="detalle-precio-card">
-                  <div>
-                    <span class="detalle-precio-numero">$${formatearPrecio(precio)}</span>
-                    <span class="detalle-precio-texto">/ noche</span>
+              <div class="detalle-info-grid">
+                <div class="detalle-info-left">
+                  <div class="detalle-bloque">
+                    <h3>Información del alojamiento</h3>
+                    <div class="detalle-lista">
+                      <div class="detalle-item"><strong>Tipo:</strong> ${escapeHTML(tipo)}</div>
+                      <div class="detalle-item"><strong>Capacidad:</strong> ${huespedes} huéspedes</div>
+                      <div class="detalle-item"><strong>Check-in:</strong> ${escapeHTML(checkinHora)}</div>
+                      <div class="detalle-item"><strong>Check-out:</strong> ${escapeHTML(checkoutHora)}</div>
+                      <div class="detalle-item"><strong>Cancelación:</strong> ${escapeHTML(cancelacion)}</div>
+                      <div class="detalle-item"><strong>Ubicación:</strong> ${escapeHTML(textoUbicacionMapa)}</div>
+                    </div>
                   </div>
 
-                  <p class="detalle-subprecio">Precio final según cantidad de noches</p>
-
-                  <div class="detalle-reserva-form">
-                    <label class="detalle-label" for="checkin">Check-in</label>
-                    <input class="detalle-input" type="date" id="checkin" value="${checkinParam}" min="${hoy}">
-
-                    <label class="detalle-label" for="checkout">Check-out</label>
-                    <input class="detalle-input" type="date" id="checkout" value="${checkoutParam}" min="${hoy}">
-
-                    <label class="detalle-label" for="guests">Huéspedes</label>
-                    <select class="detalle-select" id="guests">
-                      ${Array.from({ length: huespedes }, (_, i) => i + 1).map(n => `
-                        <option value="${n}" ${String(n) === String(guestsParam) ? "selected" : ""}>${n}</option>
-                      `).join("")}
-                    </select>
+                  <div class="detalle-bloque">
+                    <h3>Servicios</h3>
+                    <div class="chips">
+                      ${servicios.map(item => `<span class="chip">${escapeHTML(item)}</span>`).join("")}
+                    </div>
                   </div>
 
-                  <div class="detalle-alerta" id="totalBox">
-                    Seleccioná fechas válidas para calcular el total
+                  <div class="detalle-bloque">
+                    <h3>Reglas</h3>
+                    <div class="detalle-lista">
+                      ${reglas.map(item => `<div class="detalle-item">${escapeHTML(item)}</div>`).join("")}
+                    </div>
                   </div>
 
-                  <button class="detalle-btn-reservar disabled" id="btnReservar" type="button">
-                    Reservar
-                  </button>
+                  <div class="detalle-mapa-box">
+                    <h3>Ubicación</h3>
+                    <p class="detalle-mapa-texto">
+                      ${
+                        puedeVerExacta
+                          ? "Como esta reserva pertenece a una cuenta con acceso, se muestra la ubicación exacta del alojamiento."
+                          : "Antes de reservar se muestra una ubicación aproximada para proteger al anfitrión."
+                      }
+                    </p>
+                    <div id="mapaDetalle"></div>
+                  </div>
+                </div>
+
+                <div class="detalle-info-right">
+                  <div class="detalle-precio-card">
+                    <div>
+                      <span class="detalle-precio-numero">$${formatearPrecio(precio)}</span>
+                      <span class="detalle-precio-texto">/ noche</span>
+                    </div>
+
+                    <p class="detalle-subprecio">Precio final según cantidad de noches</p>
+
+                    <div class="detalle-reserva-form">
+                      <label class="detalle-label" for="checkin">Check-in</label>
+                      <input class="detalle-input" type="date" id="checkin" value="${escapeHTML(checkinParam)}" min="${hoy}">
+
+                      <label class="detalle-label" for="checkout">Check-out</label>
+                      <input class="detalle-input" type="date" id="checkout" value="${escapeHTML(checkoutParam)}" min="${hoy}">
+
+                      <label class="detalle-label" for="guests">Huéspedes</label>
+                      <select class="detalle-select" id="guests">
+                        ${Array.from({ length: huespedes }, (_, i) => i + 1).map(n => `
+                          <option value="${n}" ${String(n) === String(guestsParam) ? "selected" : ""}>${n}</option>
+                        `).join("")}
+                      </select>
+                    </div>
+
+                    <div class="detalle-alerta" id="totalBox">
+                      Seleccioná fechas válidas para calcular el total
+                    </div>
+
+                    <button class="detalle-btn-reservar disabled" id="btnReservar" type="button">
+                      Reservar
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <section style="margin-top:30px;">
-            <h3>Reseñas de huéspedes</h3>
+            <section class="resenas-box">
+              <h3 style="margin-top:0;">Reseñas de huéspedes</h3>
+              <div id="resenasResumen" style="margin-bottom:10px; font-weight:700;"></div>
+              <div id="listaResenas"></div>
+              <div id="boxDejarResena" style="display:none;"></div>
+            </section>
+          </section>
+        `;
 
-            <div id="resenasResumen" style="margin-bottom:10px; font-weight:700;"></div>
-            <div id="listaResenas"></div>
+        renderMapaDetalle(a, reservaVisible, user);
+        await cargarResenas(id, user);
 
-            <div id="boxDejarResena" style="display:none; margin-top:20px;">
-              <h4>Dejar reseña</h4>
+        const checkinEl = document.getElementById("checkin");
+        const checkoutEl = document.getElementById("checkout");
+        const guestsEl = document.getElementById("guests");
+        const btnReservar = document.getElementById("btnReservar");
 
-              <form id="formResena">
-                <select id="puntaje" required>
-                  <option value="">Puntaje</option>
-                  <option value="5">5 - Excelente</option>
-                  <option value="4">4 - Muy bueno</option>
-                  <option value="3">3 - Bueno</option>
+        const refrescarTotal = () => actualizarBoxTotal(precio);
+
+        checkinEl?.addEventListener("change", refrescarTotal);
+        checkoutEl?.addEventListener("change", refrescarTotal);
+        guestsEl?.addEventListener("change", refrescarTotal);
+
+        refrescarTotal();
+
+        btnReservar?.addEventListener("click", async () => {
+          if (btnReservar.classList.contains("disabled")) return;
+
+          const userLocal = getUserLocal();
+          if (!userLocal?.uid) {
+            alert("Iniciá sesión para reservar.");
+            location.href = "login.html";
+            return;
+          }
+
+          const checkin = checkinEl.value;
+          const checkout = checkoutEl.value;
+          const guests = Number(guestsEl.value || 1);
+          const noches = calcularNoches(checkin, checkout);
+
+          if (!checkin || !checkout || noches <= 0) {
+            alert("Completá fechas válidas.");
+            return;
+          }
+
+          const total = noches * precio;
+
+          try {
+            btnReservar.disabled = true;
+            btnReservar.textContent = "Reservando...";
+
+            await addDoc(collection(db, "reservas"), {
+              alojamientoId: id,
+              alojamientoTitulo: titulo,
+              alojamientoFoto: foto || "",
+              titulo,
+              foto: foto || "",
+
+              anfitrionId: a.anfitrionId || "",
+              anfitrionEmail: a.anfitrionEmail || a.contacto?.email || "",
+
+              huespedId: userLocal.uid,
+              huespedEmail: userLocal.email || "",
+              huespedNombre: userLocal.nombre || userLocal.name || userLocal.email || "Huésped",
+
+              checkin,
+              checkout,
+              guests,
+              total,
+              precioNoche: precio,
+              noches,
+
+              status: "pendiente",
+              estado: "pendiente",
+              chatHabilitado: false,
+              createdAt: serverTimestamp(),
+              creadaEn: serverTimestamp()
+            });
+
+            alert("Reserva enviada correctamente.");
+            location.href = "mis-reservas.html";
+          } catch (error) {
+            console.error("Error creando reserva:", error);
+            alert("No se pudo crear la reserva.");
+            btnReservar.disabled = false;
+            btnReservar.textContent = "Reservar";
+          }
+        });
+      } catch (error) {
+        console.error("Error cargando detalle:", error);
+        noExiste.style.display = "block";
+      }
+    }
+
+    cargarDetalle();
+  </script>
+</body>
+</html>
