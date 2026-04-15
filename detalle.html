@@ -133,6 +133,35 @@
       background:linear-gradient(135deg,#f4f5fb,#eceffd);
     }
 
+    .detalle-thumbs{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
+      gap:10px;
+      padding:14px;
+      background:#fff;
+      border-top:1px solid #ececf3;
+    }
+
+    .detalle-thumb{
+      width:100%;
+      height:84px;
+      object-fit:cover;
+      border-radius:12px;
+      border:2px solid transparent;
+      cursor:pointer;
+      display:block;
+      background:#f2f4fa;
+      transition:.18s ease;
+    }
+
+    .detalle-thumb.active{
+      border-color:#4f3dbb;
+    }
+
+    .detalle-thumb:hover{
+      border-color:#b9b7e8;
+    }
+
     .detalle-info-grid{
       display:grid;
       grid-template-columns:1.25fr 380px;
@@ -370,6 +399,12 @@
       .detalle-precio-numero{font-size:34px}
       .detalle-btn-reservar{font-size:21px}
       #mapaDetalle{height:300px}
+      .detalle-thumbs{
+        grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
+      }
+      .detalle-thumb{
+        height:72px;
+      }
     }
   </style>
 </head>
@@ -552,7 +587,14 @@
         mapaDetalle = null;
       }
 
-      mapaDetalle = L.map("mapaDetalle").setView(
+      mapaDetalle = L.map("mapaDetalle", {
+        scrollWheelZoom: false,
+        dragging: true,
+        touchZoom: true,
+        doubleClickZoom: true,
+        boxZoom: true,
+        keyboard: false
+      }).setView(
         [infoMapa.lat, infoMapa.lng],
         infoMapa.exacta ? 16 : 13
       );
@@ -725,9 +767,8 @@
 
         const a = snap.data();
 
-        const foto = a.fotos?.find(f => f.isCover)?.url
-          || a.fotos?.[0]?.url
-          || "";
+        const fotos = Array.isArray(a.fotos) ? a.fotos : [];
+        const fotoPortada = fotos.find(f => f.isCover)?.url || fotos[0]?.url || "";
 
         const precio = Number(a.precio || 0);
         const ciudad = limpiarTexto(a.ciudad, "Ubicación no informada");
@@ -766,11 +807,28 @@
             <div class="detalle-card">
               <div class="detalle-galeria">
                 ${
-                  foto
-                    ? `<img src="${escapeHTML(foto)}" alt="${escapeHTML(titulo)}">`
+                  fotoPortada
+                    ? `<img id="fotoPrincipalDetalle" src="${escapeHTML(fotoPortada)}" alt="${escapeHTML(titulo)}">`
                     : `<div class="detalle-galeria-empty">Sin imagen disponible</div>`
                 }
               </div>
+
+              ${
+                fotos.length > 1
+                  ? `
+                    <div class="detalle-thumbs">
+                      ${fotos.map((f, i) => `
+                        <img
+                          class="detalle-thumb ${f.url === fotoPortada ? "active" : ""}"
+                          src="${escapeHTML(f.url)}"
+                          alt="Foto ${i + 1}"
+                          data-foto="${escapeHTML(f.url)}"
+                        >
+                      `).join("")}
+                    </div>
+                  `
+                  : ""
+              }
 
               <div class="detalle-info-grid">
                 <div class="detalle-info-left">
@@ -858,6 +916,21 @@
           </section>
         `;
 
+        const fotoPrincipalEl = document.getElementById("fotoPrincipalDetalle");
+        const thumbs = document.querySelectorAll(".detalle-thumb");
+
+        thumbs.forEach((thumb) => {
+          thumb.addEventListener("click", () => {
+            const nuevaFoto = thumb.getAttribute("data-foto");
+            if (fotoPrincipalEl && nuevaFoto) {
+              fotoPrincipalEl.src = nuevaFoto;
+            }
+
+            thumbs.forEach(t => t.classList.remove("active"));
+            thumb.classList.add("active");
+          });
+        });
+
         renderMapaDetalle(a, reservaVisible, user);
         await cargarResenas(id, user);
 
@@ -903,9 +976,9 @@
             await addDoc(collection(db, "reservas"), {
               alojamientoId: id,
               alojamientoTitulo: titulo,
-              alojamientoFoto: foto || "",
+              alojamientoFoto: fotoPortada || "",
               titulo,
-              foto: foto || "",
+              foto: fotoPortada || "",
 
               anfitrionId: a.anfitrionId || "",
               anfitrionEmail: a.anfitrionEmail || a.contacto?.email || "",
