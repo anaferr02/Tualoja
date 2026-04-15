@@ -802,13 +802,20 @@
     signOut
   } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
   import {
-    collection,
-    addDoc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
   let currentUser = null;
-
+  const storage = getStorage();
+  
   const provinciasPorPais = {
     Argentina: [
       "Buenos Aires", "CABA", "Catamarca", "Chaco", "Chubut", "Córdoba",
@@ -857,7 +864,6 @@
   const paisSelect = document.getElementById("pais");
   const provinciaSelect = document.getElementById("provincia");
   const ciudadSelect = document.getElementById("ciudadSelect");
-  const ciudadInput = document.getElementById("ciudadInput");
   const logoutLink = document.getElementById("logoutLink");
   const fotosInput = document.getElementById("fotos");
   const preview = document.getElementById("preview");
@@ -891,12 +897,19 @@ dropzone.addEventListener("drop", async (e) => {
   e.preventDefault();
   dropzone.style.background = "#f9faff";
 
-  const files = Array.from(e.dataTransfer.files || []);
+  const files = Array.from(e.dataTransfer.files || []).filter(file =>
+    file.type.startsWith("image/")
+  );
+
   if (!files.length) return;
 
   for (const file of files) {
-    const b64 = await fileToBase64(file);
-    fotos.push({ b64, isCover: false });
+    const previewUrl = URL.createObjectURL(file);
+    fotos.push({
+      file,
+      previewUrl,
+      isCover: false
+    });
   }
 
   asegurarPortada();
@@ -976,16 +989,14 @@ function actualizarContador(){
     });
   }
 
-  paisSelect?.addEventListener("change", () => {
-    cargarProvincias();
-    ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
-    ciudadInput.value = "";
-  });
+ paisSelect?.addEventListener("change", () => {
+  cargarProvincias();
+  ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
+});
 
-  provinciaSelect?.addEventListener("change", () => {
-    cargarCiudades();
-    ciudadInput.value = "";
-  });
+provinciaSelect?.addEventListener("change", () => {
+  cargarCiudades();
+});
 
   function initMapa(intentos = 0) {
     const mapaEl = document.getElementById("mapa");
@@ -1032,7 +1043,7 @@ function actualizarContador(){
         return;
       }
 
-      const ciudadFinal = ciudadSelect.value || ciudadInput.value.trim();
+      const ciudadFinal = ciudadSelect.value.trim();
       const provincia = provinciaSelect?.value || "";
       const pais = paisSelect?.value || "";
 
@@ -1094,28 +1105,28 @@ function actualizarContador(){
     if (!fotos.some((x) => x.isCover)) fotos[0].isCover = true;
   }
 
-  function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const r = new FileReader();
-      r.onload = () => resolve(String(r.result));
-      r.onerror = reject;
-      r.readAsDataURL(file);
+
+  fotosInput?.addEventListener("change", async () => {
+  const files = Array.from(fotosInput.files || []).filter(file =>
+    file.type.startsWith("image/")
+  );
+
+  if (!files.length) return;
+
+  for (const file of files) {
+    const previewUrl = URL.createObjectURL(file);
+    fotos.push({
+      file,
+      previewUrl,
+      isCover: false
     });
   }
 
-  fotosInput?.addEventListener("change", async () => {
-    const files = Array.from(fotosInput.files || []);
-    if (!files.length) return;
-
-    for (const file of files) {
-      const b64 = await fileToBase64(file);
-      fotos.push({ b64, isCover: false });
-    }
-
-    asegurarPortada();
-    fotosInput.value = "";
-    renderFotos();
-  });
+  asegurarPortada();
+  fotosInput.value = "";
+  renderFotos();
+  actualizarContador();
+});
 
  function renderFotos() {
   asegurarPortada();
@@ -1126,7 +1137,7 @@ function actualizarContador(){
     item.className = "preview-item";
 
     const img = document.createElement("img");
-    img.src = ph.b64;
+    img.src = ph.previewUrl;
 
     // 🔥 CLICK EN IMAGEN = HACER PORTADA
     img.style.cursor = "pointer";
@@ -1194,6 +1205,29 @@ function actualizarContador(){
     };
   }
 
+  async function subirFotosAStorage(fotosOrdenadas, alojamientoId) {
+    const urls = [];
+
+    for (let i = 0; i < fotosOrdenadas.length; i++) {
+      const foto = fotosOrdenadas[i];
+      if (!foto.file) continue;
+
+      const extension = (foto.file.name.split(".").pop() || "jpg").toLowerCase();
+      const nombreArchivo = `alojamientos/${currentUser.uid}/${alojamientoId}/foto_${i + 1}.${extension}`;
+      const storageRef = ref(storage, nombreArchivo);
+
+      await uploadBytes(storageRef, foto.file);
+      const url = await getDownloadURL(storageRef);
+
+      urls.push({
+        url,
+        isCover: foto.isCover
+      });
+    }
+
+    return urls;
+  }
+
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -1212,10 +1246,10 @@ function actualizarContador(){
       return;
     }
 
-    const ciudadFinal = ciudadSelect.value || ciudadInput.value.trim();
+    const ciudadFinal = ciudadSelect.value.trim();
 
     if (!ciudadFinal) {
-      msg.textContent = "❌ Elegí o escribí una ciudad.";
+      msg.textContent = "❌ Elegí una ciudad.";
       return;
     }
 
@@ -1226,9 +1260,17 @@ function actualizarContador(){
       const reglas = Array.from(form.querySelectorAll('input[name="reglas"]:checked')).map(el => el.value);
       const fotosOrdenadas = [...fotos].sort((a, b) => Number(b.isCover) - Number(a.isCover));
 
+      if (!fotosOrdenadas.length) {
+        msg.textContent = "❌ Subí al menos una foto.";
+        return;
+      }
+
       const latReal = Number(latInput.value);
       const lngReal = Number(lngInput.value);
       const ubicacionPublica = generarUbicacionAproximada(latReal, lngReal);
+
+      const alojamientoId = crypto.randomUUID();
+      const fotosSubidas = await subirFotosAStorage(fotosOrdenadas, alojamientoId);
 
       const data = {
         titulo: form.titulo.value.trim(),
@@ -1264,7 +1306,7 @@ function actualizarContador(){
         precio: Number(form.precio.value),
         maxNoches: Number(form.maxNoches.value || 30),
 
-        fotos: fotosOrdenadas,
+        fotos: fotosSubidas,
         anfitrion: form.anfitrion.value.trim(),
 
         datosFiscales: {
@@ -1286,6 +1328,7 @@ function actualizarContador(){
         fechaAceptacionContrato: new Date().toISOString(),
         versionContrato: "1.0",
 
+        publicacionId: alojamientoId,
         anfitrionId: currentUser.uid,
         anfitrionEmail: currentUser.email || "",
         createdAt: serverTimestamp()
