@@ -267,6 +267,11 @@
       background:#241da1;
     }
 
+    .publish-actions button.btn[type="submit"]:disabled{
+      opacity:.7;
+      cursor:not-allowed;
+    }
+
     .btn-outline{
       background:#fff;
       color:#1b167f;
@@ -289,104 +294,108 @@
       overflow:hidden;
       border:1px solid rgba(27,22,127,.12);
     }
+
     .btn-buscar-mapa{
-  min-width: 190px;
-  min-height: 52px;
-  border: 0;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #6f61ea, #4f3dbb);
-  color: #fff !important;
-  font-weight: 800;
-  font-size: 15px;
-  cursor: pointer;
-  box-shadow: 0 10px 24px rgba(79, 61, 187, .20);
-  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
-}
+      min-width: 190px;
+      min-height: 52px;
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #6f61ea, #4f3dbb);
+      color: #fff !important;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(79, 61, 187, .20);
+      transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+    }
 
-.btn-buscar-mapa:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 14px 28px rgba(79, 61, 187, .24);
-  opacity: .98;
-}
+    .btn-buscar-mapa:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(79, 61, 187, .24);
+      opacity: .98;
+    }
 
-.btn-buscar-mapa:active{
-  transform: translateY(0);
-}
+    .btn-buscar-mapa:active{
+      transform: translateY(0);
+    }
 
-@media (max-width: 760px){
-  .btn-buscar-mapa{
-    width: 100%;
-  }
-}
+    @media (max-width: 760px){
+      .btn-buscar-mapa{
+        width: 100%;
+      }
+    }
+
     .check-contrato{
-  display:flex;
-  align-items:center; /* 🔥 clave */
-  gap:10px;
-  margin-top:20px;
-  font-size:14px;
-  line-height:1.4;
-}
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top:20px;
+      font-size:14px;
+      line-height:1.4;
+    }
 
-.check-contrato input{
-  margin:0;
-  width:18px;
-  height:18px;
-  cursor:pointer;
-}
+    .check-contrato input{
+      margin:0;
+      width:18px;
+      height:18px;
+      cursor:pointer;
+    }
 
-.check-contrato a{
-  color:#4f3dbb;
-  font-weight:700;
-  text-decoration:none;
-}
+    .check-contrato a{
+      color:#4f3dbb;
+      font-weight:700;
+      text-decoration:none;
+    }
 
-.check-contrato a:hover{
-  text-decoration:underline;
-}
+    .check-contrato a:hover{
+      text-decoration:underline;
+    }
+
     .btn-subir-fotos{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  padding:14px 20px;
-  border-radius:16px;
-  background: linear-gradient(180deg, #6f61ea, #4f3dbb);
-  color:#fff;
-  font-weight:800;
-  font-size:14px;
-  cursor:pointer;
-  box-shadow: 0 10px 24px rgba(79, 61, 187, .20);
-  transition: .2s ease;
-}
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:14px 20px;
+      border-radius:16px;
+      background: linear-gradient(180deg, #6f61ea, #4f3dbb);
+      color:#fff;
+      font-weight:800;
+      font-size:14px;
+      cursor:pointer;
+      box-shadow: 0 10px 24px rgba(79, 61, 187, .20);
+      transition: .2s ease;
+    }
 
-.btn-subir-fotos:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 14px 28px rgba(79, 61, 187, .25);
-}
+    .btn-subir-fotos:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(79, 61, 187, .25);
+    }
 
-.btn-subir-fotos:active{
-  transform: translateY(0);
-}
+    .btn-subir-fotos:active{
+      transform: translateY(0);
+    }
+
     .dropzone{
-  border:2px dashed #c7ccff;
-  border-radius:18px;
-  padding:30px;
-  text-align:center;
-  cursor:pointer;
-  background:#f9faff;
-  transition:.2s ease;
-}
+      border:2px dashed #c7ccff;
+      border-radius:18px;
+      padding:30px;
+      text-align:center;
+      cursor:pointer;
+      background:#f9faff;
+      transition:.2s ease;
+    }
 
-.dropzone:hover{
-  background:#eef2ff;
-  border-color:#6f61ea;
-}
+    .dropzone:hover{
+      background:#eef2ff;
+      border-color:#6f61ea;
+    }
 
-.dropzone p{
-  margin:0;
-  font-weight:700;
-  color:#4f3dbb;
-}
+    .dropzone p{
+      margin:0;
+      font-weight:700;
+      color:#4f3dbb;
+    }
   </style>
 </head>
 
@@ -496,14 +505,11 @@
               </select>
             </div>
             <div>
-  <label>Ciudad *</label>
-
-  <select id="ciudadSelect">
-    <option value="">Elegí una ciudad</option>
-  </select>
-
-  
-</div>
+              <label>Ciudad *</label>
+              <select id="ciudadSelect" required>
+                <option value="">Elegí una ciudad</option>
+              </select>
+            </div>
           </div>
 
           <label>Dirección (obligatoria) *</label>
@@ -521,31 +527,31 @@
             </div>
           </div>
 
-   <div style="margin-top:16px;">
-  <label>Buscar dirección en el mapa</label>
+          <div style="margin-top:16px;">
+            <label>Buscar dirección en el mapa</label>
 
-  <div style="display:flex; gap:10px; flex-wrap:wrap;">
-    <input
-      id="buscarDireccion"
-      type="text"
-      placeholder="Ej: San Martín 123, Paraná, Entre Ríos"
-      style="flex:1; min-width:260px;"
-    />
-    <button
-  type="button"
-  id="btnBuscarMapa"
-  class="btn btn-buscar-mapa"
->
-  Buscar en mapa
-</button>
-  </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <input
+                id="buscarDireccion"
+                type="text"
+                placeholder="Ej: San Martín 123, Paraná, Entre Ríos"
+                style="flex:1; min-width:260px;"
+              />
+              <button
+                type="button"
+                id="btnBuscarMapa"
+                class="btn btn-buscar-mapa"
+              >
+                Buscar en mapa
+              </button>
+            </div>
 
-  <small class="help">Escribí la dirección y tocá “Buscar en mapa” para ubicar el alojamiento automáticamente.</small>
+            <small class="help">Escribí la dirección y tocá “Buscar en mapa” para ubicar el alojamiento automáticamente.</small>
 
-  <label style="margin-top:14px;">Ubicación en el mapa *</label>
-  <div id="mapa"></div>
-  <small class="help">También podés hacer clic en el mapa para ajustar el punto exacto.</small>
-</div>
+            <label style="margin-top:14px;">Ubicación en el mapa *</label>
+            <div id="mapa"></div>
+            <small class="help">También podés hacer clic en el mapa para ajustar el punto exacto.</small>
+          </div>
 
           <div class="grid-2">
             <div>
@@ -624,21 +630,21 @@
           </select>
         </section>
 
-       <section class="publish-section">
-  <h3>Fotos</h3>
-  <p class="muted" style="margin-top:-6px;">
-    Subí varias. Podés arrastrarlas o seleccionarlas.
-  </p>
+        <section class="publish-section">
+          <h3>Fotos</h3>
+          <p class="muted" style="margin-top:-6px;">
+            Subí varias. Podés arrastrarlas o seleccionarlas.
+          </p>
 
-  <div class="dropzone" id="dropzone">
-    <p>📸 Arrastrá fotos acá o hacé click para subir</p>
-    <input id="fotos" type="file" accept="image/*" multiple hidden />
-  </div>
+          <div class="dropzone" id="dropzone">
+            <p>📸 Arrastrá fotos acá o hacé click para subir</p>
+            <input id="fotos" type="file" accept="image/*" multiple hidden />
+          </div>
 
-  <p id="contadorFotos" class="help"></p>
+          <p id="contadorFotos" class="help"></p>
 
-  <div id="preview" class="preview-grid"></div>
-</section>
+          <div id="preview" class="preview-grid"></div>
+        </section>
 
         <section class="publish-section">
           <h3>Precio y estadía</h3>
@@ -657,81 +663,83 @@
           </div>
         </section>
 
-      <section class="publish-section">
-  <h3>Datos del anfitrión y facturación</h3>
-  <p class="section-note">
-    Estos datos se usarán para contacto, pagos y para facturar la comisión de TuAloja.
-  </p>
+        <section class="publish-section">
+          <h3>Datos del anfitrión y facturación</h3>
+          <p class="section-note">
+            Estos datos se usarán para contacto, pagos y para facturar la comisión de TuAloja.
+          </p>
 
-  <div class="grid-2">
-    <div>
-      <label>Nombre del anfitrión *</label>
-      <input name="anfitrion" required placeholder="Ej: Ana Laura" />
-    </div>
-    <div>
-      <label>Razón social o nombre fiscal *</label>
-      <input name="razonSocial" required placeholder="Ej: Ana Laura Fernández" />
-    </div>
+          <div class="grid-2">
+            <div>
+              <label>Nombre del anfitrión *</label>
+              <input name="anfitrion" required placeholder="Ej: Ana Laura" />
+            </div>
+            <div>
+              <label>Razón social o nombre fiscal *</label>
+              <input name="razonSocial" required placeholder="Ej: Ana Laura Fernández" />
+            </div>
 
-    <div>
-      <label>CUIT / CUIL *</label>
-      <input name="cuit" required placeholder="Ej: 20-12345678-9" />
-    </div>
-    <div>
-      <label>Condición fiscal *</label>
-      <select name="condicionFiscal" required>
-        <option value="">Elegí una opción</option>
-        <option value="Monotributista">Monotributista</option>
-        <option value="Responsable Inscripto">Responsable Inscripto</option>
-        <option value="Consumidor Final">Consumidor Final</option>
-        <option value="Exento">Exento</option>
-      </select>
-    </div>
+            <div>
+              <label>CUIT / CUIL *</label>
+              <input name="cuit" required placeholder="Ej: 20-12345678-9" />
+            </div>
+            <div>
+              <label>Condición fiscal *</label>
+              <select name="condicionFiscal" required>
+                <option value="">Elegí una opción</option>
+                <option value="Monotributista">Monotributista</option>
+                <option value="Responsable Inscripto">Responsable Inscripto</option>
+                <option value="Consumidor Final">Consumidor Final</option>
+                <option value="Exento">Exento</option>
+              </select>
+            </div>
 
-    <div>
-      <label>Dirección fiscal *</label>
-      <input name="direccionFiscal" required placeholder="Ej: San Martín 123, Entre Ríos" />
-    </div>
-    <div>
-      <label>Tipo de comprobante preferido *</label>
-      <select name="tipoFactura" required>
-        <option value="">Elegí una opción</option>
-        <option value="Factura C">Factura C</option>
-        <option value="Factura A">Factura A</option>
-        <option value="Factura B">Factura B</option>
-      </select>
-    </div>
+            <div>
+              <label>Dirección fiscal *</label>
+              <input name="direccionFiscal" required placeholder="Ej: San Martín 123, Entre Ríos" />
+            </div>
+            <div>
+              <label>Tipo de comprobante preferido *</label>
+              <select name="tipoFactura" required>
+                <option value="">Elegí una opción</option>
+                <option value="Factura C">Factura C</option>
+                <option value="Factura A">Factura A</option>
+                <option value="Factura B">Factura B</option>
+              </select>
+            </div>
 
-    <div>
-      <label>Teléfono *</label>
-      <input name="telefono" required placeholder="Ej: +54 9 3447..." />
-    </div>
-    <div>
-      <label>Email de contacto *</label>
-      <input name="email" type="email" required placeholder="Ej: contacto@tualoja.com" />
-    </div>
+            <div>
+              <label>Teléfono *</label>
+              <input name="telefono" required placeholder="Ej: +54 9 3447..." />
+            </div>
+            <div>
+              <label>Email de contacto *</label>
+              <input name="email" type="email" required placeholder="Ej: contacto@tualoja.com" />
+            </div>
 
-    <div>
-      <label>Titular de la cuenta (opcional)</label>
-      <input name="titularCuenta" placeholder="Ej: Ana Laura Fernández" />
-    </div>
-    <div>
-      <label>Alias o CBU para pagos (opcional)</label>
-      <input name="aliasCbu" placeholder="Ej: ANA.TUALOJA.2026" />
-    </div>
-  </div>
-</section>
-     <label class="check-contrato">
-  <input type="checkbox" id="aceptaContrato" required />
-  <span>
-    Acepto los 
-    <a href="terminos-anfitriones.html" target="_blank">
-      Términos para Anfitriones
-    </a>
-  </span>
-</label>
+            <div>
+              <label>Titular de la cuenta (opcional)</label>
+              <input name="titularCuenta" placeholder="Ej: Ana Laura Fernández" />
+            </div>
+            <div>
+              <label>Alias o CBU para pagos (opcional)</label>
+              <input name="aliasCbu" placeholder="Ej: ANA.TUALOJA.2026" />
+            </div>
+          </div>
+        </section>
+
+        <label class="check-contrato">
+          <input type="checkbox" id="aceptaContrato" required />
+          <span>
+            Acepto los
+            <a href="terminos-anfitriones.html" target="_blank">
+              Términos para Anfitriones
+            </a>
+          </span>
+        </label>
+
         <div class="publish-actions">
-          <button class="btn" type="submit">Publicar</button>
+          <button class="btn" type="submit" id="submitBtn">Publicar</button>
           <a class="btn btn-outline" href="index.html">Volver a inicio</a>
         </div>
 
@@ -742,13 +750,14 @@
         <input type="hidden" name="_subject" value="TuAloja - Nueva publicación" />
         <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_template" value="table" />
+
         <input type="hidden" name="Razón social" id="mf_razonsocial" />
-<input type="hidden" name="CUIT / CUIL" id="mf_cuit" />
-<input type="hidden" name="Condición fiscal" id="mf_condicionfiscal" />
-<input type="hidden" name="Dirección fiscal" id="mf_direccionfiscal" />
-<input type="hidden" name="Tipo de comprobante" id="mf_tipofactura" />
-<input type="hidden" name="Titular cuenta" id="mf_titularcuenta" />
-<input type="hidden" name="Alias / CBU" id="mf_aliascbu" />
+        <input type="hidden" name="CUIT / CUIL" id="mf_cuit" />
+        <input type="hidden" name="Condición fiscal" id="mf_condicionfiscal" />
+        <input type="hidden" name="Dirección fiscal" id="mf_direccionfiscal" />
+        <input type="hidden" name="Tipo de comprobante" id="mf_tipofactura" />
+        <input type="hidden" name="Titular cuenta" id="mf_titularcuenta" />
+        <input type="hidden" name="Alias / CBU" id="mf_aliascbu" />
         <input type="hidden" name="email" id="mf_email_to" value="" />
         <input type="hidden" name="_replyto" id="mf_replyto" value="" />
         <input type="hidden" name="_autoresponse" id="mf_autoresponse" value="" />
@@ -779,595 +788,619 @@
   </main>
 
   <footer class="footer-ayuda">
-  <p>© 2026 TuAloja. Todos los derechos reservados.</p>
-  <div class="footer-links">
-    <a href="politica-de-privacidad.html">Política de Privacidad</a>
-    <span>|</span>
-    <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
-    <span>|</span>
-    <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
-    <span>|</span>
-    <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
-  </div>
-</footer>
+    <p>© 2026 TuAloja. Todos los derechos reservados.</p>
+    <div class="footer-links">
+      <a href="politica-de-privacidad.html">Política de Privacidad</a>
+      <span>|</span>
+      <a href="terminos-y-condiciones.html">Términos y Condiciones</a>
+      <span>|</span>
+      <a href="politica-de-cancelacion.html">Política de Cancelaciones</a>
+      <span>|</span>
+      <a href="politica-anti-estafas.html">Política Anti-Estafas</a>
+    </div>
+  </footer>
 
-<script type="module" src="script.js"></script>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <script type="module" src="script.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-<script type="module">
-  import { auth, db } from "./firebase-config.js";
-  import {
-    onAuthStateChanged,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-  import {
-  collection,
-  addDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import {
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+    import {
+      collection,
+      addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+    import {
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
-  let currentUser = null;
-  const storage = getStorage();
-  
-  const provinciasPorPais = {
-    Argentina: [
-      "Buenos Aires", "CABA", "Catamarca", "Chaco", "Chubut", "Córdoba",
-      "Corrientes", "Entre Ríos", "Formosa", "Jujuy", "La Pampa",
-      "La Rioja", "Mendoza", "Misiones", "Neuquén", "Río Negro",
-      "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe",
-      "Santiago del Estero", "Tierra del Fuego", "Tucumán"
-    ],
-    Uruguay: [
-      "Artigas", "Canelones", "Cerro Largo", "Colonia", "Durazno",
-      "Flores", "Florida", "Lavalleja", "Maldonado", "Montevideo",
-      "Paysandú", "Río Negro", "Rivera", "Rocha", "Salto",
-      "San José", "Soriano", "Tacuarembó", "Treinta y Tres"
-    ],
-    Chile: [
-      "Arica y Parinacota", "Tarapacá", "Antofagasta", "Atacama", "Coquimbo",
-      "Valparaíso", "Metropolitana", "O’Higgins", "Maule", "Ñuble",
-      "Biobío", "La Araucanía", "Los Ríos", "Los Lagos", "Aysén",
-      "Magallanes"
-    ]
-  };
+    let currentUser = null;
+    const storage = getStorage();
 
-  const ciudadesPorProvincia = {
-    "Entre Ríos": [
-      "Paraná", "Concordia", "Gualeguaychú", "Concepción del Uruguay",
-      "Colón", "Villa Elisa", "San José", "Federación", "Chajarí",
-      "Nogoyá", "Victoria", "Diamante", "San Salvador", "Villaguay",
-      "Gualeguay", "La Paz", "Federal", "Crespo"
-    ],
-    "Buenos Aires": [
-      "La Plata", "Mar del Plata", "Bahía Blanca", "Tandil",
-      "Pinamar", "Villa Gesell", "San Bernardo", "Necochea"
-    ],
-    "Córdoba": [
-      "Córdoba", "Villa Carlos Paz", "Villa General Belgrano",
-      "La Falda", "Capilla del Monte", "Mina Clavero", "Alta Gracia"
-    ],
-    "Santa Fe": [
-      "Rosario", "Santa Fe", "Rafaela", "Reconquista"
-    ],
-    "Mendoza": [
-      "Mendoza", "San Rafael", "Maipú", "Luján de Cuyo"
-    ]
-  };
+    const provinciasPorPais = {
+      Argentina: [
+        "Buenos Aires", "CABA", "Catamarca", "Chaco", "Chubut", "Córdoba",
+        "Corrientes", "Entre Ríos", "Formosa", "Jujuy", "La Pampa",
+        "La Rioja", "Mendoza", "Misiones", "Neuquén", "Río Negro",
+        "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe",
+        "Santiago del Estero", "Tierra del Fuego", "Tucumán"
+      ],
+      Uruguay: [
+        "Artigas", "Canelones", "Cerro Largo", "Colonia", "Durazno",
+        "Flores", "Florida", "Lavalleja", "Maldonado", "Montevideo",
+        "Paysandú", "Río Negro", "Rivera", "Rocha", "Salto",
+        "San José", "Soriano", "Tacuarembó", "Treinta y Tres"
+      ],
+      Chile: [
+        "Arica y Parinacota", "Tarapacá", "Antofagasta", "Atacama", "Coquimbo",
+        "Valparaíso", "Metropolitana", "O’Higgins", "Maule", "Ñuble",
+        "Biobío", "La Araucanía", "Los Ríos", "Los Lagos", "Aysén",
+        "Magallanes"
+      ]
+    };
 
-  const paisSelect = document.getElementById("pais");
-  const provinciaSelect = document.getElementById("provincia");
-  const ciudadSelect = document.getElementById("ciudadSelect");
-  const logoutLink = document.getElementById("logoutLink");
-  const fotosInput = document.getElementById("fotos");
-  const preview = document.getElementById("preview");
-  const msg = document.getElementById("msg");
-  const form = document.getElementById("publishForm");
-  const mailForm = document.getElementById("mailForm");
-  const latInput = document.getElementById("lat");
-  const lngInput = document.getElementById("lng");
-  const buscarDireccionInput = document.getElementById("buscarDireccion");
-  const btnBuscarMapa = document.getElementById("btnBuscarMapa");
-  const aceptaContrato = document.getElementById("aceptaContrato");
-  const dropzone = document.getElementById("dropzone");
-const contadorFotos = document.getElementById("contadorFotos");
+    const ciudadesPorProvincia = {
+      "Entre Ríos": [
+        "Paraná", "Concordia", "Gualeguaychú", "Concepción del Uruguay",
+        "Colón", "Villa Elisa", "San José", "Federación", "Chajarí",
+        "Nogoyá", "Victoria", "Diamante", "San Salvador", "Villaguay",
+        "Gualeguay", "La Paz", "Federal", "Crespo"
+      ],
+      "Buenos Aires": [
+        "La Plata", "Mar del Plata", "Bahía Blanca", "Tandil",
+        "Pinamar", "Villa Gesell", "San Bernardo", "Necochea"
+      ],
+      "Córdoba": [
+        "Córdoba", "Villa Carlos Paz", "Villa General Belgrano",
+        "La Falda", "Capilla del Monte", "Mina Clavero", "Alta Gracia"
+      ],
+      "Santa Fe": [
+        "Rosario", "Santa Fe", "Rafaela", "Reconquista"
+      ],
+      "Mendoza": [
+        "Mendoza", "San Rafael", "Maipú", "Luján de Cuyo"
+      ]
+    };
 
-// 👉 click abre selector
-dropzone.addEventListener("click", () => {
-  fotosInput.click();
-});
+    const paisSelect = document.getElementById("pais");
+    const provinciaSelect = document.getElementById("provincia");
+    const ciudadSelect = document.getElementById("ciudadSelect");
+    const logoutLink = document.getElementById("logoutLink");
+    const fotosInput = document.getElementById("fotos");
+    const preview = document.getElementById("preview");
+    const msg = document.getElementById("msg");
+    const form = document.getElementById("publishForm");
+    const mailForm = document.getElementById("mailForm");
+    const latInput = document.getElementById("lat");
+    const lngInput = document.getElementById("lng");
+    const buscarDireccionInput = document.getElementById("buscarDireccion");
+    const btnBuscarMapa = document.getElementById("btnBuscarMapa");
+    const aceptaContrato = document.getElementById("aceptaContrato");
+    const dropzone = document.getElementById("dropzone");
+    const contadorFotos = document.getElementById("contadorFotos");
+    const submitBtn = document.getElementById("submitBtn");
 
-// 👉 arrastrar archivos
-dropzone.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  dropzone.style.background = "#eef2ff";
-});
+    let fotos = [];
+    let mapa = null;
+    let marcador = null;
+    let publicando = false;
 
-dropzone.addEventListener("dragleave", () => {
-  dropzone.style.background = "#f9faff";
-});
-
-dropzone.addEventListener("drop", async (e) => {
-  e.preventDefault();
-  dropzone.style.background = "#f9faff";
-
-  const files = Array.from(e.dataTransfer.files || []).filter(file =>
-    file.type.startsWith("image/")
-  );
-
-  if (!files.length) return;
-
-  for (const file of files) {
-    const previewUrl = URL.createObjectURL(file);
-    fotos.push({
-      file,
-      previewUrl,
-      isCover: false
+    dropzone?.addEventListener("click", () => {
+      fotosInput.click();
     });
-  }
 
-  asegurarPortada();
-  renderFotos();
-  actualizarContador();
-});
-
-// 👉 contador
-function actualizarContador(){
-  if (!contadorFotos) return;
-
-  if (!fotos.length) {
-    contadorFotos.textContent = "";
-    return;
-  }
-
-  contadorFotos.textContent = `📷 ${fotos.length} foto${fotos.length > 1 ? "s" : ""} cargada${fotos.length > 1 ? "s" : ""}`;
-}
-
-  let fotos = [];
-  let mapa = null;
-  let marcador = null;
-
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      location.href = "login.html?next=" + encodeURIComponent("publicar.html");
-      return;
-    }
-    currentUser = user;
-  });
-
-  if (logoutLink) {
-    logoutLink.addEventListener("click", async (e) => {
+    dropzone?.addEventListener("dragover", (e) => {
       e.preventDefault();
-      await signOut(auth);
-      location.href = "login.html";
+      dropzone.style.background = "#eef2ff";
     });
-  }
 
-  function cargarProvincias() {
-    const pais = paisSelect.value;
-    const provincias = provinciasPorPais[pais] || [];
-
-    provinciaSelect.innerHTML = "";
-
-    if (!pais) {
-      provinciaSelect.innerHTML = `<option value="">Primero elegí un país</option>`;
-      return;
-    }
-
-    provinciaSelect.innerHTML = `<option value="">Elegí una provincia</option>`;
-
-    provincias.forEach((prov) => {
-      const option = document.createElement("option");
-      option.value = prov;
-      option.textContent = prov;
-      provinciaSelect.appendChild(option);
+    dropzone?.addEventListener("dragleave", () => {
+      dropzone.style.background = "#f9faff";
     });
-  }
 
-  function cargarCiudades() {
-    const provincia = provinciaSelect.value;
-    const ciudades = ciudadesPorProvincia[provincia] || [];
+    dropzone?.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.style.background = "#f9faff";
 
-    ciudadSelect.innerHTML = `<option value="">Elegí una ciudad</option>`;
+      const files = Array.from(e.dataTransfer.files || []).filter(file =>
+        file.type.startsWith("image/")
+      );
 
-    if (!provincia) {
-      ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
-      return;
-    }
+      if (!files.length) return;
 
-    ciudades.forEach((ciudad) => {
-      const option = document.createElement("option");
-      option.value = ciudad;
-      option.textContent = ciudad;
-      ciudadSelect.appendChild(option);
-    });
-  }
-
- paisSelect?.addEventListener("change", () => {
-  cargarProvincias();
-  ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
-});
-
-provinciaSelect?.addEventListener("change", () => {
-  cargarCiudades();
-});
-
-  function initMapa(intentos = 0) {
-    const mapaEl = document.getElementById("mapa");
-    if (!mapaEl) return;
-
-    if (typeof L === "undefined") {
-      if (intentos < 20) {
-        setTimeout(() => initMapa(intentos + 1), 200);
-      } else {
-        console.error("Leaflet no cargó correctamente.");
+      for (const file of files) {
+        const previewUrl = URL.createObjectURL(file);
+        fotos.push({
+          file,
+          previewUrl,
+          isCover: false
+        });
       }
-      return;
-    }
 
-    if (mapa) return;
-
-    mapa = L.map("mapa").setView([-31.73197, -60.5238], 13);
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap"
-    }).addTo(mapa);
-
-    function actualizarUbicacion(lat, lng) {
-      latInput.value = Number(lat).toFixed(6);
-      lngInput.value = Number(lng).toFixed(6);
-
-      if (marcador) {
-        marcador.setLatLng([lat, lng]);
-      } else {
-        marcador = L.marker([lat, lng]).addTo(mapa);
-      }
-    }
-
-    mapa.on("click", (e) => {
-      const { lat, lng } = e.latlng;
-      actualizarUbicacion(lat, lng);
+      asegurarPortada();
+      renderFotos();
+      actualizarContador();
     });
 
-    async function buscarDireccionEnMapa() {
-      const queryBase = buscarDireccionInput?.value?.trim() || "";
+    function actualizarContador() {
+      if (!contadorFotos) return;
 
-      if (!queryBase) {
-        alert("Escribí una dirección.");
+      if (!fotos.length) {
+        contadorFotos.textContent = "";
         return;
       }
 
-      const ciudadFinal = ciudadSelect.value.trim();
-      const provincia = provinciaSelect?.value || "";
-      const pais = paisSelect?.value || "";
+      contadorFotos.textContent = `📷 ${fotos.length} foto${fotos.length > 1 ? "s" : ""} cargada${fotos.length > 1 ? "s" : ""}`;
+    }
 
-      const queryCompleta = [queryBase, ciudadFinal, provincia, pais]
-        .filter(Boolean)
-        .join(", ");
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        location.href = "login.html?next=" + encodeURIComponent("publicar.html");
+        return;
+      }
+      currentUser = user;
+    });
 
-      try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(queryCompleta)}`;
-        const resp = await fetch(url, {
-          headers: {
-            "Accept": "application/json"
-          }
-        });
+    if (logoutLink) {
+      logoutLink.addEventListener("click", async (e) => {
+        e.preventDefault();
+        await signOut(auth);
+        location.href = "login.html";
+      });
+    }
 
-        const results = await resp.json();
+    function cargarProvincias() {
+      const pais = paisSelect.value;
+      const provincias = provinciasPorPais[pais] || [];
 
-        if (!results || !results.length) {
-          alert("No se encontró la dirección. Probá escribiéndola más completa.");
+      provinciaSelect.innerHTML = "";
+
+      if (!pais) {
+        provinciaSelect.innerHTML = `<option value="">Primero elegí un país</option>`;
+        return;
+      }
+
+      provinciaSelect.innerHTML = `<option value="">Elegí una provincia</option>`;
+
+      provincias.forEach((prov) => {
+        const option = document.createElement("option");
+        option.value = prov;
+        option.textContent = prov;
+        provinciaSelect.appendChild(option);
+      });
+    }
+
+    function cargarCiudades() {
+      const provincia = provinciaSelect.value;
+      const ciudades = ciudadesPorProvincia[provincia] || [];
+
+      ciudadSelect.innerHTML = `<option value="">Elegí una ciudad</option>`;
+
+      if (!provincia) {
+        ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
+        return;
+      }
+
+      ciudades.forEach((ciudad) => {
+        const option = document.createElement("option");
+        option.value = ciudad;
+        option.textContent = ciudad;
+        ciudadSelect.appendChild(option);
+      });
+    }
+
+    paisSelect?.addEventListener("change", () => {
+      cargarProvincias();
+      ciudadSelect.innerHTML = `<option value="">Primero elegí una provincia</option>`;
+    });
+
+    provinciaSelect?.addEventListener("change", () => {
+      cargarCiudades();
+    });
+
+    function initMapa(intentos = 0) {
+      const mapaEl = document.getElementById("mapa");
+      if (!mapaEl) return;
+
+      if (typeof L === "undefined") {
+        if (intentos < 20) {
+          setTimeout(() => initMapa(intentos + 1), 200);
+        } else {
+          console.error("Leaflet no cargó correctamente.");
+        }
+        return;
+      }
+
+      if (mapa) return;
+
+      mapa = L.map("mapa").setView([-31.73197, -60.5238], 13);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap"
+      }).addTo(mapa);
+
+      function actualizarUbicacion(lat, lng) {
+        latInput.value = Number(lat).toFixed(6);
+        lngInput.value = Number(lng).toFixed(6);
+
+        if (marcador) {
+          marcador.setLatLng([lat, lng]);
+        } else {
+          marcador = L.marker([lat, lng]).addTo(mapa);
+        }
+      }
+
+      mapa.on("click", (e) => {
+        const { lat, lng } = e.latlng;
+        actualizarUbicacion(lat, lng);
+      });
+
+      async function buscarDireccionEnMapa() {
+        const queryBase = buscarDireccionInput?.value?.trim() || "";
+
+        if (!queryBase) {
+          alert("Escribí una dirección.");
           return;
         }
 
-        const result = results[0];
-        const lat = Number(result.lat);
-        const lng = Number(result.lon);
+        const ciudadFinal = ciudadSelect.value.trim();
+        const provincia = provinciaSelect?.value || "";
+        const pais = paisSelect?.value || "";
 
-        mapa.setView([lat, lng], 18);
-        actualizarUbicacion(lat, lng);
+        const queryCompleta = [queryBase, ciudadFinal, provincia, pais]
+          .filter(Boolean)
+          .join(", ");
 
-        if (!form.direccion.value.trim()) {
-          form.direccion.value = queryBase;
+        try {
+          const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(queryCompleta)}`;
+          const resp = await fetch(url, {
+            headers: { "Accept": "application/json" }
+          });
+
+          const results = await resp.json();
+
+          if (!results || !results.length) {
+            alert("No se encontró la dirección. Probá escribiéndola más completa.");
+            return;
+          }
+
+          const result = results[0];
+          const lat = Number(result.lat);
+          const lng = Number(result.lon);
+
+          mapa.setView([lat, lng], 18);
+          actualizarUbicacion(lat, lng);
+
+          if (!form.direccion.value.trim()) {
+            form.direccion.value = queryBase;
+          }
+        } catch (error) {
+          console.error("Error buscando dirección:", error);
+          alert("No se pudo buscar la dirección.");
         }
-      } catch (error) {
-        console.error("Error buscando dirección:", error);
-        alert("No se pudo buscar la dirección.");
+      }
+
+      if (buscarDireccionInput) {
+        buscarDireccionInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            buscarDireccionEnMapa();
+          }
+        });
+      }
+
+      if (btnBuscarMapa) {
+        btnBuscarMapa.addEventListener("click", buscarDireccionEnMapa);
+      }
+
+      setTimeout(() => {
+        mapa.invalidateSize();
+      }, 500);
+    }
+
+    function asegurarPortada() {
+      if (!fotos.length) return;
+      if (!fotos.some((x) => x.isCover)) {
+        fotos[0].isCover = true;
       }
     }
 
-    if (buscarDireccionInput) {
-      buscarDireccionInput.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          buscarDireccionEnMapa();
-        }
-      });
-    }
+    fotosInput?.addEventListener("change", () => {
+      const files = Array.from(fotosInput.files || []).filter(file =>
+        file.type.startsWith("image/")
+      );
 
-    if (btnBuscarMapa) {
-      btnBuscarMapa.addEventListener("click", buscarDireccionEnMapa);
-    }
+      if (!files.length) return;
 
-    setTimeout(() => {
-      mapa.invalidateSize();
-    }, 500);
-  }
+      for (const file of files) {
+        const previewUrl = URL.createObjectURL(file);
+        fotos.push({
+          file,
+          previewUrl,
+          isCover: false
+        });
+      }
 
-  function asegurarPortada() {
-    if (!fotos.length) return;
-    if (!fotos.some((x) => x.isCover)) fotos[0].isCover = true;
-  }
-
-
-  fotosInput?.addEventListener("change", async () => {
-  const files = Array.from(fotosInput.files || []).filter(file =>
-    file.type.startsWith("image/")
-  );
-
-  if (!files.length) return;
-
-  for (const file of files) {
-    const previewUrl = URL.createObjectURL(file);
-    fotos.push({
-      file,
-      previewUrl,
-      isCover: false
+      asegurarPortada();
+      fotosInput.value = "";
+      renderFotos();
+      actualizarContador();
     });
-  }
 
-  asegurarPortada();
-  fotosInput.value = "";
-  renderFotos();
-  actualizarContador();
-});
+    function renderFotos() {
+      asegurarPortada();
+      preview.innerHTML = "";
 
- function renderFotos() {
-  asegurarPortada();
-  preview.innerHTML = "";
+      fotos.forEach((ph, idx) => {
+        const item = document.createElement("div");
+        item.className = "preview-item";
 
-  fotos.forEach((ph, idx) => {
-    const item = document.createElement("div");
-    item.className = "preview-item";
+        const img = document.createElement("img");
+        img.src = ph.previewUrl;
+        img.style.cursor = "pointer";
+        img.title = "Hacé click para poner esta foto como portada";
+        img.onclick = () => {
+          fotos = fotos.map((x, i) => ({ ...x, isCover: i === idx }));
+          renderFotos();
+        };
 
-    const img = document.createElement("img");
-    img.src = ph.previewUrl;
+        const actions = document.createElement("div");
+        actions.className = "preview-actions";
 
-    // 🔥 CLICK EN IMAGEN = HACER PORTADA
-    img.style.cursor = "pointer";
-    img.title = "Hacé click para poner esta foto como portada";
-    img.onclick = () => {
-      fotos = fotos.map((x, i) => ({ ...x, isCover: i === idx }));
-      renderFotos();
-    };
+        const left = document.createElement("div");
+        left.style.display = "flex";
+        left.style.gap = "8px";
 
-    const actions = document.createElement("div");
-    actions.className = "preview-actions";
+        const btnDel = document.createElement("button");
+        btnDel.type = "button";
+        btnDel.className = "mini-btn";
+        btnDel.textContent = "Borrar";
+        btnDel.onclick = () => {
+          const wasCover = fotos[idx]?.isCover;
+          fotos.splice(idx, 1);
 
-    const left = document.createElement("div");
-    left.style.display = "flex";
-    left.style.gap = "8px";
+          if (wasCover && fotos.length) {
+            fotos = fotos.map((x, i) => ({ ...x, isCover: i === 0 }));
+          }
 
-    // 👉 SOLO BOTÓN BORRAR
-    const btnDel = document.createElement("button");
-    btnDel.type = "button";
-    btnDel.className = "mini-btn";
-    btnDel.textContent = "Borrar";
-    btnDel.onclick = () => {
-      const wasCover = fotos[idx]?.isCover;
-      fotos.splice(idx, 1);
+          renderFotos();
+        };
 
-      if (wasCover && fotos.length) {
-        fotos = fotos.map((x, i) => ({ ...x, isCover: i === 0 }));
-      }
-      renderFotos();
-    };
+        left.appendChild(btnDel);
 
-    left.appendChild(btnDel);
+        const badge = document.createElement("span");
+        badge.className = "mini-badge";
 
-    const badge = document.createElement("span");
-    badge.className = "mini-badge";
+        if (ph.isCover) {
+          badge.textContent = "Portada";
+          badge.style.background = "#4f3dbb";
+          badge.style.color = "#fff";
+        } else {
+          badge.textContent = `${idx + 1}/${fotos.length}`;
+          badge.style.background = "#e5e7eb";
+          badge.style.color = "#333";
+        }
 
-    // 🔥 SOLO UNA PORTADA EN AZUL
-    if (ph.isCover) {
-      badge.textContent = "Portada";
-      badge.style.background = "#4f3dbb";
-      badge.style.color = "#fff";
-    } else {
-      badge.textContent = `${idx + 1}/${fotos.length}`;
-      badge.style.background = "#e5e7eb";
-      badge.style.color = "#333";
-    }
+        actions.appendChild(left);
+        actions.appendChild(badge);
 
-    actions.appendChild(left);
-    actions.appendChild(badge);
-
-    item.appendChild(img);
-    item.appendChild(actions);
-    preview.appendChild(item);
-  });
-
-  // 👉 contador
-  actualizarContador();
-}
-
-  function generarUbicacionAproximada(lat, lng) {
-    const maxOffset = 0.008;
-    return {
-      lat: lat + (Math.random() - 0.5) * maxOffset,
-      lng: lng + (Math.random() - 0.5) * maxOffset
-    };
-  }
-
-  async function subirFotosAStorage(fotosOrdenadas, alojamientoId) {
-    const urls = [];
-
-    for (let i = 0; i < fotosOrdenadas.length; i++) {
-      const foto = fotosOrdenadas[i];
-      if (!foto.file) continue;
-
-      const extension = (foto.file.name.split(".").pop() || "jpg").toLowerCase();
-      const nombreArchivo = `alojamientos/${currentUser.uid}/${alojamientoId}/foto_${i + 1}.${extension}`;
-      const storageRef = ref(storage, nombreArchivo);
-
-      await uploadBytes(storageRef, foto.file);
-      const url = await getDownloadURL(storageRef);
-
-      urls.push({
-        url,
-        isCover: foto.isCover
+        item.appendChild(img);
+        item.appendChild(actions);
+        preview.appendChild(item);
       });
+
+      actualizarContador();
     }
 
-    return urls;
-  }
-
-  form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    if (!currentUser) {
-      msg.textContent = "❌ Tenés que iniciar sesión.";
-      return;
+    function generarUbicacionAproximada(lat, lng) {
+      const maxOffset = 0.008;
+      return {
+        lat: lat + (Math.random() - 0.5) * maxOffset,
+        lng: lng + (Math.random() - 0.5) * maxOffset
+      };
     }
 
-    if (!latInput.value || !lngInput.value) {
-      msg.textContent = "❌ Marcá la ubicación en el mapa.";
-      return;
-    }
+    async function subirFotosAStorage(fotosOrdenadas, alojamientoId) {
+      const urls = [];
 
-    if (!aceptaContrato.checked) {
-      msg.textContent = "❌ Tenés que aceptar el contrato.";
-      return;
-    }
+      for (let i = 0; i < fotosOrdenadas.length; i++) {
+        const foto = fotosOrdenadas[i];
+        if (!foto.file) continue;
 
-    const ciudadFinal = ciudadSelect.value.trim();
+        const extension = (foto.file.name.split(".").pop() || "jpg").toLowerCase();
+        const nombreArchivo = `alojamientos/${currentUser.uid}/${alojamientoId}/foto_${i + 1}.${extension}`;
+        const storageRef = ref(storage, nombreArchivo);
 
-    if (!ciudadFinal) {
-      msg.textContent = "❌ Elegí una ciudad.";
-      return;
-    }
+        await uploadBytes(storageRef, foto.file);
+        const url = await getDownloadURL(storageRef);
 
-    msg.textContent = "Publicando...";
-
-    try {
-      const servicios = Array.from(form.querySelectorAll('input[name="servicios"]:checked')).map(el => el.value);
-      const reglas = Array.from(form.querySelectorAll('input[name="reglas"]:checked')).map(el => el.value);
-      const fotosOrdenadas = [...fotos].sort((a, b) => Number(b.isCover) - Number(a.isCover));
-
-      if (!fotosOrdenadas.length) {
-        msg.textContent = "❌ Subí al menos una foto.";
-        return;
+        urls.push({
+          url,
+          isCover: foto.isCover
+        });
       }
 
-      const latReal = Number(latInput.value);
-      const lngReal = Number(lngInput.value);
-      const ubicacionPublica = generarUbicacionAproximada(latReal, lngReal);
+      return urls;
+    }
 
-      const alojamientoId = crypto.randomUUID();
-      const fotosSubidas = await subirFotosAStorage(fotosOrdenadas, alojamientoId);
+    async function enviarMailOculto() {
+      try {
+        const formData = new FormData(mailForm);
 
-      const data = {
-        titulo: form.titulo.value.trim(),
-        tipo: form.tipo.value,
-        capacidad: Number(form.capacidad.value),
-        habitaciones: Number(form.habitaciones.value),
-        camas: Number(form.camas.value),
-        banos: Number(form.banos.value),
-        descripcion: form.descripcion.value.trim(),
+        await fetch(mailForm.action, {
+          method: "POST",
+          body: formData,
+          headers: {
+            Accept: "application/json"
+          }
+        });
+      } catch (error) {
+        console.error("Error enviando mail:", error);
+      }
+    }
 
-        pais: form.pais.value,
-        provincia: form.provincia.value,
-        ciudad: ciudadFinal,
-        direccion: form.direccion.value.trim(),
-        cp: form.cp.value.trim(),
-        referencia: form.referencia.value.trim(),
+    form?.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-        lat: latReal,
-        lng: lngReal,
-        latReal,
-        lngReal,
-        latPublica: ubicacionPublica.lat,
-        lngPublica: ubicacionPublica.lng,
+      if (publicando) return;
+      publicando = true;
 
-        servicios,
-        reglas,
-        reglasExtra: form.reglasExtra.value.trim(),
+      try {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Publicando...";
+        }
 
-        checkinDesde: form.checkinDesde.value,
-        checkoutHasta: form.checkoutHasta.value,
-        cancelacion: form.cancelacion.value,
+        if (!currentUser) {
+          msg.textContent = "❌ Tenés que iniciar sesión.";
+          return;
+        }
 
-        precio: Number(form.precio.value),
-        maxNoches: Number(form.maxNoches.value || 30),
+        if (!latInput.value || !lngInput.value) {
+          msg.textContent = "❌ Marcá la ubicación en el mapa.";
+          return;
+        }
 
-        fotos: fotosSubidas,
-        anfitrion: form.anfitrion.value.trim(),
+        if (!aceptaContrato.checked) {
+          msg.textContent = "❌ Tenés que aceptar los Términos para Anfitriones.";
+          return;
+        }
 
-        datosFiscales: {
-          razonSocial: form.razonSocial.value.trim(),
-          cuit: form.cuit.value.trim(),
-          condicionFiscal: form.condicionFiscal.value,
-          direccionFiscal: form.direccionFiscal.value.trim(),
-          tipoFactura: form.tipoFactura.value,
-          titularCuenta: form.titularCuenta.value.trim(),
-          aliasCbu: form.aliasCbu.value.trim()
-        },
+        const ciudadFinal = ciudadSelect.value.trim();
 
-        contacto: {
-          telefono: form.telefono.value.trim(),
-          email: form.email.value.trim()
-        },
+        if (!ciudadFinal) {
+          msg.textContent = "❌ Elegí una ciudad.";
+          return;
+        }
 
-        aceptaContrato: true,
-        fechaAceptacionContrato: new Date().toISOString(),
-        versionContrato: "1.0",
+        const fotosOrdenadas = [...fotos].sort((a, b) => Number(b.isCover) - Number(a.isCover));
 
-        publicacionId: alojamientoId,
-        anfitrionId: currentUser.uid,
-        anfitrionEmail: currentUser.email || "",
-        createdAt: serverTimestamp()
-      };
+        if (!fotosOrdenadas.length) {
+          msg.textContent = "❌ Subí al menos una foto.";
+          return;
+        }
 
-      const docRef = await addDoc(collection(db, "alojamientos"), data);
+        msg.textContent = "Publicando...";
 
-      document.getElementById("mf_id").value = docRef.id;
-      document.getElementById("mf_titulo").value = data.titulo;
-      document.getElementById("mf_tipo").value = data.tipo;
-      document.getElementById("mf_capacidad").value = String(data.capacidad);
-      document.getElementById("mf_habitaciones").value = String(data.habitaciones);
-      document.getElementById("mf_camas").value = String(data.camas);
-      document.getElementById("mf_banos").value = String(data.banos);
-      document.getElementById("mf_provincia").value = data.provincia;
-      document.getElementById("mf_ciudad").value = data.ciudad;
-      document.getElementById("mf_direccion").value = data.direccion;
-      document.getElementById("mf_precio").value = String(data.precio);
-      document.getElementById("mf_maxnoches").value = String(data.maxNoches);
-      document.getElementById("mf_checkin").value = data.checkinDesde;
-      document.getElementById("mf_checkout").value = data.checkoutHasta;
-      document.getElementById("mf_cancelacion").value = data.cancelacion;
-      document.getElementById("mf_anfitrion").value = data.anfitrion;
-      document.getElementById("mf_telefono").value = data.contacto?.telefono || "-";
-      document.getElementById("mf_email").value = data.contacto?.email || "-";
+        const servicios = Array.from(
+          form.querySelectorAll('input[name="servicios"]:checked')
+        ).map(el => el.value);
 
-      document.getElementById("mf_razonsocial").value = data.datosFiscales?.razonSocial || "-";
-      document.getElementById("mf_cuit").value = data.datosFiscales?.cuit || "-";
-      document.getElementById("mf_condicionfiscal").value = data.datosFiscales?.condicionFiscal || "-";
-      document.getElementById("mf_direccionfiscal").value = data.datosFiscales?.direccionFiscal || "-";
-      document.getElementById("mf_tipofactura").value = data.datosFiscales?.tipoFactura || "-";
-      document.getElementById("mf_titularcuenta").value = data.datosFiscales?.titularCuenta || "-";
-      document.getElementById("mf_aliascbu").value = data.datosFiscales?.aliasCbu || "-";
-      document.getElementById("mf_servicios").value = servicios.length ? servicios.join(", ") : "-";
-      document.getElementById("mf_reglas").value = reglas.length ? reglas.join(", ") : "-";
-      document.getElementById("mf_replyto").value = data.contacto.email;
-      document.getElementById("mf_email_to").value = data.contacto.email;
+        const reglas = Array.from(
+          form.querySelectorAll('input[name="reglas"]:checked')
+        ).map(el => el.value);
 
-      document.getElementById("mf_autoresponse").value =
+        const latReal = Number(latInput.value);
+        const lngReal = Number(lngInput.value);
+        const ubicacionPublica = generarUbicacionAproximada(latReal, lngReal);
+
+        const alojamientoId = crypto.randomUUID();
+        const fotosSubidas = await subirFotosAStorage(fotosOrdenadas, alojamientoId);
+
+        const data = {
+          titulo: form.titulo.value.trim(),
+          tipo: form.tipo.value,
+          capacidad: Number(form.capacidad.value),
+          habitaciones: Number(form.habitaciones.value),
+          camas: Number(form.camas.value),
+          banos: Number(form.banos.value),
+          descripcion: form.descripcion.value.trim(),
+
+          pais: form.pais.value,
+          provincia: form.provincia.value,
+          ciudad: ciudadFinal,
+          direccion: form.direccion.value.trim(),
+          cp: form.cp.value.trim(),
+          referencia: form.referencia.value.trim(),
+
+          lat: latReal,
+          lng: lngReal,
+          latReal,
+          lngReal,
+          latPublica: ubicacionPublica.lat,
+          lngPublica: ubicacionPublica.lng,
+
+          servicios,
+          reglas,
+          reglasExtra: form.reglasExtra.value.trim(),
+
+          checkinDesde: form.checkinDesde.value,
+          checkoutHasta: form.checkoutHasta.value,
+          cancelacion: form.cancelacion.value,
+
+          precio: Number(form.precio.value),
+          maxNoches: Number(form.maxNoches.value || 30),
+
+          fotos: fotosSubidas,
+          anfitrion: form.anfitrion.value.trim(),
+
+          datosFiscales: {
+            razonSocial: form.razonSocial.value.trim(),
+            cuit: form.cuit.value.trim(),
+            condicionFiscal: form.condicionFiscal.value,
+            direccionFiscal: form.direccionFiscal.value.trim(),
+            tipoFactura: form.tipoFactura.value,
+            titularCuenta: form.titularCuenta.value.trim(),
+            aliasCbu: form.aliasCbu.value.trim()
+          },
+
+          contacto: {
+            telefono: form.telefono.value.trim(),
+            email: form.email.value.trim()
+          },
+
+          aceptaContrato: true,
+          fechaAceptacionContrato: new Date().toISOString(),
+          versionContrato: "1.0",
+
+          publicacionId: alojamientoId,
+          anfitrionId: currentUser.uid,
+          anfitrionEmail: currentUser.email || "",
+          createdAt: serverTimestamp()
+        };
+
+        const docRef = await addDoc(collection(db, "alojamientos"), data);
+
+        document.getElementById("mf_id").value = docRef.id;
+        document.getElementById("mf_titulo").value = data.titulo;
+        document.getElementById("mf_tipo").value = data.tipo;
+        document.getElementById("mf_capacidad").value = String(data.capacidad);
+        document.getElementById("mf_habitaciones").value = String(data.habitaciones);
+        document.getElementById("mf_camas").value = String(data.camas);
+        document.getElementById("mf_banos").value = String(data.banos);
+        document.getElementById("mf_provincia").value = data.provincia;
+        document.getElementById("mf_ciudad").value = data.ciudad;
+        document.getElementById("mf_direccion").value = data.direccion;
+        document.getElementById("mf_precio").value = String(data.precio);
+        document.getElementById("mf_maxnoches").value = String(data.maxNoches);
+        document.getElementById("mf_checkin").value = data.checkinDesde;
+        document.getElementById("mf_checkout").value = data.checkoutHasta;
+        document.getElementById("mf_cancelacion").value = data.cancelacion;
+        document.getElementById("mf_anfitrion").value = data.anfitrion;
+        document.getElementById("mf_telefono").value = data.contacto?.telefono || "-";
+        document.getElementById("mf_email").value = data.contacto?.email || "-";
+
+        document.getElementById("mf_razonsocial").value = data.datosFiscales?.razonSocial || "-";
+        document.getElementById("mf_cuit").value = data.datosFiscales?.cuit || "-";
+        document.getElementById("mf_condicionfiscal").value = data.datosFiscales?.condicionFiscal || "-";
+        document.getElementById("mf_direccionfiscal").value = data.datosFiscales?.direccionFiscal || "-";
+        document.getElementById("mf_tipofactura").value = data.datosFiscales?.tipoFactura || "-";
+        document.getElementById("mf_titularcuenta").value = data.datosFiscales?.titularCuenta || "-";
+        document.getElementById("mf_aliascbu").value = data.datosFiscales?.aliasCbu || "-";
+        document.getElementById("mf_servicios").value = servicios.length ? servicios.join(", ") : "-";
+        document.getElementById("mf_reglas").value = reglas.length ? reglas.join(", ") : "-";
+        document.getElementById("mf_replyto").value = data.contacto.email;
+        document.getElementById("mf_email_to").value = data.contacto.email;
+
+        document.getElementById("mf_autoresponse").value =
 `¡Hola ${data.anfitrion}! 👋
 
 Recibimos correctamente tu publicación en TuAloja.
@@ -1383,32 +1416,39 @@ Recibimos correctamente tu publicación en TuAloja.
 Gracias por confiar en TuAloja 💙
 — Equipo TuAloja`;
 
-      msg.textContent = "✅ Publicado correctamente. Redirigiendo...";
+        msg.textContent = "✅ Publicado correctamente. Redirigiendo...";
 
-      setTimeout(() => {
-        mailForm.submit();
-      }, 300);
+        enviarMailOculto();
 
-      setTimeout(() => {
-        location.href = "gracias.html";
-      }, 900);
-    } catch (error) {
-      console.error(error);
-      msg.textContent = "❌ No se pudo publicar. Intentá nuevamente.";
-    }
-  });
+        setTimeout(() => {
+          location.href = "gracias.html";
+        }, 1200);
 
-  window.addEventListener("load", () => {
-    if (paisSelect.value) {
-      cargarProvincias();
-    }
+      } catch (error) {
+        console.error("Error al publicar:", error);
+        msg.textContent = "❌ No se pudo publicar. Intentá nuevamente.";
+      } finally {
+        if (!msg.textContent.includes("✅")) {
+          publicando = false;
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Publicar";
+          }
+        }
+      }
+    });
 
-    if (provinciaSelect.value) {
-      cargarCiudades();
-    }
+    window.addEventListener("load", () => {
+      if (paisSelect.value) {
+        cargarProvincias();
+      }
 
-    initMapa();
-  });
-</script>
+      if (provinciaSelect.value) {
+        cargarCiudades();
+      }
+
+      initMapa();
+    });
+  </script>
 </body>
 </html>
