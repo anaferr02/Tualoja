@@ -7,7 +7,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyCj82nKioR0zTYQJPMUme0yFCXDKivVC_g",
   authDomain: "tualoja-5210e.firebaseapp.com",
   projectId: "tualoja-5210e",
-  storageBucket: "tualoja-5210e.firebasestorage.app",
+  storageBucket: "tualoja-5210e.appspot.com",
   messagingSenderId: "472294290866",
   appId: "1:472294290866:web:7bc5d811c4c63bea9660ab",
   measurementId: "G-M9H49YEZSN"
