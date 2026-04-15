@@ -624,7 +624,9 @@ L.marker([infoMapa.lat, infoMapa.lng], {
 
       const a = snap.data();
 
-      const foto = a.fotos?.[0] || "";
+      const foto = a.fotos?.find(f => f.isCover)?.url 
+           || a.fotos?.[0]?.url 
+           || "https://via.placeholder.com/800x400?text=Sin+imagen";
       const precio = Number(a.precio || 0);
       const ciudad = limpiarTexto(a.ciudad, "Ubicación no informada");
       const provincia = limpiarTexto(a.provincia, "");
