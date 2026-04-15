@@ -107,17 +107,56 @@
     }
 
     .detalle-galeria{
-      background:#eceef7;
-      min-height:320px;
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:10px;
+      background:#fff;
+      padding:10px;
     }
 
-    .detalle-galeria img{
+    .detalle-galeria-principal{
+      height:420px;
+      border-radius:18px;
+      overflow:hidden;
+      background:#000;
+    }
+
+    .detalle-galeria-principal img{
       width:100%;
       height:100%;
-      min-height:320px;
-      max-height:460px;
       object-fit:cover;
       display:block;
+    }
+
+    .detalle-galeria-lateral{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .detalle-galeria-mini{
+      height:205px;
+      border-radius:16px;
+      overflow:hidden;
+      background:#f2f4fa;
+      cursor:pointer;
+      border:2px solid transparent;
+      transition:.18s ease;
+    }
+
+    .detalle-galeria-mini img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .detalle-galeria-mini:hover{
+      border-color:#b9b7e8;
+    }
+
+    .detalle-galeria-mini.active{
+      border-color:#4f3dbb;
     }
 
     .detalle-galeria-empty{
@@ -131,6 +170,7 @@
       font-weight:700;
       text-align:center;
       background:linear-gradient(135deg,#f4f5fb,#eceffd);
+      border-radius:18px;
     }
 
     .detalle-thumbs{
@@ -392,16 +432,32 @@
       .hamburger{display:block}
       .detalle-page{padding:20px 14px 50px}
       .detalle-layout h1{font-size:34px}
-      .detalle-galeria img,
-      .detalle-galeria-empty{min-height:240px}
       .detalle-info-left,
       .detalle-info-right{padding:22px 18px 24px}
       .detalle-precio-numero{font-size:34px}
       .detalle-btn-reservar{font-size:21px}
       #mapaDetalle{height:300px}
+
+      .detalle-galeria{
+        grid-template-columns:1fr;
+      }
+
+      .detalle-galeria-principal{
+        height:300px;
+      }
+
+      .detalle-galeria-lateral{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .detalle-galeria-mini{
+        height:120px;
+      }
+
       .detalle-thumbs{
         grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
       }
+
       .detalle-thumb{
         height:72px;
       }
@@ -805,23 +861,40 @@
             <p class="detalle-descripcion-top">${escapeHTML(descripcion)}</p>
 
             <div class="detalle-card">
-              <div class="detalle-galeria">
-                ${
-                  fotoPortada
-                    ? `<img id="fotoPrincipalDetalle" src="${escapeHTML(fotoPortada)}" alt="${escapeHTML(titulo)}">`
-                    : `<div class="detalle-galeria-empty">Sin imagen disponible</div>`
-                }
-              </div>
+              ${
+                fotoPortada
+                  ? `
+                    <div class="detalle-galeria">
+                      <div class="detalle-galeria-principal">
+                        <img id="fotoPrincipalDetalle" src="${escapeHTML(fotoPortada)}" alt="${escapeHTML(titulo)}">
+                      </div>
+
+                      <div class="detalle-galeria-lateral">
+                        ${fotos.slice(0, 4).map((f, i) => `
+                          <div
+                            class="detalle-galeria-mini ${f.url === fotoPortada ? "active" : ""}"
+                            data-foto="${escapeHTML(f.url)}"
+                          >
+                            <img src="${escapeHTML(f.url)}" alt="Foto ${i + 1}">
+                          </div>
+                        `).join("")}
+                      </div>
+                    </div>
+                  `
+                  : `
+                    <div class="detalle-galeria-empty">Sin imagen disponible</div>
+                  `
+              }
 
               ${
-                fotos.length > 1
+                fotos.length > 4
                   ? `
                     <div class="detalle-thumbs">
-                      ${fotos.map((f, i) => `
+                      ${fotos.slice(4).map((f, i) => `
                         <img
-                          class="detalle-thumb ${f.url === fotoPortada ? "active" : ""}"
+                          class="detalle-thumb"
                           src="${escapeHTML(f.url)}"
-                          alt="Foto ${i + 1}"
+                          alt="Foto ${i + 5}"
                           data-foto="${escapeHTML(f.url)}"
                         >
                       `).join("")}
@@ -918,16 +991,30 @@
 
         const fotoPrincipalEl = document.getElementById("fotoPrincipalDetalle");
         const thumbs = document.querySelectorAll(".detalle-thumb");
+        const minis = document.querySelectorAll(".detalle-galeria-mini");
+
+        function cambiarFotoPrincipal(nuevaFoto) {
+          if (!fotoPrincipalEl || !nuevaFoto) return;
+          fotoPrincipalEl.src = nuevaFoto;
+
+          thumbs.forEach(t => {
+            t.classList.toggle("active", t.getAttribute("data-foto") === nuevaFoto);
+          });
+
+          minis.forEach(m => {
+            m.classList.toggle("active", m.getAttribute("data-foto") === nuevaFoto);
+          });
+        }
 
         thumbs.forEach((thumb) => {
           thumb.addEventListener("click", () => {
-            const nuevaFoto = thumb.getAttribute("data-foto");
-            if (fotoPrincipalEl && nuevaFoto) {
-              fotoPrincipalEl.src = nuevaFoto;
-            }
+            cambiarFotoPrincipal(thumb.getAttribute("data-foto"));
+          });
+        });
 
-            thumbs.forEach(t => t.classList.remove("active"));
-            thumb.classList.add("active");
+        minis.forEach((mini) => {
+          mini.addEventListener("click", () => {
+            cambiarFotoPrincipal(mini.getAttribute("data-foto"));
           });
         });
 
