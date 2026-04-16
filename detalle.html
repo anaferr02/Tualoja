@@ -323,6 +323,21 @@
       font-weight:700;
     }
 
+    .detalle-aviso{
+      margin:10px 0 12px;
+      padding:14px;
+      border-radius:16px;
+      background:#fff7e8;
+      border:1px solid #f1ddb2;
+      color:#6d5520;
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .detalle-aviso strong{
+      color:#5d4819;
+    }
+
     .detalle-btn-reservar{
       display:inline-flex;
       align-items:center;
@@ -488,7 +503,7 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script type="module">
-    import { db } from "./firebase-config.js";
+    import { db, auth } from "./firebase-config.js";
     import {
       doc,
       getDoc,
@@ -499,6 +514,10 @@
       getDocs,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+    import {
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
     const wrap = document.getElementById("detalleAlojamiento");
     const noExiste = document.getElementById("noExiste");
@@ -512,6 +531,11 @@
     const destinoParam = params.get("destino") || "";
 
     let mapaDetalle = null;
+    let firebaseUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      firebaseUser = user || null;
+    });
 
     if (checkinParam || checkoutParam || guestsParam || destinoParam) {
       const backParams = new URLSearchParams();
@@ -840,8 +864,8 @@
 
         const servicios = convertirLista(a.servicios, ["Wifi", "Aire acondicionado"]);
         const reglas = convertirLista(a.reglas, ["No se permite fumar", "No se permiten fiestas"]);
-        const hoy = obtenerHoy();
         const user = getUserLocal();
+        const hoy = obtenerHoy();
         const reservaVisible = await buscarReservaVisible(id, user);
         const puedeVerExacta = puedeVerUbicacionExacta(reservaVisible, user);
         const textoUbicacionMapa = puedeVerExacta
@@ -972,6 +996,12 @@
                       Seleccioná fechas válidas para calcular el total
                     </div>
 
+                    <div class="detalle-aviso">
+                      <strong>💳 Pago al llegar:</strong> la estadía se abona directamente al anfitrión al momento del check-in.<br><br>
+                      <strong>🔒 Seguridad:</strong> TuAloja no solicita pagos anticipados ni recomienda transferencias por fuera de la plataforma antes de la llegada.<br><br>
+                      <strong>📌 Importante:</strong> si reservás y finalmente no vas a asistir, avisá con anticipación. La falta de presentación sin aviso puede afectar futuras reservas.
+                    </div>
+
                     <button class="detalle-btn-reservar disabled" id="btnReservar" type="button">
                       Reservar
                     </button>
@@ -1037,8 +1067,8 @@
         btnReservar?.addEventListener("click", async () => {
           if (btnReservar.classList.contains("disabled")) return;
 
-          const userLocal = getUserLocal();
-          if (!userLocal?.uid) {
+          if (!firebaseUser) {
+            localStorage.setItem("redirectAfterLogin", window.location.pathname + window.location.search);
             alert("Iniciá sesión para reservar.");
             location.href = "login.html";
             return;
@@ -1070,9 +1100,9 @@
               anfitrionId: a.anfitrionId || "",
               anfitrionEmail: a.anfitrionEmail || a.contacto?.email || "",
 
-              huespedId: userLocal.uid,
-              huespedEmail: userLocal.email || "",
-              huespedNombre: userLocal.nombre || userLocal.name || userLocal.email || "Huésped",
+              huespedId: firebaseUser.uid,
+              huespedEmail: firebaseUser.email || "",
+              huespedNombre: firebaseUser.displayName || firebaseUser.email || "Huésped",
 
               checkin,
               checkout,
@@ -1080,6 +1110,11 @@
               total,
               precioNoche: precio,
               noches,
+
+              formaPago: "Pago al llegar al alojamiento",
+              pagoAnticipado: false,
+              estadoPago: "pendiente en check-in",
+              politicaNoShow: "Si el huésped no se presenta sin aviso previo, puede afectar futuras reservas.",
 
               status: "pendiente",
               estado: "pendiente",
