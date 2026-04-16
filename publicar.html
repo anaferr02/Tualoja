@@ -1369,38 +1369,39 @@
 
         const docRef = await addDoc(collection(db, "alojamientos"), data);
 
-        document.getElementById("mf_id").value = docRef.id;
-        document.getElementById("mf_titulo").value = data.titulo;
-        document.getElementById("mf_tipo").value = data.tipo;
-        document.getElementById("mf_capacidad").value = String(data.capacidad);
-        document.getElementById("mf_habitaciones").value = String(data.habitaciones);
-        document.getElementById("mf_camas").value = String(data.camas);
-        document.getElementById("mf_banos").value = String(data.banos);
-        document.getElementById("mf_provincia").value = data.provincia;
-        document.getElementById("mf_ciudad").value = data.ciudad;
-        document.getElementById("mf_direccion").value = data.direccion;
-        document.getElementById("mf_precio").value = String(data.precio);
-        document.getElementById("mf_maxnoches").value = String(data.maxNoches);
-        document.getElementById("mf_checkin").value = data.checkinDesde;
-        document.getElementById("mf_checkout").value = data.checkoutHasta;
-        document.getElementById("mf_cancelacion").value = data.cancelacion;
-        document.getElementById("mf_anfitrion").value = data.anfitrion;
-        document.getElementById("mf_telefono").value = data.contacto?.telefono || "-";
-        document.getElementById("mf_email").value = data.contacto?.email || "-";
+        try {
+          document.getElementById("mf_id").value = docRef.id;
+          document.getElementById("mf_titulo").value = data.titulo;
+          document.getElementById("mf_tipo").value = data.tipo;
+          document.getElementById("mf_capacidad").value = String(data.capacidad);
+          document.getElementById("mf_habitaciones").value = String(data.habitaciones);
+          document.getElementById("mf_camas").value = String(data.camas);
+          document.getElementById("mf_banos").value = String(data.banos);
+          document.getElementById("mf_provincia").value = data.provincia;
+          document.getElementById("mf_ciudad").value = data.ciudad;
+          document.getElementById("mf_direccion").value = data.direccion;
+          document.getElementById("mf_precio").value = String(data.precio);
+          document.getElementById("mf_maxnoches").value = String(data.maxNoches);
+          document.getElementById("mf_checkin").value = data.checkinDesde;
+          document.getElementById("mf_checkout").value = data.checkoutHasta;
+          document.getElementById("mf_cancelacion").value = data.cancelacion;
+          document.getElementById("mf_anfitrion").value = data.anfitrion;
+          document.getElementById("mf_telefono").value = data.contacto?.telefono || "-";
+          document.getElementById("mf_email").value = data.contacto?.email || "-";
 
-        document.getElementById("mf_razonsocial").value = data.datosFiscales?.razonSocial || "-";
-        document.getElementById("mf_cuit").value = data.datosFiscales?.cuit || "-";
-        document.getElementById("mf_condicionfiscal").value = data.datosFiscales?.condicionFiscal || "-";
-        document.getElementById("mf_direccionfiscal").value = data.datosFiscales?.direccionFiscal || "-";
-        document.getElementById("mf_tipofactura").value = data.datosFiscales?.tipoFactura || "-";
-        document.getElementById("mf_titularcuenta").value = data.datosFiscales?.titularCuenta || "-";
-        document.getElementById("mf_aliascbu").value = data.datosFiscales?.aliasCbu || "-";
-        document.getElementById("mf_servicios").value = servicios.length ? servicios.join(", ") : "-";
-        document.getElementById("mf_reglas").value = reglas.length ? reglas.join(", ") : "-";
-        document.getElementById("mf_replyto").value = data.contacto.email;
-        document.getElementById("mf_email_to").value = data.contacto.email;
+          document.getElementById("mf_razonsocial").value = data.datosFiscales?.razonSocial || "-";
+          document.getElementById("mf_cuit").value = data.datosFiscales?.cuit || "-";
+          document.getElementById("mf_condicionfiscal").value = data.datosFiscales?.condicionFiscal || "-";
+          document.getElementById("mf_direccionfiscal").value = data.datosFiscales?.direccionFiscal || "-";
+          document.getElementById("mf_tipofactura").value = data.datosFiscales?.tipoFactura || "-";
+          document.getElementById("mf_titularcuenta").value = data.datosFiscales?.titularCuenta || "-";
+          document.getElementById("mf_aliascbu").value = data.datosFiscales?.aliasCbu || "-";
+          document.getElementById("mf_servicios").value = servicios.length ? servicios.join(", ") : "-";
+          document.getElementById("mf_reglas").value = reglas.length ? reglas.join(", ") : "-";
+          document.getElementById("mf_replyto").value = data.contacto.email;
+          document.getElementById("mf_email_to").value = data.contacto.email;
 
-        document.getElementById("mf_autoresponse").value =
+          document.getElementById("mf_autoresponse").value =
 `¡Hola ${data.anfitrion}! 👋
 
 Recibimos correctamente tu publicación en TuAloja.
@@ -1416,13 +1417,16 @@ Recibimos correctamente tu publicación en TuAloja.
 Gracias por confiar en TuAloja 💙
 — Equipo TuAloja`;
 
+          enviarMailOculto();
+        } catch (mailError) {
+          console.error("Error preparando o enviando mail:", mailError);
+        }
+
         msg.textContent = "✅ Publicado correctamente. Redirigiendo...";
 
-        enviarMailOculto();
-
         setTimeout(() => {
-          location.href = "gracias.html";
-        }, 1200);
+          window.location.href = "./gracias.html";
+        }, 600);
 
       } catch (error) {
         console.error("Error al publicar:", error);
