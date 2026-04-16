@@ -1092,7 +1092,7 @@ En caso de hacerlo, TuAloja no se hará responsable por posibles estafas.<br><br
             btnReservar.disabled = true;
             btnReservar.textContent = "Reservando...";
 
-            await addDoc(collection(db, "reservas"), {
+            const reservaRef = await addDoc(collection(db, "reservas"), {
               alojamientoId: id,
               alojamientoTitulo: titulo,
               alojamientoFoto: fotoPortada || "",
@@ -1124,6 +1124,18 @@ En caso de hacerlo, TuAloja no se hará responsable por posibles estafas.<br><br
               createdAt: serverTimestamp(),
               creadaEn: serverTimestamp()
             });
+
+            if (a.anfitrionId) {
+              await addDoc(collection(db, "notificaciones"), {
+                userId: a.anfitrionId,
+                tipo: "reserva",
+                mensaje: "Tenés una nueva reserva",
+                leida: false,
+                reservaId: reservaRef.id,
+                alojamientoId: id,
+                createdAt: serverTimestamp()
+              });
+            }
 
             alert("Reserva enviada correctamente.");
             location.href = "mis-reservas.html";
