@@ -91,7 +91,7 @@
       border:1px solid #d4e0ff;
       border-radius:24px;
       padding:22px 24px;
-      margin-bottom:26px;
+      margin-bottom:18px;
       display:flex;
       gap:16px;
       align-items:flex-start;
@@ -123,6 +123,28 @@
       color:#4e567a;
       font-size:16px;
       line-height:1.5;
+    }
+
+    .warning-box{
+      background:#fff7e8;
+      border:1px solid #f1ddb2;
+      border-radius:24px;
+      padding:20px 22px;
+      margin-bottom:26px;
+      color:#6d5520;
+    }
+
+    .warning-box h3{
+      margin:0 0 10px;
+      font-size:21px;
+      color:#5d4819;
+      font-family:Georgia, "Times New Roman", serif;
+    }
+
+    .warning-box p{
+      margin:0;
+      line-height:1.6;
+      font-size:15px;
     }
 
     .filters{
@@ -365,6 +387,15 @@
     </div>
   </section>
 
+  <section class="warning-box">
+    <h3>💳 Pago y seguridad</h3>
+    <p>
+      El pago de la estadía se realiza directamente al momento de la llegada al alojamiento.
+      TuAloja no solicita transferencias anticipadas ni recomienda enviar dinero por fuera de la plataforma antes del check-in.
+      Si finalmente no podés asistir, avisá con anticipación para evitar inconvenientes con el anfitrión.
+    </p>
+  </section>
+
   <section class="filters">
     <button class="filter-btn active" data-filter="todas" type="button">Todas</button>
     <button class="filter-btn" data-filter="pendiente" type="button">Pendientes</button>
@@ -440,11 +471,17 @@ async function enriquecerReserva(r) {
     if (!snap.exists()) return r;
 
     const alojamiento = snap.data();
+    const fotoPortada =
+      alojamiento.fotos?.find?.(f => f.isCover)?.url ||
+      alojamiento.fotos?.[0]?.url ||
+      r.alojamientoFoto ||
+      r.foto ||
+      "";
 
     return {
       ...r,
       alojamientoTitulo: alojamiento.titulo || r.alojamientoTitulo || r.title || r.titulo || "Reserva",
-      alojamientoFoto: alojamiento.fotos?.[0] || r.alojamientoFoto || r.foto || "",
+      alojamientoFoto: fotoPortada,
       total: r.total || null
     };
   } catch (error) {
@@ -462,7 +499,8 @@ function puedeCancelar(r) {
 
   return true;
 }
-  async function solicitarCancelacion(reserva) {
+
+async function solicitarCancelacion(reserva) {
   try {
     const motivo = prompt(
       "Contanos brevemente el motivo de la cancelación por fuerza mayor:"
@@ -558,6 +596,7 @@ function renderReservas() {
           <p><strong>Huéspedes:</strong> ${r.guests || "-"}</p>
           <p><strong>Estado:</strong> <span class="estado-badge ${estado.clase}">${estado.texto}</span></p>
           <p><strong>Total:</strong> ${total}</p>
+          <p><strong>Pago:</strong> Se realiza al momento de llegar al alojamiento.</p>
 
           ${
             r.noLeidoHuesped
@@ -571,22 +610,22 @@ function renderReservas() {
               : ""
           }
 
-       ${
-  (r.chatIniciado || ["aceptada","confirmada"].includes(String(r.status || "").toLowerCase()))
-    ? `<div style="margin-top:10px;">
-        <p style="margin:0 0 10px; color:#b00020; font-weight:700;">
-          Esta reserva ya no se puede cancelar online.
-        </p>
-        <button class="btn-outline" data-solicitar-cancel="${r._docId}" type="button">
-          Solicitar cancelación por fuerza mayor
-        </button>
-        <p style="margin-top:8px; color:#6a7195; font-size:14px;">
-          También podés escribirnos a
-          <a href="mailto:alojamientos@tualoja.com">alojamientos@tualoja.com</a>
-        </p>
-      </div>`
-    : ""
-}
+          ${
+            (r.chatIniciado || ["aceptada","confirmada"].includes(String(r.status || "").toLowerCase()))
+              ? `<div style="margin-top:10px;">
+                  <p style="margin:0 0 10px; color:#b00020; font-weight:700;">
+                    Esta reserva ya no se puede cancelar online.
+                  </p>
+                  <button class="btn-outline" data-solicitar-cancel="${r._docId}" type="button">
+                    Solicitar cancelación por fuerza mayor
+                  </button>
+                  <p style="margin-top:8px; color:#6a7195; font-size:14px;">
+                    También podés escribirnos a
+                    <a href="mailto:alojamientos@tualoja.com">alojamientos@tualoja.com</a>
+                  </p>
+                </div>`
+              : ""
+          }
         </div>
 
         <div class="reserva-side">
@@ -621,7 +660,6 @@ function renderReservas() {
         alert("Esta reserva ya no se puede cancelar online.");
         return;
       }
-       
 
       const ok = confirm("¿Querés cancelar esta reserva?");
       if (!ok) return;
@@ -641,15 +679,16 @@ function renderReservas() {
         console.error("Error al cancelar reserva:", error);
         alert("No se pudo cancelar la reserva.");
       }
-        lista.querySelectorAll("[data-solicitar-cancel]").forEach((btn) => {
+    });
+  });
+
+  lista.querySelectorAll("[data-solicitar-cancel]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-solicitar-cancel");
       const reserva = reservasCache.find((r) => r._docId === id);
       if (!reserva) return;
 
       await solicitarCancelacion(reserva);
-    });
-  });
     });
   });
 }
@@ -707,8 +746,8 @@ async function cargarReservas() {
     }
 
     rows.sort((a, b) => {
-      const fa = a.creadaEn?.seconds || 0;
-      const fb = b.creadaEn?.seconds || 0;
+      const fa = a.creadaEn?.seconds || a.createdAt?.seconds || 0;
+      const fb = b.creadaEn?.seconds || b.createdAt?.seconds || 0;
       return fb - fa;
     });
 
