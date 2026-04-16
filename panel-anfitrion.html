@@ -309,6 +309,57 @@
       display:inline-block;
     }
 
+    .invoice-card{
+      background:#fff;
+      border:1px solid rgba(0,0,0,.06);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:0 8px 20px rgba(0,0,0,.04);
+    }
+
+    .invoice-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+
+    .invoice-head h3{
+      margin:0;
+      color:#272d7d;
+      font-family:Georgia, "Times New Roman", serif;
+      font-size:24px;
+    }
+
+    .invoice-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .invoice-field{
+      background:#f8f9ff;
+      border:1px solid rgba(0,0,0,.05);
+      border-radius:14px;
+      padding:10px 12px;
+    }
+
+    .invoice-label{
+      font-size:12px;
+      color:#667;
+      margin-bottom:4px;
+    }
+
+    .invoice-value{
+      font-size:15px;
+      font-weight:700;
+      color:#1f2450;
+      word-break:break-word;
+    }
+
     .hamburger{
       display:none;
       font-size:20px;
@@ -436,6 +487,7 @@
     @media (max-width:720px){
       .item{ grid-template-columns:1fr; }
       .grid-2{ grid-template-columns:1fr; }
+      .invoice-grid{ grid-template-columns:1fr; }
     }
 
     @media (max-width:560px){
@@ -467,7 +519,7 @@
         <div>
           <h1>Panel anfitrión</h1>
           <p class="muted" style="margin:6px 0 0;">
-            Administrá tus alojamientos, reservas y fechas ocupadas.
+            Administrá tus alojamientos, reservas, fechas ocupadas y facturación.
           </p>
         </div>
       </div>
@@ -498,6 +550,7 @@
         <button class="tab-btn active" id="tabListings" type="button">Mis alojamientos</button>
         <button class="tab-btn" id="tabBookings" type="button">Reservas recibidas</button>
         <button class="tab-btn" id="tabCalendar" type="button">Calendario</button>
+        <button class="tab-btn" id="tabBilling" type="button">Facturación</button>
       </div>
 
       <section id="secListings">
@@ -526,6 +579,17 @@
         <div id="calList" class="calendar-grid"></div>
         <p id="calEmpty" class="muted" style="display:none; margin-top:12px;">
           Aún no hay reservas para mostrar en el calendario.
+        </p>
+      </section>
+
+      <section id="secBilling" style="display:none;">
+        <div class="panel-note muted">
+          Acá vas a ver tus facturas emitidas por TuAloja, su estado y el vencimiento.
+        </div>
+        <div id="billSummary" class="muted"></div>
+        <div id="billList" class="list"></div>
+        <p id="billEmpty" class="muted" style="display:none; margin-top:12px;">
+          Todavía no tenés facturas cargadas.
         </p>
       </section>
     </div>
@@ -581,10 +645,12 @@
     const secListings = document.getElementById("secListings");
     const secBookings = document.getElementById("secBookings");
     const secCalendar = document.getElementById("secCalendar");
+    const secBilling = document.getElementById("secBilling");
 
     const tabListings = document.getElementById("tabListings");
     const tabBookings = document.getElementById("tabBookings");
     const tabCalendar = document.getElementById("tabCalendar");
+    const tabBilling = document.getElementById("tabBilling");
 
     const list = document.getElementById("list");
     const empty = document.getElementById("empty");
@@ -596,6 +662,10 @@
 
     const calList = document.getElementById("calList");
     const calEmpty = document.getElementById("calEmpty");
+
+    const billSummary = document.getElementById("billSummary");
+    const billList = document.getElementById("billList");
+    const billEmpty = document.getElementById("billEmpty");
 
     const btnLogoutTop = document.getElementById("btnLogoutTop");
     const hamburgerBtn = document.getElementById("hamburgerBtn");
@@ -615,9 +685,10 @@
     let currentEditDocId = null;
     let listingsCache = [];
     let bookingsCache = [];
+    let invoicesCache = [];
 
     function setActiveTab(activeBtn) {
-      [tabListings, tabBookings, tabCalendar].forEach(btn => btn.classList.remove("active"));
+      [tabListings, tabBookings, tabCalendar, tabBilling].forEach(btn => btn.classList.remove("active"));
       activeBtn.classList.add("active");
     }
 
@@ -625,10 +696,12 @@
       secListings.style.display = which === "listings" ? "block" : "none";
       secBookings.style.display = which === "bookings" ? "block" : "none";
       secCalendar.style.display = which === "calendar" ? "block" : "none";
+      secBilling.style.display = which === "billing" ? "block" : "none";
 
       if (which === "listings") setActiveTab(tabListings);
       if (which === "bookings") setActiveTab(tabBookings);
       if (which === "calendar") setActiveTab(tabCalendar);
+      if (which === "billing") setActiveTab(tabBilling);
     }
 
     function escapeHTML(str) {
@@ -661,11 +734,12 @@
       return noches > 0 ? noches : null;
     }
 
-   function coverFromFotos(item) {
-  return item?.fotos?.find(f => f.isCover)?.url
-      || item?.fotos?.[0]?.url
-      || "";
-}
+    function coverFromFotos(item) {
+      return item?.fotos?.find(f => f.isCover)?.url
+        || item?.fotos?.[0]?.url
+        || "";
+    }
+
     function esMioAlojamiento(x, user) {
       const myEmail = String(user?.email || "").toLowerCase().trim();
       const myUid = String(user?.uid || "").trim();
@@ -697,15 +771,30 @@
       return emails.includes(myEmail) || (myUid && uids.includes(myUid));
     }
 
+    function esMiFactura(x, user) {
+      const myEmail = String(user?.email || "").toLowerCase().trim();
+      const myUid = String(user?.uid || "").trim();
+
+      const emails = [
+        x.anfitrionEmail, x.ownerEmail, x.email
+      ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
+
+      const uids = [
+        x.anfitrionId, x.ownerId, x.ownerUid, x.uid, x.userId
+      ].map(v => String(v || "").trim()).filter(Boolean);
+
+      return emails.includes(myEmail) || (myUid && uids.includes(myUid));
+    }
+
     function estadoChip(estado) {
       const e = String(estado || "pendiente").toLowerCase();
 
-      if (e === "aceptada" || e === "confirmada") {
-        return `<span class="chip chip-ok">Aceptada</span>`;
+      if (e === "aceptada" || e === "confirmada" || e === "pagada") {
+        return `<span class="chip chip-ok">${escapeHTML(e.charAt(0).toUpperCase() + e.slice(1))}</span>`;
       }
 
-      if (e === "cancelada" || e === "rechazada") {
-        return `<span class="chip chip-bad">${escapeHTML(e)}</span>`;
+      if (e === "cancelada" || e === "rechazada" || e === "vencida") {
+        return `<span class="chip chip-bad">${escapeHTML(e.charAt(0).toUpperCase() + e.slice(1))}</span>`;
       }
 
       return `<span class="chip chip-warn">Pendiente</span>`;
@@ -946,9 +1035,72 @@
       `).join("");
     }
 
+    function renderBilling() {
+      billSummary.textContent = invoicesCache.length
+        ? `Tenés ${invoicesCache.length} factura(s) cargada(s).`
+        : "";
+
+      if (!invoicesCache.length) {
+        billList.innerHTML = "";
+        billEmpty.style.display = "block";
+        return;
+      }
+
+      billEmpty.style.display = "none";
+
+      billList.innerHTML = invoicesCache.map((f) => {
+        const periodo = f.periodo || f.mes || "Sin período";
+        const estado = String(f.estado || "pendiente").toLowerCase();
+        const pdfUrl = f.pdfUrl || f.archivoUrl || "";
+        const numero = f.numeroFactura || f.numero || f.comprobante || "Sin número";
+
+        return `
+          <article class="invoice-card">
+            <div class="invoice-head">
+              <div>
+                <h3>Factura ${escapeHTML(numero)}</h3>
+                <div class="muted">Período: ${escapeHTML(periodo)}</div>
+              </div>
+              <div class="chips">
+                ${estadoChip(estado)}
+              </div>
+            </div>
+
+            <div class="invoice-grid">
+              <div class="invoice-field">
+                <div class="invoice-label">Monto</div>
+                <div class="invoice-value">$${formatARS(f.monto || 0)} ${escapeHTML(f.moneda || "ARS")}</div>
+              </div>
+
+              <div class="invoice-field">
+                <div class="invoice-label">Vencimiento</div>
+                <div class="invoice-value">${formatDate(f.fechaVencimiento || f.vencimiento || "")}</div>
+              </div>
+
+              <div class="invoice-field">
+                <div class="invoice-label">Fecha de emisión</div>
+                <div class="invoice-value">${formatDate(f.fechaEmision || f.emision || "")}</div>
+              </div>
+
+              <div class="invoice-field">
+                <div class="invoice-label">Detalle</div>
+                <div class="invoice-value">${escapeHTML(f.detalle || "Comisión TuAloja")}</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              ${pdfUrl ? `<a class="mini-btn primary" href="${escapeHTML(pdfUrl)}" target="_blank" rel="noopener noreferrer">Ver factura</a>` : ""}
+              ${pdfUrl ? `<a class="mini-btn" href="${escapeHTML(pdfUrl)}" target="_blank" rel="noopener noreferrer">Descargar PDF</a>` : ""}
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
     async function loadAll(user) {
       listingsCache = [];
       bookingsCache = [];
+      invoicesCache = [];
 
       const alojSnap = await getDocs(collection(db, "alojamientos"));
       alojSnap.forEach((d) => {
@@ -966,15 +1118,34 @@
         }
       });
 
+      try {
+        const facturasSnap = await getDocs(collection(db, "facturas"));
+        facturasSnap.forEach((d) => {
+          const data = d.data();
+          if (esMiFactura(data, user)) {
+            invoicesCache.push({ ...data, _docId: d.id });
+          }
+        });
+      } catch (error) {
+        console.warn("No se pudieron cargar las facturas o la colección aún no existe.", error);
+      }
+
       bookingsCache.sort((a, b) => {
-        const sa = a.creadaEn?.seconds || 0;
-        const sb = b.creadaEn?.seconds || 0;
+        const sa = a.creadaEn?.seconds || a.createdAt?.seconds || 0;
+        const sb = b.creadaEn?.seconds || b.createdAt?.seconds || 0;
         return sb - sa;
+      });
+
+      invoicesCache.sort((a, b) => {
+        const fa = a.fechaEmision || a.emision || "";
+        const fb = b.fechaEmision || b.emision || "";
+        return String(fb).localeCompare(String(fa));
       });
 
       renderListings();
       renderBookings();
       renderCalendar();
+      renderBilling();
       updateStats();
     }
 
@@ -991,6 +1162,7 @@
     tabListings.addEventListener("click", () => showTab("listings"));
     tabBookings.addEventListener("click", () => showTab("bookings"));
     tabCalendar.addEventListener("click", () => showTab("calendar"));
+    tabBilling.addEventListener("click", () => showTab("billing"));
 
     btnLogoutTop?.addEventListener("click", async () => {
       await signOut(auth);
