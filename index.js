@@ -37,4 +37,37 @@ async function cargarAlojamientos() {
 }
 
 cargarAlojamientos();
+  const buscador = document.getElementById("buscador");
+const sugerencias = document.getElementById("sugerencias");
+
+buscador.addEventListener("input", () => {
+  const valor = buscador.value.toLowerCase();
+  sugerencias.innerHTML = "";
+
+  if (valor.length < 2) return; // evita que busque con 1 letra
+
+  // Filtrar por ciudad o dirección
+  const resultados = alojamientos.filter(a =>
+    a.ciudad?.toLowerCase().includes(valor) ||
+    a.direccion?.toLowerCase().includes(valor)
+  );
+
+  // Limitar a 5 resultados
+  resultados.slice(0, 5).forEach(a => {
+    const div = document.createElement("div");
+    div.classList.add("sugerencia");
+
+    div.innerHTML = `
+      <strong>${a.ciudad || "Sin ciudad"}</strong><br>
+      <small>${a.direccion || ""}</small>
+    `;
+
+    div.addEventListener("click", () => {
+      buscador.value = a.ciudad;
+      sugerencias.innerHTML = "";
+    });
+
+    sugerencias.appendChild(div);
+  });
+});
 });
