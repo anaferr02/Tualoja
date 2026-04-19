@@ -787,7 +787,10 @@
     grid-template-columns: 1fr;
   }
 
-
+  .card-alojamiento img{
+    height: 200px;
+  }
+ 
 
   </style>
 </head>
@@ -842,10 +845,8 @@
   </section>
 
   <div class="search-wrap">
-    <div style="position: relative; width: 100%; max-width: 400px;">
-  <input type="text" id="buscador" placeholder="¿A dónde vas?" autocomplete="off">
-  <div id="sugerencias"></div>
-</div>
+    <section class="search-box">
+      <input type="text" id="destino" placeholder="¿A dónde querés ir?" />
       <input type="date" id="entrada" />
       <input type="date" id="salida" />
 
@@ -1072,7 +1073,7 @@
   }
 
   function buscar() {
-   const destino = document.getElementById("buscador")?.value?.trim() || "";
+    const destino = document.getElementById("destino")?.value?.trim() || "";
     const entradaInput = document.getElementById("entrada");
     const salidaInput = document.getElementById("salida");
 
