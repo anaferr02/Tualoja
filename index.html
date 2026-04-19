@@ -864,8 +864,10 @@
   </section>
 
   <div class="search-wrap">
-    <input type="text" id="buscador" placeholder="¿A dónde vas?" autocomplete="off">
-<div id="sugerencias"></div>
+    <div style="position: relative; width: 100%; max-width: 400px;">
+  <input type="text" id="buscador" placeholder="¿A dónde vas?" autocomplete="off">
+  <div id="sugerencias"></div>
+</div>
       <input type="date" id="entrada" />
       <input type="date" id="salida" />
 
@@ -1092,7 +1094,7 @@
   }
 
   function buscar() {
-    const destino = document.getElementById("destino")?.value?.trim() || "";
+   const destino = document.getElementById("buscador")?.value?.trim() || "";
     const entradaInput = document.getElementById("entrada");
     const salidaInput = document.getElementById("salida");
 
