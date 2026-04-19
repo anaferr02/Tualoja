@@ -27,6 +27,42 @@ app.post("/buscar", (req, res) => {
     res.json(filtrados);
   });
 });
+const buscador = document.getElementById("buscador");
+const sugerencias = document.getElementById("sugerencias");
+
+// Ejemplo de datos (después esto lo sacás de Firebase)
+const destinos = [
+  "Paraná",
+  "Córdoba",
+  "Buenos Aires",
+  "Rosario",
+  "Mendoza",
+  "Bariloche"
+];
+
+buscador.addEventListener("input", () => {
+  const valor = buscador.value.toLowerCase();
+  sugerencias.innerHTML = "";
+
+  if (valor === "") return;
+
+  const resultados = destinos.filter(d =>
+    d.toLowerCase().includes(valor)
+  );
+
+  resultados.forEach(r => {
+    const div = document.createElement("div");
+    div.classList.add("sugerencia");
+    div.textContent = r;
+
+    div.addEventListener("click", () => {
+      buscador.value = r;
+      sugerencias.innerHTML = "";
+    });
+
+    sugerencias.appendChild(div);
+  });
+});
 
 // Iniciar el servidor
 app.listen(PORT, () => {
