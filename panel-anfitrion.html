@@ -1007,6 +1007,7 @@ border:3px solid #1b167f;
                 <span class="chip chip-strong">Total: $${formatARS(total)}</span>
                 ${r.noLeidoAnfitrion ? `<span class="chip chip-bad">Nuevo mensaje</span>` : ""}
               </div>
+              
 
               ${r.mensaje ? `<p style="margin:12px 0 0; color:#4d5678;"><strong>Mensaje:</strong> ${escapeHTML(r.mensaje)}</p>` : ""}
 
@@ -1045,6 +1046,83 @@ border:3px solid #1b167f;
           }
         });
       });
+      let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+
+function renderCalendar() {
+
+    const calendar = document.getElementById("calendar");
+    const monthTitle = document.getElementById("monthTitle");
+
+    if (!calendar || !monthTitle) return;
+
+    calendar.innerHTML = "";
+
+    const meses = [
+        "Enero","Febrero","Marzo","Abril","Mayo","Junio",
+        "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+    ];
+
+    monthTitle.textContent = meses[currentMonth] + " " + currentYear;
+
+    const primerDia = new Date(currentYear, currentMonth, 1).getDay();
+    const diasMes = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+    for (let i = 0; i < primerDia; i++) {
+        calendar.innerHTML += "<div></div>";
+    }
+
+    for (let dia = 1; dia <= diasMes; dia++) {
+
+        const fecha = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+
+        const celda = document.createElement("div");
+
+        celda.className = "day free";
+
+        celda.innerHTML = `<strong>${dia}</strong>`;
+
+        const reserva = bookingsCache.find(r => {
+
+            const estado = (r.status || "").toLowerCase();
+
+            if (!(estado === "aceptada" || estado === "confirmada"))
+                return false;
+
+            return fecha >= r.checkin && fecha < r.checkout;
+
+        });
+
+        if (reserva) {
+
+            celda.classList.remove("free");
+            celda.classList.add("busy");
+
+            celda.title =
+                "Huésped: " +
+                (reserva.huespedNombre || reserva.guestName || "") +
+                "\nIngreso: " +
+                reserva.checkin +
+                "\nSalida: " +
+                reserva.checkout;
+
+        }
+
+        const hoy = new Date();
+
+        if (
+            hoy.getDate() === dia &&
+            hoy.getMonth() === currentMonth &&
+            hoy.getFullYear() === currentYear
+        ) {
+            celda.classList.add("today");
+        }
+
+        calendar.appendChild(celda);
+
+    }
+
+}
 
       bookList.querySelectorAll("[data-reject]").forEach(btn => {
         btn.addEventListener("click", async () => {
@@ -1220,6 +1298,32 @@ border:3px solid #1b167f;
     tabBookings.addEventListener("click", () => showTab("bookings"));
     tabCalendar.addEventListener("click", () => showTab("calendar"));
     tabBilling.addEventListener("click", () => showTab("billing"));
+
+    document.getElementById("prevMonth").addEventListener("click", () => {
+
+    currentMonth--;
+
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+
+    renderCalendar();
+
+});
+
+document.getElementById("nextMonth").addEventListener("click", () => {
+
+    currentMonth++;
+
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+
+    renderCalendar();
+
+});
 
     btnLogoutTop?.addEventListener("click", async () => {
       await signOut(auth);
