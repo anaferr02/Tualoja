@@ -489,6 +489,47 @@
       .grid-2{ grid-template-columns:1fr; }
       .invoice-grid{ grid-template-columns:1fr; }
     }
+    .calendar-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.weekdays{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+font-weight:bold;
+text-align:center;
+margin-bottom:10px;
+}
+
+#calendar{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:8px;
+}
+
+.day{
+height:90px;
+border-radius:12px;
+background:white;
+border:1px solid #ddd;
+padding:8px;
+cursor:pointer;
+}
+
+.day.free{
+background:#e9ffe9;
+}
+
+.day.busy{
+background:#ffd9d9;
+}
+
+.day.today{
+border:3px solid #1b167f;
+}
 
     @media (max-width:560px){
       .stats{
@@ -1031,17 +1072,7 @@
       });
     }
 
-    function renderCalendar() {
-      const activas = bookingsCache.filter((r) => {
-        const e = String(r.status || "").toLowerCase();
-        return e === "aceptada" || e === "confirmada";
-      });
-
-      if (!activas.length) {
-        calList.innerHTML = "";
-        calEmpty.style.display = "block";
-        return;
-      }
+   
 
       calEmpty.style.display = "none";
 
