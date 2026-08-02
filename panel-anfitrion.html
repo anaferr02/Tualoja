@@ -1152,23 +1152,7 @@ function renderCalendar() {
 
    
 
-      calEmpty.style.display = "none";
-
-      calList.innerHTML = activas.map((r) => `
-        <article class="calendar-row">
-          <div class="calendar-head">
-            <div>
-              <h3 style="margin:0 0 8px; color:#272d7d;">${escapeHTML(r.titulo || r.alojamientoTitulo || "Reserva")}</h3>
-              <div class="muted">Huésped: ${escapeHTML(r.huespedNombre || r.guestName || r.huespedEmail || "Sin nombre")}</div>
-            </div>
-
-            <div class="calendar-range">
-              ${formatDate(r.checkin)} → ${formatDate(r.checkout)}
-            </div>
-          </div>
-        </article>
-      `).join("");
-    }
+  
 
     function renderBilling() {
       billSummary.textContent = invoicesCache.length
