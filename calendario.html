@@ -392,17 +392,16 @@ let anioActual = fechaActual.getFullYear();
 
 
 // Elementos HTML
-
 const selectAlojamiento =
 document.getElementById("selectAlojamiento");
 
 
 const calendario =
-document.getElementById("calendar");
+document.getElementById("calendario");
 
 
 const tituloMes =
-document.getElementById("monthTitle");
+document.getElementById("mesActual");
 
 
 
@@ -645,7 +644,7 @@ renderCalendar();
 // botones mes anterior y siguiente
 
 
-document.getElementById("prevMonth")
+document.getElementById("anterior")
 .addEventListener("click",()=>{
 
 
@@ -668,7 +667,7 @@ document.getElementById("prevMonth")
 
 
 
-document.getElementById("nextMonth")
+document.getElementById("siguiente")
 .addEventListener("click",()=>{
 
 
