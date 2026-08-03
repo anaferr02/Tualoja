@@ -350,8 +350,205 @@ Cerrar
 <script type="module">
 
 // AQUÍ irá TODO el JavaScript
+  <script type="module">
+
+import { auth, db } from "./firebase-config.js";
+
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+
+import {
+    collection,
+    getDocs,
+    addDoc,
+    deleteDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+
+// ===============================
+// VARIABLES
+// ===============================
+
+let usuarioActual = null;
+
+let alojamientos = [];
+
+let reservas = [];
+
+let fechasBloqueadas = [];
+
+let alojamientoSeleccionado = null;
+
+
+let fechaActual = new Date();
+
+let mesActual = fechaActual.getMonth();
+
+let anioActual = fechaActual.getFullYear();
+
+
+
+// Elementos HTML
+
+const selectAlojamiento =
+document.getElementById("selectAlojamiento");
+
+
+const calendario =
+document.getElementById("calendar");
+
+
+const tituloMes =
+document.getElementById("monthTitle");
+
+
+
+
+// ===============================
+// ESPERAR LOGIN
+// ===============================
+
+
+onAuthStateChanged(auth, async(user)=>{
+
+
+    if(!user){
+
+        alert("Debes iniciar sesión");
+
+        window.location.href="login.html";
+
+        return;
+
+    }
+
+
+    usuarioActual=user;
+
+
+    await cargarDatos();
+
+
+});
+
+
+
+
+// ===============================
+// CARGAR DATOS FIREBASE
+// ===============================
+
+
+async function cargarDatos(){
+
+
+    alojamientos=[];
+
+
+    const alojSnap =
+    await getDocs(collection(db,"alojamientos"));
+
+
+
+    alojSnap.forEach((d)=>{
+
+
+        let data=d.data();
+
+
+
+        if(
+            data.anfitrionId===usuarioActual.uid ||
+            data.ownerUid===usuarioActual.uid
+        ){
+
+            alojamientos.push({
+
+                id:d.id,
+
+                ...data
+
+            });
+
+        }
+
+
+    });
+
+
+
+    cargarSelector();
+
+
+
+}
+
+
+
+
+// ===============================
+// SELECT ALOJAMIENTO
+// ===============================
+
+
+function cargarSelector(){
+
+
+    selectAlojamiento.innerHTML=
+    `
+    <option value="">
+    Seleccionar alojamiento
+    </option>
+    `;
+
+
+
+    alojamientos.forEach((a)=>{
+
+
+        selectAlojamiento.innerHTML +=
+
+        `
+        <option value="${a.id}">
+        ${a.nombre || a.titulo}
+        </option>
+        `;
+
+
+    });
+
+
+
+}
+
+
+
+
+selectAlojamiento.addEventListener(
+"change",
+async()=>{
+
+
+    alojamientoSeleccionado =
+    selectAlojamiento.value;
+
+
+    await cargarReservas();
+
+
+    renderCalendar();
+
+
+});
+
+
 
 </script>
+
+
 
 </body>
 </html>
