@@ -543,6 +543,150 @@ async()=>{
 
 
 });
+  // ===============================
+// GENERAR CALENDARIO
+// ===============================
+
+function renderCalendar(){
+
+    calendario.innerHTML = "";
+
+
+    const primerDia = new Date(
+        anioActual,
+        mesActual,
+        1
+    ).getDay();
+
+
+    const diasMes = new Date(
+        anioActual,
+        mesActual + 1,
+        0
+    ).getDate();
+
+
+
+    const nombresMes = [
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre"
+    ];
+
+
+    tituloMes.textContent =
+    nombresMes[mesActual] + " " + anioActual;
+
+
+
+    // espacios antes del primer día
+
+    for(let i=0;i<primerDia;i++){
+
+        let vacio=document.createElement("div");
+
+        vacio.className="empty-day";
+
+        calendario.appendChild(vacio);
+
+    }
+
+
+
+    // crear días
+
+    for(let dia=1; dia<=diasMes; dia++){
+
+
+        let div=document.createElement("div");
+
+        div.className="day available";
+
+
+        div.innerHTML=`
+
+            <div class="day-number">
+                ${dia}
+            </div>
+
+            <div class="day-info available-text">
+                Disponible
+            </div>
+
+        `;
+
+
+
+        calendario.appendChild(div);
+
+    }
+
+
+}
+
+
+
+// cargar calendario al iniciar
+
+renderCalendar();
+
+
+
+
+// botones mes anterior y siguiente
+
+
+document.getElementById("prevMonth")
+.addEventListener("click",()=>{
+
+
+    mesActual--;
+
+
+    if(mesActual<0){
+
+        mesActual=11;
+        anioActual--;
+
+    }
+
+
+    renderCalendar();
+
+
+});
+
+
+
+
+document.getElementById("nextMonth")
+.addEventListener("click",()=>{
+
+
+    mesActual++;
+
+
+    if(mesActual>11){
+
+        mesActual=0;
+        anioActual++;
+
+    }
+
+
+    renderCalendar();
+
+
+});
 
 
 
