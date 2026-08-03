@@ -1,1 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calendario - TuAloja</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#f3f5fb;
+color:#222;
+}
+
+header{
+background:white;
+padding:18px 30px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+.logo{
+font-size:30px;
+font-weight:bold;
+color:#1b167f;
+text-decoration:none;
+}
+
+.volver{
+
+background:#1b167f;
+color:white;
+padding:12px 18px;
+border-radius:10px;
+text-decoration:none;
+font-weight:bold;
+
+}
+
+main{
+
+max-width:1300px;
+margin:30px auto;
+padding:20px;
+
+}
+
+.titulo{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
+
+}
+
+.titulo h1{
+
+font-size:34px;
+color:#1b167f;
+
+}
+
+.controles{
+
+display:flex;
+align-items:center;
+gap:20px;
+
+}
+
+.controles button{
+
+width:45px;
+height:45px;
+border:none;
+border-radius:12px;
+background:#1b167f;
+color:white;
+font-size:20px;
+cursor:pointer;
+
+}
+
+#mesActual{
+
+font-size:28px;
+font-weight:bold;
+color:#1b167f;
+
+}
+
+.diasSemana{
+
+display:grid;
+grid-template-columns:repeat(7,1fr);
+margin-bottom:10px;
+gap:10px;
+
+}
+
+.diasSemana div{
+
+background:#1b167f;
+color:white;
+padding:15px;
+border-radius:10px;
+text-align:center;
+font-weight:bold;
+
+}
+
+#calendario{
+
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:10px;
+
+}
+
+.dia{
+
+background:white;
+border-radius:15px;
+height:130px;
+padding:10px;
+box-shadow:0 5px 15px rgba(0,0,0,.08);
+cursor:pointer;
+transition:.25s;
+
+display:flex;
+flex-direction:column;
+
+}
+
+.dia:hover{
+
+transform:scale(1.03);
+
+}
+
+.numero{
+
+font-weight:bold;
+font-size:18px;
+
+}
+
+.libre{
+
+background:#e9ffe8;
+
+}
+
+.ocupado{
+
+background:#ffdcdc;
+
+}
+
+.bloqueado{
+
+background:#fff3c8;
+
+}
+
+.hoy{
+
+border:3px solid #1b167f;
+
+}
+
+.info{
+
+margin-top:auto;
+font-size:12px;
+
+}
+
+.modal{
+
+position:fixed;
+left:0;
+top:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.45);
+
+display:none;
+justify-content:center;
+align-items:center;
+
+}
+
+.modalContenido{
+
+background:white;
+width:450px;
+padding:25px;
+border-radius:18px;
+
+}
+
+.modalContenido h2{
+
+margin-bottom:15px;
+color:#1b167f;
+
+}
+
+.modalContenido p{
+
+margin-bottom:10px;
+
+}
+
+.modalContenido button{
+
+margin-top:20px;
+padding:12px 18px;
+border:none;
+border-radius:10px;
+background:#1b167f;
+color:white;
+cursor:pointer;
+
+}
+
+@media(max-width:900px){
+
+#calendario{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.diasSemana{
+
+display:none;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<a class="logo" href="index.html">
+
+TuAloja
+
+</a>
+
+<a class="volver" href="panel-anfitrion.html">
+
+← Volver al Panel
+
+</a>
+
+</header>
+
+<main>
+
+<div class="titulo">
+
+<h1>
+
+Calendario de Disponibilidad
+
+</h1>
+
+<div class="controles">
+
+<button id="anterior">
+
+◀
+
+</button>
+
+<div id="mesActual"></div>
+
+<button id="siguiente">
+
+▶
+
+</button>
+
+</div>
+
+</div>
+
+<div class="diasSemana">
+
+<div>Dom</div>
+<div>Lun</div>
+<div>Mar</div>
+<div>Mié</div>
+<div>Jue</div>
+<div>Vie</div>
+<div>Sáb</div>
+
+</div>
+
+<div id="calendario">
+
+</div>
+
+</main>
+
+<div class="modal" id="modal">
+
+<div class="modalContenido">
+
+<h2>
+
+Información del día
+
+</h2>
+
+<div id="contenidoModal">
+
+</div>
+
+<button onclick="cerrarModal()">
+
+Cerrar
+
+</button>
+
+</div>
+
+</div>
+
+<script type="module">
+
+// AQUÍ irá TODO el JavaScript
+
+</script>
+
+</body>
+</html>
