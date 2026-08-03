@@ -489,47 +489,6 @@
       .grid-2{ grid-template-columns:1fr; }
       .invoice-grid{ grid-template-columns:1fr; }
     }
-    .calendar-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
-}
-
-.weekdays{
-display:grid;
-grid-template-columns:repeat(7,1fr);
-font-weight:bold;
-text-align:center;
-margin-bottom:10px;
-}
-
-#calendar{
-display:grid;
-grid-template-columns:repeat(7,1fr);
-gap:8px;
-}
-
-.day{
-height:90px;
-border-radius:12px;
-background:white;
-border:1px solid #ddd;
-padding:8px;
-cursor:pointer;
-}
-
-.day.free{
-background:#e9ffe9;
-}
-
-.day.busy{
-background:#ffd9d9;
-}
-
-.day.today{
-border:3px solid #1b167f;
-}
 
     @media (max-width:560px){
       .stats{
@@ -614,40 +573,14 @@ border:3px solid #1b167f;
       </section>
 
       <section id="secCalendar" style="display:none;">
-
-    <div class="panel-note muted">
-        Administrá la disponibilidad de tu alojamiento.
-    </div>
-
-    <div class="calendar-header">
-
-        <button id="prevMonth" class="mini-btn">
-            ◀
-        </button>
-
-        <h2 id="monthTitle"></h2>
-
-        <button id="nextMonth" class="mini-btn">
-            ▶
-        </button>
-
-    </div>
-
-    <div class="weekdays">
-
-        <div>Dom</div>
-        <div>Lun</div>
-        <div>Mar</div>
-        <div>Mié</div>
-        <div>Jue</div>
-        <div>Vie</div>
-        <div>Sáb</div>
-
-    </div>
-
-    <div id="calendar"></div>
-
-</section>
+        <div class="panel-note muted">
+          Fechas reservadas de tus alojamientos.
+        </div>
+        <div id="calList" class="calendar-grid"></div>
+        <p id="calEmpty" class="muted" style="display:none; margin-top:12px;">
+          Aún no hay reservas para mostrar en el calendario.
+        </p>
+      </section>
 
       <section id="secBilling" style="display:none;">
         <div class="panel-note muted">
@@ -1007,7 +940,6 @@ border:3px solid #1b167f;
                 <span class="chip chip-strong">Total: $${formatARS(total)}</span>
                 ${r.noLeidoAnfitrion ? `<span class="chip chip-bad">Nuevo mensaje</span>` : ""}
               </div>
-              
 
               ${r.mensaje ? `<p style="margin:12px 0 0; color:#4d5678;"><strong>Mensaje:</strong> ${escapeHTML(r.mensaje)}</p>` : ""}
 
@@ -1047,9 +979,7 @@ border:3px solid #1b167f;
         });
       });
 
-function renderCalendar() {
-
-      .forEach(btn => {
+      bookList.querySelectorAll("[data-reject]").forEach(btn => {
         btn.addEventListener("click", async () => {
           const id = btn.getAttribute("data-reject");
           try {
@@ -1075,9 +1005,35 @@ function renderCalendar() {
       });
     }
 
-   
+    function renderCalendar() {
+      const activas = bookingsCache.filter((r) => {
+        const e = String(r.status || "").toLowerCase();
+        return e === "aceptada" || e === "confirmada";
+      });
 
-  
+      if (!activas.length) {
+        calList.innerHTML = "";
+        calEmpty.style.display = "block";
+        return;
+      }
+
+      calEmpty.style.display = "none";
+
+      calList.innerHTML = activas.map((r) => `
+        <article class="calendar-row">
+          <div class="calendar-head">
+            <div>
+              <h3 style="margin:0 0 8px; color:#272d7d;">${escapeHTML(r.titulo || r.alojamientoTitulo || "Reserva")}</h3>
+              <div class="muted">Huésped: ${escapeHTML(r.huespedNombre || r.guestName || r.huespedEmail || "Sin nombre")}</div>
+            </div>
+
+            <div class="calendar-range">
+              ${formatDate(r.checkin)} → ${formatDate(r.checkout)}
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
 
     function renderBilling() {
       billSummary.textContent = invoicesCache.length
@@ -1207,32 +1163,6 @@ function renderCalendar() {
     tabBookings.addEventListener("click", () => showTab("bookings"));
     tabCalendar.addEventListener("click", () => showTab("calendar"));
     tabBilling.addEventListener("click", () => showTab("billing"));
-
-    document.getElementById("prevMonth").addEventListener("click", () => {
-
-    currentMonth--;
-
-    if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-    }
-
-    renderCalendar();
-
-});
-
-document.getElementById("nextMonth").addEventListener("click", () => {
-
-    currentMonth++;
-
-    if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-    }
-
-    renderCalendar();
-
-});
 
     btnLogoutTop?.addEventListener("click", async () => {
       await signOut(auth);
