@@ -1,237 +1,245 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Calendario TuAloja</title>
+<title>Calendario - TuAloja</title>
 
 <style>
 
 *{
+margin:0;
+padding:0;
 box-sizing:border-box;
 font-family:Arial,Helvetica,sans-serif;
 }
 
 body{
-margin:0;
 background:#f3f5fb;
 color:#222;
 }
 
-
 header{
-background:white;
+background:#fff;
 padding:18px 30px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-box-shadow:0 5px 20px rgba(0,0,0,.1);
+box-shadow:0 5px 20px rgba(0,0,0,.08);
 }
-
 
 .logo{
 font-size:30px;
 font-weight:bold;
-color:#1b167f;
 text-decoration:none;
+color:#1b167f;
 }
 
-
 .volver{
-
 background:#1b167f;
 color:white;
 padding:12px 18px;
-border-radius:12px;
+border-radius:10px;
 text-decoration:none;
-
+font-weight:bold;
 }
-
 
 main{
-
-max-width:1200px;
+max-width:1300px;
 margin:30px auto;
 padding:20px;
-
 }
-
 
 h1{
-
 color:#1b167f;
-
+margin-bottom:20px;
 }
 
-
-select{
-
+#selectAlojamiento{
+width:320px;
 padding:12px;
 border-radius:10px;
-border:1px solid #ddd;
-width:300px;
-margin-bottom:20px;
-
+border:1px solid #ccc;
+margin-bottom:25px;
+font-size:15px;
 }
-
-
 
 .controles{
-
 display:flex;
-justify-content:space-between;
+justify-content:center;
 align-items:center;
+gap:20px;
 margin-bottom:20px;
-
 }
-
 
 .controles button{
-
-background:#1b167f;
-color:white;
-border:0;
 width:45px;
 height:45px;
+border:none;
 border-radius:10px;
+background:#1b167f;
+color:white;
+font-size:20px;
 cursor:pointer;
-
 }
 
-
-
 #mesActual{
-
 font-size:28px;
 font-weight:bold;
 color:#1b167f;
-
+min-width:220px;
+text-align:center;
 }
 
-
-
 .diasSemana{
-
 display:grid;
 grid-template-columns:repeat(7,1fr);
 gap:8px;
-
+margin-bottom:10px;
 }
 
-
-
 .diasSemana div{
-
 background:#1b167f;
 color:white;
 padding:12px;
 text-align:center;
 border-radius:10px;
-
+font-weight:bold;
 }
 
-
-
 #calendario{
-
 display:grid;
 grid-template-columns:repeat(7,1fr);
 gap:8px;
-margin-top:10px;
-
 }
-
-
 
 .dia{
-
-height:120px;
 background:white;
-border-radius:15px;
+height:120px;
 padding:10px;
-box-shadow:0 5px 15px rgba(0,0,0,.08);
+border-radius:14px;
+box-shadow:0 4px 12px rgba(0,0,0,.08);
 cursor:pointer;
-
+transition:.2s;
+display:flex;
+flex-direction:column;
 }
 
-
+.dia:hover{
+transform:scale(1.03);
+}
 
 .numero{
-
 font-size:18px;
 font-weight:bold;
-
 }
-
-
-.libre{
-
-background:#e5ffe5;
-
-}
-
-
-.ocupado{
-
-background:#ffd8d8;
-
-}
-
-
 
 .info{
-
+margin-top:auto;
 font-size:12px;
-margin-top:15px;
-
 }
 
+.libre{
+background:#e9ffe8;
+}
 
+.ocupado{
+background:#ffd9d9;
+}
+
+.bloqueado{
+background:#ffe9a8;
+}
+
+.hoy{
+border:3px solid #1b167f;
+}
+
+.vacio{
+background:transparent;
+box-shadow:none;
+cursor:default;
+}
 
 .modal{
-
 display:none;
 position:fixed;
-inset:0;
-background:rgba(0,0,0,.5);
+left:0;
+top:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.45);
 justify-content:center;
 align-items:center;
-
 }
-
-
 
 .modal-box{
-
 background:white;
+width:420px;
 padding:25px;
 border-radius:15px;
-width:400px;
-
 }
 
+.modal-box h2{
+margin-bottom:15px;
+color:#1b167f;
+}
 
 .modal-box button{
-
+margin-top:20px;
+padding:12px 18px;
+border:none;
+border-radius:10px;
 background:#1b167f;
 color:white;
-border:0;
+cursor:pointer;
+}
+
+.acciones{
+margin-top:15px;
+display:flex;
+gap:10px;
+}
+
+.btnBloquear{
+background:#ff9800;
+color:white;
 padding:10px;
-border-radius:10px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+flex:1;
+}
+
+.btnDesbloquear{
+background:#2e7d32;
+color:white;
+padding:10px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+flex:1;
+}
+
+@media(max-width:900px){
+
+#calendario{
+grid-template-columns:repeat(2,1fr);
+}
+
+.diasSemana{
+display:none;
+}
 
 }
 
-
-
 </style>
-
 </head>
 
-
 <body>
-
 
 <header>
 
@@ -239,23 +247,15 @@ border-radius:10px;
 TuAloja
 </a>
 
-
 <a class="volver" href="panel-anfitrion.html">
 ← Volver al Panel
 </a>
 
-
 </header>
-
-
 
 <main>
 
-
-<h1>
-Calendario de Disponibilidad
-</h1>
-
+<h1>Calendario de Disponibilidad</h1>
 
 <select id="selectAlojamiento">
 
@@ -265,27 +265,19 @@ Seleccionar alojamiento
 
 </select>
 
-
-
 <div class="controles">
-
 
 <button id="anterior">
 ◀
 </button>
 
-
 <div id="mesActual"></div>
-
 
 <button id="siguiente">
 ▶
 </button>
 
-
 </div>
-
-
 
 <div class="diasSemana">
 
@@ -299,50 +291,66 @@ Seleccionar alojamiento
 
 </div>
 
-
 <div id="calendario"></div>
 
-
-
 </main>
-
-
 
 <div class="modal" id="modal">
 
 <div class="modal-box">
 
-<h2>
-Información
-</h2>
-
+<h2>Información del día</h2>
 
 <div id="contenidoModal"></div>
 
+<div class="acciones">
 
-<button onclick="cerrarModal()">
-Cerrar
+<button
+id="btnBloquear"
+class="btnBloquear">
+Bloquear fecha
 </button>
 
+<button
+id="btnDesbloquear"
+class="btnDesbloquear">
+Desbloquear
+</button>
+
+</div>
+
+<button
+style="margin-top:20px"
+onclick="cerrarModal()">
+
+Cerrar
+
+</button>
 
 </div>
 
 </div>
+
 <script type="module">
 
 import { auth, db } from "./firebase-config.js";
 
 import {
 onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-
+}
+from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
 import {
+
 collection,
-getDocs
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+getDocs,
+addDoc,
+deleteDoc,
+query,
+where
 
-
+}
+from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 let usuarioActual=null;
 
@@ -350,8 +358,11 @@ let alojamientos=[];
 
 let reservas=[];
 
+let fechasBloqueadas=[];
+
 let alojamientoSeleccionado="";
 
+let fechaSeleccionada="";
 
 let fecha=new Date();
 
@@ -359,440 +370,411 @@ let mes=fecha.getMonth();
 
 let anio=fecha.getFullYear();
 
-let fechasBloqueadas = [];
-
-
-
 const calendario=document.getElementById("calendario");
 
 const mesActual=document.getElementById("mesActual");
 
 const select=document.getElementById("selectAlojamiento");
 
+const modal=document.getElementById("modal");
 
+const contenidoModal=document.getElementById("contenidoModal");
 
-onAuthStateChanged(auth,async(user)=>{
+const btnBloquear=document.getElementById("btnBloquear");
 
+const btnDesbloquear=document.getElementById("btnDesbloquear");
+// ===============================
+// INICIAR SESIÓN
+// ===============================
 
-if(!user){
+onAuthStateChanged(auth, async (user) => {
 
-alert("Debes iniciar sesión");
-
-location.href="login.html";
-
-return;
-
-}
-
-
-usuarioActual=user;
-
-
-await cargarDatos();
-
-
-renderCalendario();
-
-
-});
-
-
-
-
-
-async function cargarDatos(){
-
-
-alojamientos=[];
-
-reservas=[];
-
-
-
-// CARGAR ALOJAMIENTOS
-
-const alojSnap=
-await getDocs(collection(db,"alojamientos"));
-
-
-
-alojSnap.forEach((doc)=>{
-
-
-let a=doc.data();
-
-
-
-if(
-a.anfitrionId===usuarioActual.uid ||
-a.ownerUid===usuarioActual.uid ||
-a.ownerId===usuarioActual.uid
-){
-
-
-alojamientos.push({
-
-id:doc.id,
-
-...a
-
-});
-
-
-}
-
-
-
-});
-
-// Cargar fechas bloqueadas
-fechasBloqueadas = [];
-
-const bloqueadasSnap = await getDocs(collection(db, "fechasBloqueadas"));
-
-bloqueadasSnap.forEach((doc) => {
-    const data = doc.data();
-
-    if (data.alojamientoId === alojamientoSeleccionado) {
-        fechasBloqueadas.push(data);
+    if (!user) {
+        alert("Debes iniciar sesión");
+        location.href = "login.html";
+        return;
     }
-});
 
+    usuarioActual = user;
 
+    await cargarDatos();
 
-
-
-select.innerHTML=
-`
-<option value="">
-Seleccionar alojamiento
-</option>
-`;
-
-
-
-alojamientos.forEach(a=>{
-
-
-select.innerHTML +=
-`
-<option value="${a.id}">
-${a.titulo || a.nombre}
-</option>
-`;
-
+    renderCalendario();
 
 });
 
+// ===============================
+// CARGAR DATOS
+// ===============================
 
+async function cargarDatos() {
 
+    alojamientos = [];
+    reservas = [];
+    fechasBloqueadas = [];
 
+    // -------------------
+    // Alojamientos
+    // -------------------
 
-// CARGAR RESERVAS
+    const alojSnap = await getDocs(
+        collection(db, "alojamientos")
+    );
 
+    alojSnap.forEach((doc) => {
 
-const reservasSnap=
-await getDocs(collection(db,"reservas"));
+        const a = doc.data();
 
+        if (
+            a.anfitrionId === usuarioActual.uid ||
+            a.ownerUid === usuarioActual.uid ||
+            a.ownerId === usuarioActual.uid
+        ) {
 
+            alojamientos.push({
+                id: doc.id,
+                ...a
+            });
 
-reservasSnap.forEach(doc=>{
+        }
 
+    });
 
-let r=doc.data();
+    select.innerHTML = `
+        <option value="">
+            Seleccionar alojamiento
+        </option>
+    `;
 
+    alojamientos.forEach((a) => {
 
+        select.innerHTML += `
+            <option value="${a.id}">
+                ${a.titulo || a.nombre || "Sin nombre"}
+            </option>
+        `;
 
-if(r.anfitrionId===usuarioActual.uid){
+    });
 
-reservas.push({
+    // -------------------
+    // Reservas
+    // -------------------
 
-id:doc.id,
+    const reservasSnap = await getDocs(
+        collection(db, "reservas")
+    );
 
-...r
+    reservasSnap.forEach((doc) => {
 
-});
+        const r = doc.data();
+
+        if (r.anfitrionId === usuarioActual.uid) {
+
+            reservas.push({
+                id: doc.id,
+                ...r
+            });
+
+        }
+
+    });
 
 }
 
+// ===============================
+// CAMBIO DE ALOJAMIENTO
+// ===============================
+
+select.addEventListener("change", async () => {
+
+    alojamientoSeleccionado = select.value;
+
+    fechasBloqueadas = [];
+
+    const q = query(
+        collection(db, "fechasBloqueadas"),
+        where("alojamientoId", "==", alojamientoSeleccionado)
+    );
+
+    const bloqueadas = await getDocs(q);
+
+    bloqueadas.forEach((doc) => {
+
+        fechasBloqueadas.push({
+            id: doc.id,
+            ...doc.data()
+        });
+
+    });
+
+    renderCalendario();
 
 });
-
-
-
-}
-
-
-
-
-
-select.addEventListener("change",()=>{
-
-
-alojamientoSeleccionado=
-select.value;
-
-
-renderCalendario();
-
-
-});
-
-
-
-
-
+    // ===============================
+// DIBUJAR CALENDARIO
+// ===============================
 
 function renderCalendario(){
 
+    calendario.innerHTML="";
 
-calendario.innerHTML="";
+    const primerDia=new Date(anio,mes,1).getDay();
 
+    const diasMes=new Date(anio,mes+1,0).getDate();
 
+    const meses=[
+        "Enero","Febrero","Marzo","Abril",
+        "Mayo","Junio","Julio","Agosto",
+        "Septiembre","Octubre","Noviembre","Diciembre"
+    ];
 
-let primerDia=
-new Date(anio,mes,1).getDay();
+    mesActual.textContent=meses[mes]+" "+anio;
 
+    // Espacios vacíos
+    for(let i=0;i<primerDia;i++){
 
+        const vacio=document.createElement("div");
+        vacio.className="vacio";
 
-let cantidadDias=
-new Date(anio,mes+1,0).getDate();
+        calendario.appendChild(vacio);
 
+    }
 
+    // Días
+    for(let dia=1;dia<=diasMes;dia++){
 
-let nombres=[
+        const fechaTexto=
+            anio+"-"+
+            String(mes+1).padStart(2,"0")+"-"+
+            String(dia).padStart(2,"0");
 
-"Enero",
-"Febrero",
-"Marzo",
-"Abril",
-"Mayo",
-"Junio",
-"Julio",
-"Agosto",
-"Septiembre",
-"Octubre",
-"Noviembre",
-"Diciembre"
+        const cuadro=document.createElement("div");
 
-];
+        cuadro.className="dia libre";
 
+        let texto="🟢 Disponible";
 
+        // Buscar reserva
+        const reserva=reservas.find(r=>
 
-mesActual.textContent=
-nombres[mes]+" "+anio;
+            r.alojamientoId===alojamientoSeleccionado &&
 
+            fechaTexto>=r.checkin &&
 
+            fechaTexto<r.checkout
 
+        );
 
+        // Buscar bloqueo manual
+        const bloqueo=fechasBloqueadas.find(f=>
 
-for(let i=0;i<primerDia;i++){
+            f.fecha===fechaTexto
 
+        );
 
-let espacio=document.createElement("div");
+        if(reserva){
 
-calendario.appendChild(espacio);
+            cuadro.className="dia ocupado";
 
+            texto="🔴 Reservado";
+
+        }
+
+        if(bloqueo){
+
+            cuadro.className="dia bloqueado";
+
+            texto="🟡 Bloqueado";
+
+        }
+
+        const hoy=new Date();
+
+        const hoyTexto=
+
+            hoy.getFullYear()+"-"+
+            String(hoy.getMonth()+1).padStart(2,"0")+"-"+
+            String(hoy.getDate()).padStart(2,"0");
+
+        if(fechaTexto===hoyTexto){
+
+            cuadro.classList.add("hoy");
+
+        }
+
+        cuadro.innerHTML=`
+
+            <div class="numero">
+
+                ${dia}
+
+            </div>
+
+            <div class="info">
+
+                ${texto}
+
+            </div>
+
+        `;
+
+        cuadro.onclick=()=>{
+
+            fechaSeleccionada=fechaTexto;
+
+            contenidoModal.innerHTML=`
+
+            <p>
+
+            <b>Fecha:</b>
+
+            ${fechaTexto}
+
+            </p>
+
+            <p>
+
+            ${texto}
+
+            </p>
+
+            `;
+
+            modal.style.display="flex";
+
+        };
+
+        calendario.appendChild(cuadro);
+
+    }
 
 }
+    //====================================
+// BOTÓN BLOQUEAR FECHA
+//====================================
 
+btnBloquear.addEventListener("click", async () => {
 
+    if (alojamientoSeleccionado == "") {
+        alert("Seleccioná un alojamiento.");
+        return;
+    }
 
+    await addDoc(collection(db, "fechasBloqueadas"), {
 
-for(let dia=1;dia<=cantidadDias;dia++){
+        alojamientoId: alojamientoSeleccionado,
+        fecha: fechaSeleccionada,
+        motivo: "Bloqueado por anfitrión",
+        anfitrionId: usuarioActual.uid,
+        createdAt: new Date()
 
+    });
 
+    alert("Fecha bloqueada.");
 
-let caja=document.createElement("div");
+    modal.style.display = "none";
 
+    await cargarDatos();
 
-caja.className="dia libre";
+    const q = query(
+        collection(db, "fechasBloqueadas"),
+        where("alojamientoId", "==", alojamientoSeleccionado)
+    );
 
+    fechasBloqueadas = [];
 
+    const snap = await getDocs(q);
 
-let fechaTexto=
-anio+"-"+
+    snap.forEach(doc => {
 
-String(mes+1).padStart(2,"0")
-+"-"+
-String(dia).padStart(2,"0");
+        fechasBloqueadas.push({
+            id: doc.id,
+            ...doc.data()
+        });
 
+    });
 
-
-let reservaDia=
-reservas.find(r=>{
-
-
-return (
-
-r.alojamientoId===alojamientoSeleccionado &&
-
-fechaTexto>=r.checkin &&
-
-fechaTexto<r.checkout
-
-);
-
+    renderCalendario();
 
 });
 
 
+//====================================
+// BOTÓN DESBLOQUEAR
+//====================================
+
+btnDesbloquear.addEventListener("click", async () => {
+
+    const bloqueo = fechasBloqueadas.find(f => f.fecha == fechaSeleccionada);
+
+    if (!bloqueo) {
+
+        alert("Esa fecha no está bloqueada.");
+
+        return;
+
+    }
+
+    await deleteDoc(doc(db, "fechasBloqueadas", bloqueo.id));
+
+    fechasBloqueadas = fechasBloqueadas.filter(f => f.id != bloqueo.id);
+
+    modal.style.display = "none";
+
+    renderCalendario();
+
+});
 
 
-if(reservaDia){
+//====================================
+// CAMBIAR MES
+//====================================
 
+document.getElementById("anterior").onclick = () => {
 
-caja.className="dia ocupado";
+    mes--;
 
+    if (mes < 0) {
 
-caja.innerHTML=
-`
-<div class="numero">
-${dia}
-</div>
+        mes = 11;
 
-<div class="info">
+        anio--;
 
-🔴 Reservado
+    }
 
-<br>
+    renderCalendario();
 
-${reservaDia.titulo || reservaDia.alojamientoTitulo || ""}
+};
 
-</div>
+document.getElementById("siguiente").onclick = () => {
 
-`;
+    mes++;
 
+    if (mes > 11) {
 
+        mes = 0;
 
-}else{
+        anio++;
 
+    }
 
-caja.innerHTML=
-`
-<div class="numero">
-${dia}
-</div>
-
-<div class="info">
-🟢 Disponible
-</div>
-
-`;
-
-
-}
-
-
-
-
-caja.onclick=()=>{
-
-
-document.getElementById("modal").style.display="flex";
-
-
-document.getElementById("contenidoModal").innerHTML=
-
-`
-Fecha:
-<b>${fechaTexto}</b>
-<br><br>
-
-${
-reservaDia ?
-
-"Reserva: "+(reservaDia.titulo || reservaDia.alojamientoTitulo)
-
-:
-
-"Disponible"
-
-}
-
-`;
-
+    renderCalendario();
 
 };
 
 
+//====================================
+// CERRAR MODAL
+//====================================
 
-calendario.appendChild(caja);
+window.cerrarModal = function () {
 
-
-
-}
-
-
-
-
-}
-
-
-
-
-
-
-document.getElementById("anterior").onclick=()=>{
-
-
-mes--;
-
-
-if(mes<0){
-
-mes=11;
-
-anio--;
-
-}
-
-
-renderCalendario();
-
+    modal.style.display = "none";
 
 };
-
-
-
-
-
-document.getElementById("siguiente").onclick=()=>{
-
-
-mes++;
-
-
-if(mes>11){
-
-mes=0;
-
-anio++;
-
-}
-
-
-renderCalendario();
-
-
-};
-
-
-
-
-
-window.cerrarModal=function(){
-
-
-document.getElementById("modal").style.display="none";
-
-
-}
-
-
 
 </script>
 
-
 </body>
+
 </html>
