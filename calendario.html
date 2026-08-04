@@ -359,6 +359,8 @@ let mes=fecha.getMonth();
 
 let anio=fecha.getFullYear();
 
+let fechasBloqueadas = [];
+
 
 
 const calendario=document.getElementById("calendario");
@@ -441,6 +443,19 @@ id:doc.id,
 
 
 
+});
+
+// Cargar fechas bloqueadas
+fechasBloqueadas = [];
+
+const bloqueadasSnap = await getDocs(collection(db, "fechasBloqueadas"));
+
+bloqueadasSnap.forEach((doc) => {
+    const data = doc.data();
+
+    if (data.alojamientoId === alojamientoSeleccionado) {
+        fechasBloqueadas.push(data);
+    }
 });
 
 
