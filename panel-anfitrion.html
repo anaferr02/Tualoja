@@ -59,9 +59,7 @@
       transition:.2s ease;
     }
 
-    .top-btn:hover{
-      background:#f7f8ff;
-    }
+    .top-btn:hover{ background:#f7f8ff; }
 
     .page-wrap{
       max-width:1100px;
@@ -455,14 +453,11 @@
     }
 
     @media (max-width:900px){
-      .stats{
-        grid-template-columns:repeat(2, minmax(0,1fr));
-      }
+      .stats{ grid-template-columns:repeat(2, minmax(0,1fr)); }
     }
 
     @media (max-width:800px){
       .hamburger{ display:block; }
-
       .header-actions{
         display:none;
         position:absolute;
@@ -476,12 +471,8 @@
         align-items:stretch;
         min-width:220px;
       }
-
       .header-actions.nav-open{ display:flex; }
-
-      .top-btn{
-        text-align:center;
-      }
+      .top-btn{ text-align:center; }
     }
 
     @media (max-width:720px){
@@ -491,9 +482,7 @@
     }
 
     @media (max-width:560px){
-      .stats{
-        grid-template-columns:1fr;
-      }
+      .stats{ grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -549,9 +538,7 @@
       <div class="tabs">
         <button class="tab-btn active" id="tabListings" type="button">Mis alojamientos</button>
         <button class="tab-btn" id="tabBookings" type="button">Reservas recibidas</button>
-        <button class="tab-btn" onclick="location.href='calendario.html'">
-    Calendario
-</button>
+        <button class="tab-btn" id="tabCalendar" type="button">Calendario</button>
         <button class="tab-btn" id="tabBilling" type="button">Facturación</button>
       </div>
 
@@ -689,9 +676,10 @@
     let bookingsCache = [];
     let invoicesCache = [];
 
+    // Manejo de pestañas
     function setActiveTab(activeBtn) {
-      [tabListings, tabBookings, tabCalendar, tabBilling].forEach(btn => btn.classList.remove("active"));
-      activeBtn.classList.add("active");
+      [tabListings, tabBookings, tabCalendar, tabBilling].forEach(btn => btn?.classList.remove("active"));
+      activeBtn?.classList.add("active");
     }
 
     function showTab(which) {
@@ -704,6 +692,59 @@
       if (which === "bookings") setActiveTab(tabBookings);
       if (which === "calendar") setActiveTab(tabCalendar);
       if (which === "billing") setActiveTab(tabBilling);
+    }
+
+    tabListings.addEventListener("click", () => showTab("listings"));
+    tabBookings.addEventListener("click", () => showTab("bookings"));
+    tabCalendar.addEventListener("click", () => showTab("calendar"));
+    tabBilling.addEventListener("click", () => showTab("billing"));
+
+    // Menú Responsive
+    if (hamburgerBtn) {
+      hamburgerBtn.addEventListener("click", () => {
+        headerActions.classList.toggle("nav-open");
+      });
+    }
+
+    // Modal Events
+    if (closeEditModal) closeEditModal.addEventListener("click", closeModal);
+    if (cancelEditModal) cancelEditModal.addEventListener("click", closeModal);
+
+    editForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentEditDocId) return;
+
+      const titulo = document.getElementById("editTitulo").value;
+      const precio = Number(document.getElementById("editPrecio").value);
+      const maxNoches = Number(document.getElementById("editMaxNoches").value);
+      const descripcion = document.getElementById("editDescripcion").value;
+
+      try {
+        await updateDoc(doc(db, "alojamientos", currentEditDocId), {
+          titulo, precio, maxNoches, descripcion
+        });
+
+        const item = listingsCache.find(x => x._docId === currentEditDocId);
+        if (item) {
+          item.titulo = titulo;
+          item.precio = precio;
+          item.maxNoches = maxNoches;
+          item.descripcion = descripcion;
+        }
+
+        renderListings();
+        closeModal();
+      } catch (err) {
+        console.error("Error al actualizar: ", err);
+        alert("No se pudo actualizar la publicación.");
+      }
+    });
+
+    if (btnLogoutTop) {
+      btnLogoutTop.addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.href = "login.html";
+      });
     }
 
     function escapeHTML(str) {
@@ -739,6 +780,7 @@
     function coverFromFotos(item) {
       return item?.fotos?.find(f => f.isCover)?.url
         || item?.fotos?.[0]?.url
+        || item?.imagenUrl
         || "";
     }
 
@@ -1091,142 +1133,55 @@
             </div>
 
             <div class="actions">
-              ${pdfUrl ? `<a class="mini-btn primary" href="${escapeHTML(pdfUrl)}" target="_blank" rel="noopener noreferrer">Ver factura</a>` : ""}
-              ${pdfUrl ? `<a class="mini-btn" href="${escapeHTML(pdfUrl)}" target="_blank" rel="noopener noreferrer">Descargar PDF</a>` : ""}
+              ${pdfUrl ? `<a class="mini-btn primary" href="${escapeHTML(pdfUrl)}" target="_blank">Descargar PDF</a>` : ""}
             </div>
           </article>
         `;
       }).join("");
     }
 
-    async function loadAll(user) {
-      listingsCache = [];
-      bookingsCache = [];
-      invoicesCache = [];
-
-      const alojSnap = await getDocs(collection(db, "alojamientos"));
-      alojSnap.forEach((d) => {
-        const data = d.data();
-        if (esMioAlojamiento(data, user)) {
-          listingsCache.push({ ...data, _docId: d.id });
-        }
-      });
-
-      const reservasSnap = await getDocs(collection(db, "reservas"));
-      reservasSnap.forEach((d) => {
-        const data = d.data();
-        if (esMiReserva(data, user)) {
-          bookingsCache.push({ ...data, _docId: d.id });
-        }
-      });
-
+    async function cargarDatos(user) {
       try {
-        const facturasSnap = await getDocs(collection(db, "facturas"));
-        facturasSnap.forEach((d) => {
-          const data = d.data();
-          if (esMiFactura(data, user)) {
-            invoicesCache.push({ ...data, _docId: d.id });
-          }
-        });
-      } catch (error) {
-        console.warn("No se pudieron cargar las facturas o la colección aún no existe.", error);
-      }
+        // Fetch Alojamientos
+        const snapListings = await getDocs(collection(db, "alojamientos"));
+        listingsCache = snapListings.docs
+          .map(d => ({ _docId: d.id, ...d.data() }))
+          .filter(x => esMioAlojamiento(x, user));
 
-      bookingsCache.sort((a, b) => {
-        const sa = a.creadaEn?.seconds || a.createdAt?.seconds || 0;
-        const sb = b.creadaEn?.seconds || b.createdAt?.seconds || 0;
-        return sb - sa;
-      });
+        // Fetch Reservas
+        const snapBookings = await getDocs(collection(db, "reservas"));
+        bookingsCache = snapBookings.docs
+          .map(d => ({ _docId: d.id, ...d.data() }))
+          .filter(x => esMiReserva(x, user));
 
-      invoicesCache.sort((a, b) => {
-        const fa = a.fechaEmision || a.emision || "";
-        const fb = b.fechaEmision || b.emision || "";
-        return String(fb).localeCompare(String(fa));
-      });
-
-      renderListings();
-      renderBookings();
-      renderCalendar();
-      renderBilling();
-      updateStats();
-    }
-
-    hamburgerBtn?.addEventListener("click", () => {
-      headerActions?.classList.toggle("nav-open");
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!headerActions?.contains(e.target) && !hamburgerBtn?.contains(e.target)) {
-        headerActions?.classList.remove("nav-open");
-      }
-    });
-
-    tabListings.addEventListener("click", () => showTab("listings"));
-    tabBookings.addEventListener("click", () => showTab("bookings"));
-    tabCalendar.addEventListener("click", () => showTab("calendar"));
-    tabBilling.addEventListener("click", () => showTab("billing"));
-
-    btnLogoutTop?.addEventListener("click", async () => {
-      await signOut(auth);
-      localStorage.removeItem("tualoja_user");
-      localStorage.removeItem("tualoja_logged");
-      location.href = "index.html";
-    });
-
-    closeEditModal?.addEventListener("click", closeModal);
-    cancelEditModal?.addEventListener("click", closeModal);
-
-    editBackdrop?.addEventListener("click", (e) => {
-      if (e.target === editBackdrop) closeModal();
-    });
-
-    editForm?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentEditDocId) return;
-
-      const titulo = document.getElementById("editTitulo").value.trim();
-      const precio = Number(document.getElementById("editPrecio").value || 0);
-      const maxNoches = Number(document.getElementById("editMaxNoches").value || 30);
-      const descripcion = document.getElementById("editDescripcion").value.trim();
-
-      try {
-        await updateDoc(doc(db, "alojamientos", currentEditDocId), {
-          titulo,
-          precio,
-          maxNoches,
-          descripcion
-        });
-
-        const item = listingsCache.find(x => x._docId === currentEditDocId);
-        if (item) {
-          item.titulo = titulo;
-          item.precio = precio;
-          item.maxNoches = maxNoches;
-          item.descripcion = descripcion;
+        // Fetch Facturas (si existe la colección)
+        try {
+          const snapInvoices = await getDocs(collection(db, "facturas"));
+          invoicesCache = snapInvoices.docs
+            .map(d => ({ _docId: d.id, ...d.data() }))
+            .filter(x => esMiFactura(x, user));
+        } catch (e) {
+          console.warn("No se pudo cargar la colección de facturas o no existe.");
+          invoicesCache = [];
         }
 
         renderListings();
-        closeModal();
+        renderBookings();
+        renderCalendar();
+        renderBilling();
+        updateStats();
       } catch (error) {
-        console.error(error);
-        alert("No se pudo guardar la edición.");
+        console.error("Error al cargar datos de Firestore:", error);
       }
-    });
+    }
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        alert("Iniciá sesión para entrar al panel anfitrión.");
-        location.href = "login.html";
-        return;
-      }
-
-      currentUser = user;
-
-      try {
-        await loadAll(user);
-      } catch (error) {
-        console.error(error);
-        alert("No se pudo cargar el panel anfitrión.");
+    // Auth State Listener
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        cargarDatos(user);
+      } else {
+        window.location.href = "login.html";
       }
     });
   </script>
