@@ -677,7 +677,6 @@
     let currentEditDocId = null;
     let listingsCache = [];
     let bookingsCache = [];
-    let invoicesCache = [];
 
     // Manejo de pestañas
     function setActiveTab(activeBtn) {
@@ -697,10 +696,10 @@
       if (which === "billing") setActiveTab(tabBilling);
     }
 
-    tabListings.addEventListener("click", () => showTab("listings"));
-    tabBookings.addEventListener("click", () => showTab("bookings"));
-    tabCalendar.addEventListener("click", () => showTab("calendar"));
-    tabBilling.addEventListener("click", () => showTab("billing"));
+    tabListings?.addEventListener("click", () => showTab("listings"));
+    tabBookings?.addEventListener("click", () => showTab("bookings"));
+    tabCalendar?.addEventListener("click", () => showTab("calendar"));
+    tabBilling?.addEventListener("click", () => showTab("billing"));
 
     // Menú Responsive
     if (hamburgerBtn) {
@@ -713,7 +712,7 @@
     if (closeEditModal) closeEditModal.addEventListener("click", () => editBackdrop.style.display = "none");
     if (cancelEditModal) cancelEditModal.addEventListener("click", () => editBackdrop.style.display = "none");
 
-    editForm.addEventListener("submit", async (e) => {
+    editForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!currentEditDocId) return;
 
@@ -762,7 +761,7 @@
     if (closeBlockModal) closeBlockModal.addEventListener("click", () => blockBackdrop.style.display = "none");
     if (cancelBlockModal) cancelBlockModal.addEventListener("click", () => blockBackdrop.style.display = "none");
 
-    blockForm.addEventListener("submit", async (e) => {
+    blockForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const alojId = blockAlojamientoId.value;
       const checkin = document.getElementById("blockCheckin").value;
@@ -772,7 +771,7 @@
       const aloj = listingsCache.find(a => a._docId === alojId);
 
       try {
-        const docRef = await addDoc(collection(db, "reservas"), {
+        const payload = {
           alojamientoId: alojId,
           titulo: aloj ? aloj.titulo : "Reserva Externa",
           huespedNombre: notas ? `Bloqueo manual (${notas})` : "Bloqueo manual (Externa)",
@@ -781,23 +780,22 @@
           status: "confirmada",
           esBloqueoManual: true,
           anfitrionId: currentUser.uid,
-          anfitrionEmail: currentUser.email,
+          anfitrionEmail: currentUser.email || "",
+          hostEmail: currentUser.email || "",
+          ownerUid: currentUser.uid,
           createdAt: new Date().toISOString()
-        });
+        };
+
+        const docRef = await addDoc(collection(db, "reservas"), payload);
 
         bookingsCache.push({
           _docId: docRef.id,
-          alojamientoId: alojId,
-          titulo: aloj ? aloj.titulo : "Reserva Externa",
-          huespedNombre: notas ? `Bloqueo manual (${notas})` : "Bloqueo manual (Externa)",
-          checkin,
-          checkout,
-          status: "confirmada",
-          esBloqueoManual: true,
-          anfitrionId: currentUser.uid
+          ...payload
         });
 
         renderCalendar();
+        renderBookings();
+        updateStats();
         blockBackdrop.style.display = "none";
         blockForm.reset();
       } catch (err) {
@@ -903,10 +901,10 @@
 
       const ingresos = confirmadas.reduce((acc, x) => acc + Number(x.total || 0), 0);
 
-      statAlojamientos.textContent = String(listingsCache.length);
-      statReservas.textContent = String(bookingsCache.length);
-      statConfirmadas.textContent = String(confirmadas.length);
-      statIngresos.textContent = `$${formatARS(ingresos)}`;
+      if (statAlojamientos) statAlojamientos.textContent = String(listingsCache.length);
+      if (statReservas) statReservas.textContent = String(bookingsCache.length);
+      if (statConfirmadas) statConfirmadas.textContent = String(confirmadas.length);
+      if (statIngresos) statIngresos.textContent = `$${formatARS(ingresos)}`;
     }
 
     function openEditModal(item) {
@@ -1120,15 +1118,18 @@
               <div class="calendar-range">
                 ${formatDate(r.checkin)} → ${formatDate(r.checkout)}
               </div>
-              ${r.esBloqueoManual ? `<button class="mini-btn danger" type="button" data-unblock="${r._docId}">Liberar fechas</button>` : ""}
+              ${r.esBloqueoManual ? `<button class="mini-btn danger btn-unblock-trigger" type="button" data-unblock="${r._docId}">Liberar fechas</button>` : ""}
             </div>
           </div>
         </article>
       `).join("");
 
-      calList.querySelectorAll("[data-unblock]").forEach(btn => {
-        btn.addEventListener("click", async () => {
+      // Modificado para asegurar la vinculación del evento click en 'Liberar fechas'
+      calList.querySelectorAll(".btn-unblock-trigger").forEach(btn => {
+        btn.onclick = async (e) => {
+          e.preventDefault();
           const id = btn.getAttribute("data-unblock");
+          
           if (!confirm("¿Deseas desbloquear estas fechas del calendario?")) return;
 
           try {
@@ -1138,10 +1139,10 @@
             renderBookings();
             updateStats();
           } catch (err) {
-            console.error(err);
-            alert("No se pudo liberar el bloqueo.");
+            console.error("Error al borrar el bloqueo:", err);
+            alert("No se pudo liberar el bloqueo. Revisa la consola o las reglas de Firestore.");
           }
-        });
+        };
       });
     }
 
