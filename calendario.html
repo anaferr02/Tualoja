@@ -315,64 +315,68 @@
     </div>
   </div>
 
-  <script type="module">
-    import { auth, db } from "./firebase-config.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-    import {
-      collection,
-      getDocs,
-      addDoc,
-      deleteDoc,
-      doc,
-      query,
-      where
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+ <script type="module">
+  import { auth, db } from "./firebase-config.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+  import {
+    collection,
+    getDocs,
+    addDoc,
+    deleteDoc,
+    doc,
+    query,
+    where
+  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-    let usuarioActual = null;
-    let alojamientos = [];
-    let reservas = [];
-    let fechasBloqueadas = [];
-    let alojamientoSeleccionado = "";
-    let fechaInicio = null;
-    let fechaFin = null;
+  let usuarioActual = null;
+  let alojamientos = [];
+  let reservas = [];
+  let fechasBloqueadas = [];
+  let alojamientoSeleccionado = "";
+  let fechaInicio = null;
+  let fechaFin = null;
 
-    let fecha = new Date();
-    let mes = fecha.getMonth();
-    let anio = fecha.getFullYear();
+  let fecha = new Date();
+  let mes = fecha.getMonth();
+  let anio = fecha.getFullYear();
 
-    const calendario = document.getElementById("calendario");
-    const mesActual = document.getElementById("mesActual");
-    const select = document.getElementById("selectAlojamiento");
-    const fechaInicioTexto = document.getElementById("fechaInicioTexto");
-    const fechaFinTexto = document.getElementById("fechaFinTexto");
-    const btnBloquearRango = document.getElementById("btnBloquearRango");
-    const btnDesbloquearRango = document.getElementById("btnDesbloquearRango");
-    const btnCancelarSeleccion = document.getElementById("btnCancelarSeleccion");
-    const modal = document.getElementById("modal");
+  const calendario = document.getElementById("calendario");
+  const mesActual = document.getElementById("mesActual");
+  const select = document.getElementById("selectAlojamiento");
+  const fechaInicioTexto = document.getElementById("fechaInicioTexto");
+  const fechaFinTexto = document.getElementById("fechaFinTexto");
+  const btnBloquearRango = document.getElementById("btnBloquearRango");
+  const btnDesbloquearRango = document.getElementById("btnDesbloquearRango");
+  const btnCancelarSeleccion = document.getElementById("btnCancelarSeleccion");
+  const modal = document.getElementById("modal");
 
-    // ===============================
-    // INICIAR SESIÓN
-    // ===============================
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        alert("Debes iniciar sesión");
-        location.href = "login.html";
-        return;
-      }
+  // Helper para convertir objeto Date a texto YYYY-MM-DD
+  function formatearFecha(d) {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
 
-      usuarioActual = user;
-      await cargarDatos();
-      cancelarSeleccion();
-    });
+  // INICIAR SESIÓN
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      alert("Debes iniciar sesión");
+      location.href = "login.html";
+      return;
+    }
 
-    // ===============================
-    // CARGAR DATOS
-    // ===============================
-    async function cargarDatos() {
-      alojamientos = [];
-      reservas = [];
+    usuarioActual = user;
+    await cargarDatos();
+    cancelarSeleccion();
+  });
 
-      // Alojamientos
+  // CARGAR ALOJAMIENTOS Y RESERVAS
+  async function cargarDatos() {
+    alojamientos = [];
+    reservas = [];
+
+    try {
       const alojSnap = await getDocs(collection(db, "alojamientos"));
       alojSnap.forEach((doc) => {
         const a = doc.data();
@@ -381,42 +385,33 @@
           a.ownerUid === usuarioActual.uid ||
           a.ownerId === usuarioActual.uid
         ) {
-          alojamientos.push({
-            id: doc.id,
-            ...a
-          });
+          alojamientos.push({ id: doc.id, ...a });
         }
       });
 
       select.innerHTML = `<option value="">Seleccionar alojamiento</option>`;
       alojamientos.forEach((a) => {
-        select.innerHTML += `
-          <option value="${a.id}">
-            ${a.titulo || a.nombre || "Sin nombre"}
-          </option>
-        `;
+        select.innerHTML += `<option value="${a.id}">${a.titulo || a.nombre || "Sin nombre"}</option>`;
       });
 
-      // Reservas
       const reservasSnap = await getDocs(collection(db, "reservas"));
       reservasSnap.forEach((doc) => {
         const r = doc.data();
         if (r.anfitrionId === usuarioActual.uid) {
-          reservas.push({
-            id: doc.id,
-            ...r
-          });
+          reservas.push({ id: doc.id, ...r });
         }
       });
+    } catch (err) {
+      console.error("Error al cargar datos:", err);
     }
+  }
 
-    // ===============================
-    // CARGAR FECHAS BLOQUEADAS
-    // ===============================
-    async function cargarBloqueadas() {
-      fechasBloqueadas = [];
-      if (!alojamientoSeleccionado) return;
+  // CARGAR FECHAS BLOQUEADAS DE LA BASE DE DATOS
+  async function cargarBloqueadas() {
+    fechasBloqueadas = [];
+    if (!alojamientoSeleccionado) return;
 
+    try {
       const q = query(
         collection(db, "fechasBloqueadas"),
         where("alojamientoId", "==", alojamientoSeleccionado)
@@ -429,254 +424,257 @@
           ...doc.data()
         });
       });
+    } catch (err) {
+      console.error("Error al cargar fechas bloqueadas:", err);
+    }
+  }
+
+  // CAMBIO DE ALOJAMIENTO
+  select.addEventListener("change", async () => {
+    alojamientoSeleccionado = select.value;
+    await cargarBloqueadas();
+    cancelarSeleccion();
+  });
+
+  function actualizarBarra() {
+    fechaInicioTexto.textContent = fechaInicio || "-";
+    fechaFinTexto.textContent = fechaFin || "-";
+
+    const mostrar = !!(fechaInicio && fechaFin);
+    btnBloquearRango.classList.toggle("oculto", !mostrar);
+    btnDesbloquearRango.classList.toggle("oculto", !mostrar);
+    btnCancelarSeleccion.classList.toggle("oculto", !mostrar);
+  }
+
+  function cancelarSeleccion() {
+    fechaInicio = null;
+    fechaFin = null;
+    actualizarBarra();
+    renderCalendario();
+  }
+
+  function fechaDentroDelRango(fechaTexto) {
+    if (!fechaInicio || !fechaFin) return false;
+    return fechaTexto >= fechaInicio && fechaTexto <= fechaFin;
+  }
+
+  btnCancelarSeleccion.onclick = () => {
+    cancelarSeleccion();
+  };
+
+  // DIBUJAR CALENDARIO
+  function renderCalendario() {
+    calendario.innerHTML = "";
+
+    const primerDia = new Date(anio, mes, 1).getDay();
+    const diasMes = new Date(anio, mes + 1, 0).getDate();
+    const meses = [
+      "Enero", "Febrero", "Marzo", "Abril",
+      "Mayo", "Junio", "Julio", "Agosto",
+      "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+
+    mesActual.textContent = meses[mes] + " " + anio;
+
+    // Celdas vacías del inicio de mes
+    for (let i = 0; i < primerDia; i++) {
+      const vacio = document.createElement("div");
+      vacio.className = "vacio";
+      calendario.appendChild(vacio);
     }
 
-    // ===============================
-    // CAMBIO DE ALOJAMIENTO
-    // ===============================
-    select.addEventListener("change", async () => {
-      alojamientoSeleccionado = select.value;
-      await cargarBloqueadas();
-      cancelarSeleccion();
-    });
+    const hoyTexto = formatearFecha(new Date());
 
-    // ===============================
-    // FUNCIONES DE SELECCIÓN DE RANGO
-    // ===============================
-    function actualizarBarra() {
-      fechaInicioTexto.textContent = fechaInicio || "-";
-      fechaFinTexto.textContent = fechaFin || "-";
+    for (let dia = 1; dia <= diasMes; dia++) {
+      const fechaTexto = `${anio}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
 
-      const mostrar = !!(fechaInicio && fechaFin);
-      btnBloquearRango.classList.toggle("oculto", !mostrar);
-      btnDesbloquearRango.classList.toggle("oculto", !mostrar);
-      btnCancelarSeleccion.classList.toggle("oculto", !mostrar);
-    }
+      const cuadro = document.createElement("div");
+      let texto = "🟢 Disponible";
+      let claseEstado = "libre";
 
-    function cancelarSeleccion() {
-      fechaInicio = null;
-      fechaFin = null;
-      actualizarBarra();
-      renderCalendario();
-    }
+      // Buscar si está reservado
+      const reserva = reservas.find((r) =>
+        r.alojamientoId === alojamientoSeleccionado &&
+        fechaTexto >= r.checkin &&
+        fechaTexto < r.checkout
+      );
 
-    function fechaDentroDelRango(fechaTexto) {
-      if (!fechaInicio || !fechaFin) return false;
-      return fechaTexto >= fechaInicio && fechaTexto <= fechaFin;
-    }
+      // Buscar si está bloqueado por el anfitrión
+      const bloqueo = fechasBloqueadas.find((f) => String(f.fecha).trim() === fechaTexto);
 
-    btnCancelarSeleccion.onclick = () => {
-      cancelarSeleccion();
-    };
-
-    // ===============================
-    // DIBUJAR CALENDARIO
-    // ===============================
-    function renderCalendario() {
-      calendario.innerHTML = "";
-
-      const primerDia = new Date(anio, mes, 1).getDay();
-      const diasMes = new Date(anio, mes + 1, 0).getDate();
-      const meses = [
-        "Enero", "Febrero", "Marzo", "Abril",
-        "Mayo", "Junio", "Julio", "Agosto",
-        "Septiembre", "Octubre", "Noviembre", "Diciembre"
-      ];
-
-      mesActual.textContent = meses[mes] + " " + anio;
-
-      // Espacios vacíos
-      for (let i = 0; i < primerDia; i++) {
-        const vacio = document.createElement("div");
-        vacio.className = "vacio";
-        calendario.appendChild(vacio);
+      if (reserva) {
+        claseEstado = "ocupado";
+        texto = "🔴 Reservado";
+      } else if (bloqueo) {
+        claseEstado = "bloqueado";
+        texto = "🟡 Bloqueado";
       }
 
-      // Días
-      for (let dia = 1; dia <= diasMes; dia++) {
-        const fechaTexto =
-          anio + "-" +
-          String(mes + 1).padStart(2, "0") + "-" +
-          String(dia).padStart(2, "0");
+      cuadro.className = `dia ${claseEstado}`;
 
-        const cuadro = document.createElement("div");
-        cuadro.className = "dia libre";
-        let texto = "🟢 Disponible";
+      if (fechaDentroDelRango(fechaTexto)) {
+        cuadro.classList.add("seleccionado");
+      }
+      if (fechaTexto === fechaInicio) {
+        cuadro.classList.add("inicioRango");
+      }
+      if (fechaTexto === fechaFin) {
+        cuadro.classList.add("finRango");
+      }
+      if (fechaTexto === hoyTexto) {
+        cuadro.classList.add("hoy");
+      }
 
-        // Buscar reserva
-        const reserva = reservas.find((r) =>
+      cuadro.innerHTML = `
+        <div class="numero">${dia}</div>
+        <div class="info">${texto}</div>
+      `;
+
+      cuadro.onclick = () => {
+        if (reserva) return; 
+
+        if (!fechaInicio) {
+          fechaInicio = fechaTexto;
+          fechaFin = null;
+        } else if (!fechaFin) {
+          fechaFin = fechaTexto;
+          if (fechaInicio > fechaFin) {
+            const aux = fechaInicio;
+            fechaInicio = fechaFin;
+            fechaFin = aux;
+          }
+        } else {
+          fechaInicio = fechaTexto;
+          fechaFin = null;
+        }
+
+        actualizarBarra();
+        renderCalendario();
+      };
+
+      calendario.appendChild(cuadro);
+    }
+  }
+
+  // ACCIÓN DE BLOQUEAR EN FIREBASE
+  btnBloquearRango.onclick = async () => {
+    if (!fechaInicio || !fechaFin) {
+      alert("Seleccioná un rango.");
+      return;
+    }
+    if (!alojamientoSeleccionado) {
+      alert("Seleccioná un alojamiento arriba en el menú desplegable.");
+      return;
+    }
+
+    btnBloquearRango.disabled = true;
+    btnBloquearRango.textContent = "Bloqueando...";
+
+    try {
+      const [aY, aM, aD] = fechaInicio.split("-").map(Number);
+      const [fY, fM, fD] = fechaFin.split("-").map(Number);
+
+      let fechaActual = new Date(aY, aM - 1, aD);
+      const fechaLimite = new Date(fY, fM - 1, fD);
+
+      const promesas = [];
+
+      while (fechaActual <= fechaLimite) {
+        const textoFecha = formatearFecha(fechaActual);
+
+        const yaExiste = fechasBloqueadas.some((f) => String(f.fecha).trim() === textoFecha);
+        const yaReservada = reservas.some((r) =>
           r.alojamientoId === alojamientoSeleccionado &&
-          fechaTexto >= r.checkin &&
-          fechaTexto < r.checkout
+          textoFecha >= r.checkin &&
+          textoFecha < r.checkout
         );
 
-        // Buscar bloqueo manual
-        const bloqueo = fechasBloqueadas.find((f) => f.fecha === fechaTexto);
-
-        if (reserva) {
-          cuadro.className = "dia ocupado";
-          texto = "🔴 Reservado";
-        } else if (bloqueo) {
-          cuadro.className = "dia bloqueado";
-          texto = "🟡 Bloqueado";
-        }
-
-        if (fechaDentroDelRango(fechaTexto)) {
-          cuadro.classList.add("seleccionado");
-        }
-
-        if (fechaTexto === fechaInicio) {
-          cuadro.classList.add("inicioRango");
-        }
-
-        if (fechaTexto === fechaFin) {
-          cuadro.classList.add("finRango");
-        }
-
-        const hoy = new Date();
-        const hoyTexto =
-          hoy.getFullYear() + "-" +
-          String(hoy.getMonth() + 1).padStart(2, "0") + "-" +
-          String(hoy.getDate()).padStart(2, "0");
-
-        if (fechaTexto === hoyTexto) {
-          cuadro.classList.add("hoy");
-        }
-
-        cuadro.innerHTML = `
-          <div class="numero">${dia}</div>
-          <div class="info">${texto}</div>
-        `;
-
-        cuadro.onclick = () => {
-          if (reserva) return; // No seleccionar días con reserva
-
-          // Primer clic
-          if (!fechaInicio) {
-            fechaInicio = fechaTexto;
-            fechaFin = null;
-          }
-          // Segundo clic
-          else if (!fechaFin) {
-            fechaFin = fechaTexto;
-
-            // Invertir automáticamente si eligió una fecha mayor al inicio
-            if (fechaInicio > fechaFin) {
-              const aux = fechaInicio;
-              fechaInicio = fechaFin;
-              fechaFin = aux;
-            }
-          }
-          // Tercer clic (Reiniciar)
-          else {
-            fechaInicio = fechaTexto;
-            fechaFin = null;
-          }
-
-          actualizarBarra();
-          renderCalendario();
-        };
-
-        calendario.appendChild(cuadro);
-      }
-    }
-
-    // ===============================
-    // BOTÓN BLOQUEAR RANGO
-    // ===============================
-    btnBloquearRango.onclick = async () => {
-      if (!fechaInicio || !fechaFin) {
-        alert("Seleccioná un rango.");
-        return;
-      }
-      if (!alojamientoSeleccionado) {
-        alert("Seleccioná un alojamiento primero.");
-        return;
-      }
-
-      let fechaActual = new Date(fechaInicio + "T00:00:00");
-      const ultima = new Date(fechaFin + "T00:00:00");
-
-      while (fechaActual <= ultima) {
-        const yyyy = fechaActual.getFullYear();
-        const mm = String(fechaActual.getMonth() + 1).padStart(2, "0");
-        const dd = String(fechaActual.getDate()).padStart(2, "0");
-        const texto = `${yyyy}-${mm}-${dd}`;
-
-        const existe = fechasBloqueadas.find((f) => f.fecha === texto);
-        const reservada = reservas.find((r) =>
-          r.alojamientoId === alojamientoSeleccionado &&
-          texto >= r.checkin &&
-          texto < r.checkout
-        );
-
-        if (!existe && !reservada) {
-          await addDoc(collection(db, "fechasBloqueadas"), {
-            alojamientoId: alojamientoSeleccionado,
-            fecha: texto,
-            motivo: "Bloqueado por anfitrión",
-            anfitrionId: usuarioActual.uid,
-            createdAt: new Date()
-          });
+        if (!yaExiste && !yaReservada) {
+          promesas.push(
+            addDoc(collection(db, "fechasBloqueadas"), {
+              alojamientoId: alojamientoSeleccionado,
+              fecha: textoFecha,
+              motivo: "Bloqueado por anfitrión",
+              anfitrionId: usuarioActual.uid,
+              createdAt: new Date()
+            })
+          );
         }
 
         fechaActual.setDate(fechaActual.getDate() + 1);
       }
 
-      alert("Rango bloqueado.");
+      // Guardar todo de forma simultánea
+      await Promise.all(promesas);
+
       await cargarBloqueadas();
       cancelarSeleccion();
-    };
+      alert("¡Fechas bloqueadas con éxito!");
+    } catch (error) {
+      console.error("Error al guardar bloqueo:", error);
+      alert("Ocurrió un error al guardar en la base de datos: " + error.message);
+    } finally {
+      btnBloquearRango.disabled = false;
+      btnBloquearRango.textContent = "Bloquear rango";
+    }
+  };
 
-    // ===============================
-    // BOTÓN DESBLOQUEAR RANGO
-    // ===============================
-    btnDesbloquearRango.onclick = async () => {
-      if (!fechaInicio || !fechaFin) {
-        alert("Seleccioná un rango.");
-        return;
-      }
+  // ACCIÓN DE DESBLOQUEAR EN FIREBASE
+  btnDesbloquearRango.onclick = async () => {
+    if (!fechaInicio || !fechaFin) {
+      alert("Seleccioná un rango.");
+      return;
+    }
+
+    btnDesbloquearRango.disabled = true;
+    btnDesbloquearRango.textContent = "Desbloqueando...";
+
+    try {
+      const promesasEliminar = [];
 
       for (const bloqueo of fechasBloqueadas) {
         if (bloqueo.fecha >= fechaInicio && bloqueo.fecha <= fechaFin) {
-          await deleteDoc(doc(db, "fechasBloqueadas", bloqueo.id));
+          promesasEliminar.push(deleteDoc(doc(db, "fechasBloqueadas", bloqueo.id)));
         }
       }
 
-      alert("Rango desbloqueado.");
+      await Promise.all(promesasEliminar);
+
       await cargarBloqueadas();
       cancelarSeleccion();
-    };
+      alert("¡Rango desbloqueado!");
+    } catch (error) {
+      console.error("Error al desbloquear:", error);
+      alert("Error al intentar desbloquear: " + error.message);
+    } finally {
+      btnDesbloquearRango.disabled = false;
+      btnDesbloquearRango.textContent = "Desbloquear rango";
+    }
+  };
 
-    // ===============================
-    // CAMBIAR MES
-    // ===============================
-    document.getElementById("anterior").onclick = () => {
-      mes--;
-      if (mes < 0) {
-        mes = 11;
-        anio--;
-      }
-      renderCalendario();
-    };
+  // NAVEGACIÓN DE MESES
+  document.getElementById("anterior").onclick = () => {
+    mes--;
+    if (mes < 0) {
+      mes = 11;
+      anio--;
+    }
+    renderCalendario();
+  };
 
-    document.getElementById("siguiente").onclick = () => {
-      mes++;
-      if (mes > 11) {
-        mes = 0;
-        anio++;
-      }
-      renderCalendario();
-    };
+  document.getElementById("siguiente").onclick = () => {
+    mes++;
+    if (mes > 11) {
+      mes = 0;
+      anio++;
+    }
+    renderCalendario();
+  };
 
-    // ===============================
-    // CERRAR MODAL
-    // ===============================
-    window.cerrarModal = function () {
-      modal.style.display = "none";
-    };
-  </script>
-
+  window.cerrarModal = function () {
+    modal.style.display = "none";
+  };
+</script>
 </body>
 
 </html>
