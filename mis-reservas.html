@@ -720,30 +720,32 @@ async function cargarReservas() {
     }
 
     const reservasRef = collection(db, "reservas");
+    const snap = await getDocs(reservasRef);
     let rows = [];
 
-    try {
-      const q = query(reservasRef, where("huespedId", "==", user.uid));
-      const snap = await getDocs(q);
+    const myUid = String(user.uid || "").trim();
+    const myEmail = String(user.email || "").toLowerCase().trim();
 
-      snap.forEach((d) => {
-        rows.push({ ...d.data(), _docId: d.id });
-      });
-    } catch (error) {
-      console.warn("No se pudo filtrar por huespedId, pruebo por email.", error);
+    snap.forEach((d) => {
+      const x = d.data();
 
-      const snap = await getDocs(reservasRef);
+      // Compatibilidad con múltiples nombres de campo para el ID del huésped
+      const uids = [
+        x.huespedId, x.guestId, x.userId, x.clienteId, x.uid, x.userUid
+      ].map(v => String(v || "").trim()).filter(Boolean);
 
-      snap.forEach((d) => {
-        const x = d.data();
-        const emailReserva = (x.huespedEmail || x.guestEmail || "").toLowerCase();
-        const emailUsuario = (user.email || "").toLowerCase();
+      // Compatibilidad con múltiples nombres de campo para el Email del huésped
+      const emails = [
+        x.huespedEmail, x.guestEmail, x.email, x.userEmail, x.correo
+      ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
 
-        if (emailReserva === emailUsuario) {
-          rows.push({ ...x, _docId: d.id });
-        }
-      });
-    }
+      const esMiReservaComoHuesped = uids.includes(myUid) || (myEmail && emails.includes(myEmail));
+
+      // Filtra reservas propias omitiendo los bloqueos manuales de anfitrión
+      if (esMiReservaComoHuesped && !x.esBloqueoManual) {
+        rows.push({ ...x, _docId: d.id });
+      }
+    });
 
     rows.sort((a, b) => {
       const fa = a.creadaEn?.seconds || a.createdAt?.seconds || 0;
@@ -763,7 +765,7 @@ async function cargarReservas() {
     if (lista) {
       lista.innerHTML = `
         <div class="empty-box">
-          No se pudieron cargar tus reservas.
+          No se pudieron cargar tus reservas. Revisa la consola.
         </div>
       `;
     }
