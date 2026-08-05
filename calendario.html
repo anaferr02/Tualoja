@@ -2,1075 +2,709 @@
 <html lang="es">
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario - TuAloja</title>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-<title>Calendario - TuAloja</title>
+    body {
+      background: #f3f5fb;
+      color: #222;
+    }
 
-<style>
+    header {
+      background: #fff;
+      padding: 18px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
+    }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,Helvetica,sans-serif;
-}
+    .logo {
+      font-size: 30px;
+      font-weight: bold;
+      text-decoration: none;
+      color: #1b167f;
+    }
 
-body{
-background:#f3f5fb;
-color:#222;
-}
+    .volver {
+      background: #1b167f;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
 
-header{
-background:#fff;
-padding:18px 30px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-box-shadow:0 5px 20px rgba(0,0,0,.08);
-}
+    main {
+      max-width: 1300px;
+      margin: 30px auto;
+      padding: 20px;
+    }
 
-.logo{
-font-size:30px;
-font-weight:bold;
-text-decoration:none;
-color:#1b167f;
-}
+    h1 {
+      color: #1b167f;
+      margin-bottom: 20px;
+    }
 
-.volver{
-background:#1b167f;
-color:white;
-padding:12px 18px;
-border-radius:10px;
-text-decoration:none;
-font-weight:bold;
-}
+    #selectAlojamiento {
+      width: 320px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin-bottom: 25px;
+      font-size: 15px;
+    }
 
-main{
-max-width:1300px;
-margin:30px auto;
-padding:20px;
-}
+    .controles {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
 
-h1{
-color:#1b167f;
-margin-bottom:20px;
-}
+    .controles button {
+      width: 45px;
+      height: 45px;
+      border: none;
+      border-radius: 10px;
+      background: #1b167f;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
 
-#selectAlojamiento{
-width:320px;
-padding:12px;
-border-radius:10px;
-border:1px solid #ccc;
-margin-bottom:25px;
-font-size:15px;
-}
+    #mesActual {
+      font-size: 28px;
+      font-weight: bold;
+      color: #1b167f;
+      min-width: 220px;
+      text-align: center;
+    }
 
-.controles{
-display:flex;
-justify-content:center;
-align-items:center;
-gap:20px;
-margin-bottom:20px;
-}
+    .diasSemana {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
 
-.controles button{
-width:45px;
-height:45px;
-border:none;
-border-radius:10px;
-background:#1b167f;
-color:white;
-font-size:20px;
-cursor:pointer;
-}
+    .diasSemana div {
+      background: #1b167f;
+      color: white;
+      padding: 12px;
+      text-align: center;
+      border-radius: 10px;
+      font-weight: bold;
+    }
 
-#mesActual{
-font-size:28px;
-font-weight:bold;
-color:#1b167f;
-min-width:220px;
-text-align:center;
-}
+    #calendario {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
 
-.diasSemana{
-display:grid;
-grid-template-columns:repeat(7,1fr);
-gap:8px;
-margin-bottom:10px;
-}
+    .dia {
+      background: white;
+      height: 120px;
+      padding: 10px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+      cursor: pointer;
+      transition: .2s;
+      display: flex;
+      flex-direction: column;
+    }
 
-.diasSemana div{
-background:#1b167f;
-color:white;
-padding:12px;
-text-align:center;
-border-radius:10px;
-font-weight:bold;
-}
+    .dia:hover {
+      transform: scale(1.03);
+    }
 
-#calendario{
-display:grid;
-grid-template-columns:repeat(7,1fr);
-gap:8px;
-}
+    .numero {
+      font-size: 18px;
+      font-weight: bold;
+    }
 
-.dia{
-background:white;
-height:120px;
-padding:10px;
-border-radius:14px;
-box-shadow:0 4px 12px rgba(0,0,0,.08);
-cursor:pointer;
-transition:.2s;
-display:flex;
-flex-direction:column;
-}
+    .info {
+      margin-top: auto;
+      font-size: 12px;
+    }
 
-.dia:hover{
-transform:scale(1.03);
-}
+    .libre {
+      background: #e9ffe8;
+    }
 
-.numero{
-font-size:18px;
-font-weight:bold;
-}
+    .ocupado {
+      background: #ffd9d9;
+    }
 
-.info{
-margin-top:auto;
-font-size:12px;
-}
+    .bloqueado {
+      background: #ffe9a8;
+    }
 
-.libre{
-background:#e9ffe8;
-}
+    .seleccionado {
+      background: #4f8cff !important;
+      color: #fff;
+      border: 3px solid #1b167f;
+    }
 
-.ocupado{
-background:#ffd9d9;
-}
+    .inicioRango {
+      border-left: 5px solid #1b167f;
+    }
 
-.bloqueado{
-background:#ffe9a8;
-}
-    .seleccionado{
-background:#4f8cff !important;
-color:#fff;
-border:3px solid #1b167f;
-}
+    .finRango {
+      border-right: 5px solid #1b167f;
+    }
 
-.inicioRango{
-border-left:5px solid #1b167f;
-}
+    .barraSeleccion {
+      background: #fff;
+      padding: 18px;
+      border-radius: 14px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
 
-.finRango{
-border-right:5px solid #1b167f;
-}
+    .barraSeleccion span {
+      font-weight: bold;
+      color: #1b167f;
+    }
 
-.barraSeleccion{
-background:#fff;
-padding:18px;
-border-radius:14px;
-box-shadow:0 5px 15px rgba(0,0,0,.08);
-margin-bottom:25px;
-display:flex;
-align-items:center;
-gap:15px;
-flex-wrap:wrap;
-}
+    .barraSeleccion button {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
 
-.barraSeleccion span{
-font-weight:bold;
-color:#1b167f;
-}
+    #btnBloquearRango {
+      background: #ff9800;
+      color: white;
+    }
 
-.barraSeleccion button{
-padding:12px 18px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-font-weight:bold;
-}
+    #btnDesbloquearRango {
+      background: #2e7d32;
+      color: white;
+    }
 
-#btnBloquearRango{
-background:#ff9800;
-color:white;
-}
+    #btnCancelarSeleccion {
+      background: #e53935;
+      color: white;
+    }
 
-#btnDesbloquearRango{
-background:#2e7d32;
-color:white;
-}
+    .oculto {
+      display: none;
+    }
 
-#btnCancelarSeleccion{
-background:#e53935;
-color:white;
-}
+    .hoy {
+      border: 3px solid #1b167f;
+    }
 
-.oculto{
-display:none;
-}
+    .vacio {
+      background: transparent;
+      box-shadow: none;
+      cursor: default;
+    }
 
-.hoy{
-border:3px solid #1b167f;
-}
+    .modal {
+      display: none;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, .45);
+      justify-content: center;
+      align-items: center;
+    }
 
-.vacio{
-background:transparent;
-box-shadow:none;
-cursor:default;
-}
+    .modal-box {
+      background: white;
+      width: 420px;
+      padding: 25px;
+      border-radius: 15px;
+    }
 
-.modal{
-display:none;
-position:fixed;
-left:0;
-top:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,.45);
-justify-content:center;
-align-items:center;
-}
+    .modal-box h2 {
+      margin-bottom: 15px;
+      color: #1b167f;
+    }
 
-.modal-box{
-background:white;
-width:420px;
-padding:25px;
-border-radius:15px;
-}
+    .modal-box button {
+      margin-top: 20px;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 10px;
+      background: #1b167f;
+      color: white;
+      cursor: pointer;
+    }
 
-.modal-box h2{
-margin-bottom:15px;
-color:#1b167f;
-}
+    .acciones {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
 
-.modal-box button{
-margin-top:20px;
-padding:12px 18px;
-border:none;
-border-radius:10px;
-background:#1b167f;
-color:white;
-cursor:pointer;
-}
+    .btnBloquear {
+      background: #ff9800;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      flex: 1;
+    }
 
-.acciones{
-margin-top:15px;
-display:flex;
-gap:10px;
-}
+    .btnDesbloquear {
+      background: #2e7d32;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      flex: 1;
+    }
 
-.btnBloquear{
-background:#ff9800;
-color:white;
-padding:10px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-flex:1;
-}
+    @media(max-width:900px) {
+      #calendario {
+        grid-template-columns: repeat(2, 1fr);
+      }
 
-.btnDesbloquear{
-background:#2e7d32;
-color:white;
-padding:10px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-flex:1;
-}
-
-@media(max-width:900px){
-
-#calendario{
-grid-template-columns:repeat(2,1fr);
-}
-
-.diasSemana{
-display:none;
-}
-
-}
-
-</style>
+      .diasSemana {
+        display: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-
-<a class="logo" href="index.html">
-TuAloja
-</a>
-
-<a class="volver" href="panel-anfitrion.html">
-← Volver al Panel
-</a>
-
-</header>
-
-<main>
-
-<h1>Calendario de Disponibilidad</h1>
-
-<select id="selectAlojamiento">
-
-<option value="">
-Seleccionar alojamiento
-</option>
-
-</select>
-    async function cargarBloqueadas(){
-
-    fechasBloqueadas=[];
-
-    if(!alojamientoSeleccionado) return;
-
-    const q=query(
-
-        collection(db,"fechasBloqueadas"),
-
-        where(
-
-            "alojamientoId",
-
-            "==",
-
-            alojamientoSeleccionado
-
-        )
-
-    );
-
-    const snap=await getDocs(q);
-
-    snap.forEach(doc=>{
-
-        fechasBloqueadas.push({
-
-            id:doc.id,
-
-            ...doc.data()
-
-        });
-
-    });
-
-}
-
-<div class="controles">
-
-<button id="anterior">
-◀
-</button>
-
-<div id="mesActual"></div>
-
-<button id="siguiente">
-▶
-</button>
-
-</div>
-
-<div class="diasSemana">
-
-<div>Dom</div>
-<div>Lun</div>
-<div>Mar</div>
-<div>Mié</div>
-<div>Jue</div>
-<div>Vie</div>
-<div>Sáb</div>
-
-</div>
-
-<div id="calendario"></div>
-
-</main>
-
-<div class="modal" id="modal">
-
-<div class="modal-box">
-
-<h2>Información del día</h2>
-
-<div id="contenidoModal"></div>
-
-<div class="acciones">
-
-<button
-id="btnBloquear"
-class="btnBloquear">
-Bloquear fecha
-<select id="selectAlojamiento">
-
-<option value="">
-Seleccionar alojamiento
-</option>
-
-</select>
-
-<div class="barraSeleccion">
-
-<span>
-
-Desde:
-
-<b id="fechaInicioTexto">
-
--
-
-</b>
-
-</span>
-
-<span>
-
-Hasta:
-
-<b id="fechaFinTexto">
-
--
-
-</b>
-
-</span>
-
-<button
-id="btnBloquearRango"
-class="oculto">
-
-Bloquear rango
-
-</button>
-
-<button
-id="btnDesbloquearRango"
-class="oculto">
-
-Desbloquear rango
-
-</button>
-
-<button
-id="btnCancelarSeleccion"
-class="oculto">
-
-Cancelar
-
-</button>
-
-</div>
-
-<script type="module">
-
-import { auth, db } from "./firebase-config.js";
-
-import {
-onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-
-import {
-
-collection,
-getDocs,
-addDoc,
-deleteDoc,
-doc,
-query,
-where
-
-}
-from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-
-let usuarioActual=null;
-
-let alojamientos=[];
-
-let reservas=[];
-
-let fechasBloqueadas=[];
-
-let alojamientoSeleccionado="";
-
-let fechaInicio=null;
-
-let fechaFin=null;
-let fecha=new Date();
-
-let mes=fecha.getMonth();
-
-let anio=fecha.getFullYear();
-
-const calendario=document.getElementById("calendario");
-
-const mesActual=document.getElementById("mesActual");
-
-const select=document.getElementById("selectAlojamiento");
-
-const fechaInicioTexto=document.getElementById("fechaInicioTexto");
-
-const fechaFinTexto=document.getElementById("fechaFinTexto");
-
-const btnBloquearRango=document.getElementById("btnBloquearRango");
-
-const btnDesbloquearRango=document.getElementById("btnDesbloquearRango");
-
-const btnCancelarSeleccion=document.getElementById("btnCancelarSeleccion");
-// ===============================
-// INICIAR SESIÓN
-// ===============================
-
-onAuthStateChanged(auth, async (user) => {
-
-    if (!user) {
+  <header>
+    <a class="logo" href="index.html">TuAloja</a>
+    <a class="volver" href="panel-anfitrion.html">← Volver al Panel</a>
+  </header>
+
+  <main>
+    <h1>Calendario de Disponibilidad</h1>
+
+    <select id="selectAlojamiento">
+      <option value="">Seleccionar alojamiento</option>
+    </select>
+
+    <div class="barraSeleccion">
+      <span>Desde: <b id="fechaInicioTexto">-</b></span>
+      <span>Hasta: <b id="fechaFinTexto">-</b></span>
+      <button id="btnBloquearRango" class="oculto">Bloquear rango</button>
+      <button id="btnDesbloquearRango" class="oculto">Desbloquear rango</button>
+      <button id="btnCancelarSeleccion" class="oculto">Cancelar</button>
+    </div>
+
+    <div class="controles">
+      <button id="anterior">◀</button>
+      <div id="mesActual"></div>
+      <button id="siguiente">▶</button>
+    </div>
+
+    <div class="diasSemana">
+      <div>Dom</div>
+      <div>Lun</div>
+      <div>Mar</div>
+      <div>Mié</div>
+      <div>Jue</div>
+      <div>Vie</div>
+      <div>Sáb</div>
+    </div>
+
+    <div id="calendario"></div>
+  </main>
+
+  <div class="modal" id="modal">
+    <div class="modal-box">
+      <h2>Información del día</h2>
+      <div id="contenidoModal"></div>
+      <button onclick="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+    import {
+      collection,
+      getDocs,
+      addDoc,
+      deleteDoc,
+      doc,
+      query,
+      where
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+    let usuarioActual = null;
+    let alojamientos = [];
+    let reservas = [];
+    let fechasBloqueadas = [];
+    let alojamientoSeleccionado = "";
+    let fechaInicio = null;
+    let fechaFin = null;
+
+    let fecha = new Date();
+    let mes = fecha.getMonth();
+    let anio = fecha.getFullYear();
+
+    const calendario = document.getElementById("calendario");
+    const mesActual = document.getElementById("mesActual");
+    const select = document.getElementById("selectAlojamiento");
+    const fechaInicioTexto = document.getElementById("fechaInicioTexto");
+    const fechaFinTexto = document.getElementById("fechaFinTexto");
+    const btnBloquearRango = document.getElementById("btnBloquearRango");
+    const btnDesbloquearRango = document.getElementById("btnDesbloquearRango");
+    const btnCancelarSeleccion = document.getElementById("btnCancelarSeleccion");
+    const modal = document.getElementById("modal");
+
+    // ===============================
+    // INICIAR SESIÓN
+    // ===============================
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
         alert("Debes iniciar sesión");
         location.href = "login.html";
         return;
+      }
+
+      usuarioActual = user;
+      await cargarDatos();
+      await cargarBloqueadas();
+      cancelarSeleccion();
+      renderCalendario();
+    });
+
+    // ===============================
+    // CARGAR DATOS
+    // ===============================
+    async function cargarDatos() {
+      alojamientos = [];
+      reservas = [];
+
+      // Alojamientos
+      const alojSnap = await getDocs(collection(db, "alojamientos"));
+      alojSnap.forEach((doc) => {
+        const a = doc.data();
+        if (
+          a.anfitrionId === usuarioActual.uid ||
+          a.ownerUid === usuarioActual.uid ||
+          a.ownerId === usuarioActual.uid
+        ) {
+          alojamientos.push({
+            id: doc.id,
+            ...a
+          });
+        }
+      });
+
+      select.innerHTML = `<option value="">Seleccionar alojamiento</option>`;
+      alojamientos.forEach((a) => {
+        select.innerHTML += `
+          <option value="${a.id}">
+            ${a.titulo || a.nombre || "Sin nombre"}
+          </option>
+        `;
+      });
+
+      // Reservas
+      const reservasSnap = await getDocs(collection(db, "reservas"));
+      reservasSnap.forEach((doc) => {
+        const r = doc.data();
+        if (r.anfitrionId === usuarioActual.uid) {
+          reservas.push({
+            id: doc.id,
+            ...r
+          });
+        }
+      });
     }
 
-    usuarioActual = user;
+    // ===============================
+    // CARGAR FECHAS BLOQUEADAS
+    // ===============================
+    async function cargarBloqueadas() {
+      fechasBloqueadas = [];
+      if (!alojamientoSeleccionado) return;
 
-    await cargarDatos();
-
- await cargarBloqueadas();
-
-cancelarSeleccion();
-
-renderCalendario();
-
-});
-
-// ===============================
-// CARGAR DATOS
-// ===============================
-
-async function cargarDatos() {
-
-    alojamientos = [];
-    reservas = [];
-    fechasBloqueadas = [];
-
-    // -------------------
-    // Alojamientos
-    // -------------------
-
-    const alojSnap = await getDocs(
-        collection(db, "alojamientos")
-    );
-
-    alojSnap.forEach((doc) => {
-
-        const a = doc.data();
-
-        if (
-            a.anfitrionId === usuarioActual.uid ||
-            a.ownerUid === usuarioActual.uid ||
-            a.ownerId === usuarioActual.uid
-        ) {
-
-            alojamientos.push({
-                id: doc.id,
-                ...a
-            });
-
-        }
-
-    });
-
-    select.innerHTML = `
-        <option value="">
-            Seleccionar alojamiento
-        </option>
-    `;
-
-    alojamientos.forEach((a) => {
-
-        select.innerHTML += `
-            <option value="${a.id}">
-                ${a.titulo || a.nombre || "Sin nombre"}
-            </option>
-        `;
-
-    });
-
-    // -------------------
-    // Reservas
-    // -------------------
-
-    const reservasSnap = await getDocs(
-        collection(db, "reservas")
-    );
-
-    reservasSnap.forEach((doc) => {
-
-        const r = doc.data();
-
-        if (r.anfitrionId === usuarioActual.uid) {
-
-            reservas.push({
-                id: doc.id,
-                ...r
-            });
-
-        }
-
-    });
-
-}
-
-// ===============================
-// CAMBIO DE ALOJAMIENTO
-// ===============================
-
-select.addEventListener("change", async () => {
-
-    alojamientoSeleccionado = select.value;
-
-    fechasBloqueadas = [];
-
-    const q = query(
+      const q = query(
         collection(db, "fechasBloqueadas"),
         where("alojamientoId", "==", alojamientoSeleccionado)
-    );
+      );
 
-    const bloqueadas = await getDocs(q);
-
-    bloqueadas.forEach((doc) => {
-
+      const snap = await getDocs(q);
+      snap.forEach((doc) => {
         fechasBloqueadas.push({
-            id: doc.id,
-            ...doc.data()
+          id: doc.id,
+          ...doc.data()
         });
-
-    });
-
-    renderCalendario();
-
-});
-    // ===============================
-// DIBUJAR CALENDARIO
-// ===============================
-    function actualizarBarra(){
-
-fechaInicioTexto.textContent=fechaInicio || "-";
-
-fechaFinTexto.textContent=fechaFin || "-";
-
-const mostrar=(fechaInicio && fechaFin);
-
-btnBloquearRango.classList.toggle("oculto",!mostrar);
-
-btnDesbloquearRango.classList.toggle("oculto",!mostrar);
-
-btnCancelarSeleccion.classList.toggle("oculto",!mostrar);
-
-}
-    function cancelarSeleccion(){
-
-fechaInicio=null;
-
-fechaFin=null;
-
-actualizarBarra();
-
-renderCalendario();
-
-}
-    function fechaDentroDelRango(fecha){
-
-if(!fechaInicio || !fechaFin) return false;
-
-return fecha>=fechaInicio && fecha<=fechaFin;
-
-}
-    btnCancelarSeleccion.onclick=()=>{
-
-cancelarSeleccion();
-
-};
-    
-
-function renderCalendario(){
-
-    calendario.innerHTML="";
-
-    const primerDia=new Date(anio,mes,1).getDay();
-
-    const diasMes=new Date(anio,mes+1,0).getDate();
-
-    const meses=[
-        "Enero","Febrero","Marzo","Abril",
-        "Mayo","Junio","Julio","Agosto",
-        "Septiembre","Octubre","Noviembre","Diciembre"
-    ];
-
-    mesActual.textContent=meses[mes]+" "+anio;
-
-    // Espacios vacíos
-    for(let i=0;i<primerDia;i++){
-
-        const vacio=document.createElement("div");
-        vacio.className="vacio";
-
-        calendario.appendChild(vacio);
-
+      });
     }
 
-    // Días
-    for(let dia=1;dia<=diasMes;dia++){
+    // ===============================
+    // CAMBIO DE ALOJAMIENTO
+    // ===============================
+    select.addEventListener("change", async () => {
+      alojamientoSeleccionado = select.value;
+      await cargarBloqueadas();
+      renderCalendario();
+    });
 
-        const fechaTexto=
-            anio+"-"+
-            String(mes+1).padStart(2,"0")+"-"+
-            String(dia).padStart(2,"0");
+    // ===============================
+    // FUNCIONES DE SELECCIÓN DE RANGO
+    // ===============================
+    function actualizarBarra() {
+      fechaInicioTexto.textContent = fechaInicio || "-";
+      fechaFinTexto.textContent = fechaFin || "-";
 
-        const cuadro=document.createElement("div");
+      const mostrar = !!(fechaInicio && fechaFin);
+      btnBloquearRango.classList.toggle("oculto", !mostrar);
+      btnDesbloquearRango.classList.toggle("oculto", !mostrar);
+      btnCancelarSeleccion.classList.toggle("oculto", !mostrar);
+    }
 
-        cuadro.className="dia libre";
+    function cancelarSeleccion() {
+      fechaInicio = null;
+      fechaFin = null;
+      actualizarBarra();
+      renderCalendario();
+    }
 
-        let texto="🟢 Disponible";
+    function fechaDentroDelRango(fechaTexto) {
+      if (!fechaInicio || !fechaFin) return false;
+      return fechaTexto >= fechaInicio && fechaTexto <= fechaFin;
+    }
+
+    btnCancelarSeleccion.onclick = () => {
+      cancelarSeleccion();
+    };
+
+    // ===============================
+    // DIBUJAR CALENDARIO
+    // ===============================
+    function renderCalendario() {
+      calendario.innerHTML = "";
+
+      const primerDia = new Date(anio, mes, 1).getDay();
+      const diasMes = new Date(anio, mes + 1, 0).getDate();
+      const meses = [
+        "Enero", "Febrero", "Marzo", "Abril",
+        "Mayo", "Junio", "Julio", "Agosto",
+        "Septiembre", "Octubre", "Noviembre", "Diciembre"
+      ];
+
+      mesActual.textContent = meses[mes] + " " + anio;
+
+      // Espacios vacíos
+      for (let i = 0; i < primerDia; i++) {
+        const vacio = document.createElement("div");
+        vacio.className = "vacio";
+        calendario.appendChild(vacio);
+      }
+
+      // Días
+      for (let dia = 1; dia <= diasMes; dia++) {
+        const fechaTexto =
+          anio + "-" +
+          String(mes + 1).padStart(2, "0") + "-" +
+          String(dia).padStart(2, "0");
+
+        const cuadro = document.createElement("div");
+        cuadro.className = "dia libre";
+        let texto = "🟢 Disponible";
 
         // Buscar reserva
-        const reserva=reservas.find(r=>
-
-            r.alojamientoId===alojamientoSeleccionado &&
-
-            fechaTexto>=r.checkin &&
-
-            fechaTexto<r.checkout
-
+        const reserva = reservas.find((r) =>
+          r.alojamientoId === alojamientoSeleccionado &&
+          fechaTexto >= r.checkin &&
+          fechaTexto < r.checkout
         );
 
         // Buscar bloqueo manual
-        const bloqueo=fechasBloqueadas.find(f=>
+        const bloqueo = fechasBloqueadas.find((f) => f.fecha === fechaTexto);
 
-            f.fecha===fechaTexto
-
-        );
-
-        if(reserva){
-
-            cuadro.className="dia ocupado";
-
-            texto="🔴 Reservado";
-
+        if (reserva) {
+          cuadro.className = "dia ocupado";
+          texto = "🔴 Reservado";
+        } else if (bloqueo) {
+          cuadro.className = "dia bloqueado";
+          texto = "🟡 Bloqueado";
         }
 
-        if(bloqueo){
-
-            cuadro.className="dia bloqueado";
-
-            texto="🟡 Bloqueado";
-
-        }
-        if(fechaDentroDelRango(fechaTexto)){
-
-    cuadro.classList.add("seleccionado");
-
-}
-        if(fechaTexto===fechaInicio){
-
-    cuadro.classList.add("inicioRango");
-
-}
-
-if(fechaTexto===fechaFin){
-
-    cuadro.classList.add("finRango");
-
-}
-
-        const hoy=new Date();
-
-        const hoyTexto=
-
-            hoy.getFullYear()+"-"+
-            String(hoy.getMonth()+1).padStart(2,"0")+"-"+
-            String(hoy.getDate()).padStart(2,"0");
-
-        if(fechaTexto===hoyTexto){
-
-            cuadro.classList.add("hoy");
-
+        if (fechaDentroDelRango(fechaTexto)) {
+          cuadro.classList.add("seleccionado");
         }
 
-        cuadro.innerHTML=`
+        if (fechaTexto === fechaInicio) {
+          cuadro.classList.add("inicioRango");
+        }
 
-            <div class="numero">
+        if (fechaTexto === fechaFin) {
+          cuadro.classList.add("finRango");
+        }
 
-                ${dia}
+        const hoy = new Date();
+        const hoyTexto =
+          hoy.getFullYear() + "-" +
+          String(hoy.getMonth() + 1).padStart(2, "0") + "-" +
+          String(hoy.getDate()).padStart(2, "0");
 
-            </div>
+        if (fechaTexto === hoyTexto) {
+          cuadro.classList.add("hoy");
+        }
 
-            <div class="info">
-
-                ${texto}
-
-            </div>
-
+        cuadro.innerHTML = `
+          <div class="numero">${dia}</div>
+          <div class="info">${texto}</div>
         `;
 
-        cuadro.onclick=()=>{
+        cuadro.onclick = () => {
+          if (reserva) return; // No seleccionar días con reserva
 
-    // No permitir seleccionar reservas
-    if(reserva){
-        return;
-    }
+          // Primer clic
+          if (!fechaInicio) {
+            fechaInicio = fechaTexto;
+            fechaFin = null;
+          }
+          // Segundo clic
+          else if (!fechaFin) {
+            fechaFin = fechaTexto;
 
-    // Primer clic
-    if(!fechaInicio){
+            // Invertir automáticamente si eligió una fecha mayor al inicio
+            if (fechaInicio > fechaFin) {
+              const aux = fechaInicio;
+              fechaInicio = fechaFin;
+              fechaFin = aux;
+            }
+          }
+          // Tercer clic (Reiniciar)
+          else {
+            fechaInicio = fechaTexto;
+            fechaFin = null;
+          }
 
-        fechaInicio=fechaTexto;
-
-        fechaFin=null;
-
-    }
-
-    // Segundo clic
-    else if(!fechaFin){
-
-        fechaFin=fechaTexto;
-
-        // Si eligió primero una fecha mayor,
-        // invertir automáticamente
-
-        if(fechaInicio>fechaFin){
-
-            const aux=fechaInicio;
-
-            fechaInicio=fechaFin;
-
-            fechaFin=aux;
-
-        }
-
-    }
-
-    // Tercer clic
-    else{
-
-        fechaInicio=fechaTexto;
-
-        fechaFin=null;
-
-    }
-
-    actualizarBarra();
-
-    renderCalendario();
-
-};
+          actualizarBarra();
+          renderCalendario();
+        };
 
         calendario.appendChild(cuadro);
-
+      }
     }
 
-}
-    //====================================
-// BOTÓN BLOQUEAR FECHA
-//====================================
-
-btnBloquearRango.onclick = async ()=>{
-
-    if(!fechaInicio || !fechaFin){
-
+    // ===============================
+    // BOTÓN BLOQUEAR RANGO
+    // ===============================
+    btnBloquearRango.onclick = async () => {
+      if (!fechaInicio || !fechaFin) {
         alert("Seleccioná un rango.");
-
         return;
+      }
+      if (!alojamientoSeleccionado) {
+        alert("Seleccioná un alojamiento primero.");
+        return;
+      }
 
-    }
+      let fechaActual = new Date(fechaInicio + "T00:00:00");
+      const ultima = new Date(fechaFin + "T00:00:00");
 
-    let fechaActual=new Date(fechaInicio);
+      while (fechaActual <= ultima) {
+        const texto =
+          fechaActual.getFullYear() + "-" +
+          String(fechaActual.getMonth() + 1).padStart(2, "0") + "-" +
+          String(fechaActual.getDate()).padStart(2, "0");
 
-    const ultima=new Date(fechaFin);
-
-    while(fechaActual<=ultima){
-
-        const texto=
-
-        fechaActual.getFullYear()+"-"+
-
-        String(fechaActual.getMonth()+1).padStart(2,"0")+"-"+
-
-        String(fechaActual.getDate()).padStart(2,"0");
-
-        const existe=fechasBloqueadas.find(f=>f.fecha===texto);
-
-        const reservada=reservas.find(r=>
-
-            r.alojamientoId===alojamientoSeleccionado &&
-
-            texto>=r.checkin &&
-
-            texto<r.checkout
-
+        const existe = fechasBloqueadas.find((f) => f.fecha === texto);
+        const reservada = reservas.find((r) =>
+          r.alojamientoId === alojamientoSeleccionado &&
+          texto >= r.checkin &&
+          texto < r.checkout
         );
 
-        if(!existe && !reservada){
-
-            await addDoc(collection(db,"fechasBloqueadas"),{
-
-                alojamientoId:alojamientoSeleccionado,
-
-                fecha:texto,
-
-                motivo:"Bloqueado por anfitrión",
-
-                anfitrionId:usuarioActual.uid,
-
-                createdAt:new Date()
-
-            });
-
+        if (!existe && !reservada) {
+          await addDoc(collection(db, "fechasBloqueadas"), {
+            alojamientoId: alojamientoSeleccionado,
+            fecha: texto,
+            motivo: "Bloqueado por anfitrión",
+            anfitrionId: usuarioActual.uid,
+            createdAt: new Date()
+          });
         }
 
-        fechaActual.setDate(
+        fechaActual.setDate(fechaActual.getDate() + 1);
+      }
 
-            fechaActual.getDate()+1
+      alert("Rango bloqueado.");
+      cancelarSeleccion();
+      await cargarBloqueadas();
+      renderCalendario();
+    };
 
-        );
-
-    }
-
-    alert("Rango bloqueado.");
-
-    cancelarSeleccion();
-
-    await cargarBloqueadas();
-
-    renderCalendario();
-
-};
-    alert("Fecha bloqueada.");
-
-    modal.style.display = "none";
-
-    await cargarDatos();
-
-    const q = query(
-        collection(db, "fechasBloqueadas"),
-        where("alojamientoId", "==", alojamientoSeleccionado)
-    );
-
-    fechasBloqueadas = [];
-
-    const snap = await getDocs(q);
-
-    snap.forEach(doc => {
-
-        fechasBloqueadas.push({
-            id: doc.id,
-            ...doc.data()
-        });
-
-    });
-
-    renderCalendario();
-
-});
-
-
-//====================================
-// BOTÓN DESBLOQUEAR
-//====================================
-
-btnDesbloquearRango.onclick=async()=>{
-
-    if(!fechaInicio || !fechaFin){
-
+    // ===============================
+    // BOTÓN DESBLOQUEAR RANGO
+    // ===============================
+    btnDesbloquearRango.onclick = async () => {
+      if (!fechaInicio || !fechaFin) {
         alert("Seleccioná un rango.");
-
         return;
+      }
 
-    }
-
-    for(const bloqueo of fechasBloqueadas){
-
-        if(
-
-            bloqueo.fecha>=fechaInicio &&
-
-            bloqueo.fecha<=fechaFin
-
-        ){
-
-            await deleteDoc(
-
-                doc(
-
-                    db,
-
-                    "fechasBloqueadas",
-
-                    bloqueo.id
-
-                )
-
-            );
-
+      for (const bloqueo of fechasBloqueadas) {
+        if (bloqueo.fecha >= fechaInicio && bloqueo.fecha <= fechaFin) {
+          await deleteDoc(doc(db, "fechasBloqueadas", bloqueo.id));
         }
+      }
 
-    }
+      alert("Rango desbloqueado.");
+      cancelarSeleccion();
+      await cargarBloqueadas();
+      renderCalendario();
+    };
 
-    cancelarSeleccion();
-
-    await cargarBloqueadas();
-
-    renderCalendario();
-
-};
-
-//====================================
-// CAMBIAR MES
-//====================================
-
-document.getElementById("anterior").onclick = () => {
-
-    mes--;
-
-    if (mes < 0) {
-
+    // ===============================
+    // CAMBIAR MES
+    // ===============================
+    document.getElementById("anterior").onclick = () => {
+      mes--;
+      if (mes < 0) {
         mes = 11;
-
         anio--;
+      }
+      renderCalendario();
+    };
 
-    }
-
-    renderCalendario();
-
-};
-
-document.getElementById("siguiente").onclick = () => {
-
-    mes++;
-
-    if (mes > 11) {
-
+    document.getElementById("siguiente").onclick = () => {
+      mes++;
+      if (mes > 11) {
         mes = 0;
-
         anio++;
+      }
+      renderCalendario();
+    };
 
-    }
-
-    renderCalendario();
-
-};
-
-
-//====================================
-// CERRAR MODAL
-//====================================
-
-window.cerrarModal = function () {
-
-    modal.style.display = "none";
-
-};
-
-</script>
+    // ===============================
+    // CERRAR MODAL
+    // ===============================
+    window.cerrarModal = function () {
+      modal.style.display = "none";
+    };
+  </script>
 
 </body>
 
