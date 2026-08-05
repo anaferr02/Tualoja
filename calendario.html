@@ -148,7 +148,8 @@
     }
 
     .bloqueado {
-      background: #ffe9a8;
+      background: #ffe9a8 !important;
+      color: #222 !important;
     }
 
     .seleccionado {
@@ -251,32 +252,6 @@
       background: #1b167f;
       color: white;
       cursor: pointer;
-    }
-
-    .acciones {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-    }
-
-    .btnBloquear {
-      background: #ff9800;
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      flex: 1;
-    }
-
-    .btnDesbloquear {
-      background: #2e7d32;
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      flex: 1;
     }
 
     @media(max-width:900px) {
@@ -387,9 +362,7 @@
 
       usuarioActual = user;
       await cargarDatos();
-      await cargarBloqueadas();
       cancelarSeleccion();
-      renderCalendario();
     });
 
     // ===============================
@@ -464,7 +437,7 @@
     select.addEventListener("change", async () => {
       alojamientoSeleccionado = select.value;
       await cargarBloqueadas();
-      renderCalendario();
+      cancelarSeleccion();
     });
 
     // ===============================
@@ -625,10 +598,10 @@
       const ultima = new Date(fechaFin + "T00:00:00");
 
       while (fechaActual <= ultima) {
-        const texto =
-          fechaActual.getFullYear() + "-" +
-          String(fechaActual.getMonth() + 1).padStart(2, "0") + "-" +
-          String(fechaActual.getDate()).padStart(2, "0");
+        const yyyy = fechaActual.getFullYear();
+        const mm = String(fechaActual.getMonth() + 1).padStart(2, "0");
+        const dd = String(fechaActual.getDate()).padStart(2, "0");
+        const texto = `${yyyy}-${mm}-${dd}`;
 
         const existe = fechasBloqueadas.find((f) => f.fecha === texto);
         const reservada = reservas.find((r) =>
@@ -651,9 +624,8 @@
       }
 
       alert("Rango bloqueado.");
-      cancelarSeleccion();
       await cargarBloqueadas();
-      renderCalendario();
+      cancelarSeleccion();
     };
 
     // ===============================
@@ -672,9 +644,8 @@
       }
 
       alert("Rango desbloqueado.");
-      cancelarSeleccion();
       await cargarBloqueadas();
-      renderCalendario();
+      cancelarSeleccion();
     };
 
     // ===============================
