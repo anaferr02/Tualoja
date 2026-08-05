@@ -153,6 +153,63 @@ background:#ffd9d9;
 .bloqueado{
 background:#ffe9a8;
 }
+    .seleccionado{
+background:#4f8cff !important;
+color:#fff;
+border:3px solid #1b167f;
+}
+
+.inicioRango{
+border-left:5px solid #1b167f;
+}
+
+.finRango{
+border-right:5px solid #1b167f;
+}
+
+.barraSeleccion{
+background:#fff;
+padding:18px;
+border-radius:14px;
+box-shadow:0 5px 15px rgba(0,0,0,.08);
+margin-bottom:25px;
+display:flex;
+align-items:center;
+gap:15px;
+flex-wrap:wrap;
+}
+
+.barraSeleccion span{
+font-weight:bold;
+color:#1b167f;
+}
+
+.barraSeleccion button{
+padding:12px 18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+}
+
+#btnBloquearRango{
+background:#ff9800;
+color:white;
+}
+
+#btnDesbloquearRango{
+background:#2e7d32;
+color:white;
+}
+
+#btnCancelarSeleccion{
+background:#e53935;
+color:white;
+}
+
+.oculto{
+display:none;
+}
 
 .hoy{
 border:3px solid #1b167f;
@@ -264,6 +321,43 @@ Seleccionar alojamiento
 </option>
 
 </select>
+    async function cargarBloqueadas(){
+
+    fechasBloqueadas=[];
+
+    if(!alojamientoSeleccionado) return;
+
+    const q=query(
+
+        collection(db,"fechasBloqueadas"),
+
+        where(
+
+            "alojamientoId",
+
+            "==",
+
+            alojamientoSeleccionado
+
+        )
+
+    );
+
+    const snap=await getDocs(q);
+
+    snap.forEach(doc=>{
+
+        fechasBloqueadas.push({
+
+            id:doc.id,
+
+            ...doc.data()
+
+        });
+
+    });
+
+}
 
 <div class="controles">
 
@@ -309,25 +403,63 @@ Seleccionar alojamiento
 id="btnBloquear"
 class="btnBloquear">
 Bloquear fecha
+<select id="selectAlojamiento">
+
+<option value="">
+Seleccionar alojamiento
+</option>
+
+</select>
+
+<div class="barraSeleccion">
+
+<span>
+
+Desde:
+
+<b id="fechaInicioTexto">
+
+-
+
+</b>
+
+</span>
+
+<span>
+
+Hasta:
+
+<b id="fechaFinTexto">
+
+-
+
+</b>
+
+</span>
+
+<button
+id="btnBloquearRango"
+class="oculto">
+
+Bloquear rango
+
 </button>
 
 <button
-id="btnDesbloquear"
-class="btnDesbloquear">
-Desbloquear
-</button>
+id="btnDesbloquearRango"
+class="oculto">
 
-</div>
+Desbloquear rango
+
+</button>
 
 <button
-style="margin-top:20px"
-onclick="cerrarModal()">
+id="btnCancelarSeleccion"
+class="oculto">
 
-Cerrar
+Cancelar
 
 </button>
-
-</div>
 
 </div>
 
@@ -346,6 +478,7 @@ collection,
 getDocs,
 addDoc,
 deleteDoc,
+doc,
 query,
 where
 
@@ -362,8 +495,9 @@ let fechasBloqueadas=[];
 
 let alojamientoSeleccionado="";
 
-let fechaSeleccionada="";
+let fechaInicio=null;
 
+let fechaFin=null;
 let fecha=new Date();
 
 let mes=fecha.getMonth();
@@ -376,13 +510,15 @@ const mesActual=document.getElementById("mesActual");
 
 const select=document.getElementById("selectAlojamiento");
 
-const modal=document.getElementById("modal");
+const fechaInicioTexto=document.getElementById("fechaInicioTexto");
 
-const contenidoModal=document.getElementById("contenidoModal");
+const fechaFinTexto=document.getElementById("fechaFinTexto");
 
-const btnBloquear=document.getElementById("btnBloquear");
+const btnBloquearRango=document.getElementById("btnBloquearRango");
 
-const btnDesbloquear=document.getElementById("btnDesbloquear");
+const btnDesbloquearRango=document.getElementById("btnDesbloquearRango");
+
+const btnCancelarSeleccion=document.getElementById("btnCancelarSeleccion");
 // ===============================
 // INICIAR SESIÓN
 // ===============================
@@ -399,7 +535,11 @@ onAuthStateChanged(auth, async (user) => {
 
     await cargarDatos();
 
-    renderCalendario();
+ await cargarBloqueadas();
+
+cancelarSeleccion();
+
+renderCalendario();
 
 });
 
@@ -513,6 +653,45 @@ select.addEventListener("change", async () => {
     // ===============================
 // DIBUJAR CALENDARIO
 // ===============================
+    function actualizarBarra(){
+
+fechaInicioTexto.textContent=fechaInicio || "-";
+
+fechaFinTexto.textContent=fechaFin || "-";
+
+const mostrar=(fechaInicio && fechaFin);
+
+btnBloquearRango.classList.toggle("oculto",!mostrar);
+
+btnDesbloquearRango.classList.toggle("oculto",!mostrar);
+
+btnCancelarSeleccion.classList.toggle("oculto",!mostrar);
+
+}
+    function cancelarSeleccion(){
+
+fechaInicio=null;
+
+fechaFin=null;
+
+actualizarBarra();
+
+renderCalendario();
+
+}
+    function fechaDentroDelRango(fecha){
+
+if(!fechaInicio || !fechaFin) return false;
+
+return fecha>=fechaInicio && fecha<=fechaFin;
+
+}
+    btnCancelarSeleccion.onclick=()=>{
+
+cancelarSeleccion();
+
+};
+    
 
 function renderCalendario(){
 
@@ -587,6 +766,22 @@ function renderCalendario(){
             texto="🟡 Bloqueado";
 
         }
+        if(fechaDentroDelRango(fechaTexto)){
+
+    cuadro.classList.add("seleccionado");
+
+}
+        if(fechaTexto===fechaInicio){
+
+    cuadro.classList.add("inicioRango");
+
+}
+
+if(fechaTexto===fechaFin){
+
+    cuadro.classList.add("finRango");
+
+}
 
         const hoy=new Date();
 
@@ -620,29 +815,54 @@ function renderCalendario(){
 
         cuadro.onclick=()=>{
 
-            fechaSeleccionada=fechaTexto;
+    // No permitir seleccionar reservas
+    if(reserva){
+        return;
+    }
 
-            contenidoModal.innerHTML=`
+    // Primer clic
+    if(!fechaInicio){
 
-            <p>
+        fechaInicio=fechaTexto;
 
-            <b>Fecha:</b>
+        fechaFin=null;
 
-            ${fechaTexto}
+    }
 
-            </p>
+    // Segundo clic
+    else if(!fechaFin){
 
-            <p>
+        fechaFin=fechaTexto;
 
-            ${texto}
+        // Si eligió primero una fecha mayor,
+        // invertir automáticamente
 
-            </p>
+        if(fechaInicio>fechaFin){
 
-            `;
+            const aux=fechaInicio;
 
-            modal.style.display="flex";
+            fechaInicio=fechaFin;
 
-        };
+            fechaFin=aux;
+
+        }
+
+    }
+
+    // Tercer clic
+    else{
+
+        fechaInicio=fechaTexto;
+
+        fechaFin=null;
+
+    }
+
+    actualizarBarra();
+
+    renderCalendario();
+
+};
 
         calendario.appendChild(cuadro);
 
@@ -653,23 +873,77 @@ function renderCalendario(){
 // BOTÓN BLOQUEAR FECHA
 //====================================
 
-btnBloquear.addEventListener("click", async () => {
+btnBloquearRango.onclick = async ()=>{
 
-    if (alojamientoSeleccionado == "") {
-        alert("Seleccioná un alojamiento.");
+    if(!fechaInicio || !fechaFin){
+
+        alert("Seleccioná un rango.");
+
         return;
+
     }
 
-    await addDoc(collection(db, "fechasBloqueadas"), {
+    let fechaActual=new Date(fechaInicio);
 
-        alojamientoId: alojamientoSeleccionado,
-        fecha: fechaSeleccionada,
-        motivo: "Bloqueado por anfitrión",
-        anfitrionId: usuarioActual.uid,
-        createdAt: new Date()
+    const ultima=new Date(fechaFin);
 
-    });
+    while(fechaActual<=ultima){
 
+        const texto=
+
+        fechaActual.getFullYear()+"-"+
+
+        String(fechaActual.getMonth()+1).padStart(2,"0")+"-"+
+
+        String(fechaActual.getDate()).padStart(2,"0");
+
+        const existe=fechasBloqueadas.find(f=>f.fecha===texto);
+
+        const reservada=reservas.find(r=>
+
+            r.alojamientoId===alojamientoSeleccionado &&
+
+            texto>=r.checkin &&
+
+            texto<r.checkout
+
+        );
+
+        if(!existe && !reservada){
+
+            await addDoc(collection(db,"fechasBloqueadas"),{
+
+                alojamientoId:alojamientoSeleccionado,
+
+                fecha:texto,
+
+                motivo:"Bloqueado por anfitrión",
+
+                anfitrionId:usuarioActual.uid,
+
+                createdAt:new Date()
+
+            });
+
+        }
+
+        fechaActual.setDate(
+
+            fechaActual.getDate()+1
+
+        );
+
+    }
+
+    alert("Rango bloqueado.");
+
+    cancelarSeleccion();
+
+    await cargarBloqueadas();
+
+    renderCalendario();
+
+};
     alert("Fecha bloqueada.");
 
     modal.style.display = "none";
@@ -703,28 +977,51 @@ btnBloquear.addEventListener("click", async () => {
 // BOTÓN DESBLOQUEAR
 //====================================
 
-btnDesbloquear.addEventListener("click", async () => {
+btnDesbloquearRango.onclick=async()=>{
 
-    const bloqueo = fechasBloqueadas.find(f => f.fecha == fechaSeleccionada);
+    if(!fechaInicio || !fechaFin){
 
-    if (!bloqueo) {
-
-        alert("Esa fecha no está bloqueada.");
+        alert("Seleccioná un rango.");
 
         return;
 
     }
 
-    await deleteDoc(doc(db, "fechasBloqueadas", bloqueo.id));
+    for(const bloqueo of fechasBloqueadas){
 
-    fechasBloqueadas = fechasBloqueadas.filter(f => f.id != bloqueo.id);
+        if(
 
-    modal.style.display = "none";
+            bloqueo.fecha>=fechaInicio &&
+
+            bloqueo.fecha<=fechaFin
+
+        ){
+
+            await deleteDoc(
+
+                doc(
+
+                    db,
+
+                    "fechasBloqueadas",
+
+                    bloqueo.id
+
+                )
+
+            );
+
+        }
+
+    }
+
+    cancelarSeleccion();
+
+    await cargarBloqueadas();
 
     renderCalendario();
 
-});
-
+};
 
 //====================================
 // CAMBIAR MES
