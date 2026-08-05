@@ -145,6 +145,11 @@
       border-radius:16px;
       padding:12px 14px;
       margin-bottom:12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
     .list{
@@ -307,57 +312,6 @@
       display:inline-block;
     }
 
-    .invoice-card{
-      background:#fff;
-      border:1px solid rgba(0,0,0,.06);
-      border-radius:18px;
-      padding:16px;
-      box-shadow:0 8px 20px rgba(0,0,0,.04);
-    }
-
-    .invoice-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:8px;
-    }
-
-    .invoice-head h3{
-      margin:0;
-      color:#272d7d;
-      font-family:Georgia, "Times New Roman", serif;
-      font-size:24px;
-    }
-
-    .invoice-grid{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:10px;
-      margin-top:10px;
-    }
-
-    .invoice-field{
-      background:#f8f9ff;
-      border:1px solid rgba(0,0,0,.05);
-      border-radius:14px;
-      padding:10px 12px;
-    }
-
-    .invoice-label{
-      font-size:12px;
-      color:#667;
-      margin-bottom:4px;
-    }
-
-    .invoice-value{
-      font-size:15px;
-      font-weight:700;
-      color:#1f2450;
-      word-break:break-word;
-    }
-
     .hamburger{
       display:none;
       font-size:20px;
@@ -423,7 +377,7 @@
       margin-top:10px;
     }
 
-    input, textarea{
+    input, textarea, select{
       width:100%;
       box-sizing:border-box;
       margin-top:6px;
@@ -478,7 +432,6 @@
     @media (max-width:720px){
       .item{ grid-template-columns:1fr; }
       .grid-2{ grid-template-columns:1fr; }
-      .invoice-grid{ grid-template-columns:1fr; }
     }
 
     @media (max-width:560px){
@@ -552,7 +505,7 @@
 
       <section id="secBookings" style="display:none;">
         <div class="panel-note muted">
-          Acá vas a ver las reservas que te hacen tus huéspedes.
+          <span>Acá vas a ver las reservas que te hacen tus huéspedes.</span>
         </div>
         <div id="bookSummary" class="muted"></div>
         <div id="bookList" class="list"></div>
@@ -563,17 +516,20 @@
 
       <section id="secCalendar" style="display:none;">
         <div class="panel-note muted">
-          Fechas reservadas de tus alojamientos.
+          <span>Gestión de fechas ocupadas y reservas externas.</span>
+          <button id="btnOpenBlockModal" class="primary" type="button" style="padding:8px 14px; font-size:13px;">
+            + Bloquear fechas externamente
+          </button>
         </div>
         <div id="calList" class="calendar-grid"></div>
         <p id="calEmpty" class="muted" style="display:none; margin-top:12px;">
-          Aún no hay reservas para mostrar en el calendario.
+          Aún no hay reservas ni fechas bloqueadas para mostrar.
         </p>
       </section>
 
       <section id="secBilling" style="display:none;">
         <div class="panel-note muted">
-          Acá vas a ver tus facturas emitidas por TuAloja, su estado y el vencimiento.
+          <span>Acá vas a ver tus facturas emitidas por TuAloja, su estado y el vencimiento.</span>
         </div>
         <div id="billSummary" class="muted"></div>
         <div id="billList" class="list"></div>
@@ -584,6 +540,7 @@
     </div>
   </main>
 
+  <!-- MODAL EDITAR PUBLI -->
   <div id="editBackdrop" class="modal-backdrop">
     <div class="modal">
       <div class="modal-top">
@@ -617,6 +574,42 @@
     </div>
   </div>
 
+  <!-- MODAL BLOQUEAR FECHAS -->
+  <div id="blockBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-top">
+        <h2 style="margin:0;">Bloquear fechas por reserva externa</h2>
+        <button id="closeBlockModal" class="close-x" type="button">✕</button>
+      </div>
+
+      <form id="blockForm">
+        <label for="blockAlojamientoId">Seleccionar Alojamiento</label>
+        <select id="blockAlojamientoId" required>
+          <option value="">Cargando alojamientos...</option>
+        </select>
+
+        <div class="grid-2">
+          <div>
+            <label for="blockCheckin">Desde (Check-in)</label>
+            <input id="blockCheckin" type="date" required />
+          </div>
+          <div>
+            <label for="blockCheckout">Hasta (Check-out)</label>
+            <input id="blockCheckout" type="date" required />
+          </div>
+        </div>
+
+        <label for="blockNotas">Nota u origen (Opcional)</label>
+        <input id="blockNotas" placeholder="Ej: Reserva por llamada / Booking / etc." />
+
+        <div class="modal-actions">
+          <button class="primary" type="submit">Bloquear fechas</button>
+          <button class="btn-outline" id="cancelBlockModal" type="button">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script type="module">
     import { auth, db } from "./firebase-config.js";
     import {
@@ -627,6 +620,7 @@
       collection,
       getDocs,
       doc,
+      addDoc,
       deleteDoc,
       updateDoc
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
@@ -660,10 +654,19 @@
     const hamburgerBtn = document.getElementById("hamburgerBtn");
     const headerActions = document.getElementById("headerActions");
 
+    // Modal Edit
     const editBackdrop = document.getElementById("editBackdrop");
     const editForm = document.getElementById("editForm");
     const closeEditModal = document.getElementById("closeEditModal");
     const cancelEditModal = document.getElementById("cancelEditModal");
+
+    // Modal Block
+    const blockBackdrop = document.getElementById("blockBackdrop");
+    const blockForm = document.getElementById("blockForm");
+    const closeBlockModal = document.getElementById("closeBlockModal");
+    const cancelBlockModal = document.getElementById("cancelBlockModal");
+    const btnOpenBlockModal = document.getElementById("btnOpenBlockModal");
+    const blockAlojamientoId = document.getElementById("blockAlojamientoId");
 
     const statAlojamientos = document.getElementById("statAlojamientos");
     const statReservas = document.getElementById("statReservas");
@@ -706,9 +709,9 @@
       });
     }
 
-    // Modal Events
-    if (closeEditModal) closeEditModal.addEventListener("click", closeModal);
-    if (cancelEditModal) cancelEditModal.addEventListener("click", closeModal);
+    // Modal Edit Events
+    if (closeEditModal) closeEditModal.addEventListener("click", () => editBackdrop.style.display = "none");
+    if (cancelEditModal) cancelEditModal.addEventListener("click", () => editBackdrop.style.display = "none");
 
     editForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -733,10 +736,73 @@
         }
 
         renderListings();
-        closeModal();
+        editBackdrop.style.display = "none";
       } catch (err) {
         console.error("Error al actualizar: ", err);
         alert("No se pudo actualizar la publicación.");
+      }
+    });
+
+    // Modal Block Events
+    if (btnOpenBlockModal) {
+      btnOpenBlockModal.addEventListener("click", () => {
+        if (!listingsCache.length) {
+          alert("Primero necesitás publicar un alojamiento para poder bloquear sus fechas.");
+          return;
+        }
+        
+        blockAlojamientoId.innerHTML = listingsCache.map(l => 
+          `<option value="${l._docId}">${escapeHTML(l.titulo)}</option>`
+        ).join("");
+
+        blockBackdrop.style.display = "flex";
+      });
+    }
+
+    if (closeBlockModal) closeBlockModal.addEventListener("click", () => blockBackdrop.style.display = "none");
+    if (cancelBlockModal) cancelBlockModal.addEventListener("click", () => blockBackdrop.style.display = "none");
+
+    blockForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const alojId = blockAlojamientoId.value;
+      const checkin = document.getElementById("blockCheckin").value;
+      const checkout = document.getElementById("blockCheckout").value;
+      const notas = document.getElementById("blockNotas").value;
+
+      const aloj = listingsCache.find(a => a._docId === alojId);
+
+      try {
+        const docRef = await addDoc(collection(db, "reservas"), {
+          alojamientoId: alojId,
+          titulo: aloj ? aloj.titulo : "Reserva Externa",
+          huespedNombre: notas ? `Bloqueo manual (${notas})` : "Bloqueo manual (Externa)",
+          checkin,
+          checkout,
+          status: "confirmada",
+          esBloqueoManual: true,
+          anfitrionId: currentUser.uid,
+          anfitrionEmail: currentUser.email,
+          createdAt: new Date().toISOString()
+        });
+
+        bookingsCache.push({
+          _docId: docRef.id,
+          alojamientoId: alojId,
+          titulo: aloj ? aloj.titulo : "Reserva Externa",
+          huespedNombre: notas ? `Bloqueo manual (${notas})` : "Bloqueo manual (Externa)",
+          checkin,
+          checkout,
+          status: "confirmada",
+          esBloqueoManual: true,
+          anfitrionId: currentUser.uid
+        });
+
+        renderCalendar();
+        blockBackdrop.style.display = "none";
+        blockForm.reset();
+      } catch (err) {
+        console.error("Error al bloquear fecha: ", err);
+        alert("No se pudo crear el bloqueo de fechas.");
       }
     });
 
@@ -815,21 +881,6 @@
       return emails.includes(myEmail) || (myUid && uids.includes(myUid));
     }
 
-    function esMiFactura(x, user) {
-      const myEmail = String(user?.email || "").toLowerCase().trim();
-      const myUid = String(user?.uid || "").trim();
-
-      const emails = [
-        x.anfitrionEmail, x.ownerEmail, x.email
-      ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
-
-      const uids = [
-        x.anfitrionId, x.ownerId, x.ownerUid, x.uid, x.userId
-      ].map(v => String(v || "").trim()).filter(Boolean);
-
-      return emails.includes(myEmail) || (myUid && uids.includes(myUid));
-    }
-
     function estadoChip(estado) {
       const e = String(estado || "pendiente").toLowerCase();
 
@@ -847,7 +898,7 @@
     function updateStats() {
       const confirmadas = bookingsCache.filter(x => {
         const e = String(x.status || "").toLowerCase();
-        return e === "aceptada" || e === "confirmada";
+        return (e === "aceptada" || e === "confirmada") && !x.esBloqueoManual;
       });
 
       const ingresos = confirmadas.reduce((acc, x) => acc + Number(x.total || 0), 0);
@@ -865,12 +916,6 @@
       document.getElementById("editMaxNoches").value = item.maxNoches ? Number(item.maxNoches) : "";
       document.getElementById("editDescripcion").value = item.descripcion || "";
       editBackdrop.style.display = "flex";
-    }
-
-    function closeModal() {
-      editBackdrop.style.display = "none";
-      currentEditDocId = null;
-      editForm.reset();
     }
 
     function renderListings() {
@@ -962,7 +1007,7 @@
         const estado = String(r.status || "pendiente").toLowerCase();
         const puedeAceptar = estado === "pendiente";
         const puedeRechazar = estado === "pendiente";
-        const puedeChat = ["aceptada", "confirmada"].includes(estado);
+        const puedeChat = ["aceptada", "confirmada"].includes(estado) && !r.esBloqueoManual;
 
         return `
           <article class="item">
@@ -981,8 +1026,8 @@
                 <span class="chip">${formatDate(r.checkin)} → ${formatDate(r.checkout)}</span>
                 <span class="chip">${Number(r.guests || 1)} huésped(es)</span>
                 <span class="chip">${noches || "-"} noche(s)</span>
-                <span class="chip chip-strong">Total: $${formatARS(total)}</span>
-                ${r.noLeidoAnfitrion ? `<span class="chip chip-bad">Nuevo mensaje</span>` : ""}
+                ${total ? `<span class="chip chip-strong">Total: $${formatARS(total)}</span>` : ""}
+                ${r.esBloqueoManual ? `<span class="chip chip-warn">Externa / Manual</span>` : ""}
               </div>
 
               ${r.mensaje ? `<p style="margin:12px 0 0; color:#4d5678;"><strong>Mensaje:</strong> ${escapeHTML(r.mensaje)}</p>` : ""}
@@ -1068,76 +1113,36 @@
           <div class="calendar-head">
             <div>
               <h3 style="margin:0 0 8px; color:#272d7d;">${escapeHTML(r.titulo || r.alojamientoTitulo || "Reserva")}</h3>
-              <div class="muted">Huésped: ${escapeHTML(r.huespedNombre || r.guestName || r.huespedEmail || "Sin nombre")}</div>
+              <div class="muted">Cliente / Origen: ${escapeHTML(r.huespedNombre || r.guestName || "Reserva externa")}</div>
             </div>
 
-            <div class="calendar-range">
-              ${formatDate(r.checkin)} → ${formatDate(r.checkout)}
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="calendar-range">
+                ${formatDate(r.checkin)} → ${formatDate(r.checkout)}
+              </div>
+              ${r.esBloqueoManual ? `<button class="mini-btn danger" type="button" data-unblock="${r._docId}">Liberar fechas</button>` : ""}
             </div>
           </div>
         </article>
       `).join("");
-    }
 
-    function renderBilling() {
-      billSummary.textContent = invoicesCache.length
-        ? `Tenés ${invoicesCache.length} factura(s) cargada(s).`
-        : "";
+      calList.querySelectorAll("[data-unblock]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-unblock");
+          if (!confirm("¿Deseas desbloquear estas fechas del calendario?")) return;
 
-      if (!invoicesCache.length) {
-        billList.innerHTML = "";
-        billEmpty.style.display = "block";
-        return;
-      }
-
-      billEmpty.style.display = "none";
-
-      billList.innerHTML = invoicesCache.map((f) => {
-        const periodo = f.periodo || f.mes || "Sin período";
-        const estado = String(f.estado || "pendiente").toLowerCase();
-        const pdfUrl = f.pdfUrl || f.archivoUrl || "";
-        const numero = f.numeroFactura || f.numero || f.comprobante || "Sin número";
-
-        return `
-          <article class="invoice-card">
-            <div class="invoice-head">
-              <div>
-                <h3>Factura ${escapeHTML(numero)}</h3>
-                <div class="muted">Período: ${escapeHTML(periodo)}</div>
-              </div>
-              <div class="chips">
-                ${estadoChip(estado)}
-              </div>
-            </div>
-
-            <div class="invoice-grid">
-              <div class="invoice-field">
-                <div class="invoice-label">Monto</div>
-                <div class="invoice-value">$${formatARS(f.monto || 0)} ${escapeHTML(f.moneda || "ARS")}</div>
-              </div>
-
-              <div class="invoice-field">
-                <div class="invoice-label">Vencimiento</div>
-                <div class="invoice-value">${formatDate(f.fechaVencimiento || f.vencimiento || "")}</div>
-              </div>
-
-              <div class="invoice-field">
-                <div class="invoice-label">Fecha de emisión</div>
-                <div class="invoice-value">${formatDate(f.fechaEmision || f.emision || "")}</div>
-              </div>
-
-              <div class="invoice-field">
-                <div class="invoice-label">Detalle</div>
-                <div class="invoice-value">${escapeHTML(f.detalle || "Comisión TuAloja")}</div>
-              </div>
-            </div>
-
-            <div class="actions">
-              ${pdfUrl ? `<a class="mini-btn primary" href="${escapeHTML(pdfUrl)}" target="_blank">Descargar PDF</a>` : ""}
-            </div>
-          </article>
-        `;
-      }).join("");
+          try {
+            await deleteDoc(doc(db, "reservas", id));
+            bookingsCache = bookingsCache.filter(x => x._docId !== id);
+            renderCalendar();
+            renderBookings();
+            updateStats();
+          } catch (err) {
+            console.error(err);
+            alert("No se pudo liberar el bloqueo.");
+          }
+        });
+      });
     }
 
     async function cargarDatos(user) {
@@ -1154,21 +1159,9 @@
           .map(d => ({ _docId: d.id, ...d.data() }))
           .filter(x => esMiReserva(x, user));
 
-        // Fetch Facturas (si existe la colección)
-        try {
-          const snapInvoices = await getDocs(collection(db, "facturas"));
-          invoicesCache = snapInvoices.docs
-            .map(d => ({ _docId: d.id, ...d.data() }))
-            .filter(x => esMiFactura(x, user));
-        } catch (e) {
-          console.warn("No se pudo cargar la colección de facturas o no existe.");
-          invoicesCache = [];
-        }
-
         renderListings();
         renderBookings();
         renderCalendar();
-        renderBilling();
         updateStats();
       } catch (error) {
         console.error("Error al cargar datos de Firestore:", error);
