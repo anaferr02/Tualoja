@@ -424,8 +424,6 @@ import {
   getDocs,
   updateDoc,
   doc,
-  query,
-  where,
   getDoc,
   addDoc,
   serverTimestamp
@@ -485,7 +483,7 @@ async function enriquecerReserva(r) {
       total: r.total || null
     };
   } catch (error) {
-    console.warn("No se pudo enriquecer reserva:", error);
+    console.warn("No se pudo enriquecer la reserva ID:", r._docId, error);
     return r;
   }
 }
@@ -729,23 +727,26 @@ async function cargarReservas() {
     snap.forEach((d) => {
       const x = d.data();
 
-      // Compatibilidad con múltiples nombres de campo para el ID del huésped
+      // Nombres de campo posibles para el UID del huésped
       const uids = [
-        x.huespedId, x.guestId, x.userId, x.clienteId, x.uid, x.userUid
+        x.huespedId, x.guestId, x.userId, x.clienteId, x.uid, x.userUid, x.ownerUid
       ].map(v => String(v || "").trim()).filter(Boolean);
 
-      // Compatibilidad con múltiples nombres de campo para el Email del huésped
+      // Nombres de campo posibles para el Email del huésped
       const emails = [
         x.huespedEmail, x.guestEmail, x.email, x.userEmail, x.correo
       ].map(v => String(v || "").toLowerCase().trim()).filter(Boolean);
 
-      const esMiReservaComoHuesped = uids.includes(myUid) || (myEmail && emails.includes(myEmail));
+      const coincidenciaUid = myUid && uids.includes(myUid);
+      const coincidenciaEmail = myEmail && emails.includes(myEmail);
 
-      // Filtra reservas propias omitiendo los bloqueos manuales de anfitrión
-      if (esMiReservaComoHuesped && !x.esBloqueoManual) {
+      // Si coincide UID o Email y no es un bloqueo manual de anfitrión
+      if ((coincidenciaUid || coincidenciaEmail) && !x.esBloqueoManual) {
         rows.push({ ...x, _docId: d.id });
       }
     });
+
+    console.log("Reservas encontradas para el usuario:", rows.length);
 
     rows.sort((a, b) => {
       const fa = a.creadaEn?.seconds || a.createdAt?.seconds || 0;
@@ -753,19 +754,25 @@ async function cargarReservas() {
       return fb - fa;
     });
 
-    reservasCache = await Promise.all(rows.map(enriquecerReserva));
+    // Procesa las reservas de forma segura ante cualquier fallo individual en Firestore
+    reservasCache = await Promise.all(
+      rows.map(r => enriquecerReserva(r).catch(err => {
+        console.warn("Fallo al enriquecer pero se mantiene en la lista:", err);
+        return r;
+      }))
+    );
 
     if (estadoCarga) estadoCarga.style.display = "none";
     renderReservas();
   } catch (error) {
-    console.error("Error al cargar mis reservas:", error);
+    console.error("Error crítico al cargar reservas:", error);
 
     if (estadoCarga) estadoCarga.style.display = "none";
 
     if (lista) {
       lista.innerHTML = `
         <div class="empty-box">
-          No se pudieron cargar tus reservas. Revisa la consola.
+          Ocurrió un error al cargar tus reservas. Consulta la consola.
         </div>
       `;
     }
