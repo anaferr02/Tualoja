@@ -228,6 +228,50 @@
       box-shadow: 0 0 0 4px rgba(111,106,232,0.12);
     }
 
+    /* Autocompletado para el campo de destino */
+    .destino-container {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .destino-container input {
+      width: 100%;
+    }
+
+    .sugerencias-destino {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid rgba(27,22,127,0.12);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.15);
+      list-style: none;
+      margin: 0;
+      padding: 8px 0;
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+
+    .sugerencias-destino li {
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #1b167f;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s ease;
+    }
+
+    .sugerencias-destino li:hover {
+      background-color: #f4f7ff;
+    }
+
     .btn-header {
       height: 56px;
       padding: 0 26px;
@@ -712,7 +756,8 @@
       .search-box input,
       .search-box select,
       .btn-header,
-      .guests {
+      .guests,
+      .destino-container {
         width: 100%;
         max-width: 100%;
       }
@@ -721,86 +766,86 @@
       .section-title { font-size: 28px; }
       .type-card img { height: 210px; }
     }
+
     .inspiracion{
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 0 16px;
-}
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 16px;
+    }
 
-.inspiracion h2{
-  font-size: 28px;
-  margin-bottom: 22px;
-  color: #1f1f1f;
-}
+    .inspiracion h2{
+      font-size: 28px;
+      margin-bottom: 22px;
+      color: #1f1f1f;
+    }
 
-.grid-alojamientos{
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 22px;
-}
+    .grid-alojamientos{
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+    }
 
-.card-alojamiento{
-  background: #fff;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+    .card-alojamiento{
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-.card-alojamiento:hover{
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-}
+    .card-alojamiento:hover{
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+    }
 
-.card-alojamiento img{
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  display: block;
-}
+    .card-alojamiento img{
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+    }
 
-.card-alojamiento h3{
-  font-size: 18px;
-  margin: 14px 16px 8px;
-  color: #222;
-}
+    .card-alojamiento h3{
+      font-size: 18px;
+      margin: 14px 16px 8px;
+      color: #222;
+    }
 
-.card-alojamiento .precio{
-  font-size: 17px;
-  font-weight: 700;
-  color: #4f46e5;
-  margin: 0 16px 6px;
-}
+    .card-alojamiento .precio{
+      font-size: 17px;
+      font-weight: 700;
+      color: #4f46e5;
+      margin: 0 16px 6px;
+    }
 
-.card-alojamiento .detalle{
-  font-size: 14px;
-  color: #666;
-  margin: 0 16px 8px;
-}
+    .card-alojamiento .detalle{
+      font-size: 14px;
+      color: #666;
+      margin: 0 16px 8px;
+    }
 
-.card-alojamiento .opinion{
-  font-size: 14px;
-  color: #444;
-  font-style: italic;
-  margin: 0 16px 16px;
-}
+    .card-alojamiento .opinion{
+      font-size: 14px;
+      color: #444;
+      font-style: italic;
+      margin: 0 16px 16px;
+    }
 
-@media (max-width: 1024px){
-  .grid-alojamientos{
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+    @media (max-width: 1024px){
+      .grid-alojamientos{
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
 
-@media (max-width: 640px){
-  .grid-alojamientos{
-    grid-template-columns: 1fr;
-  }
+    @media (max-width: 640px){
+      .grid-alojamientos{
+        grid-template-columns: 1fr;
+      }
 
-  .card-alojamiento img{
-    height: 200px;
-  }
- 
-
+      .card-alojamiento img{
+        height: 200px;
+      }
+    }
   </style>
 </head>
 
@@ -855,7 +900,11 @@
 
   <div class="search-wrap">
     <section class="search-box">
-      <input type="text" id="destino" placeholder="¿A dónde querés ir?" />
+      <div class="destino-container">
+        <input type="text" id="destino" placeholder="¿A dónde querés ir?" autocomplete="off" />
+        <ul id="listaDestinos" class="sugerencias-destino"></ul>
+      </div>
+
       <input type="date" id="entrada" />
       <input type="date" id="salida" />
 
@@ -914,6 +963,7 @@
      <button type="button" class="btn-header" onclick="buscar()">Buscar</button>
     </section>
   </div>
+
  <section class="inspiracion">
   <h2>Alojamientos para inspirarte</h2>
 
@@ -954,9 +1004,6 @@
 
 <p id="debugHome" style="text-align:center;color:#b00020;font-weight:700;"></p>
 
- 
-
-
   <section class="section">
     <h2 class="section-title">Qué tipo de alojamientos vas a encontrar</h2>
     <p class="section-sub">
@@ -964,13 +1011,14 @@
     </p>
 
     <div class="types-grid">
-     <article class="type-card">
-  <img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80" alt="Cabaña con parque en Entre Ríos" />
-  <div class="type-body">
-    <h3 class="type-title">Cabañas</h3>
-    <p class="type-text">Opciones ideales para descansar, desconectarte y disfrutar de entornos naturales.</p>
-  </div>
-</article>
+      <article class="type-card">
+        <img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80" alt="Cabaña con parque en Entre Ríos" />
+        <div class="type-body">
+          <h3 class="type-title">Cabañas</h3>
+          <p class="type-text">Opciones ideales para descansar, desconectarte y disfrutar de entornos naturales.</p>
+        </div>
+      </article>
+
       <article class="type-card">
         <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80" alt="Departamentos" />
         <div class="type-body">
@@ -1276,8 +1324,72 @@
     updateSummary();
     renderKidsAges();
   })();
+
+  // Autocompletado dinámico de localidades
+  (function activarAutocompletado() {
+    const localidadesArgentina = [
+      "Bariloche, Río Negro",
+      "Buenos Aires, CABA",
+      "Córdoba, Córdoba",
+      "Colón, Entre Ríos",
+      "Gualeguaychú, Entre Ríos",
+      "Mendoza, Mendoza",
+      "Mar del Plata, Buenos Aires",
+      "Puerto Iguazú, Misiones",
+      "Rosario, Santa Fe",
+      "Salta, Salta",
+      "San Rafael, Mendoza",
+      "Tandil, Buenos Aires",
+      "Ushuaia, Tierra del Fuego",
+      "Villa Carlos Paz, Córdoba",
+      "Villa General Belgrano, Córdoba"
+    ];
+
+    const inputDestino = document.getElementById("destino");
+    const listaSugerencias = document.getElementById("listaDestinos");
+
+    if (!inputDestino || !listaSugerencias) return;
+
+    inputDestino.addEventListener("input", function() {
+      const texto = this.value.toLowerCase().trim();
+      listaSugerencias.innerHTML = "";
+
+      if (texto.length === 0) {
+        listaSugerencias.style.display = "none";
+        return;
+      }
+
+      const coincidencias = localidadesArgentina.filter(loc => 
+        loc.toLowerCase().includes(texto)
+      );
+
+      if (coincidencias.length > 0) {
+        coincidencias.forEach(localidad => {
+          const li = document.createElement("li");
+          li.innerHTML = `📍 ${localidad}`;
+          
+          li.addEventListener("click", function() {
+            inputDestino.value = localidad;
+            listaSugerencias.style.display = "none";
+          });
+
+          listaSugerencias.appendChild(li);
+        });
+        listaSugerencias.style.display = "block";
+      } else {
+        listaSugerencias.style.display = "none";
+      }
+    });
+
+    document.addEventListener("click", function(e) {
+      if (!inputDestino.contains(e.target) && !listaSugerencias.contains(e.target)) {
+        listaSugerencias.style.display = "none";
+      }
+    });
+  })();
 </script>
-  <script>
+
+<script>
 const traducciones = {
   es: {
     publicar: "Publicar alojamiento",
@@ -1330,9 +1442,6 @@ idiomaSelect.addEventListener("change", (e) => {
 
 cambiarIdioma(idiomaSelect.value);
 </script>
-
-
-  
 
 <script type="module" src="script.js"></script>
 
