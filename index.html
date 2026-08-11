@@ -1328,23 +1328,202 @@
   // Autocompletado dinámico de localidades
   (function activarAutocompletado() {
     const localidadesArgentina = [
-      "Bariloche, Río Negro",
-      "Buenos Aires, CABA",
-      "Córdoba, Córdoba",
-      "Colón, Entre Ríos",
-      "Gualeguaychú, Entre Ríos",
-      "Mendoza, Mendoza",
-      "Mar del Plata, Buenos Aires",
-      "Puerto Iguazú, Misiones",
-      "Rosario, Santa Fe",
-      "Salta, Salta",
-      "San Rafael, Mendoza",
-      "Tandil, Buenos Aires",
-      "Ushuaia, Tierra del Fuego",
-      "Villa Carlos Paz, Córdoba",
-      "Villa General Belgrano, Córdoba"
-    ];
+    "Bariloche, Río Negro",
+    "Buenos Aires, CABA",
+    "Córdoba, Córdoba",
+    "Colón, Entre Ríos",
+    "El Calafate, Santa Cruz",
+    "El Chaltén, Santa Cruz",
+    "Gualeguaychú, Entre Ríos",
+    "Mar del Plata, Buenos Aires",
+    "Mendoza, Mendoza",
+    "Perito Moreno, Santa Cruz",
+    "Puerto Iguazú, Misiones",
+    "Puerto Madryn, Chubut",
+    "Rosario, Santa Fe",
+    "Salta, Salta",
+    "San Martín de los Andes, Neuquén",
+    "San Rafael, Mendoza",
+    "Tandil, Buenos Aires",
+    "Ushuaia, Tierra del Fuego",
+    "Villa Carlos Paz, Córdoba",
+    "Villa General Belgrano, Córdoba",
+    "Villa La Angostura, Neuquén",
 
+    // Buenos Aires
+    "Tigre, Buenos Aires",
+    "San Antonio de Areco, Buenos Aires",
+    "Pinamar, Buenos Aires",
+    "Villa Gesell, Buenos Aires",
+    "Cariló, Buenos Aires",
+    "San Bernardo, Buenos Aires",
+    "Mar de las Pampas, Buenos Aires",
+    "Mar Azul, Buenos Aires",
+    "Necochea, Buenos Aires",
+    "Miramar, Buenos Aires",
+    "Chascomús, Buenos Aires",
+    "Sierra de la Ventana, Buenos Aires",
+    "Junín, Buenos Aires",
+
+    // Córdoba
+    "La Cumbrecita, Córdoba",
+    "Nono, Córdoba",
+    "Mina Clavero, Córdoba",
+    "Villa Cura Brochero, Córdoba",
+    "Santa Rosa de Calamuchita, Córdoba",
+    "La Falda, Córdoba",
+    "La Cumbre, Córdoba",
+    "Capilla del Monte, Córdoba",
+    "Villa Giardino, Córdoba",
+    "Cosquín, Córdoba",
+    "Tanti, Córdoba",
+    "Los Reartes, Córdoba",
+    "Potrero de Garay, Córdoba",
+    "Alta Gracia, Córdoba",
+    "Embalse, Córdoba",
+    "Río Ceballos, Córdoba",
+
+    // Entre Ríos
+    "Paraná, Entre Ríos",
+    "Federación, Entre Ríos",
+    "Concordia, Entre Ríos",
+    "Villa Elisa, Entre Ríos",
+    "San José, Entre Ríos",
+    "Victoria, Entre Ríos",
+    "La Paz, Entre Ríos",
+    "Chajarí, Entre Ríos",
+    "Santa Ana, Entre Ríos",
+    "Liebig, Entre Ríos",
+
+    // Mendoza
+    "Potrerillos, Mendoza",
+    "Uspallata, Mendoza",
+    "Cacheuta, Mendoza",
+    "Tunuyán, Mendoza",
+    "Tupungato, Mendoza",
+    "Luján de Cuyo, Mendoza",
+    "Maipú, Mendoza",
+    "Malargüe, Mendoza",
+
+    // Río Negro
+    "El Bolsón, Río Negro",
+    "Las Grutas, Río Negro",
+    "San Antonio Oeste, Río Negro",
+    "Villa Regina, Río Negro",
+    "General Roca, Río Negro",
+
+    // Neuquén
+    "Villa Traful, Neuquén",
+    "Junín de los Andes, Neuquén",
+    "Aluminé, Neuquén",
+    "Caviahue, Neuquén",
+    "Copahue, Neuquén",
+    "San Martín de los Andes, Neuquén",
+    "Zapala, Neuquén",
+
+    // Chubut
+    "Esquel, Chubut",
+    "Trevelin, Chubut",
+    "Lago Puelo, Chubut",
+    "El Hoyo, Chubut",
+    "Epuyén, Chubut",
+    "Rada Tilly, Chubut",
+
+    // Santa Cruz
+    "Río Gallegos, Santa Cruz",
+    "El Calafate, Santa Cruz",
+    "El Chaltén, Santa Cruz",
+    "Puerto Deseado, Santa Cruz",
+    "Puerto San Julián, Santa Cruz",
+    "Los Antiguos, Santa Cruz",
+    "Gobernador Gregores, Santa Cruz",
+
+    // Tierra del Fuego
+    "Tolhuin, Tierra del Fuego",
+    "Río Grande, Tierra del Fuego",
+
+    // Misiones
+    "Posadas, Misiones",
+    "San Ignacio, Misiones",
+    "Eldorado, Misiones",
+    "Oberá, Misiones",
+    "Puerto Rico, Misiones",
+
+    // Salta
+    "Cafayate, Salta",
+    "Cachi, Salta",
+    "San Antonio de los Cobres, Salta",
+    "La Caldera, Salta",
+    "San Lorenzo, Salta",
+
+    // Jujuy
+    "San Salvador de Jujuy, Jujuy",
+    "Purmamarca, Jujuy",
+    "Tilcara, Jujuy",
+    "Humahuaca, Jujuy",
+    "Maimará, Jujuy",
+
+    // Tucumán
+    "San Miguel de Tucumán, Tucumán",
+    "Tafí del Valle, Tucumán",
+    "San Javier, Tucumán",
+
+    // Catamarca
+    "San Fernando del Valle de Catamarca, Catamarca",
+    "Fiambalá, Catamarca",
+    "Belén, Catamarca",
+    "El Rodeo, Catamarca",
+
+    // La Rioja
+    "La Rioja, La Rioja",
+    "Chilecito, La Rioja",
+    "Villa Unión, La Rioja",
+    "Famatina, La Rioja",
+
+    // San Juan
+    "San Juan, San Juan",
+    "Barreal, San Juan",
+    "Rodeo, San Juan",
+    "Valle Fértil, San Juan",
+
+    // Santa Fe
+    "Santa Fe, Santa Fe",
+    "Rafaela, Santa Fe",
+    "San Lorenzo, Santa Fe",
+    "Reconquista, Santa Fe",
+
+    // Corrientes
+    "Corrientes, Corrientes",
+    "Paso de la Patria, Corrientes",
+    "Ituzaingó, Corrientes",
+    "Mercedes, Corrientes",
+    "Colonia Carlos Pellegrini, Corrientes",
+
+    // Chaco
+    "Resistencia, Chaco",
+    "Villa Ángela, Chaco",
+
+    // Formosa
+    "Formosa, Formosa",
+    "Clorinda, Formosa",
+
+    // La Pampa
+    "Santa Rosa, La Pampa",
+    "General Pico, La Pampa",
+
+    // San Luis
+    "San Luis, San Luis",
+    "Merlo, San Luis",
+    "Potrero de los Funes, San Luis",
+    "Villa de la Quebrada, San Luis",
+
+    // Santiago del Estero
+    "Santiago del Estero, Santiago del Estero",
+    "Termas de Río Hondo, Santiago del Estero",
+
+    // Tucumán
+    "Amaicha del Valle, Tucumán"
+];
     const inputDestino = document.getElementById("destino");
     const listaSugerencias = document.getElementById("listaDestinos");
 
