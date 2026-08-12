@@ -1510,22 +1510,31 @@
     "Santiago del Estero, Santiago del Estero",
     "Termas de Río Hondo, Santiago del Estero",
 ];
-    const inputDestino = document.getElementById("destino");
+   const inputDestino = document.getElementById("destino");
     const listaSugerencias = document.getElementById("listaDestinos");
 
     if (!inputDestino || !listaSugerencias) return;
 
+    // Función auxiliar para quitar acentos y pasar a minúsculas
+    function limpiarTexto(texto) {
+      return texto
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, ""); // Remueve marcas diacríticas (acentos)
+    }
+
     inputDestino.addEventListener("input", function() {
-      const texto = this.value.toLowerCase().trim();
+      const textoBuscado = limpiarTexto(this.value.trim());
       listaSugerencias.innerHTML = "";
 
-      if (texto.length === 0) {
+      if (textoBuscado.length === 0) {
         listaSugerencias.style.display = "none";
         return;
       }
 
+      // Compara el texto limpio de la búsqueda contra el texto limpio de cada localidad
       const coincidencias = localidadesArgentina.filter(loc => 
-        loc.toLowerCase().includes(texto)
+        limpiarTexto(loc).includes(textoBuscado)
       );
 
       if (coincidencias.length > 0) {
