@@ -286,55 +286,20 @@
     </div>
   </footer>
 
-  <script type="module">
-    import { register, loginWithGoogle } from "./public/js/auth.js";
+<script type="module">
+    import { register, loginWithGoogle } from "./registro.js"; // Asegurate que la ruta a registro.js sea la correcta
 
     const form = document.getElementById("registerForm");
     const passwordInput = document.getElementById("password");
     const password2Input = document.getElementById("password2");
-    const passwordStatus = document.getElementById("passwordStatus");
-    const toggleButtons = document.querySelectorAll(".toggle-password");
     const googleBtn = document.getElementById("googleBtn");
 
-    function validarPassword(password) {
-      const regex = /^(?=.*[A-Z])(?=.*[^\w\s]).{8,}$/;
-      return regex.test(password);
+    function validarPassword(pwd) {
+      const tiene8 = pwd.length >= 8;
+      const tieneMayus = /[A-Z]/.test(pwd);
+      const tieneSigno = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
+      return tiene8 && tieneMayus && tieneSigno;
     }
-
-    function actualizarEstadoPassword() {
-      const password = passwordInput.value;
-
-      if (!password) {
-        passwordStatus.textContent = "";
-        passwordStatus.className = "password-status";
-        return;
-      }
-
-      if (validarPassword(password)) {
-        passwordStatus.textContent = "Contraseña segura ✅";
-        passwordStatus.className = "password-status ok";
-      } else {
-        passwordStatus.textContent = "Debe tener mínimo 8 caracteres, 1 mayúscula y 1 signo ❌";
-        passwordStatus.className = "password-status error";
-      }
-    }
-
-    toggleButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const targetId = btn.getAttribute("data-target");
-        const input = document.getElementById(targetId);
-
-        if (input.type === "password") {
-          input.type = "text";
-          btn.textContent = "🙈";
-        } else {
-          input.type = "password";
-          btn.textContent = "👁️";
-        }
-      });
-    });
-
-    passwordInput.addEventListener("input", actualizarEstadoPassword);
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -345,7 +310,7 @@
       const password2 = password2Input.value;
 
       if (!validarPassword(password)) {
-        alert("La contraseña debe tener mínimo 8 caracteres, al menos 1 mayúscula y 1 signo.");
+        alert("La contraseña debe tener mínimo 8 caracteres, al menos 1 mayúscula y 1 signo/símbolo.");
         passwordInput.focus();
         return;
       }
@@ -355,6 +320,10 @@
         password2Input.focus();
         return;
       }
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Creando cuenta...";
 
       try {
         await register(nombre, email, password);
@@ -368,8 +337,23 @@
           window.location.href = "publicar.html";
         }
       } catch (error) {
-        console.error(error);
-        alert("No se pudo crear la cuenta.");
+        console.error("Error al registrar:", error);
+
+        // Capturamos el error exacto de Firebase
+        if (error.code === 'auth/email-already-in-use') {
+          alert("El correo electrónico ya está registrado. Por favor, iniciá sesión.");
+        } else if (error.code === 'auth/invalid-email') {
+          alert("El formato del correo electrónico no es válido.");
+        } else if (error.code === 'auth/weak-password') {
+          alert("La contraseña debe tener al menos 6 caracteres.");
+        } else if (error.code === 'auth/unauthorized-domain') {
+          alert("Error de configuración: Este dominio (tualoja.com) no está autorizado en la consola de Firebase.");
+        } else {
+          alert("No se pudo crear la cuenta. Motivo: " + (error.message || "Error desconocido"));
+        }
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Crear cuenta y continuar";
       }
     });
 
@@ -387,7 +371,7 @@
         }
       } catch (error) {
         console.error(error);
-        alert("No se pudo iniciar con Google.");
+        alert("No se pudo iniciar con Google: " + error.message);
       }
     });
   </script>
