@@ -1543,9 +1543,10 @@
           li.innerHTML = `📍 ${localidad}`;
           
           li.addEventListener("click", function() {
-            inputDestino.value = localidad;
-            listaSugerencias.style.display = "none";
-          });
+  // Guarda solo el nombre del municipio/ciudad sin la provincia
+  inputDestino.value = localidad.split(",")[0].trim(); 
+  listaSugerencias.style.display = "none";
+});
 
           listaSugerencias.appendChild(li);
         });
