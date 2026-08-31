@@ -965,40 +965,17 @@
   </div>
 
  <section class="inspiracion">
-  <h2>Alojamientos para inspirarte</h2>
-
-  <div class="grid-alojamientos">
-    <div class="card-alojamiento">
-      <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511" alt="Depto luminoso en Córdoba" />
-      <h3>Depto luminoso en Córdoba</h3>
-      <p class="precio">$38.000 / noche</p>
-      <p class="detalle">4 personas · WiFi · Centro</p>
-      <p class="opinion">"Muy buena ubicación y todo prolijo."</p>
+ <section class="inspiracion-wrap" style="position: relative; max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+  <h2 style="color: #1b167f; margin-bottom: 20px;">Alojamientos para inspirarte</h2>
+  
+  <div class="carrusel-container" style="position: relative; display: flex; align-items: center;">
+    <button id="btnPrev" class="carrusel-btn" style="position: absolute; left: -15px; z-index: 10; background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">‹</button>
+    
+    <div id="alojamientosInspiracion" class="grid-alojamientos" style="display: flex; gap: 20px; overflow-x: auto; scroll-behavior: smooth; padding: 10px 0; width: 100%; scrollbar-width: none;">
+      <!-- Las tarjetas dinámicas se cargarán acá -->
     </div>
-
-    <div class="card-alojamiento">
-      <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80" alt="Cabaña en complejo con parque">
-      <h3>Cabaña en Entre Ríos</h3>
-      <p class="precio">$52.000 / noche</p>
-      <p class="detalle">3 personas · Patio · Naturaleza</p>
-      <p class="opinion">"Ideal para una escapada tranquila."</p>
-    </div>
-
-    <div class="card-alojamiento">
-      <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267" alt="Monoambiente moderno en Rosario" />
-      <h3>Monoambiente moderno en Rosario</h3>
-      <p class="precio">$34.000 / noche</p>
-      <p class="detalle">2 personas · Moderno · Equipado</p>
-      <p class="opinion">"Muy cómodo y bien equipado."</p>
-    </div>
-
-    <div class="card-alojamiento">
-      <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6" alt="Casa familiar en Carlos Paz" />
-      <h3>Casa familiar en Carlos Paz</h3>
-      <p class="precio">$68.000 / noche</p>
-      <p class="detalle">6 personas · Pileta · Jardín</p>
-      <p class="opinion">"Perfecto para ir en familia."</p>
-    </div>
+    
+    <button id="btnNext" class="carrusel-btn" style="position: absolute; right: -15px; z-index: 10; background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">›</button>
   </div>
 </section>
 
